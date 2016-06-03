@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 	@Override
 	public Map<String, Object> getVariables(final Object parent) {
-		Map<String, Object> variables = new HashMap<String, Object>();
+		Map<String, Object> variables = new LinkedHashMap<String, Object>();
 
 		if ((parent != null) && (!ScriptDebugValue.isSimpleType(parent))) {
 			if (parent.getClass().isArray()) {
