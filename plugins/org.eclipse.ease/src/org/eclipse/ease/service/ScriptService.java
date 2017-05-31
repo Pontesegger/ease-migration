@@ -190,6 +190,10 @@ public class ScriptService implements IScriptService, BundleListener {
 
 	@Override
 	public ScriptType getScriptType(final String location) {
+		if (location == null) {
+			return null;
+		}
+
 		final Object resource = ResourceTools.getResource(location);
 		try {
 			if (resource instanceof IFile) {
