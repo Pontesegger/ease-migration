@@ -57,5 +57,14 @@
          </action>
       </viewContribution>
    </extension>
+   <extension
+         id="org.eclipse.ease.lang.python.PythonCompletionProvider"
+         name="Python CompletionProvider"
+         point="org.eclipse.ease.ui.codeCompletionProvider">
+      <codeCompletionProvider
+            class="org.eclipse.ease.lang.python.ui.completion.PythonCompletionProviderWrapper"
+            scriptType="Python">
+      </codeCompletionProvider>
+   </extension>
 
 </plugin>

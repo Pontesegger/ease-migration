@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.lang.python.PythonHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
+import org.osgi.framework.Bundle;
 
 import py4j.ClientServer;
 import py4j.ClientServer.ClientServerBuilder;
@@ -150,6 +152,19 @@ public class Py4jScriptEngine extends AbstractScriptEngine {
 			pythonPath = getPy4jPythonSrc().toString();
 		}
 
+		// Add EASE Python directory to python path
+		final Bundle bundle = Platform.getBundle("org.eclipse.ease.lang.python");
+		try {
+			URL url = bundle.getEntry("pysrc");
+			url = FileLocator.toFileURL(url);
+			final URI uri = new URI(url.getProtocol(), url.getPath(), null);
+			pythonPath += pathSeparator + new File(uri).getAbsolutePath();
+		} catch (final IllegalStateException e) {
+			Logger.error(Activator.PLUGIN_ID, "Cannot get entry pysrc because the plugin has not been initialized properly.", e);
+		} catch (final IOException | URISyntaxException e) {
+			Logger.error(Activator.PLUGIN_ID, "Cannot append additional Python modules to search path.", e);
+		}
+
 		pb.environment().put("PYTHONPATH", pythonPath);
 
 		String interpreter = Activator.getDefault().getPreferenceStore().getString(Py4JScriptEnginePrefConstants.INTERPRETER);
@@ -158,7 +173,9 @@ public class Py4jScriptEngine extends AbstractScriptEngine {
 
 		pb.command().add(interpreter);
 		pb.command().add("-u");
-		pb.command().add(getPy4jEaseMainPy().toString());
+		pb.command().add(
+
+				getPy4jEaseMainPy().toString());
 		pb.command().add(Integer.toString(javaListeningPort));
 
 		final Process start = pb.start();

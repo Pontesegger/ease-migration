@@ -154,4 +154,19 @@ public class ScriptCompletionProposal
 	public String getDescription() {
 		return getAdditionalProposalInfo();
 	}
+
+	// ------------------------------------------------------------------
+	// Custom methods for script completion in EASE
+	// ------------------------------------------------------------------
+	public String getReplacementString() {
+		return fReplacementString;
+	}
+
+	public int getCursorStartPosition() {
+		return fContext.getOriginalCode().length() - fContext.getFilter().length();
+	}
+
+	public IHelpResolver getHelpResolver() {
+		return fHelpResolver;
+	}
 }
