@@ -18,6 +18,7 @@ from py4j.java_gateway import JavaObject
 from py4j.protocol import Py4JJavaError, get_command_part
 import sys
 import threading
+import __main__
 
 # To ease some debugging of the py4j engine itself it is useful to turn logging on,
 # uncomment the following lines for one way to do that
@@ -109,7 +110,7 @@ class ScriptEngineExecute(object):
 
     def set_gateway(self, gateway):
         self.gateway = gateway
-        self.locals = dict()
+        self.locals = __main__.__dict__
         self.interp = EaseInteractiveConsole(self, self.locals)
         # Provide most common top level pacakage names in the namespace
         # so that code like "java.lang.String()" can work.
