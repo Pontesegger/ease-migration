@@ -60,13 +60,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 		// set tree input
 		if (fModulesTable != null) {
 			fModulesTable.setInput(fEngine);
-			Display.getDefault().asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					fModulesTable.refresh();
-				}
-			});
+			Display.getDefault().asyncExec(() -> fModulesTable.refresh());
 		}
 	}
 
@@ -81,26 +75,22 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		fModulesTable.setContentProvider(new IStructuredContentProvider() {
-
-			@Override
-			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof IScriptEngine) {
-					final IEnvironment environment = AbstractEnvironment.getEnvironment((IScriptEngine) inputElement);
-					if (environment != null) {
-						final List<ModuleDefinition> loadedModules = new ArrayList<>();
-						for (final Object element : environment.getModules()) {
-							final ModuleDefinition module = getDefinition(element);
-							if (module != null)
-								loadedModules.add(module);
-						}
-
-						return loadedModules.toArray(new ModuleDefinition[loadedModules.size()]);
+		fModulesTable.setContentProvider((IStructuredContentProvider) inputElement -> {
+			if (inputElement instanceof IScriptEngine) {
+				final IEnvironment environment = AbstractEnvironment.getEnvironment((IScriptEngine) inputElement);
+				if (environment != null) {
+					final List<ModuleDefinition> loadedModules = new ArrayList<>();
+					for (final Object element : new ArrayList<>(environment.getModules())) {
+						final ModuleDefinition module = getDefinition(element);
+						if (module != null)
+							loadedModules.add(module);
 					}
-				}
 
-				return new Object[0];
+					return loadedModules.toArray(new ModuleDefinition[loadedModules.size()]);
+				}
 			}
+
+			return new Object[0];
 		});
 
 		final TableViewerColumn tableViewerColumn = new TableViewerColumn(fModulesTable, SWT.NONE);
@@ -168,13 +158,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 		switch (status) {
 		case IExecutionListener.SCRIPT_END:
 		case IExecutionListener.SCRIPT_INJECTION_END:
-			Display.getDefault().asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					fModulesTable.refresh();
-				}
-			});
+			Display.getDefault().asyncExec(() -> fModulesTable.refresh());
 			break;
 
 		case IExecutionListener.ENGINE_END:
