@@ -24,3 +24,4 @@ Export-Package: org.eclipse.ease.lang.python,
  org.eclipse.ease.lang.python.preferences,
  org.eclipse.ease.lang.python.ui.completion
 Bundle-ClassPath: .
+Eclipse-BundleShape: dir
