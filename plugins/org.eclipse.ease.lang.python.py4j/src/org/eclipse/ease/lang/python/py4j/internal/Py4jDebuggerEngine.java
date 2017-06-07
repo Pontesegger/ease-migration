@@ -41,10 +41,10 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 
 		// in case we were called using "Run as"
 		if (fDebugger != null) {
-			// load python part of debugger
-			final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/edb.py");
-
 			try {
+				// load python part of debugger
+				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/edb.py");
+
 				internalSetVariable(PythonDebugger.PYTHON_DEBUGGER_VARIABLE, fDebugger);
 				super.internalExecute(new Script("Load Python debugger", stream), null);
 

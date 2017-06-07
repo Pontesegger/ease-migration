@@ -55,9 +55,9 @@ public class PythonCompletionProviderWrapper implements ICompletionProvider {
 		final IScriptEngine engine = context.getScriptEngine();
 		if (engine != null) {
 			if (fPythonProvider == null) {
-				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/autocomplete.py");
-
 				try {
+					final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/autocomplete.py");
+
 					// Inject variable first, then instantiate rest via script
 					engine.setVariable("_pyease_jedi_completion_provider_wrapper", this);
 					engine.inject(stream);
