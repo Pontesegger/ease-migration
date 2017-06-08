@@ -4,10 +4,6 @@
    <extension
          point="org.eclipse.help.toc">
       <toc
-            file="help/scripting_book.xml"
-            primary="true">
-      </toc>
-      <toc
             file="help/main.xml"
             primary="true">
       </toc>
