@@ -13,7 +13,6 @@ package org.eclipse.ease.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,13 +130,7 @@ public class ScriptService implements IScriptService, BundleListener {
 		}
 
 		// sort by priority
-		Collections.sort(result, new Comparator<EngineDescription>() {
-
-			@Override
-			public int compare(final EngineDescription o1, final EngineDescription o2) {
-				return o2.getPriority() - o1.getPriority();
-			}
-		});
+		Collections.sort(result, (o1, o2) -> o2.getPriority() - o1.getPriority());
 
 		return result;
 	}
@@ -216,26 +209,28 @@ public class ScriptService implements IScriptService, BundleListener {
 		}
 
 		// try to resolve by extension
-		final int pos = location.lastIndexOf('.');
-		if (pos != -1) {
-			final String extension = location.substring(pos + 1);
+		if (location != null) {
+			final int pos = location.lastIndexOf('.');
+			if (pos != -1) {
+				final String extension = location.substring(pos + 1);
 
-			for (final ScriptType scriptType : getAvailableScriptTypes().values()) {
-				if (scriptType.getDefaultExtension().equalsIgnoreCase(extension))
-					return scriptType;
-			}
-
-			// not found, verify content types
-			final IContentTypeManager contentTypeManager = Platform.getContentTypeManager();
-			final IContentType[] contentTypes = contentTypeManager.findContentTypesFor("foo." + extension);
-			if (contentTypes != null) {
 				for (final ScriptType scriptType : getAvailableScriptTypes().values()) {
+					if (scriptType.getDefaultExtension().equalsIgnoreCase(extension))
+						return scriptType;
+				}
 
-					// now lets see if one of the content types matches
-					for (final String contentTypeIdentifier : scriptType.getContentTypes()) {
-						for (final IContentType candidate : contentTypes) {
-							if (candidate.getId().equals(contentTypeIdentifier))
-								return scriptType;
+				// not found, verify content types
+				final IContentTypeManager contentTypeManager = Platform.getContentTypeManager();
+				final IContentType[] contentTypes = contentTypeManager.findContentTypesFor("foo." + extension);
+				if (contentTypes != null) {
+					for (final ScriptType scriptType : getAvailableScriptTypes().values()) {
+
+						// now lets see if one of the content types matches
+						for (final String contentTypeIdentifier : scriptType.getContentTypes()) {
+							for (final IContentType candidate : contentTypes) {
+								if (candidate.getId().equals(contentTypeIdentifier))
+									return scriptType;
+							}
 						}
 					}
 				}
