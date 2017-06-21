@@ -41,4 +41,9 @@ public class RhinoDebugTarget extends ScriptDebugTarget {
 	public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
 		return true;
 	}
+
+	@Override
+	public String getModelIdentifier() {
+		return "org.eclipse.ease.debugModelPresentation.rhino";
+	}
 }
