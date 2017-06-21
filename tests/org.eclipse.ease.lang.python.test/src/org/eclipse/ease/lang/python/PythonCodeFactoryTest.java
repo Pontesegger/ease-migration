@@ -26,9 +26,8 @@ public class PythonCodeFactoryTest {
 
 	@Test
 	public void testCommentCreator() {
-		assertEquals("# Comment", fFactory.createCommentedString("Comment"));
-		assertEquals(String.format("# Multi%n# Line%n# Comment"), fFactory.createCommentedString("Multi\nLine\nComment"));
+		assertEquals("# Comment", fFactory.createCommentedString("Comment", false));
+		assertEquals(String.format("# Multi%n# Line%n# Comment"), fFactory.createCommentedString("Multi\nLine\nComment", false));
 		assertEquals(String.format("\"\"\"Multi%nLine%nComment\"\"\""), fFactory.createCommentedString("Multi\nLine\nComment", true));
 	}
-
 }

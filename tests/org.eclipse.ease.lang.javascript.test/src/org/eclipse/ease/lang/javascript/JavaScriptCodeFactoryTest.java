@@ -26,8 +26,8 @@ public class JavaScriptCodeFactoryTest {
 
 	@Test
 	public void testCommentCreator() {
-		assertEquals("// Comment", fFactory.createCommentedString("Comment"));
-		assertEquals(String.format("// Multi%n// Line%n// Comment"), fFactory.createCommentedString("Multi\nLine\nComment"));
+		assertEquals("// Comment", fFactory.createCommentedString("Comment", false));
+		assertEquals(String.format("// Multi%n// Line%n// Comment"), fFactory.createCommentedString("Multi\nLine\nComment", false));
 		assertEquals(String.format("/**%n * Multi%n * Line%n * Comment%n */%n"), fFactory.createCommentedString("Multi\nLine\nComment", true));
 	}
 }

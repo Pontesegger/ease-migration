@@ -43,19 +43,9 @@ public class EnvironmentModule extends AbstractEnvironment {
 
 	private static final Pattern VALID_TOPICS_PATTERN = Pattern.compile("[\\w ]+(?:\\(\\))?");
 
-	public EnvironmentModule() {
-	}
-
-	/**
-	 * Creates wrapper functions for a given java instance. Searches for members and methods annotated with {@link WrapToScript} and creates wrapping code in
-	 * the target script language. A method named &lt;instance&gt;.myMethod() will be made available by calling myMethod().
-	 *
-	 * @param toBeWrapped
-	 *            instance to be wrapped
-	 */
 	@Override
 	@WrapToScript
-	public void wrap(final Object toBeWrapped) {
+	public Object wrap(final Object toBeWrapped, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
 		// register new variable in script engine
 		final String identifier = getScriptEngine().getSaveVariableName(getWrappedVariableName(toBeWrapped));
 
@@ -65,10 +55,12 @@ public class EnvironmentModule extends AbstractEnvironment {
 		Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "wrapping object: " + toBeWrapped.toString());
 
 		// create function wrappers
-		createWrappers(toBeWrapped, identifier, reloaded);
+		final Object result = createWrappers(toBeWrapped, identifier, reloaded, useCustomNamespace);
 
 		// notify listeners
 		fireModuleEvent(toBeWrapped, reloaded ? IModuleListener.RELOADED : IModuleListener.LOADED);
+
+		return result;
 	}
 
 	public static final String getWrappedVariableName(final Object toBeWrapped) {
@@ -76,60 +68,31 @@ public class EnvironmentModule extends AbstractEnvironment {
 	}
 
 	/**
-	 * Create JavaScript wrapper functions for autoload methods. Adds code of following style: <code>function {name} (a, b, c, ...) {
-	 * __module.{name}(a, b, c, ...);
-	 * }</code>
+	 * Create script wrapper functions for the given instance.
 	 *
 	 * @param instance
 	 *            module instance to create wrappers for
+	 * @param identifier
+	 *            identifier to be used to store object in script engine scope
 	 * @param reload
 	 *            flag indicating that the module was already loaded
+	 * @param useCustomNamespace
+	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to the return value only
+	 * @return java instance or wrapper object
 	 */
-	private void createWrappers(final Object instance, final String identifier, final boolean reload) {
-		// script code to inject
-		final StringBuilder scriptCode = new StringBuilder();
-
+	private Object createWrappers(final Object instance, final String identifier, final boolean reload, boolean useCustomNamespace) {
 		final ICodeFactory codeFactory = getCodeFactory();
 		if (null == codeFactory)
-			return;
+			return null;
 
-		// create wrappers for methods
-		for (final Method method : ModuleHelper.getMethods(instance.getClass())) {
-			final String code = codeFactory.createFunctionWrapper(this, identifier, method);
+		final String wrapperCode = codeFactory.createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
 
-			if ((code != null) && !code.isEmpty()) {
-				scriptCode.append(code);
-				scriptCode.append('\n');
-			}
-		}
+		if (useCustomNamespace)
+			return getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode));
+		else
+			getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode));
 
-		// create wrappers for final fields
-		if (!reload) {
-			// this is only done upon initial loading as we try to create constants here
-			for (final Field field : ModuleHelper.getFields(instance.getClass())) {
-				try {
-
-					// only wrap if field is not already declared
-					if (!getScriptEngine().hasVariable(codeFactory.getSaveVariableName(field.getName()))) {
-						final String code = codeFactory.createFinalFieldWrapper(this, identifier, field);
-
-						if ((code != null) && !code.isEmpty()) {
-							scriptCode.append(code);
-							scriptCode.append('\n');
-						}
-					} else {
-						Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "Skipped wrapping of field \"" + field.getName() + "\" (module \""
-								+ instance.getClass().getName() + "\") as variable is already declared.");
-					}
-
-				} catch (final IllegalArgumentException e) {
-					Logger.error(Activator.PLUGIN_ID, "Could not wrap field \"" + field.getName() + " \" of module \"" + instance.getClass() + "\".", e);
-				}
-			}
-		}
-
-		// execute code
-		getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", scriptCode));
+		return instance;
 	}
 
 	/**
@@ -278,13 +241,7 @@ public class EnvironmentModule extends AbstractEnvironment {
 								// method found, display help
 
 								final String link = definition.getHelpLocation(method.getName());
-								Display.getDefault().asyncExec(new Runnable() {
-
-									@Override
-									public void run() {
-										PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(link);
-									}
-								});
+								Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(link));
 
 								// done
 								return;
@@ -296,13 +253,7 @@ public class EnvironmentModule extends AbstractEnvironment {
 								// field found, display help
 
 								final String link = definition.getHelpLocation(field.getName());
-								Display.getDefault().asyncExec(new Runnable() {
-
-									@Override
-									public void run() {
-										PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(link);
-									}
-								});
+								Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(link));
 
 								// done
 								return;
@@ -312,22 +263,10 @@ public class EnvironmentModule extends AbstractEnvironment {
 				}
 
 				// nothing found, start a search in help
-				Display.getDefault().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						PlatformUI.getWorkbench().getHelpSystem().search(topic);
-					}
-				});
+				Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getHelpSystem().search(topic));
 			} else {
 				// no topic provided, show main help page
-				Display.getDefault().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						PlatformUI.getWorkbench().getHelpSystem().displayHelp();
-					}
-				});
+				Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getHelpSystem().displayHelp());
 			}
 		}
 	}

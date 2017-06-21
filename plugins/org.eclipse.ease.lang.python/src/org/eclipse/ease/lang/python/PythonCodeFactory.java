@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +140,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		// build parameter string
 		final StringBuilder methodSignature = new StringBuilder();
 		final StringBuilder methodCall = new StringBuilder();
+
 		for (final Parameter parameter : parameters) {
 			methodSignature.append(", ").append(parameter.getName());
 			methodCall.append(", ").append(parameter.getName());
@@ -212,11 +212,6 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 	public boolean isValidMethodName(final String methodName) {
 		return PythonHelper.isSaveName(methodName) && !RESERVED_KEYWORDS.contains(methodName);
-	}
-
-	@Override
-	public String createFinalFieldWrapper(final IEnvironment environment, final String moduleVariable, final Field field) {
-		return PythonHelper.getSaveName(field.getName()) + " = " + moduleVariable + '.' + field.getName() + '\n';
 	}
 
 	@Override

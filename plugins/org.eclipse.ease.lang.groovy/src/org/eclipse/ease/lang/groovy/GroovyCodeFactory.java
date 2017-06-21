@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.groovy;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,20 +112,6 @@ public class GroovyCodeFactory extends org.eclipse.ease.AbstractCodeFactory {
 		code.append(")");
 
 		return code.toString();
-	}
-
-	@Override
-	public String createFinalFieldWrapper(final IEnvironment environment, final String moduleVariable, final Field field) {
-		final StringBuilder groovyCode = new StringBuilder();
-
-		groovyCode.append(getSaveVariableName(field.getName()));
-		groovyCode.append(" = ");
-		groovyCode.append(moduleVariable);
-		groovyCode.append(".");
-		groovyCode.append(field.getName());
-		groovyCode.append(";\n");
-
-		return groovyCode.toString();
 	}
 
 	@Override

@@ -13,8 +13,10 @@ package org.eclipse.ease.modules;
 public class NativeEnvironment extends AbstractEnvironment implements IEnvironment {
 
 	@Override
-	public void wrap(final Object module) {
+	public Object wrap(Object toBeWrapped, boolean useCustomNamespace) {
 		// notify listeners
-		fireModuleEvent(module, IModuleListener.LOADED);
+		fireModuleEvent(toBeWrapped, IModuleListener.LOADED);
+
+		return toBeWrapped;
 	}
 }

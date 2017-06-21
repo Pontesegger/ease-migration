@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ease.AbstractCodeFactory;
+import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.IScriptFunctionModifier;
@@ -100,7 +101,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	@Override
 	public String classInstantiation(final Class<?> clazz, final String[] parameters) {
 		final StringBuilder code = new StringBuilder();
-		code.append("new Packages.").append(clazz.getName()).append("(");
+		code.append("new Packages.").append(clazz.getName()).append('(');
 
 		if (parameters != null) {
 			for (final String parameter : parameters)
@@ -110,69 +111,9 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 				code.delete(code.length() - 2, code.length());
 		}
 
-		code.append(")");
+		code.append(')');
 
 		return code.toString();
-	}
-
-	@Override
-	public String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
-
-		final StringBuilder javaScriptCode = new StringBuilder();
-
-		// parse parameters
-		final List<Parameter> parameters = ModuleHelper.getParameters(method);
-
-		// build parameter string
-		final StringBuilder parameterList = new StringBuilder();
-		for (final Parameter parameter : parameters)
-			parameterList.append(", ").append(parameter.getName());
-
-		if (parameterList.length() > 2)
-			parameterList.delete(0, 2);
-
-		final StringBuilder body = new StringBuilder();
-		// insert parameter checks
-		body.append(verifyParameters(parameters));
-
-		// insert hooked pre execution code
-		body.append(getPreExecutionCode(environment, method));
-
-		// insert deprecation warnings
-
-		if (ModuleHelper.isDeprecated(method))
-			body.append("\tprintError('" + method.getName() + "() is deprecated. Consider updating your code.');\n");
-
-		// insert method call
-		body.append("\tvar ").append(IScriptFunctionModifier.RESULT_NAME).append(" = ").append(moduleVariable).append('.').append(method.getName()).append('(');
-		body.append(parameterList);
-		body.append(");\n");
-
-		// insert hooked post execution code
-		body.append(getPostExecutionCode(environment, method));
-
-		// insert return statement
-		body.append("\treturn ").append(IScriptFunctionModifier.RESULT_NAME).append(";\n");
-
-		// build function declarations
-		for (final String name : getMethodNames(method)) {
-			if (!isValidMethodName(name)) {
-				Logger.error(PluginConstants.PLUGIN_ID,
-						"The method name \"" + name + "\" from the module \"" + moduleVariable + "\" can not be wrapped because it's name is reserved");
-
-			} else if (!name.isEmpty()) {
-				javaScriptCode.append("function ").append(name).append("(").append(parameterList).append(") {\n");
-				javaScriptCode.append(body);
-				javaScriptCode.append("}\n");
-			}
-		}
-
-		return javaScriptCode.toString();
-	}
-
-	@Override
-	public String createFinalFieldWrapper(final IEnvironment environment, final String moduleVariable, final Field field) {
-		return "var " + JavaScriptHelper.getSaveName(field.getName()) + " = " + moduleVariable + "." + field.getName() + ";\n";
 	}
 
 	@Override
@@ -185,20 +126,20 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		return JavaScriptHelper.getSaveName(variableName);
 	}
 
-	private StringBuilder verifyParameters(final List<Parameter> parameters) {
+	private StringBuilder verifyParameters(final List<Parameter> parameters, String indent) {
 		final StringBuilder data = new StringBuilder();
 
 		if (!parameters.isEmpty()) {
 			final Parameter parameter = parameters.get(parameters.size() - 1);
-			data.append("\tif (typeof " + parameter.getName() + " === \"undefined\") {\n");
+			data.append(indent).append("if (typeof " + parameter.getName() + " === \"undefined\") {").append(StringTools.LINE_DELIMITER);
 			if (parameter.isOptional()) {
-				data.append("\t\t" + parameter.getName() + " = " + getDefaultValue(parameter) + ";\n");
+				data.append(indent).append("\t" + parameter.getName() + " = " + getDefaultValue(parameter) + ';').append(StringTools.LINE_DELIMITER);
 			} else {
-				data.append("\t\tthrow new java.lang.RuntimeException('Parameter " + parameter.getName() + " is not optional');\n");
+				data.append(indent).append("\tthrow 'Parameter <" + parameter.getName() + "> is not optional';").append(StringTools.LINE_DELIMITER);
 
 			}
-			data.append(verifyParameters(parameters.subList(0, parameters.size() - 1)));
-			data.append("\t}\n");
+			data.append(verifyParameters(parameters.subList(0, parameters.size() - 1), indent + "\t"));
+			data.append(indent).append('}').append(StringTools.LINE_DELIMITER);
 		}
 
 		return data;
@@ -207,6 +148,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	@Override
 	public String createCommentedString(String comment, boolean addBlockComment) {
 		if (addBlockComment) {
+			// beautify block comments by having '*' characters in each line
 			final StringBuilder builder = new StringBuilder();
 			builder.append("/**").append(StringTools.LINE_DELIMITER);
 			for (final String line : comment.split("\\r?\\n"))
@@ -218,5 +160,124 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		} else
 			return super.createCommentedString(comment, addBlockComment);
+	}
+
+	@Override
+	public String createWrapper(IEnvironment environment, Object instance, String identifier, boolean customNamespace, IScriptEngine engine) {
+
+		if (customNamespace)
+			// create object wrapper
+			return createObjectWrapper(environment, instance, identifier);
+
+		else
+			return super.createWrapper(environment, instance, identifier, customNamespace, engine);
+	}
+
+	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
+		final StringBuilder scriptCode = new StringBuilder();
+
+		scriptCode.append("__EASE_temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
+		scriptCode.append("\tjavaInstance: ").append(identifier).append(',').append(StringTools.LINE_DELIMITER);
+
+		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// field definitions").append(StringTools.LINE_DELIMITER);
+		for (final Field field : ModuleHelper.getFields(instance.getClass())) {
+			scriptCode.append('\t').append(field.getName()).append(": ").append(identifier).append('.').append(field.getName()).append(',')
+					.append(StringTools.LINE_DELIMITER);
+		}
+
+		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// method definitions").append(StringTools.LINE_DELIMITER);
+		for (final Method method : ModuleHelper.getMethods(instance.getClass())) {
+			// parse parameters
+			final List<Parameter> parameters = ModuleHelper.getParameters(method);
+
+			final String body = "\t\t" + buildMethodBody(parameters, environment, method, identifier).replaceAll("\n", "\n\t\t");
+
+			// method header
+			scriptCode.append('\t').append(method.getName()).append(": function(");
+			// method parameters
+			scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
+			// method body
+			scriptCode.append(body).append(StringTools.LINE_DELIMITER);
+			// method footer
+			scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+
+			// append method aliases
+			for (final String alias : getMethodAliases(method)) {
+				if (!isValidMethodName(alias)) {
+					Logger.error(PluginConstants.PLUGIN_ID,
+							"The method name \"" + alias + "\" from the module \"" + identifier + "\" can not be wrapped because it's name is reserved");
+
+				} else if (!alias.isEmpty()) {
+					scriptCode.append('\t').append(alias).append(": function(");
+					scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
+					scriptCode.append("\t\t// method alias").append(StringTools.LINE_DELIMITER);
+					scriptCode.append("\t\treturn this.").append(method.getName()).append('(').append(buildParameterList(parameters)).append(");")
+							.append(StringTools.LINE_DELIMITER);
+					scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+				}
+			}
+		}
+
+		scriptCode.append("};").append(StringTools.LINE_DELIMITER);
+
+		return scriptCode.toString();
+	}
+
+	@Override
+	protected String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
+
+		final StringBuilder javaScriptCode = new StringBuilder();
+
+		// parse parameters
+		final List<Parameter> parameters = ModuleHelper.getParameters(method);
+
+		// build parameter string
+		final String parameterList = buildParameterList(parameters);
+
+		final String body = "\t" + buildMethodBody(parameters, environment, method, moduleVariable).replaceAll("\n", "\n\t");
+
+		// build function declarations
+		for (final String name : getMethodNames(method)) {
+			if (!isValidMethodName(name)) {
+				Logger.error(PluginConstants.PLUGIN_ID,
+						"The method name \"" + name + "\" from the module \"" + moduleVariable + "\" can not be wrapped because it's name is reserved");
+
+			} else if (!name.isEmpty()) {
+				javaScriptCode.append("function ").append(name).append('(').append(parameterList).append(") {").append(StringTools.LINE_DELIMITER);
+				javaScriptCode.append(body).append(StringTools.LINE_DELIMITER);
+				javaScriptCode.append('}').append(StringTools.LINE_DELIMITER);
+			}
+		}
+
+		return javaScriptCode.toString();
+	}
+
+	private String buildMethodBody(List<Parameter> parameters, IEnvironment environment, Method method, String classIdentifier) {
+		final StringBuilder body = new StringBuilder();
+		// insert parameter checks
+		body.append("// verify mandatory and optional parameters").append(StringTools.LINE_DELIMITER);
+		body.append(verifyParameters(parameters, "")).append(StringTools.LINE_DELIMITER);
+
+		// insert hooked pre execution code
+		body.append(getPreExecutionCode(environment, method));
+
+		// insert deprecation warnings
+
+		if (ModuleHelper.isDeprecated(method))
+			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.');").append(StringTools.LINE_DELIMITER);
+
+		// insert method call
+		body.append("// delegate call to java layer").append(StringTools.LINE_DELIMITER);
+		body.append("var ").append(IScriptFunctionModifier.RESULT_NAME).append(" = ").append(classIdentifier).append('.').append(method.getName()).append('(');
+		body.append(buildParameterList(parameters));
+		body.append(");").append(StringTools.LINE_DELIMITER);
+
+		// insert hooked post execution code
+		body.append(getPostExecutionCode(environment, method));
+
+		// insert return statement
+		body.append("return ").append(IScriptFunctionModifier.RESULT_NAME).append(';');
+
+		return body.toString();
 	}
 }

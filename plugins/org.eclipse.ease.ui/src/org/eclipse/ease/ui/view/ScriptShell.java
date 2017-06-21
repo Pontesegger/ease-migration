@@ -288,7 +288,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			else {
 				final ICodeFactory codeFactory = ScriptService.getCodeFactory(fScriptEngine);
 				if (codeFactory != null) {
-					final String helpComment = codeFactory.createCommentedString("use help(\"<topic>\") to get more information");
+					final String helpComment = codeFactory.createCommentedString("use help(\"<topic>\") to get more information", false);
 					fScriptEngine.executeAsync(helpComment);
 				}
 			}
@@ -303,29 +303,26 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 	 *            command to be stored to history.
 	 */
 	private void addToHistory(final String input) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				if (fInputCombo.getSelectionIndex() != -1)
-					fInputCombo.remove(fInputCombo.getSelectionIndex());
+		Display.getDefault().asyncExec(() -> {
+			if (fInputCombo.getSelectionIndex() != -1)
+				fInputCombo.remove(fInputCombo.getSelectionIndex());
 
-				else {
-					// new element; check if we already have such an element in our
-					// history
-					for (int index = 0; index < fInputCombo.getItemCount(); index++) {
-						if (fInputCombo.getItem(index).equals(input)) {
-							fInputCombo.remove(index);
-							break;
-						}
+			else {
+				// new element; check if we already have such an element in our
+				// history
+				for (int index = 0; index < fInputCombo.getItemCount(); index++) {
+					if (fInputCombo.getItem(index).equals(input)) {
+						fInputCombo.remove(index);
+						break;
 					}
 				}
-
-				// avoid history overflows
-				while (fInputCombo.getItemCount() >= fHistoryLength)
-					fInputCombo.remove(fInputCombo.getItemCount() - 1);
-
-				fInputCombo.add(input, 0);
 			}
+
+			// avoid history overflows
+			while (fInputCombo.getItemCount() >= fHistoryLength)
+				fInputCombo.remove(fInputCombo.getItemCount() - 1);
+
+			fInputCombo.add(input, 0);
 		});
 	}
 
@@ -402,14 +399,11 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 				if (fKeepCommand) {
 					final String code = script.getCode();
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
+					Display.getDefault().asyncExec(() -> {
 
-							if (!fInputCombo.isDisposed()) {
-								fInputCombo.setText(code);
-								fInputCombo.setSelection(new Point(0, code.length()));
-							}
+						if (!fInputCombo.isDisposed()) {
+							fInputCombo.setText(code);
+							fInputCombo.setSelection(new Point(0, code.length()));
 						}
 					});
 				}

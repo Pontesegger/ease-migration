@@ -37,18 +37,9 @@ public abstract class AbstractEnvironment extends AbstractScriptModule implement
 
 	private final ListenerList fModuleListeners = new ListenerList();
 
-	/**
-	 * Load a module. Loading a module generally enhances the script environment with new functions and variables. If a module was already loaded before, it
-	 * gets refreshed and moved to the top of the module stack. When a module is loaded, all its dependencies are loaded too. So loading one module might change
-	 * the whole module stack.
-	 *
-	 * @param name
-	 *            name of module to load
-	 * @return loaded module instance
-	 */
 	@Override
 	@WrapToScript
-	public final Object loadModule(final String identifier) {
+	public final Object loadModule(final String identifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
 		// resolve identifier
 		final String moduleName = ModuleHelper.resolveName(identifier);
 
@@ -72,7 +63,8 @@ public abstract class AbstractEnvironment extends AbstractScriptModule implement
 					if ((!fModuleNames.containsKey(requiredModule.getPath().toString())) || (entry.getValue())) {
 						// only load if module was never loaded or reload is set to true
 						try {
-							loadModule(requiredModule.getPath().toString());
+							loadModule(requiredModule.getPath().toString(), useCustomNamespace);
+
 						} catch (final RuntimeException e) {
 							throw new RuntimeException("Could not load module dependency \"" + requiredModule.getPath().toString() + "\"", e);
 						}
@@ -103,7 +95,7 @@ public abstract class AbstractEnvironment extends AbstractScriptModule implement
 					Collections.reverse(reverseList);
 
 					for (final Object loadedModule : reverseList)
-						wrap(loadedModule);
+						wrap(loadedModule, useCustomNamespace);
 				}
 			} else
 				throw new RuntimeException("Could not find module \"" + identifier + "\"");
@@ -115,9 +107,7 @@ public abstract class AbstractEnvironment extends AbstractScriptModule implement
 		fModules.add(0, module);
 
 		// create function wrappers
-		wrap(module);
-
-		return module;
+		return wrap(module, useCustomNamespace);
 	}
 
 	@Override

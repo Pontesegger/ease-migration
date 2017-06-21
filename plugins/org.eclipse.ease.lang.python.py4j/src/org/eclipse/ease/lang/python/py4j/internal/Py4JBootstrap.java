@@ -20,11 +20,10 @@ import org.eclipse.ease.modules.EnvironmentModule;
  */
 public class Py4JBootstrap implements IScriptEngineLaunchExtension {
 
-	private static final String BOOTSTRAP_CODE = EnvironmentModule.class.getName() + "().loadModule(\"" + EnvironmentModule.MODULE_NAME + "\")";
+	private static final String BOOTSTRAP_CODE = EnvironmentModule.class.getName() + "().loadModule(\"" + EnvironmentModule.MODULE_NAME + "\", False)";
 
 	@Override
 	public void createEngine(IScriptEngine engine) {
 		engine.executeAsync(new Script(Py4JBootstrap.class.getSimpleName(), BOOTSTRAP_CODE));
 	}
-
 }

@@ -44,15 +44,22 @@ public interface IEnvironment {
 	void removeModuleListener(final IModuleListener listener);
 
 	/**
-	 * Load a module. Loading a module generally enhances the JavaScript environment with new functions and variables. If a module was already loaded before, it
+	 * Load a module. Loading a module generally enhances the script environment with new functions and variables. If a module was already loaded before, it
 	 * gets refreshed and moved to the top of the module stack. When a module is loaded, all its dependencies are loaded too. So loading one module might change
 	 * the whole module stack.
+	 * <p>
+	 * When not using a custom namespace all variables and functions are loaded to the global namespace, possibly overriding existing functions. In such cases
+	 * the Java module instance is returned. When <i>useCustomNamespace</i> is used a dynamic script object is created and returned.In such cases the global
+	 * namespace is not changed. The namespace behavior is also used for loading dependencies.
+	 * </p>
 	 *
 	 * @param name
 	 *            name of module to load
+	 * @param useCustomNamespace
+	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to a custom object
 	 * @return loaded module instance
 	 */
-	Object loadModule(final String moduleIdentifier);
+	Object loadModule(final String moduleIdentifier, boolean useCustomNamespace);
 
 	/**
 	 * Wrap a java instance. Will create accessors in the target language for methods and constants defined by the java instance <i>toBeWrapped</i>. If the
@@ -61,6 +68,9 @@ public interface IEnvironment {
 	 *
 	 * @param toBeWrapped
 	 *            instance to be wrapped
+	 * @param useCustomNamespace
+	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to the return value only
+	 * @return wrapped object instance or java class when put to global namespace
 	 */
-	void wrap(final Object toBeWrapped);
+	Object wrap(final Object toBeWrapped, boolean useCustomNamespace);
 }

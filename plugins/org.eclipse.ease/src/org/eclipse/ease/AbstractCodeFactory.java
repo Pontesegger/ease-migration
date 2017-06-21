@@ -11,12 +11,14 @@
 package org.eclipse.ease;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.IScriptFunctionModifier;
+import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 
@@ -33,14 +36,27 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	/** Default line break character. */
 	public static final String LINE_DELIMITER = System.getProperty(Platform.PREF_LINE_SEPARATOR);
 
+	protected static String buildParameterList(List<Parameter> parameters) {
+		// build parameter string
+		final StringBuilder parameterList = new StringBuilder();
+		for (final Parameter parameter : parameters)
+			parameterList.append(", ").append(parameter.getName());
+
+		if (parameterList.length() > 2)
+			parameterList.delete(0, 2);
+
+		return parameterList.toString();
+	}
+
+	@Override
 	public String createKeywordHeader(Map<String, String> keywords, String existingHeader) {
-		StringBuilder header = new StringBuilder();
+		final StringBuilder header = new StringBuilder();
 
 		// copy existing text before keywords
 		if (existingHeader == null)
 			existingHeader = "";
 
-		String[] existingLines = existingHeader.split("\\r?\\n");
+		final String[] existingLines = existingHeader.split("\\r?\\n");
 		int index = 0;
 		for (; index < existingLines.length; index++) {
 			final Matcher matcher = AbstractCodeParser.PARAMETER_PATTERN.matcher(existingLines[index]);
@@ -163,17 +179,24 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	}
 
 	public static Collection<String> getMethodNames(final Method method) {
-		final Set<String> methodNames = new HashSet<String>();
+		final Set<String> methodNames = new HashSet<>();
 		methodNames.add(method.getName());
+		methodNames.addAll(getMethodAliases(method));
+
+		return methodNames;
+	}
+
+	public static Collection<String> getMethodAliases(final Method method) {
+		final Set<String> methodAliases = new HashSet<>();
 
 		final WrapToScript wrapAnnotation = method.getAnnotation(WrapToScript.class);
 		if (wrapAnnotation != null) {
 			for (final String name : wrapAnnotation.alias().split(WrapToScript.DELIMITER))
 				if (!name.trim().isEmpty())
-					methodNames.add(name.trim());
+					methodAliases.add(name.trim());
 		}
 
-		return methodNames;
+		return methodAliases;
 	}
 
 	public static String getPreExecutionCode(final IEnvironment environment, final Method method) {
@@ -234,6 +257,8 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 				code.append('"').append(((String) parameter).replace("\"", "\\\"")).append('"');
 			else if (parameter == null)
 				code.append(getNullString());
+			else if (parameter instanceof Boolean)
+				code.append(((Boolean) parameter) ? getTrueString() : getFalseString());
 			else
 				code.append(parameter.toString());
 
@@ -276,24 +301,74 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		return "*/";
 	}
 
-	/**
-	 * Provide a default implementation that adds a single line comment token to the beginning of each line of the comment. Extenders can override
-	 * {@link #getSingleLineCommentToken()} to return that token.
-	 */
-	@Override
-	public String createCommentedString(String comment) {
-		return createCommentedString(comment, false);
-	}
-
 	@Override
 	public String createCommentedString(String comment, boolean addBlockComment) {
 		if (addBlockComment) {
 			return getMultiLineCommentStartToken() + comment + getMultiLineCommentEndToken();
 
 		} else {
-			String token = getSingleLineCommentToken();
-			Stream<String> split = Pattern.compile("\r?\n").splitAsStream(comment);
+			final String token = getSingleLineCommentToken();
+			final Stream<String> split = Pattern.compile("\r?\n").splitAsStream(comment);
 			return split.map(s -> token + s).collect(Collectors.joining(System.lineSeparator()));
 		}
 	}
+
+	@Override
+	public String createWrapper(IEnvironment environment, Object instance, String identifier, boolean customNamespace, IScriptEngine engine) {
+
+		if (!customNamespace) {
+			// put functions/fields to global namespace
+			final StringBuilder scriptCode = new StringBuilder();
+
+			// create wrappers for methods
+			for (final Method method : ModuleHelper.getMethods(instance.getClass())) {
+				final String code = createFunctionWrapper(environment, identifier, method);
+
+				if ((code != null) && !code.isEmpty()) {
+					scriptCode.append(code);
+					scriptCode.append('\n');
+				}
+			}
+
+			// create wrappers for final fields
+			for (final Field field : ModuleHelper.getFields(instance.getClass())) {
+				try {
+					final Object toBeInjected = field.get(instance);
+
+					// only wrap if field is not already declared
+					if (!engine.hasVariable(getSaveVariableName(field.getName()))) {
+						engine.setVariable(getSaveVariableName(field.getName()), toBeInjected);
+
+					} else {
+						// see if the defined variable equals the one we want to set
+						final Object existing = engine.getVariable(getSaveVariableName(field.getName()));
+						if (((existing != null) && (!existing.equals(toBeInjected))) || ((existing == null) && (toBeInjected != null))) {
+							Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "Skipped wrapping of field \"" + field.getName()
+									+ "\" (module \"" + instance.getClass().getName() + "\") as variable is already declared.");
+						}
+					}
+
+				} catch (final IllegalArgumentException | IllegalAccessException e) {
+					Logger.error(Activator.PLUGIN_ID, "Could not wrap field \"" + field.getName() + " \" of module \"" + instance.getClass() + "\".", e);
+				}
+			}
+
+			return scriptCode.toString();
+
+		} else
+			throw new RuntimeException("Object wrappers not supported by default wrapper");
+	}
+
+	/**
+	 * Create code for a wrapper function in the global namespace of the script engine.
+	 *
+	 * @param environment
+	 *            environment instance
+	 * @param identifier
+	 *            function name to be used
+	 * @param method
+	 *            method to refer to
+	 * @return script code to be injected into the script engine
+	 */
+	protected abstract String createFunctionWrapper(IEnvironment environment, String identifier, Method method);
 }

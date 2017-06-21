@@ -24,13 +24,13 @@ public class BootStrapper implements IScriptEngineLaunchExtension {
 
 	@Override
 	public void createEngine(final IScriptEngine engine) {
-		ICodeFactory codeFactory = ScriptService.getCodeFactory(engine);
+		final ICodeFactory codeFactory = ScriptService.getCodeFactory(engine);
 		if (codeFactory != null) {
-			StringBuilder stringBuilder = new StringBuilder();
+			final StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append(codeFactory.classInstantiation(EnvironmentModule.class, new String[0]));
 			stringBuilder.append(".loadModule(\"");
 			stringBuilder.append(EnvironmentModule.MODULE_NAME);
-			stringBuilder.append("\");\n");
+			stringBuilder.append("\", false);\n");
 
 			engine.executeAsync(new Script("Bootloader", stringBuilder.toString()));
 		}

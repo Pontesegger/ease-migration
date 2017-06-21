@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public interface ICodeFactory {
 	/**
 	 * Parameter definition class. Holds data to describe a script parameter used in a function call.
 	 */
-	public static class Parameter {
+	public class Parameter {
 
 		private Class<?> fClazz;
 		private String fName = "";
@@ -81,20 +80,6 @@ public interface ICodeFactory {
 	String getSaveVariableName(String variableName);
 
 	/**
-	 * Create code to wrap a java method call on a given script variable to the target language. Creates script code that invokes the given <i>method</i> on the
-	 * given <i>moduleVariable</i>.
-	 *
-	 * @param environment
-	 *            script environment
-	 * @param moduleVariable
-	 *            name of variable holding the module instance
-	 * @param method
-	 *            method to be wrapped
-	 * @return wrapped script code
-	 */
-	String createFunctionWrapper(IEnvironment environment, String moduleVariable, Method method);
-
-	/**
 	 * Create code to instantiate a java class.
 	 *
 	 * @param clazz
@@ -104,19 +89,6 @@ public interface ICodeFactory {
 	 * @return wrapped script code
 	 */
 	String classInstantiation(Class<?> clazz, String[] parameters);
-
-	/**
-	 * Create code to bind a final java field to a script variable.
-	 *
-	 * @param environment
-	 *            script environment
-	 * @param moduleVariable
-	 *            name of variable holding the module instance
-	 * @param field
-	 *            field to be accessed
-	 * @return wrapped script code
-	 */
-	String createFinalFieldWrapper(IEnvironment environment, String moduleVariable, Field field);
 
 	/**
 	 * Create code to call a wrapped function. Create code to call a script function that was wrapped using
@@ -140,25 +112,16 @@ public interface ICodeFactory {
 	String getDefaultValue(final Parameter parameter);
 
 	/**
-	 * Create code for the provided comment. Typically line or block comment tokens will be added around the comment.
-	 *
-	 * @param comment
-	 *            the comment
-	 * @return the comment with comment tokens.
-	 */
-	String createCommentedString(String comment);
-
-	/**
 	 * Create code for the provided comment. Typically line or block comment tokens will be added around the comment. Start block comment token will be added
 	 * immediately before comment and end block comment token will be added immediately after comment. Format comment properly to get proper result.
 	 *
 	 * @param comment
 	 *            the comment
-	 * @param addBlockComment
-	 *            <code>true</code> for adding block comment or <code>false</code> for adding single line comment
-	 * @return the comment with comment tokens.
+	 * @param blockComment
+	 *            <code>true</code> for adding block comment or <code>false</code> for adding (multiple) line comments
+	 * @return the comment string with comment tokens.
 	 */
-	String createCommentedString(String comment, boolean addBlockComment);
+	String createCommentedString(String comment, boolean blockComment);
 
 	/**
 	 * Create a comment header for given keywords. Arbitrary content will be delimited by an empty line
@@ -170,4 +133,20 @@ public interface ICodeFactory {
 	 * @return String representation of header
 	 */
 	String createKeywordHeader(Map<String, String> keywords, String existingHeader);
+
+	/**
+	 * Create script wrapper code for a given java instance.
+	 *
+	 * @param environment
+	 *            environment module instance
+	 * @param instance
+	 *            object instance to wrap
+	 * @param identifier
+	 *            script variable name for wrapped Java object
+	 * @param customNamespace
+	 *            whether to store methods to the global namespace or to create a custom object
+	 * @param engine
+	 *            script engine
+	 */
+	String createWrapper(IEnvironment environment, Object instance, String identifier, boolean customNamespace, IScriptEngine engine);
 }
