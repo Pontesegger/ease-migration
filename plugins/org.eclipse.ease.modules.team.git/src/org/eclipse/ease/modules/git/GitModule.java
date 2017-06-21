@@ -30,6 +30,7 @@ import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.PushResult;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.RawParseUtils;
 
 /**
  * Provides functions to access and operate on git repositories through JGIT.
@@ -88,6 +89,7 @@ public class GitModule extends AbstractScriptModule {
 	 *            local repository root folder
 	 * @return GIT API instance
 	 * @throws IOException
+	 *             the repository could not be accessed
 	 */
 	@WrapToScript
 	public Git openRepository(final Object location) throws IOException {
@@ -149,31 +151,26 @@ public class GitModule extends AbstractScriptModule {
 	 *
 	 * @param repository
 	 *            repository instance or location (local) to pull
+	 * @param message
+	 *            commit message
+	 * @param author
+	 *            author to be used for the commit. Use format 'Real Name &lt;email@address&gt;'
+	 * @param amend
+	 *            whether to amend the previous commit
 	 * @return commit result
 	 * @throws IOException
+	 *             the repository could not be accessed
 	 * @throws GitAPIException
 	 */
 	@WrapToScript
-	public RevCommit commit(final Object repository, final String message, final String author, @ScriptParameter(defaultValue = "false") final boolean amend)
-			throws IOException, GitAPIException {
+	public RevCommit commit(final Object repository, final String message, @ScriptParameter(defaultValue = ScriptParameter.NULL) String author,
+			@ScriptParameter(defaultValue = "false") final boolean amend) throws IOException, GitAPIException {
+
 		final Git repo = openRepository(repository);
-		if (repo != null) {
+		if (repo != null)
+			return repo.commit().setMessage(message).setAuthor(RawParseUtils.parsePersonIdent((author != null) ? author : "")).setAmend(amend).call();
 
-			// parse author
-			String authorName = "";
-			String authorEmail = "";
-			if (author != null) {
-				final String[] authorTokens = author.split("|");
-				if (authorTokens.length > 0)
-					authorName = authorTokens[0].trim();
-
-				if (authorTokens.length > 1)
-					authorEmail = authorTokens[1].trim();
-			}
-
-			return repo.commit().setMessage(message).setAuthor(authorName, authorEmail).setAmend(amend).call();
-
-		} else
+		else
 			throw new RuntimeException("No repository found at: " + repository);
 	}
 
