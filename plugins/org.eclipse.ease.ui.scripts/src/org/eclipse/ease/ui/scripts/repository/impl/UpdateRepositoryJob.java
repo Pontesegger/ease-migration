@@ -65,8 +65,14 @@ public class UpdateRepositoryJob extends Job {
 						new PluginParser().parse(content, location);
 
 					} else {
+						// trying for remote locations
 						try {
-							new HttpParser().parse(((URI) content).toURL().toString(), location);
+							final String scriptLocation = ((URI) content).toURL().toString();
+							if (GithubParser.checkBundle() && GithubParser.isLocationValid(scriptLocation)) {
+								new GithubParser().parse(scriptLocation, location);
+							} else {
+								new HttpParser().parse(scriptLocation, location);
+							}
 						} catch (final MalformedURLException e) {
 							// not a valid URL, ignore repository
 						}
