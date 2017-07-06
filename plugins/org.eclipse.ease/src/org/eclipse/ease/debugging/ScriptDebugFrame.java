@@ -12,8 +12,11 @@ package org.eclipse.ease.debugging;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.ease.Script;
@@ -109,7 +112,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 			} else {
 				// handle java objects
-				for (Field field : parent.getClass().getDeclaredFields()) {
+				for (Field field : getFields(parent.getClass())) {
 					try {
 						if (!Modifier.isStatic(field.getModifiers())) {
 							if (!field.isAccessible())
@@ -124,6 +127,23 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 		}
 
 		return variables;
+	}
+
+	/**
+	 * Get all the variables in a class from its entire class hierarchy
+	 *
+	 * @param currentClass
+	 *            Class object for which variable list is required
+	 * @return array of variables
+	 */
+	private Field[] getFields(Class<?> currentClass) {
+		final List<Field> fields = new ArrayList<>();
+		while (currentClass != null) {
+			fields.addAll(Arrays.asList(currentClass.getDeclaredFields()));
+			currentClass = currentClass.getSuperclass();
+		}
+
+		return fields.toArray(new Field[0]);
 	}
 
 	@Override
