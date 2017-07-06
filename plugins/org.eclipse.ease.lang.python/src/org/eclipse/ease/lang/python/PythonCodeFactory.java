@@ -24,7 +24,7 @@ import org.eclipse.ease.modules.ModuleHelper;
 
 public class PythonCodeFactory extends AbstractCodeFactory {
 
-	public static List<String> RESERVED_KEYWORDS = new ArrayList<String>();
+	public static List<String> RESERVED_KEYWORDS = new ArrayList<>();
 
 	static {
 		RESERVED_KEYWORDS.add("and");
@@ -58,6 +58,76 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		RESERVED_KEYWORDS.add("while");
 		RESERVED_KEYWORDS.add("with");
 		RESERVED_KEYWORDS.add("yield");
+
+		// built in functions
+		RESERVED_KEYWORDS.add("__import__");
+		RESERVED_KEYWORDS.add("abs");
+		RESERVED_KEYWORDS.add("all");
+		RESERVED_KEYWORDS.add("any");
+		RESERVED_KEYWORDS.add("ascii");
+		RESERVED_KEYWORDS.add("bin");
+		RESERVED_KEYWORDS.add("bool");
+		RESERVED_KEYWORDS.add("bytearray");
+		RESERVED_KEYWORDS.add("bytes");
+		RESERVED_KEYWORDS.add("callable");
+		RESERVED_KEYWORDS.add("chr");
+		RESERVED_KEYWORDS.add("classmethod");
+		RESERVED_KEYWORDS.add("compile");
+		RESERVED_KEYWORDS.add("complex");
+		RESERVED_KEYWORDS.add("delattr");
+		RESERVED_KEYWORDS.add("dict");
+		RESERVED_KEYWORDS.add("dir");
+		RESERVED_KEYWORDS.add("divmod");
+		RESERVED_KEYWORDS.add("enumerate");
+		RESERVED_KEYWORDS.add("eval");
+		RESERVED_KEYWORDS.add("exec");
+		RESERVED_KEYWORDS.add("filter");
+		RESERVED_KEYWORDS.add("float");
+		RESERVED_KEYWORDS.add("format");
+		RESERVED_KEYWORDS.add("frozenset");
+		RESERVED_KEYWORDS.add("getattr");
+		RESERVED_KEYWORDS.add("globals");
+		RESERVED_KEYWORDS.add("hasattr");
+		RESERVED_KEYWORDS.add("hash");
+		RESERVED_KEYWORDS.add("help");
+		RESERVED_KEYWORDS.add("hex");
+		RESERVED_KEYWORDS.add("id");
+		RESERVED_KEYWORDS.add("input");
+		RESERVED_KEYWORDS.add("int");
+		RESERVED_KEYWORDS.add("isinstance");
+		RESERVED_KEYWORDS.add("issubclass");
+		RESERVED_KEYWORDS.add("iter");
+		RESERVED_KEYWORDS.add("len");
+		RESERVED_KEYWORDS.add("list");
+		RESERVED_KEYWORDS.add("locals");
+		RESERVED_KEYWORDS.add("map");
+		RESERVED_KEYWORDS.add("max");
+		RESERVED_KEYWORDS.add("memoryview");
+		RESERVED_KEYWORDS.add("min");
+		RESERVED_KEYWORDS.add("next");
+		RESERVED_KEYWORDS.add("object");
+		RESERVED_KEYWORDS.add("oct");
+		RESERVED_KEYWORDS.add("open");
+		RESERVED_KEYWORDS.add("ord");
+		RESERVED_KEYWORDS.add("pow");
+		RESERVED_KEYWORDS.add("print");
+		RESERVED_KEYWORDS.add("property");
+		RESERVED_KEYWORDS.add("range");
+		RESERVED_KEYWORDS.add("repr");
+		RESERVED_KEYWORDS.add("reversed");
+		RESERVED_KEYWORDS.add("round");
+		RESERVED_KEYWORDS.add("set");
+		RESERVED_KEYWORDS.add("setattr");
+		RESERVED_KEYWORDS.add("slice");
+		RESERVED_KEYWORDS.add("sorted");
+		RESERVED_KEYWORDS.add("staticmethod");
+		RESERVED_KEYWORDS.add("str");
+		RESERVED_KEYWORDS.add("sum");
+		RESERVED_KEYWORDS.add("super");
+		RESERVED_KEYWORDS.add("tuple");
+		RESERVED_KEYWORDS.add("type");
+		RESERVED_KEYWORDS.add("vars");
+		RESERVED_KEYWORDS.add("zip");
 	}
 
 	@Override
