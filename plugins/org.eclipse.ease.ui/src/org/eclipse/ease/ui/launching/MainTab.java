@@ -24,19 +24,17 @@ import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ease.ui.Activator;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,14 +77,14 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		mDisableUpdate = true;
 
 		txtSourceFile.setText("");
+		fTxtStartupParameters.setText("");
 		chkShowDynamicScript.setSelection(false);
 		chkSuspendOnStartup.setSelection(false);
 		chkSuspendOnScript.setSelection(false);
 
 		try {
 			txtSourceFile.setText(configuration.getAttribute(LaunchConstants.FILE_LOCATION, ""));
-			populateScriptEngines();
-			// TODO select correct engine from configuration
+
 			final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
 			final EngineDescription engineDescription = scriptService.getEngineByID(configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, ""));
 			if (engineDescription != null)
@@ -181,11 +179,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		grpScriptSource.setLayout(new GridLayout(2, false));
 
 		txtSourceFile = new Text(grpScriptSource, SWT.BORDER);
-		txtSourceFile.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+		txtSourceFile.addModifyListener(e -> {
+			if (!mDisableUpdate)
 				populateScriptEngines();
-			}
 		});
 		txtSourceFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
@@ -227,12 +223,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		comboViewer.setContentProvider(ArrayContentProvider.getInstance());
 		comboViewer.setLabelProvider(new LabelProvider());
-		comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
+		comboViewer.addSelectionChangedListener(e -> {
+			if (!mDisableUpdate)
 				updateLaunchConfigurationDialog();
-			}
 		});
 
 		final Group grpProgramArguments = new Group(topControl, SWT.NONE);
@@ -241,11 +234,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		grpProgramArguments.setText("Script arguments");
 
 		fTxtStartupParameters = new Text(grpProgramArguments, SWT.BORDER | SWT.WRAP | SWT.MULTI);
-		fTxtStartupParameters.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+		fTxtStartupParameters.addModifyListener(e -> {
+			if (!mDisableUpdate)
 				updateLaunchConfigurationDialog();
-			}
 		});
 		fTxtStartupParameters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
@@ -306,14 +297,36 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		if (scriptType != null) {
 			final List<EngineDescription> engines = scriptService.getEngines(scriptType.getName());
-			comboViewer.setInput(engines);
-			comboViewer.refresh();
-
-			// set preferred engine
-			if (!engines.isEmpty())
+			if (isNewScriptTypeSelected(engines)) {
+				// if new script type selected from UI, change the engines tab with new inputs
+				comboViewer.setInput(engines);
+				comboViewer.refresh();
+			}
+			if ((comboViewer.getSelection().isEmpty()) && !engines.isEmpty()) {
 				comboViewer.setSelection(new StructuredSelection(engines.get(0)));
+			}
 		}
 
 		updateLaunchConfigurationDialog();
 	}
+
+	/**
+	 * Find if script with different script type selected.
+	 *
+	 * @param engines
+	 *            list of script engines available
+	 * @return true or false based on script type selected
+	 */
+	private boolean isNewScriptTypeSelected(List<EngineDescription> engines) {
+		if ((comboViewer != null) && (comboViewer.getInput() != null)) {
+			return !engines.containsAll((List<?>) comboViewer.getInput());
+		}
+		return true;
+	}
+
+	@Override
+	public Image getImage() {
+		return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/global_tab.gif", true);
+	}
+
 }
