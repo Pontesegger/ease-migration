@@ -149,6 +149,8 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		if ((Boolean.class.equals(clazz)) || (boolean.class.equals(clazz))) {
 			return Boolean.parseBoolean(defaultStringValue) ? getTrueString() : getFalseString();
 		}
+		if (String.class.equals(clazz))
+			return "\"" + defaultStringValue + "\"";
 
 		// undefined resolves to empty constructor
 		if (ScriptParameter.UNDEFINED.equals(defaultStringValue)) {
