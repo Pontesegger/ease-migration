@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
@@ -33,28 +34,39 @@ public class ResourceDropHandler implements IShellDropHandler {
 		if ((element instanceof IFile) || (element instanceof File) || (element instanceof URI))
 			return scriptEngine.getDescription().getSupportedScriptTypes().contains(getScriptType(element));
 
+		// try to convert special file types
+		final IFile adaptedFile = Platform.getAdapterManager().getAdapter(element, IFile.class);
+		if (adaptedFile != null)
+			return scriptEngine.getDescription().getSupportedScriptTypes().contains(getScriptType(adaptedFile));
+
 		return false;
 	}
 
 	@Override
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
 		try {
-			ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
-			Method includeMethod = EnvironmentModule.class.getMethod("include", String.class);
+			final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
+			final Method includeMethod = EnvironmentModule.class.getMethod("include", String.class);
 
 			if ((element instanceof IFile) || (element instanceof File)) {
-				String call = codeFactory.createFunctionCall(includeMethod, ResourceTools.toAbsoluteLocation(element, null));
+				final String call = codeFactory.createFunctionCall(includeMethod, ResourceTools.toAbsoluteLocation(element, null));
 				scriptEngine.executeAsync(call);
 
 			} else if (element instanceof URI) {
-				String call = codeFactory.createFunctionCall(includeMethod, element.toString());
+				final String call = codeFactory.createFunctionCall(includeMethod, element.toString());
 				scriptEngine.executeAsync(call);
 
-			} else
-				// fallback solution
-				scriptEngine.executeAsync(element);
+			} else {
+				final IFile adaptedFile = Platform.getAdapterManager().getAdapter(element, IFile.class);
+				if (adaptedFile != null)
+					performDrop(scriptEngine, adaptedFile);
 
-		} catch (Exception e) {
+				else
+					// fallback solution
+					scriptEngine.executeAsync(element);
+			}
+
+		} catch (final Exception e) {
 			Logger.error(Activator.PLUGIN_ID, "include() method not found in Environment module", e);
 
 			// fallback solution
@@ -63,7 +75,7 @@ public class ResourceDropHandler implements IShellDropHandler {
 	}
 
 	private static ScriptType getScriptType(final Object element) {
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		return scriptService.getScriptType(ResourceTools.toAbsoluteLocation(element, null));
 	}
 }
