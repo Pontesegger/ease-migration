@@ -43,7 +43,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocation {
 	/**
 	 * The default value of the '{@link #isRecursive() <em>Recursive</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isRecursive()
 	 * @generated
 	 * @ordered
@@ -52,7 +52,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * The cached value of the '{@link #isRecursive() <em>Recursive</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isRecursive()
 	 * @generated
 	 * @ordered
@@ -61,7 +61,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * The default value of the '{@link #isDefault() <em>Default</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isDefault()
 	 * @generated
 	 * @ordered
@@ -70,7 +70,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * The cached value of the '{@link #isDefault() <em>Default</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isDefault()
 	 * @generated
 	 * @ordered
@@ -79,7 +79,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * The cached value of the '{@link #getScripts() <em>Scripts</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getScripts()
 	 * @generated
 	 * @ordered
@@ -88,7 +88,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	protected ScriptLocationImpl() {
@@ -97,7 +97,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -107,7 +107,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -117,12 +117,12 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public void setRecursive(boolean newRecursive) {
-		boolean oldRecursive = recursive;
+		final boolean oldRecursive = recursive;
 		recursive = newRecursive;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRepositoryPackage.SCRIPT_LOCATION__RECURSIVE, oldRecursive, recursive));
@@ -130,7 +130,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -140,12 +140,12 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public void setDefault(boolean newDefault) {
-		boolean oldDefault = default_;
+		final boolean oldDefault = default_;
 		default_ = newDefault;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRepositoryPackage.SCRIPT_LOCATION__DEFAULT, oldDefault, default_));
@@ -153,13 +153,13 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public EList<IScript> getScripts() {
 		if (scripts == null) {
-			scripts = new EObjectContainmentWithInverseEList<IScript>(IScript.class, this, IRepositoryPackage.SCRIPT_LOCATION__SCRIPTS,
+			scripts = new EObjectContainmentWithInverseEList<>(IScript.class, this, IRepositoryPackage.SCRIPT_LOCATION__SCRIPTS,
 					IRepositoryPackage.SCRIPT__ENTRY);
 		}
 		return scripts;
@@ -167,7 +167,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -182,7 +182,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -196,7 +196,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -214,7 +214,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -237,7 +237,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -258,7 +258,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -269,14 +269,14 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 		case IRepositoryPackage.SCRIPT_LOCATION__DEFAULT:
 			return default_ != DEFAULT_EDEFAULT;
 		case IRepositoryPackage.SCRIPT_LOCATION__SCRIPTS:
-			return scripts != null && !scripts.isEmpty();
+			return (scripts != null) && !scripts.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -284,7 +284,7 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 		if (eIsProxy())
 			return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		final StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (recursive: ");
 		result.append(recursive);
 		result.append(", default: ");
@@ -295,13 +295,13 @@ public class ScriptLocationImpl extends RawLocationImpl implements IScriptLocati
 
 	@Override
 	public Object getResource() {
-		Object resource = ResourceTools.resolveFolder(getLocation(), null, false);
+		final Object resource = ResourceTools.resolve(getLocation());
 		if (resource != null)
 			return resource;
 
 		try {
 			return new URI(getLocation());
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			// not a valid URI
 			return null;
 		}

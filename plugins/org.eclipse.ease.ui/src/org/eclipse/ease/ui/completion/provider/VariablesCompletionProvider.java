@@ -41,7 +41,8 @@ public class VariablesCompletionProvider extends AbstractCompletionProvider {
 					styledString.append(" : " + type, StyledString.DECORATIONS_STYLER);
 					styledString.append(" - " + "Variable", StyledString.QUALIFIER_STYLER);
 
-					addProposal(styledString, variable.getKey(), Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png"),
+					addProposal(styledString, variable.getKey(),
+							new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png")),
 							ScriptCompletionProposal.ORDER_FIELD, null);
 				}
 			}

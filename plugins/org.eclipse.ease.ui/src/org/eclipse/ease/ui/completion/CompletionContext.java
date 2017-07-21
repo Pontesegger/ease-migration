@@ -599,11 +599,11 @@ public abstract class CompletionContext implements ICompletionContext {
 						// TODO add string literal characters lookup method
 						if ((candidate.charAt(0) == '"') || (candidate.charAt(0) == '\'')) {
 							// found resource, try to resolve
-							final Object includeResource = ResourceTools.resolveFile(candidate.substring(1, candidate.length() - 1), getResource(), true);
+							final Object includeResource = ResourceTools.resolve(candidate.substring(1, candidate.length() - 1), getResource());
 							if (includeResource != null) {
 								if (!fIncludes.containsKey(includeResource)) {
 									// store object & content, as we need to parse this content multiple times
-									fIncludes.put(includeResource, ResourceTools.resourceToString(includeResource));
+									fIncludes.put(includeResource, ResourceTools.toString(includeResource));
 
 									// recursively process include files
 									addInclude(fIncludes.get(includeResource));

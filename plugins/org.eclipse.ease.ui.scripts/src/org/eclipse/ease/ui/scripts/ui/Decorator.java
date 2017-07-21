@@ -73,7 +73,6 @@ public class Decorator implements ILightweightLabelDecorator, IPreferenceChangeL
 
 			final boolean run_without_sign_remote = prefs.getBoolean(IPreferenceConstants.RUN_WITHOUT_SIGN_REMOTE);
 
-			final boolean isIFile = ResourceTools.resolveFile(iScript.getLocation(), null, true) instanceof IFile;
 			final boolean isRemote = iScript.isRemote();
 
 			// check if signature is present. null signifies signature is not there.
@@ -91,12 +90,7 @@ public class Decorator implements ILightweightLabelDecorator, IPreferenceChangeL
 	public void preferenceChange(PreferenceChangeEvent event) {
 		if (event.getKey().equals(IPreferenceConstants.RUN_WITHOUT_SIGN_LOCAL) || event.getKey().equals(IPreferenceConstants.RUN_WITHOUT_SIGN_REMOTE)) {
 			// update decorators
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					PlatformUI.getWorkbench().getDecoratorManager().update(SIGN_DECORATOR_ID);
-				}
-			});
+			Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getDecoratorManager().update(SIGN_DECORATOR_ID));
 		}
 
 	}

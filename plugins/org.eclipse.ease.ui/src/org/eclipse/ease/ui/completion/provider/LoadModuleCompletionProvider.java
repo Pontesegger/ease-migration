@@ -50,7 +50,7 @@ public class LoadModuleCompletionProvider extends AbstractCompletionProvider {
 		else
 			searchPath = new Path("/");
 
-		final Collection<String> pathProposals = new HashSet<String>();
+		final Collection<String> pathProposals = new HashSet<>();
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		final Map<String, ModuleDefinition> availableModules = scriptService.getAvailableModules();
@@ -69,8 +69,8 @@ public class LoadModuleCompletionProvider extends AbstractCompletionProvider {
 						if (!moduleEntry.getValue().isVisible())
 							displayString.append(" (hidden)", StyledString.DECORATIONS_STYLER);
 
-						addProposal(displayString, moduleEntry.getKey(), Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/module.png"), 0,
-								null);
+						addProposal(displayString, moduleEntry.getKey(),
+								new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/module.png")), 0, null);
 					}
 
 				} else {
@@ -83,8 +83,8 @@ public class LoadModuleCompletionProvider extends AbstractCompletionProvider {
 		// add path proposals
 		for (final String pathProposal : pathProposals) {
 			if (matchesFilterIgnoreCase(pathProposal))
-				addProposal(pathProposal, pathProposal + "/", PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER), 10,
-						null);
+				addProposal(pathProposal, pathProposal + "/",
+						new DescriptorImageResolver(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER)), 10, null);
 		}
 	}
 }

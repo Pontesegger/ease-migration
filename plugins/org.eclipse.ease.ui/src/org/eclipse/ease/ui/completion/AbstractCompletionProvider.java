@@ -18,8 +18,30 @@ import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.graphics.Image;
 
 public abstract class AbstractCompletionProvider implements ICompletionProvider {
+
+	public static class DescriptorImageResolver implements IImageResolver {
+		private final ImageDescriptor fDescriptor;
+
+		public DescriptorImageResolver() {
+			fDescriptor = null;
+		}
+
+		public DescriptorImageResolver(ImageDescriptor descriptor) {
+			fDescriptor = descriptor;
+		}
+
+		@Override
+		public Image getImage() {
+			return (getDescriptor() != null) ? getDescriptor().createImage() : null;
+		}
+
+		protected ImageDescriptor getDescriptor() {
+			return fDescriptor;
+		}
+	}
 
 	private Collection<ScriptCompletionProposal> fProposals = null;
 	private ICompletionContext fContext;
@@ -32,7 +54,7 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 	@Override
 	public Collection<? extends ScriptCompletionProposal> getProposals(final ICompletionContext context) {
 		fContext = context;
-		fProposals = new ArrayList<ScriptCompletionProposal>();
+		fProposals = new ArrayList<>();
 
 		prepareProposals(context);
 
@@ -56,16 +78,16 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 		fProposals.add(proposal);
 	}
 
-	protected void addProposal(final StyledString displayString, final String replacementString, final ImageDescriptor image, final int priority,
+	protected void addProposal(final StyledString displayString, final String replacementString, final IImageResolver imageResolver, final int priority,
 			final IHelpResolver helpResolver) {
 
-		fProposals.add(new ScriptCompletionProposal(fContext, displayString, replacementString, image, priority, helpResolver));
+		fProposals.add(new ScriptCompletionProposal(fContext, displayString, replacementString, imageResolver, priority, helpResolver));
 	}
 
-	protected void addProposal(final String displayString, final String replacementString, final ImageDescriptor image, final int priority,
+	protected void addProposal(final String displayString, final String replacementString, final IImageResolver imageResolver, final int priority,
 			final IHelpResolver helpResolver) {
-
-		fProposals.add(new ScriptCompletionProposal(fContext, displayString, replacementString, image, priority, helpResolver));
+		
+		fProposals.add(new ScriptCompletionProposal(fContext, displayString, replacementString, imageResolver, priority, helpResolver));
 	}
 
 	protected boolean matchesFilter(final String proposal) {

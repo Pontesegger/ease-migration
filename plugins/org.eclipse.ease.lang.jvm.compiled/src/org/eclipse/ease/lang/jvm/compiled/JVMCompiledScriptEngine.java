@@ -57,7 +57,7 @@ import org.osgi.framework.ServiceReference;
 
 public class JVMCompiledScriptEngine extends AbstractScriptEngine implements IScriptEngine {
 
-	private final Map<String, Object> fVariables = new HashMap<String, Object>();
+	private final Map<String, Object> fVariables = new HashMap<>();
 
 	public JVMCompiledScriptEngine() {
 		super("JVMCompiled");
@@ -180,14 +180,14 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 	 *             If the class was not found
 	 */
 	public static Class<?> loadClass(final Object reference) throws JavaModelException, MalformedURLException, ClassNotFoundException {
-		final Object file = ResourceTools.resolveFile(reference, null, true);
+		final Object file = ResourceTools.resolve(reference);
 
 		// find source project and resolve dependencies
 		final SimpleEntry<IFile, IBundleProjectDescription> pair = getBundleProjectDescription(file);
 		if (pair != null) {
 			final IFile sourceFile = pair.getKey();
 			final IBundleProjectDescription scriptBundleProject = pair.getValue();
-			final List<URL> urls = new ArrayList<URL>();
+			final List<URL> urls = new ArrayList<>();
 			final IProject project = scriptBundleProject.getProject();
 			final IJavaProject javaProject = JavaCore.create(project);
 
@@ -212,7 +212,7 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 							urls.add(url);
 						}
 					} else if ((cpEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) && (cpEntry.getContentKind() == IPackageFragmentRoot.K_BINARY)) {
-						IPath path = cpEntry.getPath();
+						final IPath path = cpEntry.getPath();
 						urls.add(path.toFile().toURL());
 					}
 				}
@@ -233,7 +233,7 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 			}
 
 			final IRequiredBundleDescription[] requiredBundles = scriptBundleProject.getRequiredBundles();
-			final List<Bundle> bundles = new ArrayList<Bundle>();
+			final List<Bundle> bundles = new ArrayList<>();
 			if (requiredBundles != null) {
 				for (final IRequiredBundleDescription requiredBundle : requiredBundles) {
 					final String id = requiredBundle.getName();
@@ -316,7 +316,7 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 			try {
 				final IBundleProjectDescription projectDescription = service.getDescription(sourceFile.getProject());
 				if (projectDescription != null)
-					return new AbstractMap.SimpleEntry<IFile, IBundleProjectDescription>(sourceFile, projectDescription);
+					return new AbstractMap.SimpleEntry<>(sourceFile, projectDescription);
 
 			} catch (final IllegalArgumentException ex) {
 				// ignore

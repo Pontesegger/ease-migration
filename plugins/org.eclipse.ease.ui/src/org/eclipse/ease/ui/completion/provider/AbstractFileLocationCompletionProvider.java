@@ -11,24 +11,63 @@
 package org.eclipse.ease.ui.completion.provider;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ICompletionContext.Type;
+import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
+import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public abstract class AbstractFileLocationCompletionProvider extends AbstractCompletionProvider {
+
+	private static class ResourceImageResolver implements IImageResolver {
+
+		private final Object fFile;
+
+		public ResourceImageResolver(Object file) {
+			fFile = file;
+		}
+
+		@Override
+		public Image getImage() {
+			if (fFile instanceof IResource) {
+				final IWorkbenchAdapter adapter = Platform.getAdapterManager().getAdapter(fFile, IWorkbenchAdapter.class);
+				return (adapter != null) ? adapter.getImageDescriptor(fFile).createImage() : null;
+
+			} else if (fFile instanceof File) {
+
+				if (isRootFile((File) fFile))
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
+
+				if (((File) fFile).isFile())
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE).createImage();
+
+				if (((File) fFile).isDirectory())
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
+
+			} else if (fFile instanceof ImageDescriptor)
+				return ((ImageDescriptor) fFile).createImage();
+
+			return null;
+		}
+	}
 
 	private static final int ORDER_URI_SCHEME = ScriptCompletionProposal.ORDER_DEFAULT;
 	private static final int ORDER_PROJECT = ScriptCompletionProposal.ORDER_DEFAULT + 1;
@@ -36,6 +75,10 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 	private static final int ORDER_FILE = ScriptCompletionProposal.ORDER_DEFAULT + 3;
 
 	private final ILabelProvider fLabelProvider = new WorkbenchLabelProvider();
+
+	public AbstractFileLocationCompletionProvider() {
+		Display.getDefault().syncExec(() -> fLabelProvider.getImage(ResourcesPlugin.getWorkspace().getRoot()));
+	}
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
@@ -46,45 +89,41 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 	protected void prepareProposals(final ICompletionContext context) {
 		final LocationResolver resolver = new LocationResolver(context.getFilter(), context.getResource());
 
-		if ((resolver.getResolvedFolder() == null) || (!resolver.isAbsolute())
-				|| (resolver.getType() == org.eclipse.ease.ui.completion.provider.LocationResolver.Type.UNKNOWN)) {
-			// add URI scheme proposals
-			if ((matches(context.getFilter(), "workspace:/")) && (showCandidate("workspace://")))
-				addProposal("workspace://", "workspace://", null, ORDER_URI_SCHEME, null);
+		// add URI scheme proposals
+		if ((matches(context.getFilter(), "workspace:/")) && (showCandidate("workspace://")))
+			addProposal("workspace://", "workspace://", null, ORDER_URI_SCHEME, null);
 
-			if ((matches(context.getFilter(), "project:/")) && (getContext().getResource() instanceof IResource) && (showCandidate("project://")))
-				addProposal("project://", "project://", null, ORDER_URI_SCHEME, null);
+		if ((matches(context.getFilter(), "project:/")) && (getContext().getResource() instanceof IResource) && (showCandidate("project://")))
+			addProposal("project://", "project://", null, ORDER_URI_SCHEME, null);
 
-			if ((matches(context.getFilter(), "file://")) && (showCandidate("file:///")))
-				addProposal("file:///", "file:///", null, ORDER_URI_SCHEME, null);
-		}
+		if ((matches(context.getFilter(), "file://")) && (showCandidate("file:///")))
+			addProposal("file:///", "file:///", null, ORDER_URI_SCHEME, null);
 
 		// display proposals
 		for (final Object child : resolver.getChildren()) {
 			if (child instanceof File) {
-				String name = ((File) child).getName();
-				String suffix = "";
-				if (name.isEmpty())
-					name = ((File) child).toString().replace('\\', '/');
-				else if (((File) child).isDirectory())
-					suffix = "/";
+				final String name = ((File) child).getName();
+				final String suffix = (((File) child).isDirectory()) ? "/" : "";
+				final String parentFolder = resolver.getParentString();
+				final String replacement = parentFolder + ((parentFolder.endsWith("/") ? "" : "/")) + name + suffix;
 
 				if ((matchesIgnoreCase(resolver.getFilterPart(), name)) && (showCandidate(child)))
-					addProposal(name, resolver.getParentString() + name + suffix, getImage((File) child), ORDER_FILE, null);
-			}
+					addProposal(name, replacement, new ResourceImageResolver(child), ORDER_FILE, null);
 
-			if (child instanceof IResource) {
+			} else if (child instanceof IResource) {
 				if ((matchesIgnoreCase(resolver.getFilterPart(), ((IResource) child).getName())) && (showCandidate(child))) {
-					final ImageDescriptor imageDescriptor = ImageDescriptor.createFromImage(fLabelProvider.getImage(child));
+
 					if (child instanceof IProject) {
-						addProposal(((IProject) child).getName(), resolver.getParentString() + ((IProject) child).getName() + '/', imageDescriptor,
-								ORDER_PROJECT, null);
+						addProposal(((IProject) child).getName(), resolver.getParentString() + ((IProject) child).getName() + '/',
+								new ResourceImageResolver(child), ORDER_PROJECT, null);
+
 					} else if (child instanceof IContainer) {
-						addProposal(((IContainer) child).getName(), resolver.getParentString() + ((IContainer) child).getName() + '/', imageDescriptor,
-								ORDER_FOLDER, null);
+						addProposal(((IContainer) child).getName(), resolver.getParentString() + ((IContainer) child).getName() + '/',
+								new ResourceImageResolver(child), ORDER_FOLDER, null);
+
 					} else {
-						addProposal(((IResource) child).getName(), resolver.getParentString() + ((IResource) child).getName(), imageDescriptor, ORDER_FILE,
-								null);
+						addProposal(((IResource) child).getName(), resolver.getParentString() + ((IResource) child).getName(), new ResourceImageResolver(child),
+								ORDER_FILE, null);
 					}
 				}
 			}
@@ -92,17 +131,27 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 
 		// add '..' proposal if we are not located in a root folder
 		if ((matches(resolver.getFilterPart(), "..")) && (showCandidate(".."))) {
-			final Object parentFolder = resolver.getResolvedFolder();
+			final Object parentFolder = resolver.getParentFolder();
 
-			if ((parentFolder instanceof IResource) && !(parentFolder instanceof IProject) && !(parentFolder instanceof IWorkspaceRoot)) {
+			if ((parentFolder instanceof IResource) && !(parentFolder instanceof IWorkspaceRoot)) {
 				addProposal("..", resolver.getParentString() + "../",
-						PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
+						new ResourceImageResolver(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER)), ORDER_FOLDER,
+						null);
 
-			} else if ((parentFolder instanceof File) && !(isRootFile((File) parentFolder))) {
-				addProposal("..", resolver.getParentString() + "../",
-						PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
+			} else if ((parentFolder instanceof File) && !(isRootFile((File) parentFolder)) && !(ResourceTools.VIRTUAL_WINDOWS_ROOT.equals(parentFolder))) {
+				addProposal("..", resolver.getParentString() + "/../",
+						new ResourceImageResolver(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER)), ORDER_FOLDER,
+						null);
 			}
 		}
+	}
+
+	protected boolean showCandidate(final Object candidate) {
+		// do not show closed projects
+		if ((candidate instanceof IProject) && (!((IProject) candidate).isOpen()))
+			return false;
+
+		return true;
 	}
 
 	/**
@@ -112,35 +161,19 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 	 *            file to check
 	 * @return <code>true</code> for root files
 	 */
-	private static boolean isRootFile(final File file) {
-		final Path filePath = file.toPath().normalize();
+	private static boolean isRootFile(File file) {
+		try {
+			file = file.getCanonicalFile();
+		} catch (final IOException e) {
+			// could not resolve canonical file, continue with provided file instance
+		}
+
 		for (final File rootFile : File.listRoots()) {
-			if (rootFile.toPath().equals(filePath))
+			if (rootFile.equals(file))
 				return true;
 		}
 
 		return false;
-	}
-
-	private static ImageDescriptor getImage(final File file) {
-		if (isRootFile(file))
-			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
-
-		if (file.isFile())
-			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
-
-		if (file.isDirectory())
-			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
-
-		return null;
-	}
-
-	protected boolean showCandidate(final Object candidate) {
-		// do not show closed projects
-		if ((candidate instanceof IProject) && (!((IProject) candidate).isOpen()))
-			return false;
-
-		return true;
 	}
 
 	protected static boolean hasFileExtension(final Object candidate, final String extension) {

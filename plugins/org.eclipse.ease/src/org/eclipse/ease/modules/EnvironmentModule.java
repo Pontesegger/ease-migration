@@ -131,23 +131,10 @@ public class EnvironmentModule extends AbstractEnvironment {
 	 */
 	@WrapToScript
 	public final Object include(final String filename) {
-		final Object file = ResourceTools.resolveFile(filename, getScriptEngine().getExecutedFile(), true);
+		final Object file = ResourceTools.resolve(filename, getScriptEngine().getExecutedFile());
 		if (file != null)
 			return getScriptEngine().inject(file);
 
-		else {
-
-			// maybe this is a URI
-			try {
-				final URL url = new URL(filename);
-				return getScriptEngine().inject(url.openStream());
-
-			} catch (final MalformedURLException e) {
-			} catch (final IOException e) {
-			}
-		}
-
-		// giving up
 		throw new RuntimeException("Cannot locate '" + filename + "'");
 	}
 
@@ -194,7 +181,7 @@ public class EnvironmentModule extends AbstractEnvironment {
 	public boolean loadJar(Object location) throws MalformedURLException {
 		if (!(location instanceof URL)) {
 			// try to resolve workspace URIs
-			Object file = ResourceTools.resolveFile(location.toString(), getScriptEngine().getExecutedFile(), true);
+			Object file = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 
 			if (file instanceof IFile)
 				file = ((IFile) file).getLocation().toFile();

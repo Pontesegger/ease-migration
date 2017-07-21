@@ -78,7 +78,7 @@ public class RunHeadlessScript implements IApplication {
 						engine.setVariable("argv", ((List) parameters.get("args")).toArray(new String[0]));
 
 						// TODO implement better URI handling - eg create URI and pass to script engine
-						Object scriptObject = ResourceTools.resolveFile(parameters.get("script"), null, true);
+						Object scriptObject = ResourceTools.resolve(parameters.get("script"));
 						if (scriptObject == null)
 							// no file available, try to include to resolve URIs
 							scriptObject = "include(\"" + parameters.get("script") + "\")";
@@ -131,7 +131,7 @@ public class RunHeadlessScript implements IApplication {
 	}
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {
-		final Map<String, Object> parameters = new HashMap<String, Object>();
+		final Map<String, Object> parameters = new HashMap<>();
 		parameters.put("args", new ArrayList<String>());
 
 		for (int index = 0; index < arguments.length; index++) {

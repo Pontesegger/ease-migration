@@ -16,7 +16,6 @@ import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -38,26 +37,27 @@ public class ScriptCompletionProposal
 
 	private final String fDisplayString;
 	private final String fReplacementString;
-	private final ImageDescriptor fImageDescriptor;
+	private final IImageResolver fImageResolver;
 	private StyledString fStyledString;
 	private final int fSortOrder;
 
 	private final IHelpResolver fHelpResolver;
 	private final ICompletionContext fContext;
 
+	// needs IImageResolver as workbench images can only be fetched within the UI thread
 	public ScriptCompletionProposal(final ICompletionContext context, final String displayString, final String replacementString,
-			final ImageDescriptor imageDescriptor, final int sortOrder, final IHelpResolver helpResolver) {
+			final IImageResolver imageResolver, final int sortOrder, final IHelpResolver helpResolver) {
 		fContext = context;
 		fDisplayString = displayString;
 		fReplacementString = replacementString;
-		fImageDescriptor = imageDescriptor;
+		fImageResolver = imageResolver;
 		fSortOrder = sortOrder;
 		fHelpResolver = helpResolver;
 	}
 
 	public ScriptCompletionProposal(final ICompletionContext context, final StyledString styledString, final String replacementString,
-			final ImageDescriptor imageDescriptor, final int sortOrder, final IHelpResolver helpResolver) {
-		this(context, styledString.getString(), replacementString, imageDescriptor, sortOrder, helpResolver);
+			final IImageResolver imageResolver, final int sortOrder, final IHelpResolver helpResolver) {
+		this(context, styledString.getString(), replacementString, imageResolver, sortOrder, helpResolver);
 		fStyledString = styledString;
 	}
 
@@ -80,7 +80,7 @@ public class ScriptCompletionProposal
 
 	@Override
 	public Image getImage() {
-		return (fImageDescriptor != null) ? fImageDescriptor.createImage() : null;
+		return (fImageResolver != null) ? fImageResolver.getImage() : null;
 	}
 
 	@Override

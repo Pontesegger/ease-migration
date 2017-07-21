@@ -32,9 +32,11 @@ import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.IHelpResolver;
+import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.eclipse.ease.ui.completions.java.EaseUICompletionsJavaFragment;
 import org.eclipse.ease.ui.completions.java.help.handlers.JavaClassHelpResolver;
+import org.eclipse.ease.ui.completions.java.provider.JavaMethodCompletionProvider.JDTImageResolver;
 import org.eclipse.ease.ui.tools.Timer;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -44,6 +46,33 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
 public class JavaClassCompletionProvider extends AbstractCompletionProvider {
+
+	private class JavaClassImageResolver extends DescriptorImageResolver {
+		private final String fPackageName;
+		private final String fClassName;
+
+		public JavaClassImageResolver(final String packageName, final String className) {
+			fPackageName = packageName;
+			fClassName = className;
+		}
+
+		@Override
+		protected ImageDescriptor getDescriptor() {
+			try {
+				final Class<?> clazz = JavaClassCompletionProvider.class.getClassLoader().loadClass(fPackageName + "." + fClassName.replace('.', '$'));
+				if (clazz.isEnum())
+					return JDTImageResolver.getDescriptor(ISharedImages.IMG_OBJS_ENUM);
+
+				else if (clazz.isInterface())
+					return JDTImageResolver.getDescriptor(ISharedImages.IMG_OBJS_INTERFACE);
+
+			} catch (final ClassNotFoundException e) {
+				// if we cannot find the class, use the default image
+			}
+
+			return JDTImageResolver.getDescriptor(ISharedImages.IMG_OBJS_CLASS);
+		}
+	}
 
 	/** Maps Package name -> contained classes. */
 	private static Map<String, Collection<String>> CLASSES = null;
@@ -68,9 +97,9 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 					final IHelpResolver helpResolver = new JavaClassHelpResolver(context.getPackage(), className);
 
 					// retrieve image
-					final ImageDescriptor descriptor = getImage(context.getPackage(), className);
+					final IImageResolver imageResolver = new JavaClassImageResolver(context.getPackage(), className);
 
-					addProposal(className, className, descriptor, ScriptCompletionProposal.ORDER_CLASS, helpResolver);
+					addProposal(className, className, imageResolver, ScriptCompletionProposal.ORDER_CLASS, helpResolver);
 				}
 			}
 
@@ -87,35 +116,16 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 						final IHelpResolver helpResolver = new JavaClassHelpResolver(packageEntry.getKey(), candidate);
 
 						// retrieve image
-						final ImageDescriptor descriptor = getImage(packageEntry.getKey(), candidate);
+						final IImageResolver imageResolver = new JavaClassImageResolver(packageEntry.getKey(), candidate);
 
 						final StyledString styledString = new StyledString(candidate);
 						styledString.append(" - " + packageEntry.getKey(), StyledString.QUALIFIER_STYLER);
 
-						addProposal(styledString, packageEntry.getKey() + "." + candidate, descriptor, ScriptCompletionProposal.ORDER_CLASS, helpResolver);
+						addProposal(styledString, packageEntry.getKey() + "." + candidate, imageResolver, ScriptCompletionProposal.ORDER_CLASS, helpResolver);
 					}
 				}
 			}
 		}
-	}
-
-	private static ImageDescriptor getImage(final String packageName, final String className) {
-		ImageDescriptor descriptor = null;
-
-		try {
-			final Class<?> clazz = JavaClassCompletionProvider.class.getClassLoader().loadClass(packageName + "." + className.replace('.', '$'));
-			if (clazz.isEnum())
-				descriptor = JavaMethodCompletionProvider.getSharedImage(ISharedImages.IMG_OBJS_ENUM);
-			else if (clazz.isInterface())
-				descriptor = JavaMethodCompletionProvider.getSharedImage(ISharedImages.IMG_OBJS_INTERFACE);
-		} catch (final ClassNotFoundException e) {
-			// if we cannot find the class, use the default image
-		}
-
-		if (descriptor == null)
-			descriptor = JavaMethodCompletionProvider.getSharedImage(ISharedImages.IMG_OBJS_CLASS);
-
-		return descriptor;
 	}
 
 	private static Map<String, Collection<String>> getClasses() {

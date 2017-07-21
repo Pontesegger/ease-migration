@@ -32,37 +32,37 @@ public class ResourceHyperlinkDetector extends AbstractHyperlinkDetector {
 
 	@Override
 	public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region, final boolean canShowMultipleHyperlinks) {
-		IDocument document = textViewer.getDocument();
+		final IDocument document = textViewer.getDocument();
 
 		IRegion lineInformation;
 		String line;
 		try {
 			lineInformation = document.getLineInformationOfOffset(region.getOffset());
 			line = document.get(lineInformation.getOffset(), lineInformation.getLength());
-		} catch (BadLocationException e) {
+		} catch (final BadLocationException e) {
 			return null;
 		}
 
-		int offsetInLine = region.getOffset() - lineInformation.getOffset();
-		Matcher matcher = STRING_LITERAL.matcher(line);
+		final int offsetInLine = region.getOffset() - lineInformation.getOffset();
+		final Matcher matcher = STRING_LITERAL.matcher(line);
 
 		while (matcher.find()) {
 			// literal detected, see if it is under the cursor
 			if ((offsetInLine >= matcher.start()) && (offsetInLine < matcher.end())) {
 				// extract filename
-				String filename = matcher.group((matcher.group(1) != null) ? 1 : 2);
+				final String filename = matcher.group((matcher.group(1) != null) ? 1 : 2);
 
 				// try to locate parent file
 				IFile parent = null;
-				IEditorInput input = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
+				final IEditorInput input = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
 				if (input instanceof FileEditorInput)
 					parent = ((FileEditorInput) input).getFile();
 
 				// resolve target file location
-				Object file = ResourceTools.resolveFile(filename, parent, true);
+				final Object file = ResourceTools.resolve(filename, parent);
 				if (file instanceof IFile) {
 					if (((IFile) file).exists()) {
-						Region linkRegion = new Region(lineInformation.getOffset() + matcher.start() + 1, filename.length());
+						final Region linkRegion = new Region(lineInformation.getOffset() + matcher.start() + 1, filename.length());
 						return new IHyperlink[] { new ResourceHyperlink((IFile) file, linkRegion) };
 					}
 				}

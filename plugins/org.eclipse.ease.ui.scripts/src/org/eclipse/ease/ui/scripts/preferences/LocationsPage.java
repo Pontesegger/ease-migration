@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.scripts.Activator;
 import org.eclipse.ease.ui.scripts.repository.IRawLocation;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryFactory;
@@ -60,7 +61,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 public class LocationsPage extends PreferencePage implements IWorkbenchPreferencePage {
 	private TableViewer fTableViewer;
-	private final Set<IScriptLocation> fScriptLocations = new HashSet<IScriptLocation>();;
+	private final Set<IScriptLocation> fScriptLocations = new HashSet<>();;
 
 	public LocationsPage() {
 	}
@@ -72,17 +73,17 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 
 	@Override
 	protected Control createContents(final Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout(2, false));
 		{
-			Label lblProvideLocationsTo = new Label(container, SWT.NONE);
+			final Label lblProvideLocationsTo = new Label(container, SWT.NONE);
 			lblProvideLocationsTo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 			lblProvideLocationsTo.setText("Provide locations to look for scripts. The default location will be used to store your recorded scripts.");
 		}
 		{
-			Composite composite = new Composite(container, SWT.NONE);
+			final Composite composite = new Composite(container, SWT.NONE);
 			composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 6));
-			TableColumnLayout tcl_composite = new TableColumnLayout();
+			final TableColumnLayout tcl_composite = new TableColumnLayout();
 			composite.setLayout(tcl_composite);
 			{
 				fTableViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
@@ -90,7 +91,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				table.setHeaderVisible(true);
 				table.setLinesVisible(true);
 				{
-					TableViewerColumn tableViewerColumn = new TableViewerColumn(fTableViewer, SWT.NONE);
+					final TableViewerColumn tableViewerColumn = new TableViewerColumn(fTableViewer, SWT.NONE);
 					tableViewerColumn.setEditingSupport(new EditingSupport(fTableViewer) {
 						@Override
 						protected boolean canEdit(final Object element) {
@@ -118,7 +119,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 							}
 						}
 					});
-					TableColumn tblclmnLocation = tableViewerColumn.getColumn();
+					final TableColumn tblclmnLocation = tableViewerColumn.getColumn();
 					tcl_composite.setColumnData(tblclmnLocation, new ColumnWeightData(5, ColumnWeightData.MINIMUM_WIDTH, true));
 					tblclmnLocation.setText("Location");
 					tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
@@ -146,7 +147,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 					});
 				}
 				{
-					TableViewerColumn tableViewerColumn = new TableViewerColumn(fTableViewer, SWT.NONE);
+					final TableViewerColumn tableViewerColumn = new TableViewerColumn(fTableViewer, SWT.NONE);
 					tableViewerColumn.setEditingSupport(new EditingSupport(fTableViewer) {
 						@Override
 						protected boolean canEdit(final Object element) {
@@ -174,7 +175,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 							}
 						}
 					});
-					TableColumn tblclmnRecursive = tableViewerColumn.getColumn();
+					final TableColumn tblclmnRecursive = tableViewerColumn.getColumn();
 					tcl_composite.setColumnData(tblclmnRecursive, new ColumnWeightData(1, ColumnWeightData.MINIMUM_WIDTH, true));
 					tblclmnRecursive.setText("Recursive");
 					tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
@@ -203,14 +204,14 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 			}
 		}
 		{
-			Button btnAddWorkspace = new Button(container, SWT.NONE);
+			final Button btnAddWorkspace = new Button(container, SWT.NONE);
 			btnAddWorkspace.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), true,
+					final ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), true,
 							"Select script folder");
 					if (dialog.open() == Window.OK) {
-						Object[] result = dialog.getResult();
+						final Object[] result = dialog.getResult();
 						if ((result.length > 0) && (result[0] instanceof IPath))
 							addEntry("workspace:/" + result[0].toString());
 					}
@@ -220,25 +221,25 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 			btnAddWorkspace.setText("Add Workspace...");
 		}
 		{
-			Button btnAddFileSystem = new Button(container, SWT.NONE);
+			final Button btnAddFileSystem = new Button(container, SWT.NONE);
 			btnAddFileSystem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					DirectoryDialog dialog = new DirectoryDialog(getShell());
-					String path = dialog.open();
+					final DirectoryDialog dialog = new DirectoryDialog(getShell());
+					final String path = dialog.open();
 					if (path != null)
-						addEntry(new File(path).toURI().toString());
+						addEntry(ResourceTools.toAbsoluteLocation(new File(path), null));
 				}
 			});
 			btnAddFileSystem.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 			btnAddFileSystem.setText("Add File System...");
 		}
 		{
-			Button btnAddUri = new Button(container, SWT.NONE);
+			final Button btnAddUri = new Button(container, SWT.NONE);
 			btnAddUri.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					InputDialog dialog = new InputDialog(getShell(), "Enter location URI", "Enter the URI of a location to add", "", new URIValidator());
+					final InputDialog dialog = new InputDialog(getShell(), "Enter location URI", "Enter the URI of a location to add", "", new URIValidator());
 					if (dialog.open() == Window.OK)
 						addEntry(dialog.getValue());
 				}
@@ -250,14 +251,14 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 		new Label(container, SWT.NONE);
 		;
 		{
-			Button btnSetAsDefault = new Button(container, SWT.NONE);
+			final Button btnSetAsDefault = new Button(container, SWT.NONE);
 			btnSetAsDefault.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					IStructuredSelection selection = (IStructuredSelection) fTableViewer.getSelection();
+					final IStructuredSelection selection = (IStructuredSelection) fTableViewer.getSelection();
 					if (!selection.isEmpty()) {
-						Collection<IScriptLocation> entries = (Collection<IScriptLocation>) fTableViewer.getInput();
-						for (IScriptLocation entry : entries)
+						final Collection<IScriptLocation> entries = (Collection<IScriptLocation>) fTableViewer.getInput();
+						for (final IScriptLocation entry : entries)
 							entry.setDefault(entry.equals(selection.getFirstElement()));
 					}
 
@@ -268,18 +269,18 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 			btnSetAsDefault.setText("Default");
 		}
 		{
-			Button btnDelete = new Button(container, SWT.NONE);
+			final Button btnDelete = new Button(container, SWT.NONE);
 			btnDelete.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					IStructuredSelection selection = (IStructuredSelection) fTableViewer.getSelection();
+					final IStructuredSelection selection = (IStructuredSelection) fTableViewer.getSelection();
 					if (!selection.isEmpty()) {
-						for (Object location : selection.toList())
+						for (final Object location : selection.toList())
 							fScriptLocations.remove(location);
 
 						// verify that we have a default entry
 						boolean hasDefault = false;
-						for (IScriptLocation entry : fScriptLocations)
+						for (final IScriptLocation entry : fScriptLocations)
 							hasDefault |= entry.isDefault();
 
 						if ((!hasDefault) && (!fScriptLocations.isEmpty()))
@@ -301,7 +302,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 
 	private void addEntry(final String location) {
 
-		IScriptLocation entry = IRepositoryFactory.eINSTANCE.createScriptLocation();
+		final IScriptLocation entry = IRepositoryFactory.eINSTANCE.createScriptLocation();
 		entry.setLocation(location);
 		entry.setRecursive(true);
 		// first entry is also the default entry
@@ -334,10 +335,10 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 	}
 
 	private void saveLocations() {
-		Collection<IScriptLocation> oldLocations = PreferencesHelper.getLocations();
+		final Collection<IScriptLocation> oldLocations = PreferencesHelper.getLocations();
 
-		for (IScriptLocation oldLocation : new HashSet<IScriptLocation>(oldLocations)) {
-			for (IScriptLocation newLocation : new HashSet<IScriptLocation>(fScriptLocations)) {
+		for (final IScriptLocation oldLocation : new HashSet<>(oldLocations)) {
+			for (final IScriptLocation newLocation : new HashSet<>(fScriptLocations)) {
 				if (EcoreUtil.equals(oldLocation, newLocation)) {
 					oldLocations.remove(oldLocation);
 					fScriptLocations.remove(newLocation);
@@ -346,10 +347,10 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 		}
 
 		final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
-		for (IScriptLocation oldLocation : oldLocations)
+		for (final IScriptLocation oldLocation : oldLocations)
 			repositoryService.removeLocation(oldLocation.getLocation());
 
-		for (IScriptLocation newLocation : fScriptLocations)
+		for (final IScriptLocation newLocation : fScriptLocations)
 			repositoryService.addLocation(newLocation.getLocation(), newLocation.isDefault(), newLocation.isRecursive());
 	}
 }

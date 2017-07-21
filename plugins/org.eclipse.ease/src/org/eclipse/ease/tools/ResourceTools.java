@@ -17,32 +17,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.urlhandler.WorkspaceURLConnection;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 public final class ResourceTools {
 
@@ -99,6 +94,19 @@ public final class ResourceTools {
 	}
 
 	private static final String PROJECT_SCHEME = "project";
+	private static final String PROJECT_PREFIX = PROJECT_SCHEME + "://";
+
+	private static final String WORKSPACE_SCHEME = "workspace";
+	private static final String WORKSPACE_PREFIX = WORKSPACE_SCHEME + "://";
+
+	private static final String FILE_SCHEME = "file";
+	private static final String FILE_PREFIX = FILE_SCHEME + "://";
+
+	private static final Pattern WINDOWS_LOCAL_FILE_PATTERN = Pattern.compile("(?:file:///?)?([A-Z]:[/\\\\].*)");
+	private static final Pattern WINDOWS_NETWORK_FILE_PATTERN = Pattern.compile("(?:file\\:)?((?://|\\\\\\\\)[^:/][^:]*)");
+
+	/** Virtual file indicating a file system root on windows. Needed as windows does not have a real root file object. */
+	public static final Object VIRTUAL_WINDOWS_ROOT = new File("/");
 
 	/**
 	 * @deprecated
@@ -108,217 +116,330 @@ public final class ResourceTools {
 	}
 
 	/**
-	 * Resolve a file from a given input location. Tries to resolve absolute and relative files within the workspace or file system. Relative files will be
-	 * resolved against a provided parent location.
+	 * Resolve to an existing File/IResource/URI/URL. For relative locations the parent object location is taken into account.
 	 *
 	 * @param location
-	 *            file location to be resolved
+	 *            location to resolve
 	 * @param parent
-	 *            location of parent resource
-	 * @param exists
-	 *            return file only if it exists, if <code>false</code> the file is returned whether it exists or not
-	 * @return {@link IFile}, {@link File} or <code>null</code>
+	 *            parent location to resolve from (needs to be absolute)
+	 * @return resource or <code>null</code>
 	 */
-	public static Object resolveFile(final Object location, final Object parent, final boolean exists) {
-		if (location == null)
+	public static Object resolve(Object location, Object parent) {
+		if ((location instanceof File) || (location instanceof IResource) || (location instanceof URI) || (location instanceof URL))
+			return location;
+
+		final String locationStr = location.toString();
+		if (isAbsolute(locationStr))
+			return resolve(location);
+
+		// simple checks done, now we need the parent
+		parent = resolve(parent);
+		if (!exists(parent))
 			return null;
 
-		final Object parentObject = resolveParent(parent);
-		Object candidate = resolveAbsolute(location, parentObject, false);
+		if (parent instanceof IResource) {
+			// resolve within workspace
 
-		if ((candidate == null) && (parentObject != null))
-			candidate = resolveRelativeFile(location, parentObject, exists);
+			if (locationStr.startsWith(PROJECT_PREFIX)) {
+				// "project://..." location
+				final String targetPath = WORKSPACE_PREFIX + ((IResource) parent).getProject().getName() + "/" + locationStr.substring(PROJECT_PREFIX.length());
+				return resolve(targetPath);
+			}
 
-		if (candidate instanceof IFile)
-			return ((((IFile) candidate).exists()) || (!exists)) ? candidate : null;
+			// pure relative location
+			final IPath parentPath = (parent instanceof IFile) ? ((IResource) parent).getParent().getFullPath() : ((IResource) parent).getFullPath();
+			final IPath locationPath = new Path(locationStr);
 
-		if ((candidate instanceof File) && ((((File) candidate).isFile()) || (!exists)))
-			return ((((File) candidate).exists()) || (!exists)) ? candidate : null;
+			IPath targetPath;
+			if (locationPath.segmentCount() > parentPath.segmentCount()) {
+				// check for special case when relative path steps out of workspace hierarchy
+				targetPath = appendPath(parentPath, locationPath);
+			} else
+				targetPath = parentPath.append(locationPath);
 
-		// giving up
+			if (targetPath != null) {
+				final Object resolvedTarget = resolve(WORKSPACE_PREFIX + targetPath.makeRelative().toPortableString());
+				if (resolvedTarget != null)
+					return resolvedTarget;
+			}
+
+			// could not resolve within the workspace, try within the file system
+			parent = toFileSystem((IResource) parent);
+		}
+
+		if (parent instanceof File) {
+			// resolve within file system
+			final Path parentPath = new Path(
+					(((File) parent).isFile()) ? ((File) parent).getParentFile().getAbsolutePath() : ((File) parent).getAbsolutePath());
+
+			final IPath targetPath = parentPath.append(new Path(locationStr));
+			return targetPath.toFile();
+		}
+
+		if (parent instanceof URL) {
+			try {
+				parent = ((URL) parent).toURI();
+			} catch (final URISyntaxException e) {
+				// TODO handle this exception (but for now, at least know it happened)
+				throw new RuntimeException(e);
+			}
+		}
+
+		if (parent instanceof URI) {
+			return ((URI) parent).resolve(locationStr);
+		}
+
 		return null;
 	}
 
 	/**
-	 * Resolve a folder from a given input location. Tries to resolve absolute and relative folders within the workspace or file system. Relative folders will
-	 * be resolved against a provided parent location.
+	 * Manually add segment by segment to a path to make sure we do not step back outside of the given parent path. Tries to detect cases like this one:
+	 * '/some/path/../../..' which do not get resolved correctly by path.append().
+	 *
+	 * @param parentPath
+	 *            parent path
+	 * @param locationPath
+	 *            relative path to append
+	 * @return appended path or <code>null</code> in case we leave the context
+	 */
+	private static IPath appendPath(IPath parentPath, IPath locationPath) {
+		if (locationPath.segmentCount() > 0) {
+			final IPath newParent = parentPath.append(locationPath.segment(0));
+			if (parentPath.equals(newParent))
+				return null;
+
+			return appendPath(newParent, locationPath.removeFirstSegments(1));
+
+		} else
+			return parentPath;
+	}
+
+	/**
+	 * Get the filesystem representation of a workspace resource.
+	 *
+	 * @param resource
+	 *            workspace resource
+	 * @return file system resource
+	 */
+	private static File toFileSystem(IResource resource) {
+		// on some projects getRawLocation() returns null
+		if (resource.getRawLocation() != null)
+			return resource.getRawLocation().toFile();
+
+		return resource.getLocation().toFile();
+	}
+
+	/**
+	 * Check whether a resource exists. Works only for IResource, File, URI, URL objects. Does not try to resolve the given location.
+	 *
+	 * @param resource
+	 *            resource to query for
+	 * @return <code>true</code> if resource exists or is of type URI or URL
+	 */
+	public static boolean exists(Object resource) {
+		if (resource instanceof IResource)
+			return ((IResource) resource).exists();
+
+		if (resource instanceof File)
+			return ((File) resource).exists();
+
+		if ((resource instanceof URI) || (resource instanceof URL))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Check if a resource exists and is of type file. Does not resolve the resource.
+	 *
+	 * @param resource
+	 *            {@link File} or {@link IResource} object
+	 * @return <code>true</code> when resource is a file
+	 */
+	public static boolean isFile(Object resource) {
+		if (exists(resource)) {
+			if (resource instanceof IFile)
+				return true;
+
+			if ((resource instanceof File) && (((File) resource).isFile()))
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a resource exists and is of type folder. For the eclipse workspace this check is also true for the workspace root and project locations. Does
+	 * not resolve the resource.
+	 *
+	 * @param resource
+	 *            {@link File} or {@link IResource} object
+	 * @return <code>true</code> when resource is a folder
+	 */
+	public static boolean isFolder(Object resource) {
+		if (exists(resource)) {
+			if (resource instanceof IContainer)
+				return true;
+
+			if ((resource instanceof File) && (((File) resource).isDirectory()))
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Resolve to an existing File/IResource/URI/URL.
 	 *
 	 * @param location
-	 *            folder location to be resolved
-	 * @param parent
-	 *            location of parent resource
-	 * @param exists
-	 *            return folder only if it exists
-	 * @return {@link IContainer}, {@link File} or <code>null</code>
+	 *            location to resolve
+	 * @return resource or <code>null</code>
 	 */
-	public static Object resolveFolder(final Object location, final Object parent, final boolean exists) {
-		if (location == null)
+	public static Object resolve(Object location) {
+		if ((location instanceof File) || (location instanceof IResource) || (location instanceof URI) || (location instanceof URL))
+			return location;
+
+		if ((location == null) || (location.toString().trim().isEmpty()))
 			return null;
 
-		final Object parentObject = resolveParent(parent);
-		Object candidate = resolveAbsolute(location, parentObject, true);
+		final String locationStr = location.toString();
+		if (isAbsolute(locationStr)) {
+			if (locationStr.startsWith(WORKSPACE_PREFIX)) {
+				if (WORKSPACE_PREFIX.equals(locationStr))
+					return getWorkspace();
 
-		if ((candidate == null) && (parentObject != null))
-			candidate = resolveRelativeFolder(location, parentObject, exists);
+				// workspace file
+				final IPath path = new Path(locationStr.substring(WORKSPACE_PREFIX.length()));
 
-		if (candidate instanceof IContainer)
-			return ((((IContainer) candidate).exists()) || (!exists)) ? candidate : null;
+				if (path.isEmpty())
+					// user stepped back into workspace root
+					return getWorkspace();
 
-		if ((candidate instanceof File) && ((((File) candidate).isDirectory()) || (!exists)))
-			return ((((File) candidate).exists()) || (!exists)) ? candidate : null;
-
-		// giving up
-		return null;
-	}
-
-	private static Object resolveParent(Object parent) {
-		if ((parent != null) && (!(parent instanceof IResource)) && (!(parent instanceof File))) {
-			final Object parentReference = parent;
-			parent = resolveFile(parentReference, null, true);
-			if (parent == null)
-				parent = resolveFolder(parentReference, null, true);
-		}
-
-		if (parent instanceof IFile)
-			return ((IFile) parent).getParent();
-
-		if ((parent instanceof File) && (((File) parent).isFile()))
-			return ((File) parent).getParentFile();
-
-		return parent;
-	}
-
-	private static Object resolveAbsolute(Object location, final Object parent, final boolean isFolder) {
-		if ((!isFolder) && (location instanceof IFile))
-			return location;
-
-		if ((isFolder) && (location instanceof IContainer))
-			return location;
-
-		if (location instanceof String) {
-			// try to convert to an URI
-			try {
-				location = URIUtil.fromString((String) location);
-			} catch (final URISyntaxException e) {
-				// throw on invalid URIs, ignore and continue with location as-is
-			}
-		}
-
-		if (location instanceof URI) {
-			// resolve file:// URIs
-			try {
-				location = new File((URI) location);
-			} catch (final Exception e) {
-				// URI scheme is not "file" or contains an authority
-				if (location.toString().startsWith("file:"))
-					location = new File(location.toString().substring(5));
-
-				else
-					location = URIUtil.toUnencodedString((URI) location);
-			}
-		}
-
-		if (location instanceof File)
-			return location;
-
-		// nothing of the previous, try to resolve
-		final String reference = location.toString();
-
-		if (reference.startsWith(PROJECT_SCHEME)) {
-			// project relative link
-			if (parent instanceof IResource) {
-				final IProject project = ((IResource) parent).getProject();
+				final IProject project = getWorkspace().getProject(path.segment(0));
 				if (project != null) {
-					if (isFolder)
-						return project.getFolder(new Path(reference.substring(PROJECT_SCHEME.length() + 2)));
-					else
-						return project.getFile(new Path(reference.substring(PROJECT_SCHEME.length() + 2)));
-				}
-			}
+					if (path.segmentCount() == 1)
+						return project;
 
-		} else if (reference.startsWith(WorkspaceURLConnection.SCHEME)) {
-			// workspace absolute link
-			final Path path = new Path(reference.substring(WorkspaceURLConnection.SCHEME.length() + 2));
-			if (isFolder) {
-				if (path.segmentCount() > 1)
-					return ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
-				else if (path.segmentCount() == 1)
-					return ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
+					final IFolder folder = project.getFolder(path.removeFirstSegments(1));
+					if (folder.exists())
+						return folder;
+
+					return project.getFile(path.removeFirstSegments(1));
+				}
+
+			} else if (locationStr.startsWith(FILE_PREFIX)) {
+				if (isWindows()) {
+					Matcher matcher = WINDOWS_LOCAL_FILE_PATTERN.matcher(locationStr);
+					if (matcher.matches())
+						return new File(matcher.group(1));
+
+					matcher = WINDOWS_NETWORK_FILE_PATTERN.matcher(locationStr);
+					if (matcher.matches())
+						return new File(matcher.group(1));
+
+					else if (("file:///".equals(locationStr)) || ("file://".equals(locationStr)))
+						return VIRTUAL_WINDOWS_ROOT;
+
+					// giving up
+					return null;
+
+				} else {
+					if (locationStr.startsWith("file:///"))
+						return new File(locationStr.substring(7));
+
+					else if (locationStr.startsWith("file://"))
+						return new File(locationStr.substring(6));
+
+					else
+						return new File(locationStr);
+				}
+
+			} else if (locationStr.contains("://")) {
+				// simple check for URI schemes
+				try {
+					return createURI(locationStr);
+
+				} catch (final MalformedURLException e) {
+					// could be thrown for unknown protocols like svn://
+
+					// fallback, no more escaping of spaces
+					return URI.create(locationStr);
+
+				} catch (final URISyntaxException e) {
+					// TODO handle this exception (but for now, at least know it happened)
+					throw new RuntimeException(e);
+				}
 
 			} else {
-				if (path.segmentCount() > 1)
-					return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+				// quite likely an absolute path into the file system
+				return new File(locationStr);
 			}
-
-		} else {
-			// maybe this is an absolute path within the file system
-			final File systemFile = new File(reference);
-			if (systemFile.isAbsolute())
-				return systemFile;
 		}
 
 		return null;
-
 	}
 
-	private static Object resolveRelativeFile(final Object location, final Object parent, final boolean exists) {
-		final String reference = location.toString();
-
-		if (parent instanceof IResource) {
-			// resolve a relative path in the workspace
-			final IFile relativeFile = ((IContainer) parent).getFile(new Path(reference));
-			if ((relativeFile.exists()) || (!exists))
-				return relativeFile;
-
-		} else if (parent instanceof File) {
-			// resolve a relative path in the file system
-			final File systemFile = new File(((File) parent).getAbsolutePath() + File.separator + reference);
-			if (((systemFile.exists()) && (systemFile.isFile())) || (!exists))
-				return systemFile;
-		}
-
-		// giving up
-		return null;
+	private static boolean isWindows() {
+		return System.getProperty("os.name").toLowerCase().startsWith("windows");
 	}
 
-	private static Object resolveRelativeFolder(final Object location, final Object parent, final boolean exists) {
-
-		if (parent instanceof IResource) {
-			// resolve a relative path in the workspace
-			final IPath targetPath = ((IResource) parent).getFullPath().append(new Path(location.toString()));
-			IContainer relativeFolder = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(targetPath);
-			if ((relativeFolder == null) && (targetPath.segmentCount() == 1))
-				relativeFolder = ResourcesPlugin.getWorkspace().getRoot().getProject(targetPath.segment(0));
-
-			if (relativeFolder == null)
-				relativeFolder = ((IContainer) parent).getFolder(new Path(location.toString()));
-
-			if ((relativeFolder.exists()) || (!exists))
-				return relativeFolder;
-
-		} else if (parent instanceof File) {
-			// resolve a relative path in the file system
-			final File systemFolder = new File(((File) parent).getAbsolutePath() + File.separator + location);
-			if (((systemFolder.exists()) && (systemFolder.isDirectory())) || (!exists))
-				return systemFolder;
-		}
-
-		// giving up
-		return null;
+	/**
+	 * Correctly escapes spaces in URIs.
+	 *
+	 * @param address
+	 *            address to create URI for
+	 * @return URI
+	 * @throws MalformedURLException
+	 * @throws URISyntaxException
+	 */
+	public static URI createURI(String address) throws MalformedURLException, URISyntaxException {
+		final URL url = new URL(address);
+		return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 	}
 
-	public static String toProjectRelativeLocation(final Object location, final Object parent) {
-		// try to resolve file
-		Object resource = resolveFile(location, parent, true);
-		if (!(resource instanceof IResource))
-			// try to resolve folder
-			resource = resolveFolder(location, parent, true);
+	/**
+	 * Get the workspace root.
+	 *
+	 * @return workspace root
+	 */
+	private static IWorkspaceRoot getWorkspace() {
+		return ResourcesPlugin.getWorkspace().getRoot();
+	}
 
-		if (resource instanceof IResource)
-			return PROJECT_SCHEME + "://" + ((IResource) resource).getProjectRelativePath().toPortableString();
+	/**
+	 * Verifies if a location is provided in absolute form.
+	 *
+	 * @param location
+	 *            location string
+	 * @return <code>true</code> for absolute locations
+	 */
+	public static boolean isAbsolute(String location) {
+		if (location.startsWith(PROJECT_PREFIX))
+			return false;
 
-		// nothing to resolve, return null
-		return null;
+		// simple check for URI style
+		if (location.contains("://"))
+			return true;
+
+		// check for windows files
+		if (WINDOWS_LOCAL_FILE_PATTERN.matcher(location).matches())
+			return true;
+
+		if (WINDOWS_NETWORK_FILE_PATTERN.matcher(location).matches())
+			return true;
+
+		return new Path(location).isAbsolute();
+	}
+
+	/**
+	 * Provides the project relative URI for a given workspace resource. The provided location will be of type 'project://...'.
+	 *
+	 * @param resource
+	 *            resource to get relative URI for.
+	 * @return project relative location
+	 */
+	public static String toProjectRelativeLocation(final IResource resource) {
+		return PROJECT_SCHEME + "://" + resource.getProjectRelativePath().toPortableString();
 	}
 
 	/**
@@ -332,93 +453,39 @@ public final class ResourceTools {
 	 * @return resolved location string or <code>null</code>
 	 */
 	public static String toAbsoluteLocation(final Object location, final Object parent) {
+
 		// try to resolve file
-		final Object file = resolveFile(location, parent, true);
+		final Object file = resolve(location, parent);
 		if (file instanceof IResource)
 			return WorkspaceURLConnection.SCHEME + ":/" + ((IResource) file).getFullPath().toPortableString();
 
-		else if (file instanceof File)
-			return ((File) file).toURI().toASCIIString();
+		else if (file instanceof File) {
+			if (isWindows())
+				return "file:///" + ((File) file).toString().replaceAll("\\\\", "/");
+			else
+				return "file://" + ((File) file).toString();
+		}
 
-		// try to resolve folder
-		final Object folder = resolveFolder(location, parent, true);
-		if (folder instanceof IResource)
-			return WorkspaceURLConnection.SCHEME + ":/" + ((IResource) folder).getFullPath().toPortableString();
-
-		else if (folder instanceof File)
-			return ((File) folder).toURI().toASCIIString();
+		else if (file != null)
+			return file.toString();
 
 		// nothing to resolve, return null
 		return null;
 	}
 
 	/**
-	 * Verifies that a readable source (file/stream) exists at location.
+	 * Get the content of a resource location as {@link InputStream}.
 	 *
 	 * @param location
-	 *            location to verify
-	 * @return <code>true</code> when location is readable
+	 *            location to read from
+	 * @return {@link InputStream} or <code>null</code>
 	 */
-	public static boolean exists(final Object location) {
-		if (location == null)
-			return false;
-
-		if (resolveFile(location, null, true) != null)
-			return true;
-
-		// not a file, maybe an URI?
-		try {
-
-			final URI uri = (location instanceof URI) ? (URI) location : URI.create(location.toString());
-			final InputStream stream = uri.toURL().openStream();
-			if (stream != null) {
-				stream.close();
-				return true;
-			}
-		} catch (final Exception e) {
-			// cannot open / read from stream
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get an existing resource (file/folder/URI).
-	 *
-	 * @param location
-	 *            location to look up
-	 * @return resource, either {@link File}, {@link IResource} or {@link URI}
-	 */
-	public static Object getResource(final Object location) {
-		Object file = resolveFile(location, null, true);
-		if (file != null)
-			return file;
-
-		// not a file, maybe a folder?
-		file = resolveFolder(location, null, true);
-		if (file != null)
-			return file;
-
-		// not a folder, maybe an URI?
-		if (location instanceof URI)
-			return location;
-
-		try {
-			if (location != null)
-				return URI.create(location.toString());
-		} catch (final Exception e) {
-			// cannot create URI
-		}
-
-		return null;
-	}
-
 	public static InputStream getInputStream(final Object location) {
 		if (location instanceof InputStream)
 			return (InputStream) location;
 
 		try {
-			final Object resource = getResource(location);
+			final Object resource = resolve(location);
 			if (resource instanceof IFile)
 				return ((IFile) resource).getContents();
 
@@ -448,7 +515,7 @@ public final class ResourceTools {
 	 *            location to look up
 	 * @return content or <code>null</code> in case of error
 	 */
-	public static String resourceToString(final Object location) {
+	public static String toString(final Object location) {
 		try {
 			final InputStream inputStream = new BufferedInputStream(getInputStream(location));
 			return StringTools.toString(inputStream);
@@ -457,94 +524,6 @@ public final class ResourceTools {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Converts an {@link IPath} representing a workspace resource to an {@link URI}.
-	 *
-	 * @param path
-	 *            The path to convert
-	 * @return The URI representing the provided path
-	 */
-	public static URI toURI(final IPath path) {
-		// source from org.eclipse.core.filesystem.URIUtil (Indigo version)
-		if (path == null)
-			return null;
-		if (path.isAbsolute())
-			return toURI(path.toFile().getAbsolutePath());
-		try {
-			// try to preserve the path as a relative path
-			return new URI(escapeColons(path.toString()));
-		} catch (final URISyntaxException e) {
-			return toURI(path.toFile().getAbsolutePath());
-		}
-	}
-
-	/**
-	 * Converts a String representing a local file system path to a {@link URI}. For example, this method can be used to create a URI from the output of
-	 * {@link File#getAbsolutePath()}.
-	 *
-	 * @param pathString
-	 *            The path string to convert
-	 * @return The URI representing the provided path string
-	 */
-	private static URI toURI(String pathString) {
-		// source from org.eclipse.core.filesystem.URIUtil (Indigo version)
-		if (File.separatorChar != '/')
-			pathString = pathString.replace(File.separatorChar, '/');
-		final int length = pathString.length();
-		final StringBuffer pathBuf = new StringBuffer(length + 1);
-		// There must be a leading slash in a hierarchical URI
-		if ((length > 0) && (pathString.charAt(0) != '/'))
-			pathBuf.append('/');
-		// additional double-slash for UNC paths to distinguish from host separator
-		if (pathString.startsWith("//")) //$NON-NLS-1$
-			pathBuf.append('/').append('/');
-		pathBuf.append(pathString);
-		try {
-			return new URI(EFS.SCHEME_FILE, null, pathBuf.toString(), null);
-		} catch (final URISyntaxException e) {
-			// try java.io implementation
-			return new File(pathString).toURI();
-		}
-	}
-
-	/**
-	 * Replaces any colon characters in the provided string with their equivalent URI escape sequence.
-	 */
-	private static String escapeColons(final String string) {
-		// source from org.eclipse.core.filesystem.URIUtil (Indigo version)
-		final String COLON_STRING = "%3A"; //$NON-NLS-1$
-		if (string.indexOf(':') == -1)
-			return string;
-		final int length = string.length();
-		final StringBuffer result = new StringBuffer(length);
-		for (int i = 0; i < length; i++) {
-			final char c = string.charAt(i);
-			if (c == ':')
-				result.append(COLON_STRING);
-			else
-				result.append(c);
-		}
-		return result.toString();
-	}
-
-	/**
-	 * Convert a location to a path in the workspace.
-	 *
-	 * @param location
-	 *            location to convert (workspace://...)
-	 * @return
-	 */
-	public static IPath toPath(final String location) {
-		if (location == null)
-			return null;
-
-		Object resource = resolveAbsolute(location, null, true);
-		if (resource == null)
-			resource = resolveAbsolute(location, null, false);
-
-		return (resource instanceof IResource) ? ((IResource) resource).getFullPath() : null;
 	}
 
 	/**
@@ -590,32 +569,25 @@ public final class ResourceTools {
 	}
 
 	/**
-	 * Returns the currently active file in the workbench.
+	 * Convert resource to file system {@link File}. Does not try to resolve the resource.
 	 *
-	 * Must be run on UI thread.
-	 *
-	 * @return Currently active file if successful or <code>null</code> in case of error.
+	 * @param resource
+	 *            resource to convert. Either a {@link File} or an {@link IResource}
+	 * @return file or folder in the local file system
 	 */
-	public static IFile getActiveFile() {
-		IFile file = null;
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench != null) {
-			final IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
-			if (workbenchWindow != null) {
-				final IWorkbenchPage workbenchPage = workbenchWindow.getActivePage();
-				if (workbenchPage != null) {
-					final IEditorPart editor = workbenchPage.getActiveEditor();
-					if (editor != null) {
-						file = editor.getEditorInput().getAdapter(IFile.class);
-					}
-				}
-			}
-		}
-		return file;
+	public static File toFile(Object resource) {
+		if (resource instanceof File)
+			return (File) resource;
+
+		if (resource instanceof IResource)
+			return toFileSystem((IResource) resource);
+
+		return null;
 	}
 
 	/**
-	 * Creates a folder if it does not exists already. Also creates any parent folder needed.
+	 * Creates a folder in the workspace if it does not exists already. Also creates any parent folder needed. Requires the project the folder resides to to
+	 * exist already.
 	 *
 	 * @param folder
 	 *            folder to be created
@@ -629,51 +601,6 @@ public final class ResourceTools {
 
 			if (folder instanceof IFolder)
 				((IFolder) folder).create(true, true, new NullProgressMonitor());
-		}
-	}
-
-	/**
-	 * Unpack an archive into a workspace project.
-	 *
-	 * @param archive
-	 *            archive to be unpacked
-	 * @param project
-	 *            project to unpack to
-	 * @throws CoreException
-	 *             when project resources cannot be created
-	 */
-	public static void unpackArchive(Object archive, IProject project) throws CoreException {
-		final InputStream inputStream = getInputStream(archive);
-		if (inputStream != null) {
-			final ZipInputStream stream = new ZipInputStream(new BufferedInputStream(inputStream));
-			try {
-
-				ZipEntry entry = stream.getNextEntry();
-
-				while (entry != null) {
-					IPath path = new Path(entry.getName());
-					path = path.removeFirstSegments(1).makeAbsolute();
-
-					// do not recreate .project file
-					if (!new Path("/.project").equals(path)) {
-						final IFile file = project.getFile(path);
-						ResourceTools.createFolder(file.getParent());
-						file.create(new NonClosingInputStream(stream), true, new NullProgressMonitor());
-					}
-
-					entry = stream.getNextEntry();
-				}
-
-			} catch (final IOException e) {
-				Logger.error(Activator.PLUGIN_ID, "Invalid archive detected", e);
-
-				if (stream != null) {
-					try {
-						stream.close();
-					} catch (final IOException e1) {
-					}
-				}
-			}
 		}
 	}
 }

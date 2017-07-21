@@ -37,7 +37,7 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRawLocation {
 	/**
 	 * The default value of the '{@link #getLocation() <em>Location</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
@@ -46,7 +46,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
@@ -55,7 +55,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * The default value of the '{@link #isUpdatePending() <em>Update Pending</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isUpdatePending()
 	 * @generated
 	 * @ordered
@@ -64,7 +64,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * The cached value of the '{@link #isUpdatePending() <em>Update Pending</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isUpdatePending()
 	 * @generated
 	 * @ordered
@@ -73,7 +73,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	protected RawLocationImpl() {
@@ -82,7 +82,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -92,7 +92,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -102,12 +102,12 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public void setLocation(String newLocation) {
-		String oldLocation = location;
+		final String oldLocation = location;
 		location = newLocation;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRepositoryPackage.RAW_LOCATION__LOCATION, oldLocation, location));
@@ -115,7 +115,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -125,12 +125,12 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public void setUpdatePending(boolean newUpdatePending) {
-		boolean oldUpdatePending = updatePending;
+		final boolean oldUpdatePending = updatePending;
 		updatePending = newUpdatePending;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRepositoryPackage.RAW_LOCATION__UPDATE_PENDING, oldUpdatePending, updatePending));
@@ -143,7 +143,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 	 */
 	@Override
 	public Object getResource() {
-		return ResourceTools.getResource(getLocation());
+		return ResourceTools.resolve(getLocation());
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -174,7 +174,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -192,7 +192,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -210,7 +210,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -226,7 +226,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -242,7 +242,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -250,7 +250,7 @@ public class RawLocationImpl extends MinimalEObjectImpl.Container implements IRa
 		if (eIsProxy())
 			return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		final StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (location: ");
 		result.append(location);
 		result.append(", updatePending: ");

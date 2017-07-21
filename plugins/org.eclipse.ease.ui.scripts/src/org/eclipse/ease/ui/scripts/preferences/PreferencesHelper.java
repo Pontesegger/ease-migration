@@ -13,11 +13,10 @@ package org.eclipse.ease.ui.scripts.preferences;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IPreferenceNodeVisitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.Logger;
-import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.scripts.Activator;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryFactory;
 import org.eclipse.ease.ui.scripts.repository.IScriptLocation;
@@ -43,7 +42,7 @@ public final class PreferencesHelper {
 	 * @return path to default script storage location
 	 */
 	public static String getScriptStorageLocation() {
-		String location = getUserScriptStorageLocation();
+		final String location = getUserScriptStorageLocation();
 		if (location != null)
 			return location;
 
@@ -56,7 +55,7 @@ public final class PreferencesHelper {
 	 * @return user provided storage location or <code>null</code>
 	 */
 	public static String getUserScriptStorageLocation() {
-		for (IScriptLocation location : getLocations()) {
+		for (final IScriptLocation location : getLocations()) {
 			if (location.isDefault())
 				return location.getLocation();
 		}
@@ -70,7 +69,7 @@ public final class PreferencesHelper {
 	 * @return path to default script storage location
 	 */
 	public static String getDefaultScriptStorageLocation() {
-		return ResourceTools.toURI(Activator.getDefault().getStateLocation().append("recordedScripts")).toASCIIString();
+		return URIUtil.toURI(Activator.getDefault().getStateLocation().append("recordedScripts")).toASCIIString();
 	}
 
 	/**
@@ -79,28 +78,24 @@ public final class PreferencesHelper {
 	 * @return all configured script locations
 	 */
 	public static Collection<IScriptLocation> getLocations() {
-		final Collection<IScriptLocation> locations = new HashSet<IScriptLocation>();
+		final Collection<IScriptLocation> locations = new HashSet<>();
 
 		final IEclipsePreferences rootNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
 		try {
-			rootNode.accept(new IPreferenceNodeVisitor() {
+			rootNode.accept(node -> {
+				if (rootNode.equals(node))
+					return true;
 
-				@Override
-				public boolean visit(final IEclipsePreferences node) throws BackingStoreException {
-					if (rootNode.equals(node))
-						return true;
+				else {
+					final String location = node.get(IPreferenceConstants.SCRIPT_STORAGE_LOCATION, "");
+					if (!location.isEmpty())
+						locations.add(getLocationForNode(node));
 
-					else {
-						String location = node.get(IPreferenceConstants.SCRIPT_STORAGE_LOCATION, "");
-						if (!location.isEmpty())
-							locations.add(getLocationForNode(node));
-
-						return false;
-					}
+					return false;
 				}
 			});
-		} catch (BackingStoreException e) {
+		} catch (final BackingStoreException e) {
 			// we were not able to load any locations, display empty view
 		}
 
@@ -115,12 +110,12 @@ public final class PreferencesHelper {
 	 * @return script location
 	 */
 	public static IScriptLocation getLocationForNode(final Preferences node) {
-		IScriptLocation entry = IRepositoryFactory.eINSTANCE.createScriptLocation();
+		final IScriptLocation entry = IRepositoryFactory.eINSTANCE.createScriptLocation();
 		try {
 			entry.setLocation(node.get(IPreferenceConstants.SCRIPT_STORAGE_LOCATION, ""));
 			entry.setRecursive(node.getBoolean(IPreferenceConstants.SCRIPT_STORAGE_RECURSIVE, true));
 			entry.setDefault(node.getBoolean(IPreferenceConstants.SCRIPT_STORAGE_DEFAULT, false));
-		} catch (IllegalStateException e) {
+		} catch (final IllegalStateException e) {
 			// preferences node is deleted, we cannot recreate all its content
 			entry.setLocation(node.name().replace('|', '/'));
 		}
@@ -135,8 +130,8 @@ public final class PreferencesHelper {
 	 *            location to add
 	 */
 	public static void addLocation(final IScriptLocation entry) {
-		String path = entry.getLocation().replace('/', '|');
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID + "/" + path);
+		final String path = entry.getLocation().replace('/', '|');
+		final IEclipsePreferences node = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID + "/" + path);
 		node.put(IPreferenceConstants.SCRIPT_STORAGE_LOCATION, entry.getLocation());
 		node.putBoolean(IPreferenceConstants.SCRIPT_STORAGE_DEFAULT, entry.isDefault());
 		node.putBoolean(IPreferenceConstants.SCRIPT_STORAGE_RECURSIVE, entry.isRecursive());
@@ -149,12 +144,12 @@ public final class PreferencesHelper {
 	 *            location of storage
 	 */
 	public static void removeLocation(final String locationURI) {
-		String path = locationURI.replace('/', '|');
-		IEclipsePreferences node = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID + "/" + path);
+		final String path = locationURI.replace('/', '|');
+		final IEclipsePreferences node = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID + "/" + path);
 		if (node != null) {
 			try {
 				node.removeNode();
-			} catch (BackingStoreException e) {
+			} catch (final BackingStoreException e) {
 				Logger.error(Activator.PLUGIN_ID, "Could not remove storage location for \"" + locationURI + "\"", e);
 			}
 		}

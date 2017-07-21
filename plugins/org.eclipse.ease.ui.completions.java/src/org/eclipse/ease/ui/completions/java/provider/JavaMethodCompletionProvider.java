@@ -20,6 +20,7 @@ import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.IHelpResolver;
+import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.eclipse.ease.ui.completions.java.help.handlers.JavaFieldHelpResolver;
 import org.eclipse.ease.ui.completions.java.help.handlers.JavaMethodHelpResolver;
@@ -29,6 +30,26 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 
 public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
+
+	public static class JDTImageResolver extends DescriptorImageResolver {
+
+		private final String fImageIdentifier;
+
+		public JDTImageResolver(String imageIdentifier) {
+			super();
+
+			fImageIdentifier = imageIdentifier;
+		}
+
+		@Override
+		protected ImageDescriptor getDescriptor() {
+			return getDescriptor(fImageIdentifier);
+		}
+
+		public static ImageDescriptor getDescriptor(String imageIdentifier) {
+			return JavaUI.getSharedImages().getImageDescriptor(imageIdentifier);
+		}
+	}
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
@@ -50,12 +71,14 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 				final StyledString styledString = new StyledString(method.getName() + "(" + getMethodSignature(method) + ") : " + getMethodReturnType(method));
 				styledString.append(" - " + method.getDeclaringClass().getSimpleName(), StyledString.QUALIFIER_STYLER);
 
+				final IImageResolver imageResolver = Modifier.isStatic(method.getModifiers())
+						? new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_function.png"))
+						: new JDTImageResolver(ISharedImages.IMG_OBJS_PUBLIC);
+
 				if (method.getParameterTypes().length > 0)
-					addProposal(styledString, method.getName() + "(", getMethodImage(Modifier.isStatic(method.getModifiers())),
-							ScriptCompletionProposal.ORDER_METHOD, helpResolver);
+					addProposal(styledString, method.getName() + "(", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
 				else
-					addProposal(styledString, method.getName() + "()", getMethodImage(Modifier.isStatic(method.getModifiers())),
-							ScriptCompletionProposal.ORDER_METHOD, helpResolver);
+					addProposal(styledString, method.getName() + "()", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
 			}
 		}
 
@@ -69,24 +92,13 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 				final StyledString styledString = new StyledString(field.getName() + " : " + field.getType().getSimpleName());
 				styledString.append(" - " + field.getDeclaringClass().getSimpleName(), StyledString.QUALIFIER_STYLER);
 
-				addProposal(styledString, field.getName(), getFieldImage(Modifier.isStatic(field.getModifiers())), ScriptCompletionProposal.ORDER_FIELD,
-						helpResolver);
+				final IImageResolver imageResolver = Modifier.isStatic(field.getModifiers())
+						? new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_field.png"))
+						: new JDTImageResolver(ISharedImages.IMG_FIELD_PUBLIC);
+
+				addProposal(styledString, field.getName(), imageResolver, ScriptCompletionProposal.ORDER_FIELD, helpResolver);
 			}
 		}
-	}
-
-	private static ImageDescriptor getMethodImage(final boolean isStatic) {
-		if (isStatic)
-			return Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_function.png");
-
-		return getSharedImage(ISharedImages.IMG_OBJS_PUBLIC);
-	}
-
-	private static ImageDescriptor getFieldImage(final boolean isStatic) {
-		if (isStatic)
-			return Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_field.png");
-
-		return getSharedImage(ISharedImages.IMG_FIELD_PUBLIC);
 	}
 
 	public static String getMethodReturnType(final Method method) {
@@ -106,9 +118,5 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 		}
 
 		return result.toString();
-	}
-
-	public static ImageDescriptor getSharedImage(final String name) {
-		return JavaUI.getSharedImages().getImageDescriptor(name);
 	}
 }

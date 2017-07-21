@@ -39,7 +39,8 @@ public class LoadedModuleCompletionProvider extends AbstractCompletionProvider {
 					styledString.append(" : " + field.getType().getSimpleName(), StyledString.DECORATIONS_STYLER);
 					styledString.append(" - " + definition.getName(), StyledString.QUALIFIER_STYLER);
 
-					addProposal(styledString, field.getName(), Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png"),
+					addProposal(styledString, field.getName(),
+							new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png")),
 							ScriptCompletionProposal.ORDER_FIELD, null);
 				}
 			}
@@ -51,10 +52,12 @@ public class LoadedModuleCompletionProvider extends AbstractCompletionProvider {
 					styledString.append(" - " + definition.getName(), StyledString.QUALIFIER_STYLER);
 
 					if ((method.getParameterTypes().length - ModulesTools.getOptionalParameterCount(method)) > 0) {
-						addProposal(styledString, method.getName() + "(", Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png"),
+						addProposal(styledString, method.getName() + "(",
+								new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png")),
 								ScriptCompletionProposal.ORDER_METHOD, null);
 					} else {
-						addProposal(styledString, method.getName() + "()", Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png"),
+						addProposal(styledString, method.getName() + "()",
+								new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png")),
 								ScriptCompletionProposal.ORDER_METHOD, null);
 					}
 				}

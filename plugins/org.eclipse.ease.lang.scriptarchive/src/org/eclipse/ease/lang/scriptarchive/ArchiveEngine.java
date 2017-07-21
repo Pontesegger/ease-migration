@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.Activator;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
@@ -28,9 +29,55 @@ import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ease.tools.ResourceTools.NonClosingInputStream;
 import org.eclipse.ui.PlatformUI;
 
 public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine {
+
+	/**
+	 * Unpack an archive into a workspace project.
+	 *
+	 * @param archive
+	 *            archive to be unpacked
+	 * @param project
+	 *            project to unpack to
+	 * @throws CoreException
+	 *             when project resources cannot be created
+	 */
+	private static void unpackArchive(Object archive, IProject project) throws CoreException {
+		final InputStream inputStream = ResourceTools.getInputStream(archive);
+		if (inputStream != null) {
+			final ZipInputStream stream = new ZipInputStream(new BufferedInputStream(inputStream));
+			try {
+
+				ZipEntry entry = stream.getNextEntry();
+
+				while (entry != null) {
+					IPath path = new Path(entry.getName());
+					path = path.removeFirstSegments(1).makeAbsolute();
+
+					// do not recreate .project file
+					if (!new Path("/.project").equals(path)) {
+						final IFile file = project.getFile(path);
+						ResourceTools.createFolder(file.getParent());
+						file.create(new NonClosingInputStream(stream), true, new NullProgressMonitor());
+					}
+
+					entry = stream.getNextEntry();
+				}
+
+			} catch (final IOException e) {
+				Logger.error(Activator.PLUGIN_ID, "Invalid archive detected", e);
+
+				if (stream != null) {
+					try {
+						stream.close();
+					} catch (final IOException e1) {
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Unpack an archive into a workspace project.
@@ -43,7 +90,7 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 	 */
 	private static IProject unpack(Object archive) throws CoreException {
 		final IProject project = createProject("__EASE_ScriptArchive_");
-		ResourceTools.unpackArchive(archive, project);
+		unpackArchive(archive, project);
 
 		return project;
 	}

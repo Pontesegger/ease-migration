@@ -55,12 +55,12 @@ public class JavaPackagesCompletionProvider extends AbstractCompletionProvider {
 
 					if (parentPackage.isEmpty())
 						// add root package
-						addProposal(packageName, packageName + ".", JavaMethodCompletionProvider.getSharedImage(ISharedImages.IMG_OBJS_PACKAGE),
+						addProposal(packageName, packageName + ".", new JavaMethodCompletionProvider.JDTImageResolver(ISharedImages.IMG_OBJS_PACKAGE),
 								ScriptCompletionProposal.ORDER_PACKAGE, helpResolver);
 					else
 						// add sub package
 						addProposal(parentPackage + "." + packageName, packageName + ".",
-								JavaMethodCompletionProvider.getSharedImage(ISharedImages.IMG_OBJS_PACKAGE), ScriptCompletionProposal.ORDER_PACKAGE,
+								new JavaMethodCompletionProvider.JDTImageResolver(ISharedImages.IMG_OBJS_PACKAGE), ScriptCompletionProposal.ORDER_PACKAGE,
 								helpResolver);
 				}
 			}

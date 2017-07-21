@@ -194,7 +194,7 @@ public class ScriptService implements IScriptService, BundleListener {
 			return null;
 		}
 
-		final Object resource = ResourceTools.getResource(location);
+		final Object resource = ResourceTools.resolve(location);
 		try {
 			if (resource instanceof IFile) {
 				// try to resolve by content type

@@ -89,88 +89,96 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 	@Override
 	public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch, final IProgressMonitor monitor) throws CoreException {
 
-		final Object resource = ResourceTools.resolveFile(getFileLocation(configuration), null, true);
+		final String fileLocation = getFileLocation(configuration);
+		final Object resource = ResourceTools.resolve(fileLocation);
 
-		// create engine
-		final String engineID = configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, "");
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		EngineDescription engineDescription = scriptService.getEngineByID(engineID);
-		if ((ILaunchManager.DEBUG_MODE.equals(mode)) && (!engineDescription.supportsDebugging())) {
-			// we are trying to debug using an engine that does not support debugging
-			engineDescription = null;
+		if (ResourceTools.isFile(resource)) {
 
-			// try to find an engine that supports debugging
-			final ScriptType scriptType = scriptService.getScriptType(ResourceTools.toAbsoluteLocation(resource, null));
-			if (scriptType != null) {
-				final List<EngineDescription> engines = scriptService.getEngines(scriptType.getName());
-				for (final EngineDescription description : engines) {
-					if (description.supportsDebugging()) {
-						// matching debug engine found
-						engineDescription = description;
-						break;
+			// create engine
+			final String engineID = configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, "");
+			final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+			EngineDescription engineDescription = scriptService.getEngineByID(engineID);
+			if ((ILaunchManager.DEBUG_MODE.equals(mode)) && (!engineDescription.supportsDebugging())) {
+				// we are trying to debug using an engine that does not support debugging
+				engineDescription = null;
+
+				// try to find an engine that supports debugging
+				final ScriptType scriptType = scriptService.getScriptType(ResourceTools.toAbsoluteLocation(resource, null));
+				if (scriptType != null) {
+					final List<EngineDescription> engines = scriptService.getEngines(scriptType.getName());
+					for (final EngineDescription description : engines) {
+						if (description.supportsDebugging()) {
+							// matching debug engine found
+							engineDescription = description;
+							break;
+						}
 					}
+				}
+
+				if (engineDescription != null) {
+					// ask user if he wants to change the engine: once, permanently or not
+					final RunnableWithResult<Boolean> runnable = new RunnableWithResult<Boolean>() {
+						@Override
+						public void run() {
+							final boolean confirmEngineSwitch = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Configuration change needed",
+									"The currently selected script engine does not support debugging. However an alternative engine is available. Do you want to debug your script using that alternative engine?");
+
+							setResult(confirmEngineSwitch);
+						}
+					};
+
+					Display.getDefault().syncExec(runnable);
+
+					if (!runnable.getResult())
+						// user does not want to switch engine
+						return;
+
+				} else {
+					// giving up
+					Display.getDefault().asyncExec(() -> MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch error",
+							"No debug engine available for \"" + resource + "\""));
+					return;
 				}
 			}
 
-			if (engineDescription != null) {
-				// ask user if he wants to change the engine: once, permanently or not
-				final RunnableWithResult<Boolean> runnable = new RunnableWithResult<Boolean>() {
-					@Override
-					public void run() {
-						final boolean confirmEngineSwitch = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Configuration change needed",
-								"The currently selected script engine does not support debugging. However an alternative engine is available. Do you want to debug your script using that alternative engine?");
+			final IScriptEngine engine = engineDescription.createEngine();
+			engine.setTerminateOnIdle(true);
 
-						setResult(confirmEngineSwitch);
-					}
-				};
+			// initialize console
+			final ScriptConsole console = ScriptConsole.create(engine.getName() + ": " + resource, engine);
+			engine.setOutputStream(console.getOutputStream());
+			engine.setErrorStream(console.getErrorStream());
+			engine.setInputStream(console.getInputStream());
 
-				Display.getDefault().syncExec(runnable);
+			// setup debugger
+			if (ILaunchManager.DEBUG_MODE.equals(mode))
+				setupDebugger(engine, configuration, launch);
 
-				if (!runnable.getResult())
-					// user does not want to switch engine
-					return;
+			// set startup parameters
+			final String parameterString = configuration.getAttribute(LaunchConstants.STARTUP_PARAMETERS, "").trim();
+			String[] parameters;
+			if (!parameterString.isEmpty()) {
+				parameters = parameterString.split("\\s+");
 
-			} else {
-				// giving up
-				Display.getDefault().asyncExec(() -> MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch error",
-						"No debug engine available for \"" + resource + "\""));
-				return;
-			}
+			} else
+				parameters = new String[0];
+
+			engine.setVariable("argv", parameters);
+
+			// execute resource
+			engine.executeAsync(resource);
+
+			// start engine
+			engine.schedule();
+
+			// let launch know when engine terminates
+			if (launch instanceof IExecutionListener)
+				engine.addExecutionListener((IExecutionListener) launch);
+
+		} else {
+			Display.getDefault().asyncExec(
+					() -> MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch error", "File could not be found: \"" + fileLocation + "\""));
 		}
-
-		final IScriptEngine engine = engineDescription.createEngine();
-		engine.setTerminateOnIdle(true);
-
-		// initialize console
-		final ScriptConsole console = ScriptConsole.create(engine.getName() + ": " + resource, engine);
-		engine.setOutputStream(console.getOutputStream());
-		engine.setErrorStream(console.getErrorStream());
-		engine.setInputStream(console.getInputStream());
-
-		// setup debugger
-		if (ILaunchManager.DEBUG_MODE.equals(mode))
-			setupDebugger(engine, configuration, launch);
-
-		// set startup parameters
-		final String parameterString = configuration.getAttribute(LaunchConstants.STARTUP_PARAMETERS, "").trim();
-		String[] parameters;
-		if (!parameterString.isEmpty()) {
-			parameters = parameterString.split("\\s+");
-
-		} else
-			parameters = new String[0];
-
-		engine.setVariable("argv", parameters);
-
-		// execute resource
-		engine.executeAsync(resource);
-
-		// start engine
-		engine.schedule();
-
-		// let launch know when engine terminates
-		if (launch instanceof IExecutionListener)
-			engine.addExecutionListener((IExecutionListener) launch);
 	}
 
 	@Override
