@@ -16,7 +16,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,6 +49,7 @@ public class TestSuiteModel implements IResourceChangeListener {
 	public static final String FLAG_STOP_SUITE_ON_FAILURE = "stop suite on failure";
 	public static final String FLAG_PROMOTE_ERRORS_TO_FAILURES = "promote errors to failures";
 	public static final String FLAG_EXECUTE_TEARDOWN_ON_FAILURE = "execute teardown on failure";
+	public static final String FLAG_TESTFILE_SORTING = "sorting";
 
 	private static final String XML_NODE_ROOT = "testsuite";
 	private static final String XML_NODE_TESTFILES = "testfiles";
@@ -112,7 +112,7 @@ public class TestSuiteModel implements IResourceChangeListener {
 		}
 	}
 
-	private final Collection<String> fTestFiles = new HashSet<String>();
+	private final Collection<String> fTestFiles = new ArrayList<String>();
 	private final Map<String, String> fFlags = new HashMap<String, String>();
 	private final List<Variable> fVariables = new ArrayList<Variable>();
 	private final Map<String, String> fCodeFragments = new HashMap<String, String>();
@@ -410,16 +410,16 @@ public class TestSuiteModel implements IResourceChangeListener {
 
 				@Override
 				public boolean visit(final IResourceDelta delta) throws CoreException {
-					final IResource resource = delta.getResource();
-					if (resource instanceof IContainer) {
-						// only follow if it is a parent of the file
-						return fFile.getFullPath().toString().startsWith(resource.getFullPath().toString());
-					}
+				final IResource resource = delta.getResource();
+				if (resource instanceof IContainer) {
+					// only follow if it is a parent of the file
+					return fFile.getFullPath().toString().startsWith(resource.getFullPath().toString());
+				}
 
-					if (resource.equals(fFile))
-						fDirty = true;
+				if (resource.equals(fFile))
+					fDirty = true;
 
-					return false;
+				return false;
 				}
 			});
 		} catch (final CoreException e) {

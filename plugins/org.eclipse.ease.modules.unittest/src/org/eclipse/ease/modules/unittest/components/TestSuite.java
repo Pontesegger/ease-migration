@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +70,7 @@ public class TestSuite extends TestComposite {
 
 	private final TestSuiteModel fTestModel;
 	private boolean fTerminated = false;
-	private final Map<String, TestFile> fTestFiles = new HashMap<>();
+	private final Map<String, TestFile> fTestFiles = new LinkedHashMap<>();
 
 	private int fCurrentTestCount;
 	private List<TestFile> fActiveTestFiles = Collections.emptyList();
@@ -289,7 +289,9 @@ public class TestSuite extends TestComposite {
 		}
 
 		// sort tests
-		Collections.sort(fActiveTestFiles);
+		if (getModel().getFlag(TestSuiteModel.FLAG_TESTFILE_SORTING, true)) {
+			Collections.sort(fActiveTestFiles);
+		}
 
 		if (!fActiveTestFiles.isEmpty())
 			// run TestSuite
