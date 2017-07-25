@@ -302,6 +302,9 @@ public class ResourceToolsTest {
 
 		assertEquals(fWorkspace, ResourceTools.resolve("..", fProject));
 		assertEquals(fWorkspace, ResourceTools.resolve("../../", fFile1));
+
+		assertEquals(fProject, ResourceTools.resolve("project://", fFolder));
+		assertEquals(fProject, ResourceTools.resolve("project://", fProject));
 	}
 
 	@Test
@@ -383,10 +386,21 @@ public class ResourceToolsTest {
 	}
 
 	@Test
-	public void resolveRelativeInvalid() {
-		assertNull(ResourceTools.resolve(null, null));
-		assertNull(ResourceTools.resolve("", ""));
-		assertNull(ResourceTools.resolve(" ", " "));
+	public void resolveRelativeWithoutBaseFile() {
+		assertEquals(fWorkspace, ResourceTools.resolve(null, fWorkspace));
+		assertEquals(fProject, ResourceTools.resolve(null, fProject));
+		assertEquals(fFolder, ResourceTools.resolve(null, fFolder));
+		assertEquals(fFolder, ResourceTools.resolve(null, fFile1));
+
+		assertEquals(fWorkspace, ResourceTools.resolve(" ", fWorkspace));
+		assertEquals(fProject, ResourceTools.resolve(" ", fProject));
+		assertEquals(fFolder, ResourceTools.resolve(" ", fFolder));
+		assertEquals(fFolder, ResourceTools.resolve(" ", fFile1));
+
+		assertEquals(fFsWorkspace, ResourceTools.resolve(" ", fFsWorkspace));
+		assertEquals(fFsProject, ResourceTools.resolve(" ", fFsProject));
+		assertEquals(fFsFolder, ResourceTools.resolve(" ", fFsFolder));
+		assertEquals(fFsFolder, ResourceTools.resolve(" ", fFsFile1));
 	}
 
 	@Test
