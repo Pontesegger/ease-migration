@@ -163,6 +163,11 @@
 		<module>../../plugins/org.eclipse.ease.lang.scriptarchive.ui</module>
 		<module>../../features/org.eclipse.ease.lang.scriptarchive.feature</module>
 
+		<!-- Unittest Engine -->
+		<module>../../plugins/org.eclipse.ease.lang.unittest</module>
+		<module>../../plugins/org.eclipse.ease.lang.unittest.ui</module>
+		<module>../../features/org.eclipse.ease.lang.unittest.feature</module>
+
 		<!-- releng -->
 		<module>../org.eclipse.ease.releng.target</module>
 		<module>../org.eclipse.ease.releng.p2</module>
