@@ -83,13 +83,7 @@ public class SVNModule extends AbstractScriptModule {
 		op.add(operation);
 		op.add(new SaveRepositoryLocationsOperation());
 
-		Display.getDefault().syncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				UIMonitorUtility.doTaskNowDefault(op, false);
-			}
-		});
+		Display.getDefault().syncExec(() -> UIMonitorUtility.doTaskNowDefault(op, false));
 
 		return location;
 	}
@@ -120,15 +114,11 @@ public class SVNModule extends AbstractScriptModule {
 
 		final IRepositoryResource[] doCeckout = doCeckout_tmp.toArray(new IRepositoryResource[] {});
 
-		Display.getDefault().syncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				final Shell sh = Display.getDefault().getActiveShell();
-				final IActionOperation op = ExtensionsManager.getInstance().getCurrentCheckoutFactory().getCheckoutOperation(sh, doCeckout, null, true, null,
-						SVNDepth.INFINITY, false);
-				UIMonitorUtility.doTaskNowDefault(op, true);
-			}
+		Display.getDefault().syncExec(() -> {
+			final Shell sh = Display.getDefault().getActiveShell();
+			final IActionOperation op = ExtensionsManager.getInstance().getCurrentCheckoutFactory().getCheckoutOperation(sh, doCeckout, null, true, null,
+					SVNDepth.INFINITY, false);
+			UIMonitorUtility.doTaskNowDefault(op, true);
 		});
 	}
 
@@ -141,19 +131,9 @@ public class SVNModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public long getRevision(final Object resource) {
-		IResource lookup = null;
-		final Object file = ResourceTools.resolveFile(resource, getScriptEngine().getExecutedFile(), true);
-		if (file instanceof IResource)
-			lookup = (IResource) file;
-
-		else {
-			final Object folder = ResourceTools.resolveFolder(resource, getScriptEngine().getExecutedFile(), true);
-			if (folder instanceof IContainer)
-				lookup = (IResource) folder;
-		}
-
-		if (lookup != null) {
-			final ILocalResource localResource = SVNRemoteStorage.instance().asLocalResource(lookup);
+		final Object file = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
+		if (file instanceof IResource) {
+			final ILocalResource localResource = SVNRemoteStorage.instance().asLocalResource((IResource) file);
 			return localResource.getRevision();
 		}
 

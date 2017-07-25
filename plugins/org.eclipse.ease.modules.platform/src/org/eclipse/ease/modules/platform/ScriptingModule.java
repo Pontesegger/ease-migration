@@ -43,7 +43,7 @@ public class ScriptingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public static IScriptEngine createScriptEngine(final String identifier) {
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 
 		// by ID
 		EngineDescription engine = scriptService.getEngineByID(identifier);
@@ -73,9 +73,9 @@ public class ScriptingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public static String[] listScriptEngines() {
-		final List<String> result = new ArrayList<String>();
+		final List<String> result = new ArrayList<>();
 
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		for (final EngineDescription description : scriptService.getEngines())
 			result.add(description.getID());
 
@@ -97,7 +97,7 @@ public class ScriptingModule extends AbstractScriptModule {
 	public IScriptEngine fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
 
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 
 		if (engineID == null) {
 			// try to find engine for script type
@@ -112,7 +112,7 @@ public class ScriptingModule extends AbstractScriptModule {
 
 		if (engineID != null) {
 			// engineID available
-			EngineDescription description = scriptService.getEngineByID(engineID);
+			final EngineDescription description = scriptService.getEngineByID(engineID);
 			if (description == null)
 				throw new RuntimeException("No script engine found for ID = \"" + engineID + "\"");
 
@@ -127,7 +127,7 @@ public class ScriptingModule extends AbstractScriptModule {
 			// set input parameters
 			engine.setVariable("argv", AbstractScriptEngine.extractArguments(arguments));
 
-			Object scriptObject = ResourceTools.resolveFile(resource, getScriptEngine().getExecutedFile(), true);
+			Object scriptObject = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
 			if (scriptObject == null) {
 				try {
 					// no file available, try to resolve URI
@@ -316,7 +316,7 @@ public class ScriptingModule extends AbstractScriptModule {
 		}
 
 		/** Stored elements. */
-		private final Map<String, StorageElement> fElements = new HashMap<String, StorageElement>();
+		private final Map<String, StorageElement> fElements = new HashMap<>();
 
 		/**
 		 * Retrieve a shared object.
@@ -326,7 +326,7 @@ public class ScriptingModule extends AbstractScriptModule {
 		 * @return shared object or <code>null</code>
 		 */
 		public synchronized Object get(final String key) {
-			StorageElement storedElement = fElements.get(key);
+			final StorageElement storedElement = fElements.get(key);
 			return (storedElement != null) ? storedElement.fElement : null;
 		}
 
@@ -364,7 +364,7 @@ public class ScriptingModule extends AbstractScriptModule {
 		public synchronized void remove(final String key, final IScriptEngine scriptEngine) throws IllegalAccessException {
 			if (fElements.containsKey(key)) {
 				// verify that current scriptEngine is the owner of this value or the object is writable
-				StorageElement element = fElements.get(key);
+				final StorageElement element = fElements.get(key);
 				if ((element.fWritable) || (element.fOwner.equals(getOwner(scriptEngine)))) {
 
 					// remove element
@@ -391,12 +391,12 @@ public class ScriptingModule extends AbstractScriptModule {
 			if (status == IExecutionListener.ENGINE_END) {
 
 				// clean up owned elements
-				for (String key : new HashSet<String>(fElements.keySet())) {
-					StorageElement element = fElements.get(key);
+				for (final String key : new HashSet<>(fElements.keySet())) {
+					final StorageElement element = fElements.get(key);
 					if ((element.fOwner.equals(getOwner(engine)) && (!element.fPermanent))) {
 						try {
 							remove(key, engine);
-						} catch (IllegalAccessException e) {
+						} catch (final IllegalAccessException e) {
 							// we already checked that we are the owner, so this should not happen
 							Logger.error(PluginConstants.PLUGIN_ID, "Error while cleaning up shared objects", e);
 						}

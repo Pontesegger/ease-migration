@@ -434,7 +434,7 @@ public class ChartingModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = "false") final boolean overwrite) throws Throwable {
 
 		if (fChart != null) {
-			final Object resolvedLocation = (location != null) ? ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), false) : null;
+			final Object resolvedLocation = (location != null) ? ResourceTools.resolve(location, getScriptEngine().getExecutedFile()) : null;
 			getChart().export(resolvedLocation, overwrite);
 		}
 	}

@@ -40,7 +40,7 @@ public class TestFile extends TestComposite implements Comparable<TestFile> {
 		@Override
 		protected IStatus run(final IProgressMonitor monitor) {
 
-			final Object testFile = ResourceTools.resolveFile(fFileLocation, getTestSuite().getModel().getFile(), true);
+			final Object testFile = ResourceTools.resolve(fFileLocation, getTestSuite().getModel().getFile());
 			if (testFile == null) {
 				// no test file available
 				setStatus(TestStatus.FAILURE);
@@ -202,7 +202,7 @@ public class TestFile extends TestComposite implements Comparable<TestFile> {
 	@Override
 	public void reset() {
 		final IFile parent = (getTestSuite() != null) ? getTestSuite().getModel().getFile() : null;
-		final Object file = ResourceTools.resolveFile(fFileLocation, parent, true);
+		final Object file = ResourceTools.resolve(fFileLocation, parent);
 		if (file instanceof IFile) {
 			try {
 				((IFile) file).deleteMarkers(Bundle.PLUGIN_ID + ".scriptassertion", false, IResource.DEPTH_ZERO);
@@ -222,7 +222,7 @@ public class TestFile extends TestComposite implements Comparable<TestFile> {
 
 	@Override
 	public Object getFile() {
-		return ResourceTools.resolveFile(fFileLocation, getTestSuite().getModel().getFile(), true);
+		return ResourceTools.resolve(fFileLocation, getTestSuite().getModel().getFile());
 	}
 
 	@Override

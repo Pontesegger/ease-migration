@@ -40,16 +40,10 @@ public class TestSuiteLaunchDelegate extends EaseLaunchDelegate {
 	@Override
 	public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch, final IProgressMonitor monitor) throws CoreException {
 
-		final Object resource = ResourceTools.resolveFile(getFileLocation(configuration), null, true);
+		final Object resource = ResourceTools.resolve(getFileLocation(configuration));
 		if (resource instanceof IFile) {
 			try {
-				Display.getDefault().syncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().saveAllEditors(true);
-					}
-				});
+				Display.getDefault().syncExec(() -> PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().saveAllEditors(true));
 
 				// create testsuite
 				final TestSuite suiteToRun = new TestSuite((IFile) resource);

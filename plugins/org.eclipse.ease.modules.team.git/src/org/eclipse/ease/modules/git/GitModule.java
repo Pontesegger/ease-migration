@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
@@ -62,8 +61,10 @@ public class GitModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String pass, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String branch)
 			throws InvalidRemoteException, TransportException, GitAPIException {
 
-		final File folder = resolveFolder(localLocation);
-		if (folder != null) {
+		final Object resource = ResourceTools.resolve(localLocation, getScriptEngine().getExecutedFile());
+		final File folder = ResourceTools.toFile(resource);
+
+		if (ResourceTools.isFolder(folder)) {
 			final CloneCommand cloneCommand = Git.cloneRepository();
 			cloneCommand.setURI(remoteLocation);
 			cloneCommand.setDirectory(folder);
@@ -89,19 +90,21 @@ public class GitModule extends AbstractScriptModule {
 	 *            local repository root folder
 	 * @return GIT API instance
 	 * @throws IOException
-	 *             the repository could not be accessed
 	 */
 	@WrapToScript
 	public Git openRepository(final Object location) throws IOException {
 		if (location instanceof Git)
 			return (Git) location;
 
-		final File folder = resolveFolder(location);
-		if (folder != null)
-			return Git.open(folder);
+		final Object resource = ResourceTools.resolve(location);
+		if (resource != null) {
+			final File folder = ResourceTools.toFile(resource);
 
-		else
-			throw new RuntimeException("Invalid folder location: " + location);
+			if (folder != null)
+				return Git.open(folder);
+		}
+
+		throw new RuntimeException("Invalid folder location: " + location);
 	}
 
 	/**
@@ -118,7 +121,9 @@ public class GitModule extends AbstractScriptModule {
 	@WrapToScript
 	public Git initRepository(final Object location, @ScriptParameter(defaultValue = "false") final boolean bare)
 			throws IllegalStateException, GitAPIException {
-		final File folder = resolveFolder(location);
+		final Object resource = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		final File folder = ResourceTools.toFile(resource);
+
 		if (folder != null) {
 			if (!folder.exists())
 				folder.mkdirs();
@@ -248,17 +253,5 @@ public class GitModule extends AbstractScriptModule {
 
 		} else
 			throw new RuntimeException("No repository found at: " + repository);
-	}
-
-	private final File resolveFolder(final Object location) {
-		Object folder = ResourceTools.resolveFolder(location, getScriptEngine(), false);
-		if (folder instanceof IContainer)
-			// convert workspace resource to local file
-			folder = ((IContainer) folder).getRawLocation().makeAbsolute().toFile();
-
-		if ((folder instanceof File) && (!((File) folder).exists() || (((File) folder).isDirectory())))
-			return (File) folder;
-
-		return null;
 	}
 }

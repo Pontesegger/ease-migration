@@ -27,7 +27,6 @@ import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.platform.PluginConstants;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
-import org.eclipse.jface.resource.ImageDescriptor;
 
 public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 
@@ -37,7 +36,7 @@ public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 			final String caller = context.getCaller();
 			final int param = context.getParameterOffset();
 			if (caller.endsWith("launch") || caller.endsWith("launchUI")) {
-				return param == 0 || param == 1;
+				return (param == 0) || (param == 1);
 			}
 			if (caller.endsWith("getLaunchConfiguration")) {
 				return param == 0;
@@ -57,7 +56,7 @@ public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 					final ILaunchConfigurationType type = configuration.getType();
 					final String typeName = type.getName();
 					final String display = name + " - " + typeName;
-					addProposal(display, name, DebugUITools.getDefaultImageDescriptor(configuration), 0, null);
+					addProposal(display, name, new DescriptorImageResolver(DebugUITools.getDefaultImageDescriptor(configuration)), 0, null);
 				}
 			} catch (final CoreException e) {
 				Logger.warning(PluginConstants.PLUGIN_ID, "Code Completion: could not read launch configurations", e);
@@ -66,19 +65,17 @@ public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 		} else {
 			// TODO: Make this parameter dependent on the selected launch config
 			// to only populate the relevant modes
-			final Collection<ScriptCompletionProposal> proposals = new ArrayList<ScriptCompletionProposal>();
+			final Collection<ScriptCompletionProposal> proposals = new ArrayList<>();
 			final ILaunchGroup[] launchGroups = DebugUITools.getLaunchGroups();
-			final Map<String, ILaunchGroup> modes = new HashMap<String, ILaunchGroup>();
+			final Map<String, ILaunchGroup> modes = new HashMap<>();
 			for (final ILaunchGroup launchGroup : launchGroups) {
 				modes.put(launchGroup.getMode(), launchGroup);
 			}
 			for (final ILaunchGroup launchGroup : modes.values()) {
 				final String display = launchGroup.getLabel().replace("&", "");
 				final String name = launchGroup.getMode();
-				final ImageDescriptor imageDescriptor = launchGroup.getImageDescriptor();
-				addProposal(display, name, imageDescriptor, 0, null);
+				addProposal(display, name, new DescriptorImageResolver(launchGroup.getImageDescriptor()), 0, null);
 			}
-
 		}
 	}
 }

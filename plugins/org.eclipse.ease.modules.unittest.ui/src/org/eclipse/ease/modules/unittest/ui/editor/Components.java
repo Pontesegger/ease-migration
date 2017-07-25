@@ -17,17 +17,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.modules.platform.UIModule;
 import org.eclipse.ease.modules.unittest.components.TestSuiteModel;
 import org.eclipse.ease.tools.ResourceTools;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -127,19 +121,16 @@ public class Components extends AbstractEditorPage {
 
 		// tree viewer for tests
 		fTestTree = new ContainerCheckedTreeViewer(tree);
-		fTestTree.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				if (!selection.isEmpty()) {
-					final Object element = selection.getFirstElement();
-					if (element instanceof IFile) {
-						try {
-							UIModule.showEditor((IFile) element);
-						} catch (final Throwable e) {
-							// TODO handle this exception (but for now, at least know it happened)
-							throw new RuntimeException(e);
-						}
+		fTestTree.addDoubleClickListener(event -> {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			if (!selection.isEmpty()) {
+				final Object element = selection.getFirstElement();
+				if (element instanceof IFile) {
+					try {
+						UIModule.showEditor((IFile) element);
+					} catch (final Throwable e) {
+						// TODO handle this exception (but for now, at least know it happened)
+						throw new RuntimeException(e);
 					}
 				}
 			}
@@ -200,15 +191,12 @@ public class Components extends AbstractEditorPage {
 		spinner.setSelection(1);
 		managedForm.getToolkit().adapt(spinner);
 		managedForm.getToolkit().paintBordersFor(spinner);
-		spinner.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+		spinner.addModifyListener(e -> {
 
-				final int maxThreads = getModel().getFlag(TestSuiteModel.FLAG_MAX_THREADS, 1);
-				if (spinner.getSelection() != maxThreads) {
-					getModel().setFlag(TestSuiteModel.FLAG_MAX_THREADS, spinner.getSelection());
-					setDirty();
-				}
+			final int maxThreads = getModel().getFlag(TestSuiteModel.FLAG_MAX_THREADS, 1);
+			if (spinner.getSelection() != maxThreads) {
+				getModel().setFlag(TestSuiteModel.FLAG_MAX_THREADS, spinner.getSelection());
+				setDirty();
 			}
 		});
 
@@ -276,19 +264,16 @@ public class Components extends AbstractEditorPage {
 
 		fTestTree.setInput(getModel().getFile().getProject());
 
-		fTestTree.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-				final TestSuiteModel model = getModel();
-				model.getTestFiles().clear();
+		fTestTree.addCheckStateListener(event -> {
+			final TestSuiteModel model = getModel();
+			model.getTestFiles().clear();
 
-				for (final Object object : fTestTree.getCheckedElements()) {
-					if (object instanceof IFile)
-						model.addTestFile(ResourceTools.toProjectRelativeLocation(object, null));
-				}
-
-				setDirty();
+			for (final Object object : fTestTree.getCheckedElements()) {
+				if (object instanceof IResource)
+					model.addTestFile(ResourceTools.toProjectRelativeLocation((IResource) object));
 			}
+
+			setDirty();
 		});
 	}
 
@@ -306,7 +291,7 @@ public class Components extends AbstractEditorPage {
 		// FIXME if resource is out of sync model will be null, raising an exception here!!!
 		fTestTree.setCheckedElements(new Object[0]);
 		for (final String fileLocation : model.getTestFiles()) {
-			final Object file = ResourceTools.resolveFile(fileLocation, model.getFile(), true);
+			final Object file = ResourceTools.resolve(fileLocation, model.getFile());
 			if (file != null)
 				fTestTree.setChecked(file, true);
 		}

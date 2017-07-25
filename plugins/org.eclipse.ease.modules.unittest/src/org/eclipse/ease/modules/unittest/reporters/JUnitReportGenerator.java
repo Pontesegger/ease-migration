@@ -13,6 +13,7 @@ package org.eclipse.ease.modules.unittest.reporters;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.ease.modules.unittest.components.Test;
 import org.eclipse.ease.modules.unittest.components.TestFile;
 import org.eclipse.ease.modules.unittest.components.TestResult;
@@ -54,7 +55,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 			for (final Test test : testFile.getTests()) {
 				final IMemento testcaseNode = suiteNode.createChild("testcase");
 				testcaseNode.putString("name", escape(test.getTitle()));
-				testcaseNode.putString("classname", escape(ResourceTools.toProjectRelativeLocation(testFile.getFile(), null)));
+				testcaseNode.putString("classname", escape(ResourceTools.toProjectRelativeLocation((IResource) testFile.getFile())));
 				testcaseNode.putInteger("time", (int) (test.getExecutionTime() / 1000));
 				for (final TestResult message : test.getMessages()) {
 					if (message.getStatus() == TestStatus.FAILURE) {

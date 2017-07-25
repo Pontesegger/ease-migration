@@ -72,7 +72,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 		}
 
 		if (!(executable instanceof IFile))
-			executable = ResourceTools.resolveFile(executable.toString(), getScriptEngine().getExecutedFile(), true);
+			executable = ResourceTools.resolve(executable.toString(), getScriptEngine().getExecutedFile());
 
 		if ((executable instanceof IFile) && (((IFile) executable).exists())) {
 			try {
@@ -113,7 +113,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public TestSuite openTestSuite(final String filename) throws IOException, CoreException {
-		final Object file = ResourceTools.resolveFile(filename, getScriptEngine().getExecutedFile(), true);
+		final Object file = ResourceTools.resolve(filename, getScriptEngine().getExecutedFile());
 		if ((file instanceof IFile) && (((IFile) file).exists())) {
 			if ("suite".equalsIgnoreCase(((IFile) file).getFileExtension())) {
 				// we have a test suite
@@ -149,7 +149,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	public boolean createReport(final String reportType, final TestSuite suite, final String fileLocation, final String title, final String description)
 			throws Exception {
 
-		final Object file = ResourceTools.resolveFile(fileLocation, getScriptEngine().getExecutedFile(), false);
+		final Object file = ResourceTools.resolve(fileLocation, getScriptEngine().getExecutedFile());
 
 		final IReportGenerator report = ReportTools.getReport(reportType);
 		if (report != null) {

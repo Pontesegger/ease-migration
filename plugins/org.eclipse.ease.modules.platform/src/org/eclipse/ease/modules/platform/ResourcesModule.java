@@ -141,7 +141,11 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public Object getFile(final String location, @ScriptParameter(defaultValue = "true") final boolean exists) {
-		return ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), exists);
+		final Object resource = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		if (exists)
+			return fileExists(resource) ? resource : null;
+
+		return resource;
 	}
 
 	/**
@@ -176,17 +180,24 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public Object createFolder(final Object location) throws CoreException {
-		final Object folder = ResourceTools.resolveFolder(location, getScriptEngine().getExecutedFile(), false);
-		if (folder instanceof IFolder) {
-			if (!((IFolder) folder).exists()) {
-				((IFolder) folder).create(true, true, new NullProgressMonitor());
-				return folder;
-			}
+		Object folder = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 
-		} else if (folder instanceof File) {
+		if (folder instanceof File) {
 			if (!((File) folder).exists())
 				if (((File) folder).mkdirs())
 					return folder;
+
+		} else if (folder instanceof IResource) {
+			// resolve returns IFile instances if a container does not exist, so we need to convert it to a folder
+			if (folder instanceof IFile)
+				folder = ((IResource) folder).getProject().getFolder(((IResource) folder).getProjectRelativePath());
+
+			if (folder instanceof IFolder) {
+				if (!((IFolder) folder).exists()) {
+					((IFolder) folder).create(true, true, new NullProgressMonitor());
+					return folder;
+				}
+			}
 		}
 
 		return null;
@@ -236,7 +247,8 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public boolean fileExists(final Object location) {
-		return ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), true) != null;
+		final Object resource = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		return (resource != null) && (ResourceTools.exists(resource)) && (ResourceTools.isFile(resource));
 	}
 
 	/**
@@ -304,12 +316,15 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public void deleteFile(final Object source) throws CoreException {
-		final Object file = ResourceTools.resolveFile(source, getScriptEngine().getExecutedFile(), true);
-		if (file instanceof IFile)
-			((IFile) file).delete(true, new NullProgressMonitor());
+		final Object file = ResourceTools.resolve(source, getScriptEngine().getExecutedFile());
 
-		else if ((file instanceof File) && (((File) file).isFile()))
-			((File) file).delete();
+		if (ResourceTools.isFile(file)) {
+			if (file instanceof IFile)
+				((IFile) file).delete(true, new NullProgressMonitor());
+
+			else if (file instanceof File)
+				((File) file).delete();
+		}
 	}
 
 	/**
@@ -322,12 +337,14 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public void deleteFolder(final Object source) throws CoreException {
-		final Object folder = ResourceTools.resolveFolder(source, getScriptEngine().getExecutedFile(), true);
-		if (folder instanceof IFolder)
-			((IFolder) folder).delete(true, new NullProgressMonitor());
+		final Object folder = ResourceTools.resolve(source, getScriptEngine().getExecutedFile());
+		if (ResourceTools.isFile(folder)) {
+			if (folder instanceof IFolder)
+				((IFolder) folder).delete(true, new NullProgressMonitor());
 
-		else if ((folder instanceof File) && (((File) folder).isFile()))
-			((File) folder).delete();
+			else if (folder instanceof File)
+				((File) folder).delete();
+		}
 	}
 
 	/**
@@ -340,7 +357,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public void deleteProject(final Object source) throws CoreException {
-		final Object project = ResourceTools.resolveFolder(source, getScriptEngine().getExecutedFile(), true);
+		final Object project = ResourceTools.resolve(source, getScriptEngine().getExecutedFile());
 		if (project instanceof IProject)
 			((IProject) project).delete(true, new NullProgressMonitor());
 
@@ -450,7 +467,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			handle = new ResourceHandle((IFile) location, mode);
 
 		else if (location != null)
-			handle = getFileHandle(ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), mode == IFileHandle.READ), mode, autoClose);
+			handle = getFileHandle(ResourceTools.resolve(location, getScriptEngine().getExecutedFile()), mode, autoClose);
 
 		if ((handle != null) && (!handle.exists())) {
 			// create file if it does not exist yet
@@ -486,7 +503,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			@ScriptParameter(defaultValue = "0") final int type, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String title,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String message) {
 
-		Object root = ResourceTools.resolveFolder(rootFolder, getScriptEngine().getExecutedFile(), true);
+		Object root = ResourceTools.resolve(rootFolder, getScriptEngine().getExecutedFile());
 		if (rootFolder == null)
 			root = getWorkspace();
 
@@ -584,7 +601,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String title,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String message) {
 
-		Object root = ResourceTools.resolveFolder(rootFolder, getScriptEngine().getExecutedFile(), true);
+		Object root = ResourceTools.resolve(rootFolder, getScriptEngine().getExecutedFile());
 		if (rootFolder == null)
 			root = getWorkspace();
 
@@ -661,7 +678,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 		final List<Object> result = new ArrayList<>();
 
 		// locate root folder to start with
-		Object root = ResourceTools.resolveFolder(rootFolder, getScriptEngine().getExecutedFile(), true);
+		Object root = ResourceTools.resolve(rootFolder, getScriptEngine().getExecutedFile());
 		if (root == null)
 			root = getWorkspace();
 
@@ -722,7 +739,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public boolean linkProject(final String location) {
-		final Object resolvedLocation = ResourceTools.resolveFolder(location, getScriptEngine().getExecutedFile(), true);
+		final Object resolvedLocation = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 
 		if (resolvedLocation instanceof IContainer) {
 			Logger.warning(PluginConstants.PLUGIN_ID, "The folder to link is already part of the workspace: " + location);
@@ -817,7 +834,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	public void createProblemMarker(final String severity, final Object location, final int lineNumber, final String message,
 			@ScriptParameter(defaultValue = "org.eclipse.core.resources.problemmarker") final String type,
 			@ScriptParameter(defaultValue = "true") final boolean permanent) throws CoreException {
-		final Object file = ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), true);
+		final Object file = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 
 		if (file instanceof IFile) {
 

@@ -43,7 +43,7 @@ public class ForkDropHandler implements IShellDropHandler {
 			final IEnvironment environment = AbstractEnvironment.getEnvironment(scriptEngine);
 			if (environment != null) {
 				if (environment.getModule(ScriptingModule.class) == null) {
-					if (environment.loadModule(ScriptingModule.MODULE_ID) == null)
+					if (environment.loadModule(ScriptingModule.MODULE_ID, false) == null)
 						throw new RuntimeException("Cannot load module '" + ScriptingModule.MODULE_ID + "'");
 				}
 
@@ -59,7 +59,7 @@ public class ForkDropHandler implements IShellDropHandler {
 	}
 
 	private static ScriptType getScriptType(Object element) {
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		return scriptService.getScriptType(ResourceTools.toAbsoluteLocation(element, null));
 	}
 

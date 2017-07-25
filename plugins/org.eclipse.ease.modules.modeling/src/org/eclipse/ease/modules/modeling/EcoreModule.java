@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.internal.runtime.AdapterManager;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -67,7 +68,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Stereotype;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
@@ -156,15 +156,11 @@ public class EcoreModule extends AbstractScriptModule {
 	/**
 	 * Filter used to match all create method from the factory
 	 */
-	protected static Predicate<Method> createMethodFilter = new Predicate<Method>() {
-
-		@Override
-		public boolean apply(final Method arg0) {
-			if (arg0 != null) {
-				return arg0.getName().startsWith("create");
-			}
-			return false;
+	protected static Predicate<Method> createMethodFilter = arg0 -> {
+		if (arg0 != null) {
+			return arg0.getName().startsWith("create");
 		}
+		return false;
 	};
 
 	/**
@@ -189,7 +185,7 @@ public class EcoreModule extends AbstractScriptModule {
 		final EFactory factory = getFactory();
 		if (factory != null) {
 			getScriptEngine().setVariable(getFactoryVariableName(), factory);
-			getEnvironment().wrap(factory.getClass());
+			getEnvironment().wrap(factory.getClass(), false);
 
 		} else {
 			getEnvironment().getModule(UIModule.class).showErrorDialog("Error", "Unable to find metamodel with URI : " + fUri);
@@ -245,7 +241,7 @@ public class EcoreModule extends AbstractScriptModule {
 				return null;
 			}
 
-			final IPath containerPath = ResourceTools.toPath(location);
+			final IPath containerPath = ((IResource) ResourceTools.resolve(location)).getFullPath();
 			container = URI.createPlatformResourceURI(containerPath.toString(), true);
 
 		} else {
@@ -459,16 +455,12 @@ public class EcoreModule extends AbstractScriptModule {
 		}
 
 		final Collection<Setting> result = crossReferencer.getInverseReferences(eObject, true);
-		return Collections2.transform(result, new Function<Setting, Object[]>() {
+		return Collections2.transform(result, arg0 -> {
+			final Object[] setting = new Object[2];
+			setting[1] = arg0.getEStructuralFeature();
+			setting[0] = arg0.getEObject();
 
-			@Override
-			public Object[] apply(final Setting arg0) {
-				final Object[] setting = new Object[2];
-				setting[1] = arg0.getEStructuralFeature();
-				setting[0] = arg0.getEObject();
-
-				return setting;
-			}
+			return setting;
 		});
 	}
 

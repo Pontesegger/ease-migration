@@ -339,7 +339,7 @@ public class UIModule extends AbstractScriptModule {
 	 */
 	@WrapToScript(alias = "openEditor")
 	public IEditorPart showEditor(final Object location) throws Throwable {
-		final Object file = ResourceTools.resolveFile(location, getScriptEngine().getExecutedFile(), true);
+		final Object file = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 		if (file instanceof IFile)
 			return showEditor((IFile) file);
 

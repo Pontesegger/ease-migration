@@ -39,11 +39,11 @@ public abstract class AbstractModuleTest {
 	@Test
 	public void loadModule() throws NoSuchMethodException, SecurityException {
 
-		ICodeFactory codeFactory = ScriptService.getCodeFactory(fEngine);
-		Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class);
-		String call = codeFactory.createFunctionCall(loadModuleMethod, getModuleID());
+		final ICodeFactory codeFactory = ScriptService.getCodeFactory(fEngine);
+		final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
+		final String call = codeFactory.createFunctionCall(loadModuleMethod, getModuleID(), false);
 
-		ScriptResult result = executeCode(call);
+		final ScriptResult result = executeCode(call);
 		assertEquals(getModuleClass(), result.getResult().getClass());
 		assertNull(result.getException());
 	}
@@ -65,7 +65,7 @@ public abstract class AbstractModuleTest {
 	protected ScriptResult executeCode(final Object code) {
 		try {
 			return fEngine.executeSync(code);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			throw new RuntimeException("Script engine terminated unexpectedly", e);
 		}
 	}
