@@ -128,6 +128,9 @@ public final class ResourceTools {
 		if ((location instanceof File) || (location instanceof IResource) || (location instanceof URI) || (location instanceof URL))
 			return location;
 
+		if ((location == null) || (location.toString().trim().isEmpty()))
+			return resolve(parent);
+
 		final String locationStr = location.toString();
 		if (isAbsolute(locationStr))
 			return resolve(location);

@@ -383,6 +383,13 @@ public class ResourceToolsTest {
 	}
 
 	@Test
+	public void resolveRelativeInvalid() {
+		assertNull(ResourceTools.resolve(null, null));
+		assertNull(ResourceTools.resolve("", ""));
+		assertNull(ResourceTools.resolve(" ", " "));
+	}
+
+	@Test
 	public void exists() {
 		assertTrue(ResourceTools.exists(fWorkspace));
 		assertTrue(ResourceTools.exists(fProject));
