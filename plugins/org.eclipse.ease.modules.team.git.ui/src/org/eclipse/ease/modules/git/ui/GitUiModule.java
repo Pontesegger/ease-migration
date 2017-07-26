@@ -65,10 +65,11 @@ public class GitUiModule extends AbstractScriptModule {
 	 * @param repository
 	 *            The JGit repository to work with.
 	 */
-	@WrapToScript
-	public void createBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
-		BranchOperationUI.create((Repository) repository).start();
-	}
+	// FIXME currently disabled due to API breakage in egit
+	// @WrapToScript
+	// public void createBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
+	// BranchOperationUI.create((Repository) repository).start();
+	// }
 
 	/**
 	 * Opens a dialog, allowing to select branches that ought to be removed.
@@ -76,10 +77,11 @@ public class GitUiModule extends AbstractScriptModule {
 	 * @param repository
 	 *            The JGit repository to work with.
 	 */
-	@WrapToScript
-	public void deleteBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
-		BranchOperationUI.delete((Repository) repository).start();
-	}
+	// FIXME currently disabled due to API breakage in egit
+	// @WrapToScript
+	// public void deleteBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
+	// BranchOperationUI.delete((Repository) repository).start();
+	// }
 
 	/**
 	 * Opens a dialog, allowing to select a branch that ought to be renamed.
@@ -87,10 +89,11 @@ public class GitUiModule extends AbstractScriptModule {
 	 * @param repository
 	 *            The JGit repository to work with.
 	 */
-	@WrapToScript
-	public void renameBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
-		BranchOperationUI.rename((Repository) repository).start();
-	}
+	// FIXME currently disabled due to API breakage in egit
+	// @WrapToScript
+	// public void renameBranch(@ScriptParameter(defaultValue = NULL) Object repository) {
+	// BranchOperationUI.rename((Repository) repository).start();
+	// }
 
 	/**
 	 * Get the JGit repository for the first selected repository node.
@@ -113,14 +116,11 @@ public class GitUiModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public void handleUncommittedFiles(@ScriptParameter(defaultValue = NULL) final Object repository) {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					UIRepositoryUtils.handleUncommittedFiles((Repository) repository, Display.getDefault().getActiveShell());
-				} catch (final GitAPIException e) {
-					throw new RuntimeException(e);
-				}
+		Display.getDefault().asyncExec(() -> {
+			try {
+				UIRepositoryUtils.handleUncommittedFiles((Repository) repository, Display.getDefault().getActiveShell());
+			} catch (final GitAPIException e) {
+				throw new RuntimeException(e);
 			}
 		});
 	}

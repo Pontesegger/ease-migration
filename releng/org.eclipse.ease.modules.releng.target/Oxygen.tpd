@@ -1,6 +1,6 @@
-target "Neon" with source requirements
+target "Oxygen" with source requirements
 
-location "http://download.eclipse.org/releases/neon/" eclipse-neon {
+location "http://download.eclipse.org/releases/oxygen/" eclipse-oxygen {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -23,19 +23,25 @@ location "http://download.eclipse.org/releases/neon/" eclipse-neon {
 	// unit test modules
 	org.eclipse.wst.xml_core.feature.feature.group
 	org.eclipse.wst.xml_ui.feature.feature.group
-
+	
 	// java module
 	org.eclipse.pde.feature.group
 	org.eclipse.jdt
-
+	
 	// svn module
 	org.eclipse.team.svn.feature.group
-
+	
 	// git module
 	org.eclipse.egit.feature.group
 	org.eclipse.jgit.feature.group
-
+	
 	org.eclipse.osgi
+}
+
+location "http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/" eclipse-orbit-oxygen {
+	// for java unit test of modules
+	org.mockito [1.9.5,2.0.0)
+	org.hamcrest [1.1.0,2.0.0)
 }
 
 location "http://download.eclipse.org/ease/update/nightly" {
@@ -44,13 +50,6 @@ location "http://download.eclipse.org/ease/update/nightly" {
 	org.eclipse.ease.ui.feature.feature.group lazy
 	org.eclipse.ease.lang.javascript.feature.feature.group lazy
 	org.eclipse.ease.lang.jvm.feature.feature.group lazy
-}
-
-location "http://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository" eclipse-orbit {
-	// for java unit test of modules
-	org.mockito [1.9.5,2.0.0)
-	org.hamcrest [1.1.0,2.0.0)
-	com.google.guava [12.0.0,16.0.0)
 }
 
 location "http://download.eclipse.org/nebula/releases/1.0.0" {
