@@ -16,8 +16,9 @@ Tycho naming
 Available targets
 =================
 
-	* Indigo.tpd - contains requirements for builds based on Eclipse indigo. Used to check dependencies before a release
-	
-	* Mars.tpd - target platform used to build org.eclipse.ease.core repository
+	* Luna.tpd - oldest platform to resolve plugin dependencies from
+	* Mars.tpd
+	* Neon.tpd
+	* Oxygen.tpd - current build platform
 	
 	* Developers.tpd - target platform to be set by developers. Contains additional dependencies for modules, pydev, ...

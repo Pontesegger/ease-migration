@@ -81,7 +81,7 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="Neon"
+      defaultValue="Oxygen"
       storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup:CompoundTask"
@@ -199,13 +199,13 @@
           <excludedPath>features/org.eclipse.ease.integration.modeling.uml.feature</excludedPath>
         </sourceLocator>
         <repositoryList
-            name="Neon">
+            name="Oxygen">
           <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/"/>
+              url="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
           <repository
               url="https://bintray.com/artifact/download/pontesegger/ease-engines/"/>
           <repository
-              url="http://download.eclipse.org/releases/neon"/>
+              url="http://download.eclipse.org/releases/oxygen/"/>
           <repository
               url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
         </repositoryList>
@@ -377,13 +377,13 @@
         <sourceLocator
             rootFolder="${ease.modules.git.clone.location}"/>
         <repositoryList
-            name="Neon">
+            name="Oxygen">
           <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/"/>
+              url="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
           <repository
               url="http://download.eclipse.org/ease/update/nightly"/>
           <repository
-              url="http://download.eclipse.org/releases/neon"/>
+              url="http://download.eclipse.org/releases/oxygen/"/>
           <repository
               url="http://download.eclipse.org/nebula/releases/1.0.0"/>
         </repositoryList>
