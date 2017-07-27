@@ -85,6 +85,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		try {
 			txtSourceFile.setText(configuration.getAttribute(LaunchConstants.FILE_LOCATION, ""));
 
+			// Populate the engines first
+			populateScriptEngines();
+
 			final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
 			final EngineDescription engineDescription = scriptService.getEngineByID(configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, ""));
 			if (engineDescription != null)

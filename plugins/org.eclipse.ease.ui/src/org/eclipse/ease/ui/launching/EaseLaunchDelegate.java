@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.launching;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -153,6 +155,19 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 			// setup debugger
 			if (ILaunchManager.DEBUG_MODE.equals(mode))
 				setupDebugger(engine, configuration, launch);
+
+			// register libraries
+			final Collection<String> libraries = LaunchConstants.getLibraries(configuration);
+			for (final String libraryPath : libraries) {
+				try {
+					engine.registerJar(new URL(libraryPath));
+				} catch (final MalformedURLException e) {
+					// malformed URL
+					Display.getDefault().asyncExec(() -> MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch error",
+							"Invalid URL for the library \"" + libraryPath + "\""));
+					return;
+				}
+			}
 
 			// set startup parameters
 			final String parameterString = configuration.getAttribute(LaunchConstants.STARTUP_PARAMETERS, "").trim();
