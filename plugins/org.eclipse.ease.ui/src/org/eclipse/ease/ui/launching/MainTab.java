@@ -88,7 +88,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 			// Populate the engines first
 			populateScriptEngines();
 
-			final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+			final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 			final EngineDescription engineDescription = scriptService.getEngineByID(configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, ""));
 			if (engineDescription != null)
 				comboViewer.setSelection(new StructuredSelection(engineDescription));
@@ -130,11 +130,11 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		// allow launch when a file is selected and file exists
 		try {
-			final boolean resourceExists = ResourceTools.exists(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, ""));
+			final boolean resourceExists = ResourceTools.exists(ResourceTools.resolve(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, "")));
 			if (resourceExists) {
 				// check engine
 				final String selectedEngineID = launchConfig.getAttribute(LaunchConstants.SCRIPT_ENGINE, "");
-				final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+				final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 				for (final EngineDescription description : scriptService.getEngines()) {
 					if (description.getID().equals(selectedEngineID))
 						return true;
@@ -291,7 +291,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 	protected void populateScriptEngines() {
 
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		ScriptType scriptType = null;
 
 		// resolve script type by file extension
@@ -331,5 +331,4 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 	public Image getImage() {
 		return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/global_tab.gif", true);
 	}
-
 }
