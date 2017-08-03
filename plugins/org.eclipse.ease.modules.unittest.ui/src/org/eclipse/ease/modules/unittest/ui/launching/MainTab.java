@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.modules.unittest.ui.launching;
 
-import java.io.File;
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,20 +23,18 @@ import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.launching.LaunchConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -83,9 +80,11 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		try {
 			txtSourceFile.setText(configuration.getAttribute(LaunchConstants.FILE_LOCATION, ""));
+
+			// Populate the engines first
 			populateScriptEngines();
-			// TODO select correct engine from configuration
-			final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+
+			final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 			final EngineDescription engineDescription = scriptService.getEngineByID(configuration.getAttribute(LaunchConstants.SCRIPT_ENGINE, ""));
 			if (engineDescription != null)
 				comboViewer.setSelection(new StructuredSelection(engineDescription));
@@ -123,11 +122,11 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		// allow launch when a file is selected and file exists
 		try {
-			final boolean resourceExists = ResourceTools.exists(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, ""));
+			final boolean resourceExists = ResourceTools.exists(ResourceTools.resolve(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, "")));
 			if (resourceExists) {
 				// check engine
 				final String selectedEngineID = launchConfig.getAttribute(LaunchConstants.SCRIPT_ENGINE, "");
-				final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+				final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 				for (final EngineDescription description : scriptService.getEngines()) {
 					if (description.getID().equals(selectedEngineID))
 						return true;
@@ -175,11 +174,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		grpScriptSource.setLayout(new GridLayout(2, false));
 
 		txtSourceFile = new Text(grpScriptSource, SWT.BORDER);
-		txtSourceFile.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+		txtSourceFile.addModifyListener(e -> {
+			if (!fDisableUpdate)
 				populateScriptEngines();
-			}
 		});
 		txtSourceFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
@@ -193,7 +190,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 				dialog.setMessage("Select the testsuite file to execute:");
 				dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
 				if (dialog.open() == Window.OK)
-					txtSourceFile.setText("workspace:/" + ((IFile) dialog.getFirstResult()).getFullPath().toPortableString());
+					txtSourceFile.setText(ResourceTools.toAbsoluteLocation(((IFile) dialog.getFirstResult()).getFullPath().toPortableString(), null));
 			}
 		});
 		btnBrowseProject.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
@@ -207,7 +204,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 				dialog.setFilterExtensions(new String[] { "*.suite", "*.*" });
 				dialog.setFilterNames(new String[] { "Test Suites", "All Files" });
 				final String fileName = dialog.open();
-				txtSourceFile.setText(new File(fileName).toURI().toString());
+				txtSourceFile.setText(ResourceTools.toAbsoluteLocation(fileName, null));
 			}
 		});
 		btnBrowseFilesystem.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -223,12 +220,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		comboViewer.setContentProvider(ArrayContentProvider.getInstance());
 		comboViewer.setLabelProvider(new LabelProvider());
-		comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
+		comboViewer.addSelectionChangedListener(e -> {
+			if (!fDisableUpdate)
 				updateLaunchConfigurationDialog();
-			}
 		});
 
 		// options only available in debug mode
@@ -279,24 +273,44 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 	protected void populateScriptEngines() {
 
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		ScriptType scriptType = null;
 
 		// resolve script type by file extension
 		final String sourceFile = txtSourceFile.getText();
 		scriptType = scriptService.getScriptType(sourceFile);
 
-		// if (scriptType != null) {
-		// final List<EngineDescription> engines = scriptService.getEngines(scriptType.getName());
-		final Collection<EngineDescription> engines = scriptService.getEngines();
-		comboViewer.setInput(engines);
-		comboViewer.refresh();
-
-		// set preferred engine
-		// if (!engines.isEmpty())
-		// comboViewer.setSelection(new StructuredSelection(engines.get(0)));
-		// }
+		if (scriptType != null) {
+			final List<EngineDescription> engines = scriptService.getEngines(scriptType.getName());
+			if (isNewScriptTypeSelected(engines)) {
+				// if new script type selected from UI, change the engines tab with new inputs
+				comboViewer.setInput(engines);
+				comboViewer.refresh();
+			}
+			if ((comboViewer.getSelection().isEmpty()) && !engines.isEmpty()) {
+				comboViewer.setSelection(new StructuredSelection(engines.get(0)));
+			}
+		}
 
 		updateLaunchConfigurationDialog();
+	}
+
+	/**
+	 * Find if script with different script type selected.
+	 *
+	 * @param engines
+	 *            list of script engines available
+	 * @return true or false based on script type selected
+	 */
+	private boolean isNewScriptTypeSelected(List<EngineDescription> engines) {
+		if ((comboViewer != null) && (comboViewer.getInput() != null)) {
+			return !engines.containsAll((List<?>) comboViewer.getInput());
+		}
+		return true;
+	}
+
+	@Override
+	public Image getImage() {
+		return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/global_tab.gif", true);
 	}
 }
