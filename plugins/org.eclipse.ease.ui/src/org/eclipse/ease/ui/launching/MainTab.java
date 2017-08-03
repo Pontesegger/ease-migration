@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.launching;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -210,7 +209,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 			public void widgetSelected(final SelectionEvent e) {
 				final FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 				final String fileName = dialog.open();
-				txtSourceFile.setText(new File(fileName).toURI().toString());
+				txtSourceFile.setText(ResourceTools.toAbsoluteLocation(fileName, null));
 			}
 		});
 		btnBrowseFilesystem.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));

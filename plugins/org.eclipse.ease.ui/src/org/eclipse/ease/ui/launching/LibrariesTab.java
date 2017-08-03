@@ -181,7 +181,7 @@ public class LibrariesTab extends AbstractLaunchConfigurationTab implements ILau
 		if (filePath != null) {
 			for (final String filename : dialog.getFileNames()) {
 				final String path = dialog.getFilterPath() + File.separator + filename;
-				fLibraries.add(new File(path).toURI().toString());
+				fLibraries.add(ResourceTools.toAbsoluteLocation(path, null));
 			}
 			refresh();
 		}
