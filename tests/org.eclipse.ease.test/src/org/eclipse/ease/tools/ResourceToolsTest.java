@@ -28,7 +28,6 @@ import org.junit.Test;
 
 public class ResourceToolsTest {
 
-	// private static final String TEST_FILE = "test.file";
 	private static final String PROJECT_NAME = "Sample project";
 	private static final String FOLDER_NAME = "Subfolder";
 	private static final String FILE1_NAME = "test file.txt";
@@ -49,7 +48,6 @@ public class ResourceToolsTest {
 	private File fFsProject;
 	private File fFsFolder;
 	private File fFsFile1;
-	private File fFsFile2;
 
 	public static boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().startsWith("windows");
@@ -85,7 +83,6 @@ public class ResourceToolsTest {
 			fFile2.create(new ByteArrayInputStream("Hello eclipse".getBytes("UTF-8")), false, null);
 
 		fFsFile1 = fFile1.getLocation().toFile();
-		fFsFile2 = fFile2.getLocation().toFile();
 		fFsFolder = fFsFile1.getParentFile();
 		fFsProject = fFsFolder.getParentFile();
 		fFsWorkspace = fWorkspace.getRawLocation().toFile();
@@ -519,6 +516,11 @@ public class ResourceToolsTest {
 		assertEquals("http://eclipse.org", ResourceTools.toAbsoluteLocation("http://eclipse.org", null));
 		assertEquals("https://eclipse.org/somefile.js", ResourceTools.toAbsoluteLocation("https://eclipse.org/somefile.js", null));
 		assertEquals("svn://eclipse.org/file", ResourceTools.toAbsoluteLocation("svn://eclipse.org/file", null));
+	}
+
+	@Test
+	public void toRelativeLocationInWorkspace() {
+		assertEquals(fFile1.getName(), ResourceTools.toRelativeLocation(fFile1, fFile2));
 	}
 
 	@Test

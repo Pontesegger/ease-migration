@@ -175,7 +175,7 @@ public final class ResourceTools {
 			}
 
 			// could not resolve within the workspace, try within the file system
-			parent = toFileSystem((IResource) parent);
+			parent = toFile(parent);
 		}
 
 		if (parent instanceof File) {
@@ -223,21 +223,6 @@ public final class ResourceTools {
 
 		} else
 			return parentPath;
-	}
-
-	/**
-	 * Get the filesystem representation of a workspace resource.
-	 *
-	 * @param resource
-	 *            workspace resource
-	 * @return file system resource
-	 */
-	private static File toFileSystem(IResource resource) {
-		// on some projects getRawLocation() returns null
-		if (resource.getRawLocation() != null)
-			return resource.getRawLocation().toFile();
-
-		return resource.getLocation().toFile();
 	}
 
 	/**
@@ -485,6 +470,67 @@ public final class ResourceTools {
 	}
 
 	/**
+	 * Create a relative path from one resource to another.
+	 * 
+	 * @param resource
+	 *            resource to create a relative path for
+	 * @param parent
+	 *            resource to create relative path from
+	 * @return relative path for <i>resource</i>
+	 */
+	public static String toRelativeLocation(Object resource, Object parent) {
+		resource = resolve(resource);
+		if (resource == null)
+			return null;
+
+		parent = resolve(parent);
+		if (parent == null)
+			return null;
+
+		if (isFile(parent)) {
+			if (parent instanceof IFile)
+				parent = ((IFile) parent).getParent();
+			else if (parent instanceof File)
+				parent = ((File) parent).getParentFile();
+		}
+
+		IPath parentPath;
+		IPath resourcePath;
+
+		if ((resource instanceof IResource) && (parent instanceof IResource)) {
+			// within workspace
+			parentPath = ((IResource) parent).getFullPath();
+			resourcePath = ((IResource) resource).getFullPath();
+
+		} else {
+			// within file system
+			resource = toFile(resource);
+			parent = toFile(parent);
+
+			try {
+				parentPath = new Path(((File) parent).getCanonicalPath());
+				resourcePath = new Path(((File) resource).getCanonicalPath());
+				if (!parentPath.getDevice().equals(resourcePath.getDevice()))
+					// different devices, no relative path possible
+					return null;
+			} catch (final IOException e) {
+				// could not get canonical path, giving up
+				return null;
+			}
+		}
+
+		// concatenate paths
+		final int matchingSegments = parentPath.matchingFirstSegments(resourcePath);
+		parentPath = parentPath.removeFirstSegments(matchingSegments);
+		resourcePath = resourcePath.removeFirstSegments(matchingSegments);
+
+		for (int index = 0; index < parentPath.segmentCount(); index++)
+			resourcePath = new Path("..").append(resourcePath);
+
+		return resourcePath.toPortableString();
+	}
+
+	/**
 	 * Get the content of a resource location as {@link InputStream}.
 	 *
 	 * @param location
@@ -580,7 +626,7 @@ public final class ResourceTools {
 	}
 
 	/**
-	 * Convert resource to file system {@link File}. Does not try to resolve the resource.
+	 * Get the filesystem representation of a given resource. Does not try to resolve the resource.
 	 *
 	 * @param resource
 	 *            resource to convert. Either a {@link File} or an {@link IResource}
@@ -590,8 +636,13 @@ public final class ResourceTools {
 		if (resource instanceof File)
 			return (File) resource;
 
-		if (resource instanceof IResource)
-			return toFileSystem((IResource) resource);
+		if (resource instanceof IResource) {
+			// on some projects getRawLocation() returns null
+			if (((IResource) resource).getRawLocation() != null)
+				return ((IResource) resource).getRawLocation().toFile();
+
+			return ((IResource) resource).getLocation().toFile();
+		}
 
 		return null;
 	}
