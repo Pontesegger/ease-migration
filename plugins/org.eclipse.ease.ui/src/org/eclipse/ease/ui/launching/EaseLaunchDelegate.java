@@ -37,6 +37,7 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.tools.RunnableWithResult;
+import org.eclipse.ease.tools.StringTools;
 import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.ease.ui.tools.AbstractLaunchDelegate;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -171,12 +172,7 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 
 			// set startup parameters
 			final String parameterString = configuration.getAttribute(LaunchConstants.STARTUP_PARAMETERS, "").trim();
-			String[] parameters;
-			if (!parameterString.isEmpty()) {
-				parameters = parameterString.split("\\s+");
-
-			} else
-				parameters = new String[0];
+			final String[] parameters = StringTools.parseArguments(parameterString);
 
 			engine.setVariable("argv", parameters);
 

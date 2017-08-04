@@ -48,4 +48,12 @@ public final class StringTools {
 
 		return result.toString();
 	}
+
+	public static String[] parseArguments(String argument) {
+		if ((argument != null) && !argument.isEmpty()) {
+			return argument.replaceAll("^\"", "").split("\"?(\\s+|$)(?=(([^\"]*\"){2})*[^\"]*$)\"?");
+		} else {
+			return new String[0];
+		}
+	}
 }
