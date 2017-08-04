@@ -220,7 +220,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		grpExecutionEngine.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		grpExecutionEngine.setText("&Execution Engine");
 
-		comboViewer = new ComboViewer(grpExecutionEngine, SWT.NONE);
+		comboViewer = new ComboViewer(grpExecutionEngine, SWT.READ_ONLY);
 		final Combo combo = comboViewer.getCombo();
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		comboViewer.setContentProvider(ArrayContentProvider.getInstance());
