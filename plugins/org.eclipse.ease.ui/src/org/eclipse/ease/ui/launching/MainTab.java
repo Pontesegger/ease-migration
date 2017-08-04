@@ -177,7 +177,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		final Group grpScriptSource = new Group(topControl, SWT.NONE);
 		grpScriptSource.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		grpScriptSource.setText("Script Source");
+		grpScriptSource.setText("&Script Source");
 		grpScriptSource.setLayout(new GridLayout(2, false));
 
 		txtSourceFile = new Text(grpScriptSource, SWT.BORDER);
@@ -201,7 +201,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 			}
 		});
 		btnBrowseProject.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-		btnBrowseProject.setText("Browse Workspace...");
+		btnBrowseProject.setText("Browse &Workspace...");
 
 		final Button btnBrowseFilesystem = new Button(grpScriptSource, SWT.NONE);
 		btnBrowseFilesystem.addSelectionListener(new SelectionAdapter() {
@@ -213,12 +213,12 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 			}
 		});
 		btnBrowseFilesystem.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		btnBrowseFilesystem.setText("Browse Filesystem...");
+		btnBrowseFilesystem.setText("Browse &Filesystem...");
 
 		final Group grpExecutionEngine = new Group(topControl, SWT.NONE);
 		grpExecutionEngine.setLayout(new GridLayout(1, false));
 		grpExecutionEngine.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		grpExecutionEngine.setText("Execution Engine");
+		grpExecutionEngine.setText("&Execution Engine");
 
 		comboViewer = new ComboViewer(grpExecutionEngine, SWT.NONE);
 		final Combo combo = comboViewer.getCombo();
@@ -233,7 +233,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 		final Group grpProgramArguments = new Group(topControl, SWT.NONE);
 		grpProgramArguments.setLayout(new GridLayout(1, false));
 		grpProgramArguments.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
-		grpProgramArguments.setText("Script arguments");
+		grpProgramArguments.setText("Script &arguments");
 
 		fTxtStartupParameters = new Text(grpProgramArguments, SWT.BORDER | SWT.WRAP | SWT.MULTI);
 		fTxtStartupParameters.addModifyListener(e -> {
@@ -257,7 +257,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 					updateLaunchConfigurationDialog();
 			}
 		});
-		chkShowDynamicScript.setText("Show dynamic script content");
+		chkShowDynamicScript.setText("Show &dynamic script content");
 
 		chkSuspendOnStartup = new Button(group, SWT.CHECK);
 		chkSuspendOnStartup.addSelectionListener(new SelectionAdapter() {
@@ -269,7 +269,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 					updateLaunchConfigurationDialog();
 			}
 		});
-		chkSuspendOnStartup.setText("Suspend on startup");
+		chkSuspendOnStartup.setText("Suspend on s&tartup");
 
 		chkSuspendOnScript = new Button(group, SWT.CHECK);
 		final GridData gd_chkSuspendOnScript = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -283,7 +283,7 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 					updateLaunchConfigurationDialog();
 			}
 		});
-		chkSuspendOnScript.setText("Suspend on script load");
+		chkSuspendOnScript.setText("Suspend on script &load");
 
 		setControl(topControl);
 	}
