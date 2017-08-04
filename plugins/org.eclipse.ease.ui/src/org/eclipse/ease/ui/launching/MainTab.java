@@ -129,8 +129,9 @@ public class MainTab extends AbstractLaunchConfigurationTab implements ILaunchCo
 
 		// allow launch when a file is selected and file exists
 		try {
-			final boolean resourceExists = ResourceTools.exists(ResourceTools.resolve(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, "")));
-			if (resourceExists) {
+			final Object file = ResourceTools.resolve(launchConfig.getAttribute(LaunchConstants.FILE_LOCATION, ""));
+			final boolean isFile = ResourceTools.isFile(file);
+			if (isFile) {
 				// check engine
 				final String selectedEngineID = launchConfig.getAttribute(LaunchConstants.SCRIPT_ENGINE, "");
 				final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);

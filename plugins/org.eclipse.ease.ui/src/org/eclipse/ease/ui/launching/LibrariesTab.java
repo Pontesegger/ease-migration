@@ -233,8 +233,9 @@ public class LibrariesTab extends AbstractLaunchConfigurationTab implements ILau
 		try {
 			final Collection<String> jarList = LaunchConstants.getLibraries(launchConfig);
 			for (final String jarPath : jarList) {
-				if (!ResourceTools.exists(ResourceTools.resolve(jarPath))) {
-					setErrorMessage("One of the JAR file(s) not exists");
+				final Object jarFile = ResourceTools.resolve(jarPath);
+				if (!ResourceTools.isFile(jarFile)) {
+					setErrorMessage("Invalid JAR file(s) selected.");
 					return false;
 				}
 			}
