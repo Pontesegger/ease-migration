@@ -11,8 +11,6 @@
 package org.eclipse.ease.modules.unittest.ui.editor;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
@@ -23,6 +21,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 public class Description extends AbstractEditorPage {
 
 	private Text txtDescription;
+	private boolean fDisableUpdate = false;
 
 	/**
 	 * Create the form page.
@@ -69,12 +68,10 @@ public class Description extends AbstractEditorPage {
 		txtDescription.setText(getModel().getDescription());
 
 		// add listener after initializing content
-		txtDescription.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				getModel().setDescription(txtDescription.getText());
+		txtDescription.addModifyListener(e -> {
+			getModel().setDescription(txtDescription.getText());
+			if (!fDisableUpdate)
 				setDirty();
-			}
 		});
 	}
 
@@ -85,6 +82,8 @@ public class Description extends AbstractEditorPage {
 
 	@Override
 	protected void update() {
+		fDisableUpdate = true;
 		txtDescription.setText(getModel().getDescription());
+		fDisableUpdate = false;
 	}
 }
