@@ -203,7 +203,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 		} catch (final RhinoException e) {
 			// build exception stacktrace
 			fExceptionStackTrace = getStackTrace().clone();
-			if ((script != null) && (!script.equals(fExceptionStackTrace.get(0).getScript()))) {
+			if ((fExceptionStackTrace.isEmpty()) || (((script != null) && (!script.equals(fExceptionStackTrace.get(0).getScript()))))) {
 				// topmost script is not what we expected, seems it was not put on the stack
 				fExceptionStackTrace.add(0, new ScriptDebugFrame(script, e.lineNumber(), IScriptDebugFrame.TYPE_FILE));
 			}
@@ -237,6 +237,10 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 					if (unwrapped instanceof Throwable) {
 						message = ((Throwable) unwrapped).getMessage();
 						errorName = "JavaError";
+						cause = (Throwable) unwrapped;
+					} else {
+						message = (unwrapped != null) ? unwrapped.toString() : null;
+						errorName = "ScriptException";
 					}
 
 				} else {

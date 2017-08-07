@@ -12,11 +12,9 @@
 package org.eclipse.ease;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 
 /**
  * A common class to be thrown if an error happens during script execution.
@@ -29,7 +27,7 @@ public class ScriptExecutionException extends RuntimeException {
 
 	final private String fLineSource;
 	final private int fColumnNumber;
-	final private List<IScriptDebugFrame> fScriptStackTrace;
+	final private ScriptStackTrace fScriptStackTrace;
 	final private String fErrorName;
 
 	/**
@@ -40,7 +38,7 @@ public class ScriptExecutionException extends RuntimeException {
 
 		fLineSource = null;
 		fColumnNumber = 0;
-		fScriptStackTrace = Collections.emptyList();
+		fScriptStackTrace = null;
 		fErrorName = null;
 	}
 
@@ -63,12 +61,12 @@ public class ScriptExecutionException extends RuntimeException {
 	 *            root exception
 	 */
 	public ScriptExecutionException(final String message, final int columnNumber, final String lineSource, final String errorName,
-			final List<IScriptDebugFrame> scriptStackTrace, Throwable cause) {
+			final ScriptStackTrace scriptStackTrace, Throwable cause) {
 		super(message, cause);
 
 		fLineSource = lineSource;
 		fColumnNumber = columnNumber;
-		fScriptStackTrace = new ArrayList<IScriptDebugFrame>(scriptStackTrace);
+		fScriptStackTrace = scriptStackTrace;
 		fErrorName = errorName;
 	}
 
@@ -106,10 +104,12 @@ public class ScriptExecutionException extends RuntimeException {
 	public void printStackTrace(final PrintStream s) {
 		s.println(this);
 
-		for (final IScriptDebugFrame traceElement : fScriptStackTrace) {
-			final String source = (traceElement.getName() != null) ? traceElement.getName() : "unknown script";
-			final String lineInfo = (traceElement.getLineNumber() > 0) ? ":" + traceElement.getLineNumber() : "";
-			s.println("\tat " + source + lineInfo);
+		if (fScriptStackTrace != null) {
+			for (final IScriptDebugFrame traceElement : fScriptStackTrace) {
+				final String source = (traceElement.getName() != null) ? traceElement.getName() : "unknown script";
+				final String lineInfo = (traceElement.getLineNumber() > 0) ? ":" + traceElement.getLineNumber() : "";
+				s.println("\tat " + source + lineInfo);
+			}
 		}
 
 		final Throwable cause = getCause();

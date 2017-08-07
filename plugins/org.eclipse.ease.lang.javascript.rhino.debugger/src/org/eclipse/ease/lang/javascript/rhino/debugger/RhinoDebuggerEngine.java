@@ -24,6 +24,8 @@ import org.mozilla.javascript.Context;
  */
 public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngine {
 
+	public static final String ENGINE_ID = "org.eclipse.ease.javascript.rhinoDebugger";
+
 	private RhinoDebugger fDebugger;
 
 	/**
@@ -72,6 +74,9 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 
 	@Override
 	public ScriptStackTrace getExceptionStackTrace() {
+		if ((fDebugger.getExceptionStacktrace() == null) || (fDebugger.getExceptionStacktrace().isEmpty()))
+			return super.getExceptionStackTrace();
+
 		return fDebugger.getExceptionStacktrace();
 	}
 }

@@ -18,7 +18,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +33,7 @@ import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptExecutionException;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.python.PythonHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
@@ -241,7 +241,7 @@ public class Py4jScriptEngine extends AbstractScriptEngine {
 		if (exception instanceof Throwable) {
 			throw (Throwable) exception;
 		} else if (exception != null) {
-			throw new ScriptExecutionException(exception.toString(), 0, null, null, Collections.emptyList(), null);
+			throw new ScriptExecutionException(exception.toString(), 0, null, null, new ScriptStackTrace(), null);
 		} else {
 			return interactiveReturn.getResult();
 		}
