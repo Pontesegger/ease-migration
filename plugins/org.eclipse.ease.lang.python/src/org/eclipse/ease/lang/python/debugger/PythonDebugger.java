@@ -12,9 +12,7 @@
 package org.eclipse.ease.lang.python.debugger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -22,6 +20,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.ease.ExitException;
+import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
@@ -29,6 +28,7 @@ import org.eclipse.ease.debugging.AbstractScriptDebugger;
 import org.eclipse.ease.debugging.IEventProcessor;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptDebugFrame;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.events.IDebugEvent;
 import org.eclipse.ease.debugging.events.TerminateRequest;
 
@@ -109,7 +109,7 @@ public class PythonDebugger extends AbstractScriptDebugger implements IEventProc
 	/**
 	 * @see AbstractScriptDebugger#AbstractScriptDebugger(IScriptEngine, boolean)
 	 */
-	public PythonDebugger(final IScriptEngine engine, final boolean showDynamicCode) {
+	public PythonDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		super(engine, showDynamicCode);
 	}
 
@@ -157,8 +157,8 @@ public class PythonDebugger extends AbstractScriptDebugger implements IEventProc
 	 *            Top frame of stack.
 	 * @return Stack based on given {@link IPyFrame}
 	 */
-	private List<IScriptDebugFrame> getStacktrace(final IPyFrame origin) {
-		final List<IScriptDebugFrame> trace = new ArrayList<>();
+	private ScriptStackTrace getStacktrace(final IPyFrame origin) {
+		final ScriptStackTrace trace = new ScriptStackTrace();
 
 		IPyFrame frame = origin;
 		while (frame != null) {

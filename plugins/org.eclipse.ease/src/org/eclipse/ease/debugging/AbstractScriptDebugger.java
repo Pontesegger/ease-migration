@@ -1,9 +1,7 @@
 package org.eclipse.ease.debugging;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
@@ -30,23 +29,24 @@ import org.eclipse.ease.debugging.events.TerminateRequest;
 public abstract class AbstractScriptDebugger implements IEventProcessor, IExecutionListener {
 	private EventDispatchJob fDispatcher;
 
-	private IScriptEngine fEngine;
+	private IDebugEngine fEngine;
 
 	private boolean fSuspended = false;
 
-	private final Map<Script, List<IBreakpoint>> fBreakpoints = new HashMap<Script, List<IBreakpoint>>();
+	private final Map<Script, List<IBreakpoint>> fBreakpoints = new HashMap<>();
 
 	private final boolean fShowDynamicCode;
 
 	private int fResumeType;
 
-	private List<IScriptDebugFrame> fStacktrace = new LinkedList<IScriptDebugFrame>();
+	/** Stacktrace is not set entirely, but incrementally updated by clients. */
+	private ScriptStackTrace fStacktrace = new ScriptStackTrace();
 
-	private List<IScriptDebugFrame> fExceptionStacktrace = Collections.emptyList();
+	private ScriptStackTrace fExceptionStacktrace = null;
 
 	private int fResumeStackSize = 0;
 
-	public AbstractScriptDebugger(final IScriptEngine engine, final boolean showDynamicCode) {
+	public AbstractScriptDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		fEngine = engine;
 		fShowDynamicCode = showDynamicCode;
 
@@ -108,7 +108,7 @@ public abstract class AbstractScriptDebugger implements IEventProcessor, IExecut
 		}
 	}
 
-	protected IScriptEngine getEngine() {
+	protected IDebugEngine getEngine() {
 		return fEngine;
 	}
 
@@ -132,7 +132,7 @@ public abstract class AbstractScriptDebugger implements IEventProcessor, IExecut
 			fEngine = null;
 			fDispatcher = null;
 			fStacktrace.clear();
-			fExceptionStacktrace.clear();
+			fExceptionStacktrace = null;
 			break;
 
 		case SCRIPT_START:
@@ -221,12 +221,20 @@ public abstract class AbstractScriptDebugger implements IEventProcessor, IExecut
 	 *
 	 * @return
 	 */
-	public List<IScriptDebugFrame> getStacktrace() {
-		return (!fExceptionStacktrace.isEmpty()) ? fExceptionStacktrace : fStacktrace;
+	public ScriptStackTrace getStacktrace() {
+		return fStacktrace;
 	}
 
-	protected void setStacktrace(final List<IScriptDebugFrame> stacktrace) {
+	protected void setStacktrace(final ScriptStackTrace stacktrace) {
 		fStacktrace = stacktrace;
+	}
+
+	public ScriptStackTrace getExceptionStacktrace() {
+		return fExceptionStacktrace;
+	}
+
+	protected void setExceptionStacktrace(final ScriptStackTrace exceptionStacktrace) {
+		fExceptionStacktrace = exceptionStacktrace;
 	}
 
 	/**
@@ -267,10 +275,5 @@ public abstract class AbstractScriptDebugger implements IEventProcessor, IExecut
 		default:
 			// either user did not request anything yet or "RESUME" was triggered
 		}
-	}
-
-	protected void setExceptionStacktrace() {
-		// copy current stacktrace
-		fExceptionStacktrace = new ArrayList<IScriptDebugFrame>(getStacktrace());
 	}
 }

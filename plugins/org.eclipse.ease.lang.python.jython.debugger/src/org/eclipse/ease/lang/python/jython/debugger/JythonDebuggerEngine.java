@@ -16,6 +16,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.debugging.EventDispatchJob;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.python.debugger.IPythonDebugEngine;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
@@ -76,5 +77,11 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 		target.setDispatcher(dispatcher);
 		debugger.setDispatcher(dispatcher);
 		dispatcher.schedule();
+	}
+
+	@Override
+	public ScriptStackTrace getExceptionStackTrace() {
+		// FIXME to be implemented
+		return null;
 	}
 }

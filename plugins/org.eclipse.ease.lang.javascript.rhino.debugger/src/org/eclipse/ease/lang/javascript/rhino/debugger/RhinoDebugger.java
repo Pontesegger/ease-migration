@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.AbstractScriptDebugger;
@@ -62,7 +63,7 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 
 		@Override
 		public void onExceptionThrown(final Context cx, final Throwable ex) {
-			setExceptionStacktrace();
+			setExceptionStacktrace(getStacktrace().clone());
 
 			// we do not need the scope any longer
 			fScope = null;
@@ -109,15 +110,15 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 		@Override
 		public Map<String, Object> getVariables(final Object parent) {
 			if (parent instanceof NativeObject) {
-				Map<String, Object> children = new TreeMap<String, Object>();
-				for (Object key : ((NativeObject) parent).getIds())
+				final Map<String, Object> children = new TreeMap<>();
+				for (final Object key : ((NativeObject) parent).getIds())
 					children.put(key.toString(), ((NativeObject) parent).get(key));
 
 				return children;
 			} else if (parent instanceof NativeArray) {
-				Map<String, Object> children = new LinkedHashMap<String, Object>();
+				final Map<String, Object> children = new LinkedHashMap<>();
 
-				for (Object key : ((NativeArray) parent).getIds())
+				for (final Object key : ((NativeArray) parent).getIds())
 					children.put("[" + key + "]", ((NativeArray) parent).get(key));
 
 				return children;
@@ -127,11 +128,11 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 		}
 	}
 
-	private final Map<Integer, Script> fFrameToSource = new HashMap<Integer, Script>();
+	private final Map<Integer, Script> fFrameToSource = new HashMap<>();
 
 	private Script fLastScript = null;
 
-	public RhinoDebugger(final IScriptEngine engine, final boolean showDynamicCode) {
+	public RhinoDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		super(engine, showDynamicCode);
 	}
 

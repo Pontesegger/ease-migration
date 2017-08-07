@@ -17,7 +17,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,6 +29,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.ISecurityCheck.ActionType;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptDebugFrame;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
 
@@ -96,7 +96,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	private InputStream fInputStream = null;
 
-	private final List<IScriptDebugFrame> fStackTrace = new LinkedList<>();
+	private final ScriptStackTrace fStackTrace = new ScriptStackTrace();
 
 	private EngineDescription fDescription;
 
@@ -282,7 +282,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 			// main loop
 			while ((!monitor.isCanceled()) && (!isTerminated())) {
-				
+
 				// execute code
 				if (!fScheduledScripts.isEmpty()) {
 					final Script piece = fScheduledScripts.remove(0);
@@ -480,7 +480,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			thread.interrupt();
 	}
 
-	public List<IScriptDebugFrame> getStackTrace() {
+	public ScriptStackTrace getStackTrace() {
 		return fStackTrace;
 	}
 

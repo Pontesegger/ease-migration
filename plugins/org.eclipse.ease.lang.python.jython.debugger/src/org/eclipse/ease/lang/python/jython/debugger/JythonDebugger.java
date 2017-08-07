@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.jython.debugger;
 
+import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.lang.python.debugger.IPyFrame;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
@@ -22,7 +23,7 @@ public class JythonDebugger extends PythonDebugger {
 	/**
 	 * @see PythonDebugger#PythonDebugger(IScriptEngine, boolean)
 	 */
-	public JythonDebugger(IScriptEngine engine, boolean showDynamicCode) {
+	public JythonDebugger(IDebugEngine engine, boolean showDynamicCode) {
 		super(engine, showDynamicCode);
 	}
 

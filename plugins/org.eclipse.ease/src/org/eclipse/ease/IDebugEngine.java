@@ -10,10 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
-import java.util.List;
-
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 
 /**
  * Interface to be implemented by a script debug engine.
@@ -27,7 +25,15 @@ public interface IDebugEngine extends IScriptEngine {
 	 *
 	 * @return current stack trace
 	 */
-	List<IScriptDebugFrame> getStackTrace();
+	ScriptStackTrace getStackTrace();
+
+	/**
+	 * Get the stack trace of the last thrown exception. Will be populated when an exception is thrown by the script engine. Can be evaluated in a try/catch
+	 * statement within the script. Only available during script runtime.
+	 *
+	 * @return last exception stack trace or <code>null</code>
+	 */
+	ScriptStackTrace getExceptionStackTrace();
 
 	void setupDebugger(ILaunch launch, boolean suspendOnStartup, boolean suspendOnScriptLoad, boolean showDynamicCode);
 }

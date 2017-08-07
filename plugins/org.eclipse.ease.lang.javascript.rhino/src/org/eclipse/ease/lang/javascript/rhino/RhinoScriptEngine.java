@@ -11,13 +11,10 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,6 +24,7 @@ import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptDebugFrame;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
@@ -44,7 +42,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
-import org.mozilla.javascript.debug.Debugger;
 
 /**
  * A script engine to execute JavaScript code on a Rhino interpreter.
@@ -67,14 +64,25 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 
 	public static final String ENGINE_ID = "org.eclipse.ease.javascript.rhino";
 
+	public static Context getContext() {
+		Context context = Context.getCurrentContext();
+		if (context == null) {
+			synchronized (ContextFactory.getGlobal()) {
+				context = Context.enter();
+			}
+		}
+
+		return context;
+	}
+
 	/** Rhino Scope. Created when interpreter is initialized */
 	private ScriptableObject fScope;
 
 	private Context fContext;
 
-	private Debugger fDebugger = null;
-
 	private int fOptimizationLevel = 9;
+
+	private ScriptStackTrace fExceptionStackTrace = null;
 
 	/**
 	 * Creates a new Rhino interpreter.
@@ -101,17 +109,9 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 	protected synchronized void setupEngine() {
 		fContext = getContext();
 
-		if (fDebugger != null) {
-			fContext.setOptimizationLevel(-1);
-			fContext.setGeneratingDebug(true);
-			fContext.setGeneratingSource(true);
-			fContext.setDebugger(fDebugger, null);
-
-		} else {
-			fContext.setGeneratingDebug(false);
-			fContext.setOptimizationLevel(fOptimizationLevel);
-			fContext.setDebugger(null, null);
-		}
+		fContext.setGeneratingDebug(false);
+		fContext.setOptimizationLevel(fOptimizationLevel);
+		fContext.setDebugger(null, null);
 
 		fScope = new ImporterTopLevel(fContext);
 
@@ -171,10 +171,10 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 		// remove an eventually cached terminate request
 		((ObservingContextFactory) ContextFactory.getGlobal()).cancelTerminate(getContext());
 
-		final InputStreamReader codeReader = new InputStreamReader(script.getCodeStream());
 		try {
 			final Object result;
 
+			// execution
 			if (script.getCommand() instanceof NativeFunction)
 				result = ((NativeFunction) script.getCommand()).call(getContext(), fScope, fScope, ScriptRuntime.emptyArgs);
 
@@ -182,9 +182,13 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 				// execute anonymous functions
 				result = ((org.mozilla.javascript.Script) script.getCommand()).exec(getContext(), fScope);
 
-			else
+			else {
+				final InputStreamReader codeReader = new InputStreamReader(script.getCodeStream());
 				result = getContext().evaluateReader(fScope, codeReader, fileName, 1, null);
+				codeReader.close();
+			}
 
+			// evaluate result
 			if ((result == null) || (result instanceof Undefined))
 				return null;
 
@@ -196,95 +200,70 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 
 			return result;
 
-		} catch (final WrappedException e) {
-			final Throwable wrapped = e.getWrappedException();
-			if (wrapped instanceof ScriptExecutionException)
-				throw wrapped;
-
-			else if (wrapped instanceof Throwable)
-				throw new ScriptExecutionException(wrapped.getMessage(), e.columnNumber(), e.lineSource(), "JavaError",
-						getExceptionStackTrace(script, e.lineNumber()), wrapped);
-
-		} catch (final EcmaError e) {
-			throw new ScriptExecutionException(e.getErrorMessage(), e.columnNumber(), e.lineSource(), e.getName(),
-					getExceptionStackTrace(script, e.lineNumber()), null);
-
-		} catch (final JavaScriptException e) {
-			final Object value = e.getValue();
-			if (value instanceof NativeJavaObject) {
-				final Object unwrapped = ((NativeJavaObject) value).unwrap();
-				if (unwrapped instanceof Throwable)
-					throw new ScriptExecutionException(((Throwable) unwrapped).getMessage(), e.lineNumber(), e.lineSource(), "JavaError",
-							getExceptionStackTrace(script, e.lineNumber()), (Throwable) unwrapped);
-			}
-			final String message = (e.getValue() != null) ? e.getValue().toString() : null;
-			throw new ScriptExecutionException(message, e.lineNumber(), e.lineSource(), "ScriptException", getExceptionStackTrace(script, e.lineNumber()),
-					null);
-
-		} catch (final EvaluatorException e) {
-			throw new ScriptExecutionException(e.getMessage(), e.columnNumber(), e.lineSource(), "SyntaxError", getExceptionStackTrace(script, e.lineNumber()),
-					null);
-
 		} catch (final RhinoException e) {
-			throw new ScriptExecutionException("Error running script", e.columnNumber(), e.lineSource(), "Error",
-					getExceptionStackTrace(script, e.lineNumber()), null);
-
-		} finally {
-			try {
-				if (codeReader != null)
-					codeReader.close();
-			} catch (final IOException e) {
-				// we did our best, give up
+			// build exception stacktrace
+			fExceptionStackTrace = getStackTrace().clone();
+			if ((script != null) && (!script.equals(fExceptionStackTrace.get(0).getScript()))) {
+				// topmost script is not what we expected, seems it was not put on the stack
+				fExceptionStackTrace.add(0, new ScriptDebugFrame(script, e.lineNumber(), IScriptDebugFrame.TYPE_FILE));
 			}
-		}
 
-		return null;
+			// now handle error
+			String message = e.getMessage();
+			String errorName = "Error";
+			Throwable cause = null;
+
+			if (e instanceof WrappedException) {
+				final Throwable wrapped = ((WrappedException) e).getWrappedException();
+				if (wrapped instanceof ScriptExecutionException)
+					throw wrapped;
+
+				else if (wrapped != null) {
+					// java exception thrown
+					message = wrapped.getMessage();
+					errorName = "JavaError";
+					cause = wrapped;
+				}
+
+			} else if (e instanceof EcmaError) {
+				message = ((EcmaError) e).getErrorMessage();
+				errorName = ((EcmaError) e).getName();
+
+			} else if (e instanceof JavaScriptException) {
+				// throw statement from javascript
+				final Object value = ((JavaScriptException) e).getValue();
+				if (value instanceof NativeJavaObject) {
+					final Object unwrapped = ((NativeJavaObject) value).unwrap();
+					if (unwrapped instanceof Throwable) {
+						message = ((Throwable) unwrapped).getMessage();
+						errorName = "JavaError";
+					}
+
+				} else {
+					message = (((JavaScriptException) e).getValue() != null) ? ((JavaScriptException) e).getValue().toString() : null;
+					errorName = "ScriptException";
+				}
+
+			} else if (e instanceof EvaluatorException) {
+				// invalid syntax or similar rhino exception
+				errorName = "SyntaxError";
+
+			} else {
+				message = "Error running script";
+			}
+
+			throw new ScriptExecutionException(message, e.columnNumber(), e.lineSource(), errorName, getExceptionStackTrace(), cause);
+		}
 	}
 
-	/**
-	 * Get a stack trace in case of a script exception. On exceptions a trace might not have picked up the topmost script. So we try to update the trace in case
-	 * we have more accurate information than the script engine itself. Seems the Rhino debugger does not add compilation units to the stack before the
-	 * exception is thrown.
-	 *
-	 * @param script
-	 *            expected topmost script
-	 * @param lineNumber
-	 *            line number of exception root cause
-	 * @return updated stack trace
-	 */
-	protected List<IScriptDebugFrame> getExceptionStackTrace(final Script script, final int lineNumber) {
-		final List<IScriptDebugFrame> stackTrace = new ArrayList<>(getStackTrace());
-		if ((script != null) && (!script.equals(stackTrace.get(0).getScript()))) {
-			// topmost script is not what we expected, seems it was not put on the stack
-			stackTrace.add(0, new ScriptDebugFrame(script, lineNumber, IScriptDebugFrame.TYPE_FILE));
-		}
-
-		return stackTrace;
-	}
-
-	public Context getContext() {
-		Context context = Context.getCurrentContext();
-		if (context == null) {
-			synchronized (ContextFactory.getGlobal()) {
-				context = Context.enter();
-			}
-		}
-
-		return context;
+	public ScriptStackTrace getExceptionStackTrace() {
+		return fExceptionStackTrace;
 	}
 
 	@Override
 	public void terminateCurrent() {
 		// typically requested by a different thread, so do not use getContext() here
 		((ObservingContextFactory) ContextFactory.getGlobal()).terminate(fContext);
-	}
-
-	public void setDebugger(final Debugger debugger) {
-		fDebugger = debugger;
-	}
-
-	protected Debugger getDebugger() {
-		return fDebugger;
 	}
 
 	@Override
