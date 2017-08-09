@@ -356,4 +356,12 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 	public String getSaveVariableName(final String name) {
 		return JavaScriptHelper.getSaveName(name);
 	}
+	/**
+	 * Method to get the global scope of this engine.
+	 * @return 
+	 * 			fScope
+	 */
+	public ScriptableObject getScope() {
+		return fScope;
+	}
 }
