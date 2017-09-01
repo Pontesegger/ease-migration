@@ -135,7 +135,7 @@ public class ScriptService implements IScriptService, BundleListener {
 		return result;
 	}
 
-	private Map<String, EngineDescription> getEngineDescriptions() {
+	private synchronized Map<String, EngineDescription> getEngineDescriptions() {
 		if (fEngineDescriptions == null) {
 			fEngineDescriptions = new HashMap<>();
 			final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_LANGUAGE_ID);
@@ -174,7 +174,7 @@ public class ScriptService implements IScriptService, BundleListener {
 	}
 
 	@Override
-	public Map<String, ScriptType> getAvailableScriptTypes() {
+	public synchronized Map<String, ScriptType> getAvailableScriptTypes() {
 		if (fScriptTypes == null) {
 			fScriptTypes = new HashMap<>();
 			final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_SCRIPTTYPE_ID);
@@ -254,7 +254,7 @@ public class ScriptService implements IScriptService, BundleListener {
 	}
 
 	@Override
-	public Map<String, ModuleCategoryDefinition> getAvailableModuleCategories() {
+	public synchronized Map<String, ModuleCategoryDefinition> getAvailableModuleCategories() {
 		if (fAvailableModuleCategories == null) {
 			fAvailableModuleCategories = new HashMap<>();
 			final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_MODULES_ID);
