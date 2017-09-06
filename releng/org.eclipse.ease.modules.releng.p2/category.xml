@@ -3,9 +3,6 @@
    <feature id="org.eclipse.ease.modules.feature" version="0.5.0.qualifier">
       <category name="Modules"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.unittest.feature" version="0.5.0.qualifier">
-      <category name="Modules"/>
-   </feature>
    <feature id="org.eclipse.ease.modules.team.svn.feature" version="0.5.0.qualifier">
       <category name="Modules"/>
    </feature>

@@ -115,8 +115,6 @@
 		<module>../../plugins/org.eclipse.ease.modules.platform</module>
 		<module>../../plugins/org.eclipse.ease.modules.modeling</module>
 		<module>../../plugins/org.eclipse.ease.modules.modeling.ui</module>
-		<module>../../plugins/org.eclipse.ease.modules.unittest</module>
-		<module>../../plugins/org.eclipse.ease.modules.unittest.ui</module>
 		<module>../../plugins/org.eclipse.ease.modules.help</module>
 		<module>../../plugins/org.eclipse.ease.modules.team.git</module>
 		<!-- temporary disabled due to API breakage in egit dependencies
@@ -128,7 +126,6 @@
 		<!-- Features -->
 		<module>../../features/org.eclipse.ease.modules.feature</module>
 		<module>../../features/org.eclipse.ease.modules.modeling.feature</module>
-		<module>../../features/org.eclipse.ease.modules.unittest.feature</module>
 		<module>../../features/org.eclipse.ease.modules.team.git.feature</module>
 		<module>../../features/org.eclipse.ease.modules.team.svn.feature</module>
 		<module>../../features/org.eclipse.ease.modules.charting.feature</module>
@@ -343,8 +340,6 @@
 			<id>test</id>
 			<modules>
 				<module>../../tests/org.eclipse.ease.modules.platform.test</module>
-				<module>../../tests/org.eclipse.ease.modules.unittest.test</module>
-				<module>../../tests/org.eclipse.ease.modules.unittest.ui.test</module>
 			</modules>
 			<build>
 				<plugins>
