@@ -263,8 +263,8 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 
 		EngineDescription candidate = null;
 		if ((testSuite != null) && (testSuite.getDefinition() != null)) {
-			if (testSuite.getDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, null) != null)
-				candidate = scriptService.getEngineByID(testSuite.getDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, null));
+			if (testSuite.getDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, "") != null)
+				candidate = scriptService.getEngineByID(testSuite.getDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, ""));
 		}
 
 		// now lets see if candidate supports our script resource
