@@ -51,6 +51,8 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 	/** Name of variable to be injected into executing test engines. */
 	public static final String TEST_FILE_VARIABLE = "__EASE_UnitTest_File";
 
+	public static final String TEST_SUITE_VARIABLE = "__EASE_UnitTest_Suite";
+
 	/**
 	 * Debug method to print test execution results. This method is not needed for runtime functionality.
 	 *

@@ -96,7 +96,8 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public ITestFile getTestFile() {
-		return (ITestFile) getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
+		final Object testFile = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
+		return (testFile instanceof ITestFile) ? (ITestFile) testFile : null;
 	}
 
 	/**
@@ -118,8 +119,15 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 
 		if (fCurrentTest != null)
 			fCurrentTest.getMetadata().add(metadata);
-		else
+
+		else if (getTestFile() != null)
 			getTestFile().getMetadata().add(metadata);
+
+		else if (getTestSuite() != null)
+			getTestSuite().getMetadata().add(metadata);
+
+		else
+			throw new RuntimeException("No test entity availabe. Nowhere to store metadata to");
 	}
 
 	/**
@@ -378,7 +386,11 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public ITestSuite getTestSuite() {
-		return getTestFile().getTestSuite();
+		if (getTestFile() != null)
+			return getTestFile().getTestSuite();
+
+		final Object testSuite = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE);
+		return (testSuite instanceof ITestSuite) ? (ITestSuite) testSuite : null;
 	}
 
 	/**

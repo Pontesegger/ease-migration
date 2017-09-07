@@ -48,7 +48,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * The default value of the '{@link #getInsertionOrder() <em>Insertion Order</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getInsertionOrder()
 	 * @generated
 	 * @ordered
@@ -56,7 +56,7 @@ public class TestFile extends TestContainer implements ITestFile {
 	protected static final int INSERTION_ORDER_EDEFAULT = 0;
 	/**
 	 * The cached value of the '{@link #getInsertionOrder() <em>Insertion Order</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getInsertionOrder()
 	 * @generated
 	 * @ordered
@@ -65,7 +65,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	protected TestFile() {
@@ -74,7 +74,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -84,7 +84,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -94,7 +94,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -107,7 +107,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -121,7 +121,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -136,7 +136,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -151,7 +151,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -165,7 +165,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -197,6 +197,7 @@ public class TestFile extends TestContainer implements ITestFile {
 			// execute resource
 			try {
 				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE, this);
+				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, getTestSuite());
 				fScriptEngine.setTerminateOnIdle(false);
 				fScriptEngine.schedule();
 
