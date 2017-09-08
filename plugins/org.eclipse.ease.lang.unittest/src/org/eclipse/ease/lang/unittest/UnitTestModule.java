@@ -14,11 +14,13 @@ package org.eclipse.ease.lang.unittest;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
@@ -484,36 +486,72 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 *            report title
 	 * @param description
 	 *            report description (ignored by some reports)
-	 * @return <code>true</code> when report was created successfully
-	 * @throws Exception
-	 *             on file write errors
+	 * @throws CoreException
+	 *             when we could not write to a workspace file
+	 * @throws IOException
+	 *             when we could not write to the file system
 	 */
 	@WrapToScript
-	public boolean createReport(final String reportType, final ITestEntity suite, final String fileLocation, final String title, final String description)
-			throws Exception {
+	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation, final String title, final String description)
+			throws IOException, CoreException {
 
 		final IReportGenerator report = ReportTools.getReport(reportType);
 		if (report != null) {
 			final String reportData = report.createReport(title, description, suite);
 
-			final Object file = ResourceTools.resolve(fileLocation, getScriptEngine().getExecutedFile());
-			if (file instanceof IFile) {
-				if (((IFile) file).exists())
-					((IFile) file).setContents(new ByteArrayInputStream(reportData.getBytes()), IResource.FORCE | IResource.KEEP_HISTORY, null);
-				else
-					((IFile) file).create(new ByteArrayInputStream(reportData.getBytes()), true, null);
+			saveDataToFile(reportData.getBytes(), fileLocation);
 
-				return true;
+		} else
+			throw new IOException("Report does not contain any data");
+	}
 
-			} else if (file instanceof File) {
-				final FileOutputStream outputStream = new FileOutputStream((File) file);
-				outputStream.write(reportData.getBytes());
-				outputStream.close();
+	/**
+	 * Load a test suite definition from a given resource.
+	 *
+	 * @param location
+	 *            location to load from
+	 * @return test suite definition
+	 * @throws IOException
+	 *             when reading of definition fails
+	 */
+	@WrapToScript
+	public ITestSuiteDefinition loadTestSuiteDefinition(Object location) throws IOException {
+		final Object resolvedLocation = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		return UnitTestHelper.loadTestSuite(ResourceTools.getInputStream(resolvedLocation));
+	}
 
-				return true;
-			}
-		}
+	/**
+	 * Save a test suite definition to a file.
+	 *
+	 * @param testsuite
+	 *            definition to save
+	 * @param fileLocation
+	 *            location to save file to (file system or workspace)
+	 * @throws CoreException
+	 *             when we could not write to a workspace file
+	 * @throws IOException
+	 *             when we could not write to the file system
+	 */
+	@WrapToScript
+	public void saveTestSuiteDefinition(ITestSuiteDefinition testsuite, Object fileLocation) throws IOException, CoreException {
+		final byte[] testSuiteData = UnitTestHelper.serializeTestSuite(testsuite);
+		saveDataToFile(testSuiteData, fileLocation);
+	}
 
-		return false;
+	private void saveDataToFile(byte[] data, Object fileLocation) throws IOException, CoreException {
+		final Object file = ResourceTools.resolve(fileLocation, getScriptEngine().getExecutedFile());
+		if (file instanceof IFile) {
+			if (((IFile) file).exists())
+				((IFile) file).setContents(new ByteArrayInputStream(data), IResource.FORCE | IResource.KEEP_HISTORY, null);
+			else
+				((IFile) file).create(new ByteArrayInputStream(data), true, null);
+
+		} else if (file instanceof File) {
+			final FileOutputStream outputStream = new FileOutputStream((File) file);
+			outputStream.write(data);
+			outputStream.close();
+
+		} else
+			throw new IOException("Could not find file: " + fileLocation);
 	}
 }
