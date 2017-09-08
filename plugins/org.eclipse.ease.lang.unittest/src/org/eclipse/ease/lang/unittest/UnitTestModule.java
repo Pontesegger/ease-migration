@@ -11,9 +11,14 @@
 
 package org.eclipse.ease.lang.unittest;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
@@ -21,6 +26,8 @@ import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ICode;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
+import org.eclipse.ease.lang.unittest.reporters.IReportGenerator;
+import org.eclipse.ease.lang.unittest.reporters.ReportTools;
 import org.eclipse.ease.lang.unittest.runtime.IMetadata;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory;
 import org.eclipse.ease.lang.unittest.runtime.ITest;
@@ -35,6 +42,7 @@ import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
+import org.eclipse.ease.tools.ResourceTools;
 
 /**
  * Support methods for scripted unit tests. Provides several assertion methods and utility functions to manipulate the current test instances and states.
@@ -451,5 +459,61 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 
 		} else
 			throw new Exception("No user specific code for \"" + location + "\" found.");
+	}
+
+	/**
+	 * Get a list of available test report types.
+	 *
+	 * @return String array containing available report types
+	 */
+	@WrapToScript
+	public static String[] getReportTypes() {
+		return ReportTools.getReportTemplates().toArray(new String[0]);
+	}
+
+	/**
+	 * Create a test report file.
+	 *
+	 * @param reportType
+	 *            type of report; see getReportTypes() for values
+	 * @param suite
+	 *            {@link ITestEntity} to be reported
+	 * @param fileLocation
+	 *            location where report should be stored
+	 * @param title
+	 *            report title
+	 * @param description
+	 *            report description (ignored by some reports)
+	 * @return <code>true</code> when report was created successfully
+	 * @throws Exception
+	 *             on file write errors
+	 */
+	@WrapToScript
+	public boolean createReport(final String reportType, final ITestEntity suite, final String fileLocation, final String title, final String description)
+			throws Exception {
+
+		final IReportGenerator report = ReportTools.getReport(reportType);
+		if (report != null) {
+			final String reportData = report.createReport(title, description, suite);
+
+			final Object file = ResourceTools.resolve(fileLocation, getScriptEngine().getExecutedFile());
+			if (file instanceof IFile) {
+				if (((IFile) file).exists())
+					((IFile) file).setContents(new ByteArrayInputStream(reportData.getBytes()), IResource.FORCE | IResource.KEEP_HISTORY, null);
+				else
+					((IFile) file).create(new ByteArrayInputStream(reportData.getBytes()), true, null);
+
+				return true;
+
+			} else if (file instanceof File) {
+				final FileOutputStream outputStream = new FileOutputStream((File) file);
+				outputStream.write(reportData.getBytes());
+				outputStream.close();
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
