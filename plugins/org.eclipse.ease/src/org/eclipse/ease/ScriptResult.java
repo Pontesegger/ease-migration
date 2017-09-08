@@ -50,6 +50,18 @@ public class ScriptResult {
 	}
 
 	/**
+	 * Blocks execution until the execution result is ready.
+	 */
+	public final synchronized void waitForResult() {
+		while (!isReady()) {
+			try {
+				this.wait();
+			} catch (final InterruptedException e) {
+			}
+		}
+	}
+
+	/**
 	 * Get the result value stored.
 	 *
 	 * @return result value
