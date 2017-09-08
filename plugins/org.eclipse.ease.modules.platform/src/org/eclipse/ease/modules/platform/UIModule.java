@@ -11,6 +11,7 @@
 package org.eclipse.ease.modules.platform;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.modules.AbstractScriptModule;
@@ -42,6 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IOConsoleInputStream;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.IViewDescriptor;
@@ -596,7 +598,9 @@ public class UIModule extends AbstractScriptModule {
 		final IConsole[] consoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
 		for (final IConsole console : consoles) {
 			if (console instanceof ScriptConsole) {
-				if (getScriptEngine().equals(((ScriptConsole) console).getScriptEngine()))
+				final InputStream engineInput = getScriptEngine().getInputStream();
+				final IOConsoleInputStream consoleInput = ((ScriptConsole) console).getInputStream();
+				if ((consoleInput != null) && (consoleInput.equals(engineInput)))
 					return (ScriptConsole) console;
 			}
 		}
