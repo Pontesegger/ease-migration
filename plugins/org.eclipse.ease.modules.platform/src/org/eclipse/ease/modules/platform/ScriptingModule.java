@@ -17,6 +17,7 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptable;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
@@ -91,10 +92,10 @@ public class ScriptingModule extends AbstractScriptModule {
 	 *            optional script arguments delimited by commas ','
 	 * @param engineID
 	 *            engine ID to be used
-	 * @return script engine instance or <code>null</code> in case of error
+	 * @return execution result
 	 */
 	@WrapToScript
-	public IScriptEngine fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
+	public ScriptResult fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
@@ -129,18 +130,13 @@ public class ScriptingModule extends AbstractScriptModule {
 
 			Object scriptObject = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
 			if (scriptObject == null) {
-				try {
-					// no file available, try to resolve URI
-					scriptObject = URI.create(resource.toString());
-				} catch (final IllegalArgumentException e) {
-					// could not resolve URI, giving up
-					return null;
-				}
+				// no file available, try to resolve URI
+				scriptObject = URI.create(resource.toString());
 			}
 
-			engine.executeAsync(scriptObject);
+			final ScriptResult result = engine.executeAsync(scriptObject);
 			engine.schedule();
-			return engine;
+			return result;
 		}
 
 		throw new RuntimeException("No script engine found for source \"" + resource + "\"");
