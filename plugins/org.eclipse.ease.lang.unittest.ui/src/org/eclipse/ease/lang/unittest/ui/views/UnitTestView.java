@@ -42,22 +42,21 @@ import org.eclipse.ease.ui.tools.DecoratedLabelProvider;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.util.EContentAdapter;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -89,6 +88,66 @@ public class UnitTestView extends ViewPart {
 	public static final String VIEW_ID = "org.eclipse.ease.views.unittest";
 
 	public static final String TEST_STATUS_PROPERTY = "test status";
+
+	private class TestEntityContentProvider implements ITreeContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return getChildren(inputElement);
+		}
+
+		@Override
+		public Object[] getChildren(Object parentElement) {
+			final List<Object> children = new ArrayList<>();
+
+			if (parentElement instanceof ITestEntity) {
+				children.addAll(((ITestEntity) parentElement).getMetadata());
+
+				if ((!(parentElement instanceof ITest)) || (((ITestEntity) parentElement).getResults().size() > 1))
+					children.addAll(((ITestEntity) parentElement).getResults());
+
+				if (parentElement instanceof ITestContainer) {
+					for (final Object child : ((ITestContainer) parentElement).getChildren().toArray()) {
+						if (child instanceof ITest)
+							children.add(child);
+					}
+				}
+			}
+
+			return children.toArray();
+		}
+
+		@Override
+		public Object getParent(Object element) {
+			if (element instanceof ITestEntity)
+				return ((ITestEntity) element).getParent();
+
+			return null;
+		}
+
+		@Override
+		public boolean hasChildren(Object element) {
+			if (element instanceof ITestEntity) {
+				if (!((ITestEntity) element).getMetadata().isEmpty())
+					return true;
+
+				if (((ITestEntity) element).getResults().size() > 1)
+					return true;
+
+				if (!(element instanceof ITest) && (!((ITestEntity) element).getResults().isEmpty()))
+					return true;
+
+				if (element instanceof ITestContainer) {
+					for (final Object child : ((ITestContainer) element).getChildren().toArray()) {
+						if (child instanceof ITest)
+							return true;
+					}
+				}
+			}
+
+			return false;
+		}
+	}
 
 	/**
 	 * Opens the given resource in an editor. Needs to be run from the UI thread.
@@ -159,7 +218,7 @@ public class UnitTestView extends ViewPart {
 
 	private ProgressBar fProgressBar;
 	private TreeViewer fFileTreeViewer;
-	private TableViewer fTestTreeViewer;
+	private TreeViewer fTestTreeViewer;
 	private SashForm sashForm;
 
 	private int[] fSashWeights = new int[] { 70, 30 };
@@ -346,12 +405,12 @@ public class UnitTestView extends ViewPart {
 		getSite().setSelectionProvider(selectionProvider);
 	}
 
-	private TableViewer createTestArea(final Composite parent) {
+	private TreeViewer createTestArea(final Composite parent) {
 		final Composite composite = new Composite(parent, SWT.NONE);
-		final TableColumnLayout layout = new TableColumnLayout();
+		final TreeColumnLayout layout = new TreeColumnLayout();
 		composite.setLayout(layout);
 
-		final TableViewer viewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
+		final TreeViewer viewer = new TreeViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
 		// open resource on the corresponding location a double click
 		viewer.addDoubleClickListener(event -> {
 
@@ -369,29 +428,12 @@ public class UnitTestView extends ViewPart {
 			}
 		});
 
-		viewer.getTable().setHeaderVisible(true);
-		viewer.getTable().setLinesVisible(true);
+		viewer.getTree().setHeaderVisible(true);
+		viewer.getTree().setLinesVisible(true);
 
-		viewer.setContentProvider(new ArrayContentProvider() {
-			@Override
-			public Object[] getElements(Object inputElement) {
+		viewer.setContentProvider(new TestEntityContentProvider());
 
-				if (inputElement instanceof ITestEntity) {
-					final List<Object> elements = new ArrayList<>();
-					elements.addAll(((ITestEntity) inputElement).getMetadata());
-					elements.addAll(((ITestEntity) inputElement).getResults());
-
-					if (inputElement instanceof ITestContainer)
-						elements.addAll(((ITestContainer) inputElement).getChildren());
-
-					return elements.toArray();
-				}
-
-				return super.getElements(inputElement);
-			}
-		});
-
-		final TableViewerColumn testColumn = new TableViewerColumn(viewer, SWT.NONE);
+		final TreeViewerColumn testColumn = new TreeViewerColumn(viewer, SWT.NONE);
 		testColumn.getColumn().setWidth(100);
 		testColumn.getColumn().setText("Test");
 		layout.setColumnData(testColumn.getColumn(), new ColumnWeightData(30, 50, true));
@@ -406,7 +448,7 @@ public class UnitTestView extends ViewPart {
 					return super.getText(((IMetadata) element).getKey());
 
 				else if (element instanceof ITestResult)
-					return "[global scope]";
+					return ((ITestResult) element).getStatus().toString();
 
 				return super.getText(element);
 			}
@@ -447,10 +489,9 @@ public class UnitTestView extends ViewPart {
 
 				return super.getToolTipText(element);
 			}
-
 		});
 
-		final TableViewerColumn messageColumn = new TableViewerColumn(viewer, SWT.NONE);
+		final TreeViewerColumn messageColumn = new TreeViewerColumn(viewer, SWT.NONE);
 		messageColumn.getColumn().setWidth(100);
 		messageColumn.getColumn().setText("Description/Status");
 		layout.setColumnData(messageColumn.getColumn(), new ColumnWeightData(70, 50, true));

@@ -18,6 +18,7 @@ import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestFile;
 import org.eclipse.ease.lang.unittest.runtime.ITestFolder;
+import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -64,7 +65,15 @@ public class TestSuiteLabelProvider extends LabelProvider {
 			if (file instanceof IFile)
 				return fWorkbenchLabelProvider.getImage(file);
 			else if (file instanceof File)
-				return null;
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+
+		} else if (element instanceof ITestSuite) {
+			final Object file = ((ITestSuite) element).getResource();
+			if (file instanceof IFile)
+				return fWorkbenchLabelProvider.getImage(file);
+			else if (file instanceof File)
+				return fResourceManager.createImage(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/testsuite.png"));
+			;
 
 		} else if (element instanceof ITestClass) {
 			return fResourceManager.createImage(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/testclass.png"));

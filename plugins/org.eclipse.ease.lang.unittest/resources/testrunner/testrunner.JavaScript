@@ -59,10 +59,10 @@ var __EASE_UnitTest_TestRunner = {
 						var stackTrace = new org.eclipse.ease.debugging.ScriptStackTrace();
 						stackTrace.add(debugFrame);
 
-						getCurrentTest().setStackTrace(stackTrace);
+						this.getUnitTestModule().getCurrentTest().setStackTrace(stackTrace);
 
 					} catch (e) {
-						print(e);
+						// we could not set the stacktrace for the unit test start location, ignore
 					}
 
 					if (candidate.hasOwnProperty("__ignore")) {
@@ -299,7 +299,12 @@ var __EASE_UnitTest_TestRunner = {
 	 */
 	getUnitTestModule : function() {
 		var module = getScriptEngine().getVariable("__MOD_org_eclipse_ease_lang_unittest_UnitTestModule");
-		return (module != null) ? module : loadModule("/Unittest");
+		if (module == null) {
+			loadModule("/Unittest", true);
+			module = getScriptEngine().getVariable("__MOD_org_eclipse_ease_lang_unittest_UnitTestModule");
+		}
+		
+		return module;
 	},
 }
 
