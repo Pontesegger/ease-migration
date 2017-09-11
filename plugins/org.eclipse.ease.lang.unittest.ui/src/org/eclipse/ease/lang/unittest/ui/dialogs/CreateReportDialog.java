@@ -60,20 +60,16 @@ public class CreateReportDialog extends Dialog {
 	private boolean fOpenAfterSave;
 	private String fType;
 
-	/**
-	 * Create the dialog.
-	 *
-	 * @param parentShell
-	 */
 	public CreateReportDialog(final Shell parentShell) {
 		super(parentShell);
 	}
 
-	/**
-	 * Create contents of the dialog.
-	 *
-	 * @param parent
-	 */
+	@Override
+	protected void configureShell(Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("Create Test Report");
+	}
+
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 		final Map<String, String> history = loadHistory();
