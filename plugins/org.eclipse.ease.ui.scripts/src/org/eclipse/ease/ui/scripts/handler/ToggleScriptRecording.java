@@ -37,7 +37,6 @@ import org.eclipse.ease.ui.scripts.dialogs.SelectScriptStorageDialog;
 import org.eclipse.ease.ui.scripts.preferences.PreferencesHelper;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.tools.ToggleHandler;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -54,7 +53,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.menus.UIElement;
 
 /**
- * Toggle script recording command. Start/stop script recording.
+ * Start/stop script recording.
  */
 public class ToggleScriptRecording extends ToggleHandler implements IHandler, IElementUpdater, IExecutionListener {
 
@@ -88,15 +87,11 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 						if (storage != null) {
 							// ask for script name
 							final InputDialog dialog = new InputDialog(HandlerUtil.getActiveShell(event), "Save Script",
-									"Enter a unique name for your script (use '/' as path delimiter)", "", new IInputValidator() {
+									"Enter a unique name for your script (use '/' as path delimiter)", "", name1 -> {
+										if (storage.exists(new Path(name1).makeAbsolute().toString()))
+											return "Script name <" + name1 + "> is already in use. Choose a different one.";
 
-										@Override
-										public String isValid(final String name) {
-											if (storage.exists(name))
-												return "Script name <" + name + "> is already in use. Choose a different one.";
-
-											return null;
-										}
+										return null;
 									});
 
 							if (dialog.open() == Window.OK)
@@ -160,7 +155,7 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 			// user did not select a storage yet, ask for location
 			final SelectScriptStorageDialog dialog = new SelectScriptStorageDialog(Display.getDefault().getActiveShell());
 			if (dialog.open() == Window.OK) {
-				final IRepositoryService repositoryService = (IRepositoryService) PlatformUI.getWorkbench().getService(IRepositoryService.class);
+				final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
 				repositoryService.addLocation(dialog.getLocation(), true, true);
 			}
 
@@ -192,7 +187,9 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 				if (buffer != null) {
 					// TODO add support to add trailing returns and ;
 					buffer.append(script.getCode());
-					buffer.append(StringTools.LINE_DELIMITER);
+
+					if (!buffer.toString().endsWith(StringTools.LINE_DELIMITER))
+						buffer.append(StringTools.LINE_DELIMITER);
 				} else
 					engine.removeExecutionListener(this);
 
