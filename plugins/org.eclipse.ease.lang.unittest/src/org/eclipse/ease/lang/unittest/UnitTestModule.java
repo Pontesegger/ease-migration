@@ -294,7 +294,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	public final void assertion(final IAssertion reason) throws AssertionException {
 		if (!reason.isValid()) {
 			if (fThrowOnFailure)
-				reason.throwOnFailure();
+				throw new AssertionException(reason.toString());
 			else
 				failure(reason.toString());
 		}

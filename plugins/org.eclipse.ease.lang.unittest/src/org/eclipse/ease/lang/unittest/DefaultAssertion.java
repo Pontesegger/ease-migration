@@ -51,7 +51,7 @@ public class DefaultAssertion implements IAssertion {
 
 	/**
 	 * Get a stacktrace of the location that raised the assertion.
-	 * 
+	 *
 	 * @return stacktrace or <code>null</code>
 	 */
 	public List<IScriptDebugFrame> getStackTrace() {
@@ -64,11 +64,5 @@ public class DefaultAssertion implements IAssertion {
 			return IAssertion.VALID.toString();
 
 		return (fErrorMessage != null) ? fErrorMessage : IAssertion.INVALID.toString();
-	}
-
-	@Override
-	public void throwOnFailure() throws AssertionException {
-		if (!isValid())
-			throw new AssertionException(toString());
 	}
 }
