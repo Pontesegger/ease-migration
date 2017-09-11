@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.scripts.handler;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
@@ -57,9 +54,59 @@ import org.eclipse.ui.menus.UIElement;
  */
 public class ToggleScriptRecording extends ToggleHandler implements IHandler, IElementUpdater, IExecutionListener {
 
-	private boolean fChecked = false;
-
 	private static final Map<IScriptEngine, StringBuffer> fRecordings = new HashMap<>();
+
+	private static StringBuffer addHeaderData(StringBuffer buffer, String scriptName, ScriptType scriptType) {
+
+		final Map<String, String> keywords = new HashMap<>();
+		keywords.put("name", new Path(scriptName).makeRelative().toString());
+		keywords.put("description", "Script recorded by user.");
+		keywords.put("script-type", scriptType.getName());
+		keywords.put("author", System.getProperty("user.name"));
+		keywords.put("date-recorded", new SimpleDateFormat("yyyy-MM-dd, HH:mm").format(new Date()));
+		final String keywordBlock = scriptType.getCodeFactory().createKeywordHeader(keywords, null);
+
+		buffer.insert(0, StringTools.LINE_DELIMITER);
+		buffer.insert(0, scriptType.getCodeFactory().createCommentedString(keywordBlock, true));
+
+		return buffer;
+	}
+
+	private static String askForScriptName(ExecutionEvent event, ScriptStorage storage) {
+		// ask for script name
+		final InputDialog dialog = new InputDialog(HandlerUtil.getActiveShell(event), "Save Script",
+				"Enter a unique name for your script (use '/' as path delimiter)", "", name -> {
+					if ((storage != null) && (storage.exists(new Path(name).makeAbsolute().toString())))
+						return "Script name <" + name + "> is already in use. Choose a different one.";
+
+					return null;
+				});
+
+		if (dialog.open() == Window.OK)
+			return dialog.getValue();
+
+		return null;
+	}
+
+	private static ScriptStorage createOrGetStorage() {
+		// if no default storage is selected, ask the user for the correct location
+		if (PreferencesHelper.getUserScriptStorageLocation() == null) {
+
+			// user did not select a storage yet, ask for location
+			final SelectScriptStorageDialog dialog = new SelectScriptStorageDialog(Display.getDefault().getActiveShell());
+			if (dialog.open() == Window.OK) {
+				final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
+				repositoryService.addLocation(dialog.getLocation(), true, true);
+			}
+
+			else
+				return null;
+		}
+
+		return ScriptStorage.createStorage();
+	}
+
+	private boolean fChecked = false;
 
 	@Override
 	protected final void executeToggle(final ExecutionEvent event, final boolean checked) {
@@ -77,60 +124,33 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 
 				} else {
 					// stop recording
-					final StringBuffer buffer = fRecordings.get(engine);
+					StringBuffer buffer = fRecordings.remove(engine);
 
 					if (buffer.length() > 0) {
 						// script data is available
-						String name = "recorded script";
 
-						final ScriptStorage storage = getStorage();
-						if (storage != null) {
-							// ask for script name
-							final InputDialog dialog = new InputDialog(HandlerUtil.getActiveShell(event), "Save Script",
-									"Enter a unique name for your script (use '/' as path delimiter)", "", name1 -> {
-										if (storage.exists(new Path(name1).makeAbsolute().toString()))
-											return "Script name <" + name1 + "> is already in use. Choose a different one.";
-
-										return null;
-									});
-
-							if (dialog.open() == Window.OK)
-								name = dialog.getValue();
-						}
-
+						final ScriptStorage storage = createOrGetStorage();
+						final String scriptName = askForScriptName(event, storage);
 						final EngineDescription description = engine.getDescription();
 						final ScriptType scriptType = description.getSupportedScriptTypes().iterator().next();
 
-						final String fileName = name + "." + scriptType.getDefaultExtension();
-
-						// write script header
-						final Map<String, String> keywords = new HashMap<>();
-						keywords.put("name", new Path(name).makeRelative().toString());
-						keywords.put("description", "Script recorded by user.");
-						keywords.put("script-type", scriptType.getName());
-						keywords.put("author", System.getProperty("user.name"));
-						keywords.put("date-recorded", new SimpleDateFormat("yyyy-MM-dd, HH:mm").format(new Date()));
-
-						buffer.insert(0, StringTools.LINE_DELIMITER);
-						final String keywordBlock = scriptType.getCodeFactory().createKeywordHeader(keywords, null);
-						buffer.insert(0, scriptType.getCodeFactory().createCommentedString(keywordBlock, true));
+						buffer = addHeaderData(buffer, scriptName, scriptType);
 
 						if (storage != null) {
 							// store script
+							final String fileName = scriptName + "." + scriptType.getDefaultExtension();
 							if (!storage.store(fileName, buffer.toString()))
 								// could not store script
 								MessageDialog.openError(HandlerUtil.getActiveShell(event), "Save error", "Could not store script data");
 
-							// TODO update script repository
-
 						} else {
 							// we do not have a storage, open script in editor
-							// and let user decide, what to do
+							// and let user decide what to do
 							final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 							try {
 								final IEditorDescriptor editor = IDE.getDefaultEditor(
 										ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("/sample/foo." + scriptType.getDefaultExtension())));
-								final IEditorPart openEditor = IDE.openEditor(page, new ScriptEditorInput(name, buffer.toString()), editor.getId());
+								final IEditorPart openEditor = IDE.openEditor(page, new ScriptEditorInput(scriptName, buffer.toString()), editor.getId());
 								// the editor starts indicating it is not dirty,
 								// so ask the user to perform a save as action
 								openEditor.doSaveAs();
@@ -145,27 +165,6 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 		}
 
 		fChecked = checked;
-	}
-
-	private ScriptStorage getStorage() {
-		// if no default storage is selected, ask the user for the correct
-		// location
-		if (PreferencesHelper.getUserScriptStorageLocation() == null) {
-
-			// user did not select a storage yet, ask for location
-			final SelectScriptStorageDialog dialog = new SelectScriptStorageDialog(Display.getDefault().getActiveShell());
-			if (dialog.open() == Window.OK) {
-				final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
-				repositoryService.addLocation(dialog.getLocation(), true, true);
-			}
-
-			else
-				return null;
-		}
-
-		// FIXME seems awkward! what are we doing here if we return a const
-		// anyway
-		return ScriptStorage.createStorage();
 	}
 
 	@Override
@@ -185,24 +184,14 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 			try {
 				final StringBuffer buffer = fRecordings.get(engine);
 				if (buffer != null) {
-					// TODO add support to add trailing returns and ;
 					buffer.append(script.getCode());
 
 					if (!buffer.toString().endsWith(StringTools.LINE_DELIMITER))
 						buffer.append(StringTools.LINE_DELIMITER);
 				} else
 					engine.removeExecutionListener(this);
-
-			} catch (final FileNotFoundException e) {
-				// cannot record / execute macro when file is not found
-			} catch (final CoreException e) {
-				// cannot record / execute macro when file is not found
-			} catch (final IOException e) {
-				// cannot extract string from getCode()
 			} catch (final Exception e) {
-				// TODO handle this exception (but for now, at least know it
-				// happened)
-				throw new RuntimeException(e);
+				// could not fetch code from script, gracefully fail
 			}
 		}
 	}
