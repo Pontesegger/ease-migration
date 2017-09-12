@@ -38,22 +38,23 @@ public abstract class AbstractModuleDropHandler implements IShellDropHandler {
 	 */
 	protected Object loadModule(final IScriptEngine scriptEngine, final String moduleID, final boolean force) {
 
-		IEnvironment environment = AbstractEnvironment.getEnvironment(scriptEngine);
+		final IEnvironment environment = AbstractEnvironment.getEnvironment(scriptEngine);
 		if (environment != null) {
 			if ((force) || (environment.getModule(moduleID) == null)) {
 				if (ModuleHelper.resolveName(moduleID) != null) {
 
-					ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
+					final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
 
 					try {
-						String functionCall = codeFactory.createFunctionCall(EnvironmentModule.class.getMethod("loadModule", String.class), moduleID);
+						final String functionCall = codeFactory.createFunctionCall(EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class),
+								moduleID, false);
 						return scriptEngine.executeSync(functionCall);
 
-					} catch (NoSuchMethodException e) {
+					} catch (final NoSuchMethodException e) {
 						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not found", e);
-					} catch (SecurityException e) {
+					} catch (final SecurityException e) {
 						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not accessible", e);
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						Logger.error(Activator.PLUGIN_ID, "Script execution interrupted", e);
 					}
 

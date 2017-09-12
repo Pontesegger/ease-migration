@@ -37,7 +37,7 @@ public class ModulesDropHandler implements IShellDropHandler {
 			final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
 
 			if (element instanceof ModuleDefinition) {
-				final String call = codeFactory.createFunctionCall(loadModuleMethod, ((ModuleDefinition) element).getPath().toString());
+				final String call = codeFactory.createFunctionCall(loadModuleMethod, ((ModuleDefinition) element).getPath().toString(), false);
 				scriptEngine.executeAsync(call);
 
 			} else if (element instanceof ModuleEntry) {
@@ -46,7 +46,7 @@ public class ModulesDropHandler implements IShellDropHandler {
 					if (!ModuleHelper.getLoadedModules(scriptEngine).contains(declaringModule)) {
 						// module not loaded yet
 
-						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString());
+						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString(), false);
 						scriptEngine.executeAsync(call);
 					}
 
@@ -59,7 +59,7 @@ public class ModulesDropHandler implements IShellDropHandler {
 					if (!ModuleHelper.getLoadedModules(scriptEngine).contains(declaringModule)) {
 						// module not loaded yet
 
-						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString());
+						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString(), false);
 						scriptEngine.executeAsync(call);
 					}
 

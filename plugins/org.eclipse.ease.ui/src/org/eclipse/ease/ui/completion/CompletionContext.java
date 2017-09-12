@@ -540,7 +540,7 @@ public abstract class CompletionContext implements ICompletionContext {
 	protected abstract boolean isLiteral(final char candidate);
 
 	private void addLoadedModules(final String code) {
-		final List<Position> modulePositions = AbstractCompletionParser.findInvocations("loadModule(java.lang.String)", code);
+		final List<Position> modulePositions = AbstractCompletionParser.findInvocations("loadModule(java.lang.String, boolean)", code);
 
 		for (final Position position : modulePositions) {
 			final String call = code.substring(position.getOffset(), position.getOffset() + position.getLength());

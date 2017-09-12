@@ -28,7 +28,7 @@ public class PythonEnvironementBootStrapper implements IScriptEngineLaunchExtens
 		code.append("import org\n");
 		code.append("import com\n");
 
-		code.append("EnvironmentModule().loadModule(\"/System/Environment\")\n");
+		code.append("EnvironmentModule().loadModule(\"/System/Environment\", False)\n");
 
 		engine.executeAsync(code);
 	}
