@@ -383,8 +383,15 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public ITest getCurrentTest() {
-		if (fCurrentTest == null)
-			return getTestFile().getTest(ITestEntity.GLOBAL_SCOPE_TEST);
+		if (fCurrentTest == null) {
+			if (getTestFile() != null)
+				return getTestFile().getTest(ITestEntity.GLOBAL_SCOPE_TEST);
+
+			if (getTestSuite() != null)
+				return getTestSuite().getTest(ITestEntity.GLOBAL_SCOPE_TEST);
+
+			throw new RuntimeException("No test container available.");
+		}
 
 		return fCurrentTest;
 	}
