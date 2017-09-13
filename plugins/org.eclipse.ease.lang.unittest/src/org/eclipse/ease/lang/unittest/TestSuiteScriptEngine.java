@@ -182,11 +182,15 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 
 		if ((!(command instanceof ITestEntity)) && (!(command instanceof FilteredTestCommand))) {
 			// not a testsuite. Probably a *.suite file or a stream providing suite data
-			final ITestSuite runtimeSuite = loadTestSuiteDefinition(script);
-			if (runtimeSuite != null)
-				command = runtimeSuite;
-			else
-				throw new Exception("Could not load suite from resource: " + reference);
+			try {
+				final ITestSuite runtimeSuite = loadTestSuiteDefinition(script);
+				if (runtimeSuite != null)
+					command = runtimeSuite;
+				else
+					throw new Exception("Could not load suite from resource: " + reference);
+			} catch (final Exception e) {
+				throw new Exception("Invalid testsuite content detected in: " + reference, e);
+			}
 		}
 
 		if (command instanceof ITestEntity) {
