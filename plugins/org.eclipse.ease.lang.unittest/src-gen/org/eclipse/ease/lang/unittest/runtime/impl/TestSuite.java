@@ -303,9 +303,12 @@ public class TestSuite extends TestContainer implements ITestSuite {
 				runSetupTeardownCode(ITestSuiteDefinition.CODE_LOCATION_TESTSUITE_TEARDOWN, strategy);
 
 		} finally {
-			if (getMasterEngine() != null) {
-				getMasterEngine().terminate();
+			if (getMasterEngine() != null)
 				setMasterEngine(null);
+
+			if (fSetupEngine != null) {
+				fSetupEngine.terminate();
+				fSetupEngine = null;
 			}
 
 			setEntityStatus(TestStatus.FINISHED);

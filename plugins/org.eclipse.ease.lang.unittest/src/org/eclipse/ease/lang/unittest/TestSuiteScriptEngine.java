@@ -209,8 +209,8 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 			strategy.prepareExecution(this, ((FilteredTestCommand) command).getTestRoot(), ((FilteredTestCommand) command).getActiveTests());
 			strategy.execute(((FilteredTestCommand) command).getTestRoot());
 
-			// printStatus(((ITestEntity) command), "");
 			// not needed for productive environment, can be enabled for debugging purposes
+			// printStatus(((ITestEntity) command), "");
 
 			return command;
 		} else
