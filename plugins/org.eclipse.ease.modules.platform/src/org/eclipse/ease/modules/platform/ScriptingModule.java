@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Christian Pontesegger and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Christian Pontesegger - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ease.modules.platform;
 
 import java.io.File;
@@ -23,6 +33,7 @@ import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ui.PlatformUI;
@@ -44,7 +55,13 @@ public class ScriptingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public static IScriptEngine createScriptEngine(final String identifier) {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		IScriptService scriptService;
+		try {
+			scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		} catch (final IllegalStateException e) {
+			// in headless mode the workbench is not ready
+			scriptService = ScriptService.getInstance();
+		}
 
 		// by ID
 		EngineDescription engine = scriptService.getEngineByID(identifier);
@@ -76,7 +93,14 @@ public class ScriptingModule extends AbstractScriptModule {
 	public static String[] listScriptEngines() {
 		final List<String> result = new ArrayList<>();
 
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		IScriptService scriptService;
+		try {
+			scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		} catch (final IllegalStateException e) {
+			// in headless mode the workbench is not ready
+			scriptService = ScriptService.getInstance();
+		}
+
 		for (final EngineDescription description : scriptService.getEngines())
 			result.add(description.getID());
 
@@ -98,7 +122,13 @@ public class ScriptingModule extends AbstractScriptModule {
 	public ScriptResult fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
 
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		IScriptService scriptService;
+		try {
+			scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		} catch (final IllegalStateException e) {
+			// in headless mode the workbench is not ready
+			scriptService = ScriptService.getInstance();
+		}
 
 		if (engineID == null) {
 			// try to find engine for script type
