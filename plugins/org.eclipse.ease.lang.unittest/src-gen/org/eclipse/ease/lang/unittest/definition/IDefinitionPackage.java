@@ -179,13 +179,22 @@ public interface IDefinitionPackage extends EPackage {
 	int TEST_SUITE_DEFINITION___GET_CUSTOM_CODE__STRING = 0;
 
 	/**
+	 * The operation id for the '<em>Get Variable</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TEST_SUITE_DEFINITION___GET_VARIABLE__STRING = 1;
+
+	/**
 	 * The number of operations of the '<em>Test Suite Definition</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TEST_SUITE_DEFINITION_OPERATION_COUNT = 1;
+	int TEST_SUITE_DEFINITION_OPERATION_COUNT = 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.ease.lang.unittest.definition.impl.Variable <em>Variable</em>}' class.
@@ -515,6 +524,16 @@ public interface IDefinitionPackage extends EPackage {
 	EOperation getTestSuiteDefinition__GetCustomCode__String();
 
 	/**
+	 * Returns the meta object for the '{@link org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition#getVariable(java.lang.String) <em>Get Variable</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Get Variable</em>' operation.
+	 * @see org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition#getVariable(java.lang.String)
+	 * @generated
+	 */
+	EOperation getTestSuiteDefinition__GetVariable__String();
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.ease.lang.unittest.definition.IVariable <em>Variable</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -795,6 +814,14 @@ public interface IDefinitionPackage extends EPackage {
 		 * @generated
 		 */
 		EOperation TEST_SUITE_DEFINITION___GET_CUSTOM_CODE__STRING = eINSTANCE.getTestSuiteDefinition__GetCustomCode__String();
+
+		/**
+		 * The meta object literal for the '<em><b>Get Variable</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation TEST_SUITE_DEFINITION___GET_VARIABLE__STRING = eINSTANCE.getTestSuiteDefinition__GetVariable__String();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.ease.lang.unittest.definition.impl.Variable <em>Variable</em>}' class.

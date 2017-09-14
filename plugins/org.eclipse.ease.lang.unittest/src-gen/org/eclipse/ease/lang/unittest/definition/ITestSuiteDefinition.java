@@ -279,6 +279,14 @@ public interface ITestSuiteDefinition extends EObject {
 	ICode getCustomCode(String location);
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model
+	 * @generated
+	 */
+	IVariable getVariable(String name);
+
+	/**
 	 * @generated NOT
 	 */
 	<T> T getFlag(Flag identifier, T defaultValue);

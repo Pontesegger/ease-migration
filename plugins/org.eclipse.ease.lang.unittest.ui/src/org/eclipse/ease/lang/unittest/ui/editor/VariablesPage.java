@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
@@ -30,6 +32,7 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.util.EContentAdapter;
+import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -63,6 +66,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.part.ResourceTransfer;
 import org.eclipse.ui.progress.UIJob;
 
 /**
@@ -438,9 +442,9 @@ public class VariablesPage extends AbstractEditorPage {
 	 */
 	private void initializeDnD() {
 		final int operations = DND.DROP_MOVE;
-		final Transfer[] transferTypes = new Transfer[] { LocalSelectionTransfer.getTransfer() };
+		final Transfer[] transferTypes = new Transfer[] { ResourceTransfer.getInstance(), LocalSelectionTransfer.getTransfer() };
 
-		fTreeViewer.addDragSupport(operations, transferTypes, new DragSourceAdapter() {
+		fTreeViewer.addDragSupport(operations, new Transfer[] { LocalSelectionTransfer.getTransfer() }, new DragSourceAdapter() {
 			@Override
 			public void dragFinished(DragSourceEvent event) {
 				LocalSelectionTransfer.getTransfer().setSelection(null);
@@ -455,44 +459,86 @@ public class VariablesPage extends AbstractEditorPage {
 		final ViewerDropAdapter dropSupport = new ViewerDropAdapter(fTreeViewer) {
 
 			@Override
-			public boolean validateDrop(Object target, int operation, TransferData transferType) {
-				return LocalSelectionTransfer.getTransfer().isSupportedType(transferType);
+			public boolean validateDrop(Object target, int operation, TransferData transferData) {
+				for (final Transfer transferType : transferTypes)
+					if (transferType.isSupportedType(transferData))
+						return true;
+
+				return false;
 			}
 
 			@Override
 			public boolean performDrop(Object data) {
-				Object target = getCurrentTarget();
+				if (data instanceof IStructuredSelection) {
+					final Object file = ((IStructuredSelection) data).getFirstElement();
 
-				if (target == null)
-					target = Path.ROOT;
+					if (file instanceof IFile) {
+						if (!file.equals(getFile())) {
+							// drop of other suite file
+							try {
+								final ITestSuiteDefinition droppedDefinition = UnitTestHelper.loadTestSuite(((IFile) file).getContents());
 
-				if ((target instanceof IPath) && (data instanceof IStructuredSelection)) {
-					final CompoundCommand compoundCommand = new CompoundCommand();
-
-					for (final Object element : ((IStructuredSelection) data).toList()) {
-						if (element instanceof IVariable) {
-							final IPath newFullName = ((IPath) target).append(((IVariable) element).getName());
-							final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
-									newFullName);
-
-							compoundCommand.append(command);
-
-						} else if (element instanceof IPath) {
-							for (final IVariable variable : getTestSuitDefinition().getVariables()) {
-								if (((IPath) element).isPrefixOf(variable.getFullName())) {
-									final IPath updatedName = ((IPath) target).append(variable.getName());
-									final Command command = SetCommand.create(getEditingDomain(), variable, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
-											updatedName);
-									compoundCommand.append(command);
+								final CompoundCommand compoundCommand = new CompoundCommand();
+								for (final IVariable variable : droppedDefinition.getVariables()) {
+									final IVariable existingVariable = getTestSuitDefinition().getVariable(variable.getName());
+									if (existingVariable != null) {
+										final Command command = SetCommand.create(getEditingDomain(), existingVariable,
+												IDefinitionPackage.Literals.VARIABLE__CONTENT, variable.getContent());
+										compoundCommand.append(command);
+									} else {
+										final Command command = AddCommand.create(getEditingDomain(), getTestSuitDefinition(),
+												IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__VARIABLES, variable);
+										compoundCommand.append(command);
+									}
 								}
+
+								compoundCommand.execute();
+								fTreeViewer.refresh();
+
+							} catch (final Exception e) {
+								// not a valid content, fail DnD operation gracefully
+								return false;
 							}
 						}
+
+					} else {
+						// drop of variable or folder
+						Object target = getCurrentTarget();
+
+						if (target == null)
+							target = Path.ROOT;
+
+						System.out.println(target);
+						if (target instanceof IPath) {
+							System.out.println(target);
+							final CompoundCommand compoundCommand = new CompoundCommand();
+
+							for (final Object element : ((IStructuredSelection) data).toList()) {
+								if (element instanceof IVariable) {
+									final IPath newFullName = ((IPath) target).append(((IVariable) element).getName());
+									final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
+											newFullName);
+
+									compoundCommand.append(command);
+
+								} else if (element instanceof IPath) {
+									for (final IVariable variable : getTestSuitDefinition().getVariables()) {
+										if (((IPath) element).isPrefixOf(variable.getFullName())) {
+											final IPath updatedName = ((IPath) target).append(variable.getName());
+											final Command command = SetCommand.create(getEditingDomain(), variable,
+													IDefinitionPackage.Literals.VARIABLE__FULL_NAME, updatedName);
+											compoundCommand.append(command);
+										}
+									}
+								}
+							}
+
+							compoundCommand.execute();
+							fTreeViewer.refresh();
+
+							return true;
+						}
 					}
-
-					compoundCommand.execute();
-					fTreeViewer.refresh();
-
-					return true;
 				}
 
 				return false;

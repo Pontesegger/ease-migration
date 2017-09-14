@@ -11,8 +11,6 @@ import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
-import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
-import org.eclipse.ease.lang.unittest.runtime.impl.RuntimePackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -118,16 +116,11 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 
 		isInited = true;
 
-		// Obtain or create and register interdependencies
-		RuntimePackage theRuntimePackage = (RuntimePackage)(EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) instanceof RuntimePackage ? EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) : IRuntimePackage.eINSTANCE);
-
 		// Create package meta-data objects
 		theDefinitionPackage.createPackageContents();
-		theRuntimePackage.createPackageContents();
 
 		// Initialize created meta-data
 		theDefinitionPackage.initializePackageContents();
-		theRuntimePackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theDefinitionPackage.freeze();
@@ -244,6 +237,15 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	 */
 	public EOperation getTestSuiteDefinition__GetCustomCode__String() {
 		return testSuiteDefinitionEClass.getEOperations().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EOperation getTestSuiteDefinition__GetVariable__String() {
+		return testSuiteDefinitionEClass.getEOperations().get(1);
 	}
 
 	/**
@@ -421,6 +423,7 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 		createEAttribute(testSuiteDefinitionEClass, TEST_SUITE_DEFINITION__VERSION);
 		createEAttribute(testSuiteDefinitionEClass, TEST_SUITE_DEFINITION__RESOURCE);
 		createEOperation(testSuiteDefinitionEClass, TEST_SUITE_DEFINITION___GET_CUSTOM_CODE__STRING);
+		createEOperation(testSuiteDefinitionEClass, TEST_SUITE_DEFINITION___GET_VARIABLE__STRING);
 
 		variableEClass = createEClass(VARIABLE);
 		createEAttribute(variableEClass, VARIABLE__FULL_NAME);
@@ -489,6 +492,9 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 
 		EOperation op = initEOperation(getTestSuiteDefinition__GetCustomCode__String(), this.getCode(), "getCustomCode", 0, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEString(), "location", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		op = initEOperation(getTestSuiteDefinition__GetVariable__String(), this.getVariable(), "getVariable", 0, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, ecorePackage.getEString(), "name", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(variableEClass, IVariable.class, "Variable", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getVariable_FullName(), this.getPath(), "fullName", null, 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

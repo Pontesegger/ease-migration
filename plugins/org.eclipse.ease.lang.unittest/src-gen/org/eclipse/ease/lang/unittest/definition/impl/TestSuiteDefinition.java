@@ -31,24 +31,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getName <em>Name</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getDescription <em>Description</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getIncludeFilter <em>Include Filter</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getExcludeFilter <em>Exclude Filter</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getDisabledResources <em>Disabled Resources</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getVariables <em>Variables</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getCustomCode <em>Custom Code</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getFlags <em>Flags</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getVersion <em>Version</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getResource <em>Resource</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getName <em>Name</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getDescription <em>Description</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getIncludeFilter <em>Include Filter</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getExcludeFilter <em>Exclude Filter</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getDisabledResources <em>Disabled Resources</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getVariables <em>Variables</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getCustomCode <em>Custom Code</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getFlags <em>Flags</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getVersion <em>Version</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.TestSuiteDefinition#getResource <em>Resource</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements ITestSuiteDefinition {
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -56,8 +56,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -65,8 +65,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getDescription() <em>Description</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -74,8 +74,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final String DESCRIPTION_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -83,8 +83,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected String description = DESCRIPTION_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getIncludeFilter() <em>Include Filter</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getIncludeFilter() <em>Include Filter</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIncludeFilter()
 	 * @generated
 	 * @ordered
@@ -92,8 +92,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final String INCLUDE_FILTER_EDEFAULT = "";
 
 	/**
-	 * The cached value of the '{@link #getIncludeFilter() <em>Include Filter</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getIncludeFilter() <em>Include Filter</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIncludeFilter()
 	 * @generated
 	 * @ordered
@@ -101,8 +101,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected String includeFilter = INCLUDE_FILTER_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getExcludeFilter() <em>Exclude Filter</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getExcludeFilter() <em>Exclude Filter</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getExcludeFilter()
 	 * @generated
 	 * @ordered
@@ -110,8 +110,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final String EXCLUDE_FILTER_EDEFAULT = "";
 
 	/**
-	 * The cached value of the '{@link #getExcludeFilter() <em>Exclude Filter</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getExcludeFilter() <em>Exclude Filter</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getExcludeFilter()
 	 * @generated
 	 * @ordered
@@ -119,8 +119,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected String excludeFilter = EXCLUDE_FILTER_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getDisabledResources() <em>Disabled Resources</em>}' attribute list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getDisabledResources() <em>Disabled Resources</em>}' attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getDisabledResources()
 	 * @generated
 	 * @ordered
@@ -128,8 +128,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected EList<IPath> disabledResources;
 
 	/**
-	 * The cached value of the '{@link #getVariables() <em>Variables</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getVariables() <em>Variables</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getVariables()
 	 * @generated
 	 * @ordered
@@ -137,8 +137,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected EList<IVariable> variables;
 
 	/**
-	 * The cached value of the '{@link #getCustomCode() <em>Custom Code</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getCustomCode() <em>Custom Code</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getCustomCode()
 	 * @generated
 	 * @ordered
@@ -146,8 +146,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected EList<ICode> customCode;
 
 	/**
-	 * The cached value of the '{@link #getFlags() <em>Flags</em>}' map.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getFlags() <em>Flags</em>}' map. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFlags()
 	 * @generated
 	 * @ordered
@@ -155,8 +155,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected EMap<Flag, String> flags;
 
 	/**
-	 * The default value of the '{@link #getVersion() <em>Version</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getVersion()
 	 * @generated
 	 * @ordered
@@ -164,8 +164,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final String VERSION_EDEFAULT = "";
 
 	/**
-	 * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getVersion()
 	 * @generated
 	 * @ordered
@@ -173,8 +173,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected String version = VERSION_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getResource() <em>Resource</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getResource() <em>Resource</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getResource()
 	 * @generated
 	 * @ordered
@@ -182,8 +182,8 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 	protected static final Object RESOURCE_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getResource() <em>Resource</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getResource() <em>Resource</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getResource()
 	 * @generated
 	 * @ordered
@@ -192,6 +192,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TestSuiteDefinition() {
@@ -200,6 +201,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -209,6 +211,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -218,11 +221,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setName(String newName) {
-		String oldName = name;
+		final String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__NAME, oldName, name));
@@ -230,6 +234,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -239,11 +244,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setDescription(String newDescription) {
-		String oldDescription = description;
+		final String oldDescription = description;
 		description = newDescription;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION, oldDescription, description));
@@ -251,6 +257,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -260,11 +267,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setIncludeFilter(String newIncludeFilter) {
-		String oldIncludeFilter = includeFilter;
+		final String oldIncludeFilter = includeFilter;
 		includeFilter = newIncludeFilter;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER, oldIncludeFilter, includeFilter));
@@ -272,6 +280,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -281,11 +290,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setExcludeFilter(String newExcludeFilter) {
-		String oldExcludeFilter = excludeFilter;
+		final String oldExcludeFilter = excludeFilter;
 		excludeFilter = newExcludeFilter;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER, oldExcludeFilter, excludeFilter));
@@ -293,54 +303,60 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EList<IPath> getDisabledResources() {
 		if (disabledResources == null) {
-			disabledResources = new EDataTypeUniqueEList<IPath>(IPath.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES);
+			disabledResources = new EDataTypeUniqueEList<>(IPath.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES);
 		}
 		return disabledResources;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EList<IVariable> getVariables() {
 		if (variables == null) {
-			variables = new EObjectContainmentEList<IVariable>(IVariable.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES);
+			variables = new EObjectContainmentEList<>(IVariable.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES);
 		}
 		return variables;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EList<ICode> getCustomCode() {
 		if (customCode == null) {
-			customCode = new EObjectContainmentEList<ICode>(ICode.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE);
+			customCode = new EObjectContainmentEList<>(ICode.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE);
 		}
 		return customCode;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EMap<Flag, String> getFlags() {
 		if (flags == null) {
-			flags = new EcoreEMap<Flag,String>(IDefinitionPackage.Literals.FLAG_TO_STRING_MAP, FlagToStringMap.class, this, IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS);
+			flags = new EcoreEMap<>(IDefinitionPackage.Literals.FLAG_TO_STRING_MAP, FlagToStringMap.class, this,
+					IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS);
 		}
 		return flags;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -350,11 +366,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setVersion(String newVersion) {
-		String oldVersion = version;
+		final String oldVersion = version;
 		version = newVersion;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION, oldVersion, version));
@@ -362,6 +379,7 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -371,11 +389,12 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void setResource(Object newResource) {
-		Object oldResource = resource;
+		final Object oldResource = resource;
 		resource = newResource;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE, oldResource, resource));
@@ -398,192 +417,219 @@ public class TestSuiteDefinition extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated NOT
+	 */
+	@Override
+	public IVariable getVariable(String name) {
+		for (final IVariable variable : getVariables()) {
+			if (variable.getName().equals(name))
+				return variable;
+		}
+
+		return null;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
-				return ((InternalEList<?>)getVariables()).basicRemove(otherEnd, msgs);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
-				return ((InternalEList<?>)getCustomCode()).basicRemove(otherEnd, msgs);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
-				return ((InternalEList<?>)getFlags()).basicRemove(otherEnd, msgs);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
+			return ((InternalEList<?>) getVariables()).basicRemove(otherEnd, msgs);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
+			return ((InternalEList<?>) getCustomCode()).basicRemove(otherEnd, msgs);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
+			return ((InternalEList<?>) getFlags()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
-				return getName();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
-				return getDescription();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
-				return getIncludeFilter();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
-				return getExcludeFilter();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
-				return getDisabledResources();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
-				return getVariables();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
-				return getCustomCode();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
-				if (coreType) return getFlags();
-				else return getFlags().map();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
-				return getVersion();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
-				return getResource();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
+			return getName();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
+			return getDescription();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
+			return getIncludeFilter();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
+			return getExcludeFilter();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
+			return getDisabledResources();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
+			return getVariables();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
+			return getCustomCode();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
+			if (coreType)
+				return getFlags();
+			else
+				return getFlags().map();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
+			return getVersion();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
+			return getResource();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
-				setName((String)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
-				setDescription((String)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
-				setIncludeFilter((String)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
-				setExcludeFilter((String)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
-				getDisabledResources().clear();
-				getDisabledResources().addAll((Collection<? extends IPath>)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
-				getVariables().clear();
-				getVariables().addAll((Collection<? extends IVariable>)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
-				getCustomCode().clear();
-				getCustomCode().addAll((Collection<? extends ICode>)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
-				((EStructuralFeature.Setting)getFlags()).set(newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
-				setVersion((String)newValue);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
-				setResource(newValue);
-				return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
+			setName((String) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
+			setDescription((String) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
+			setIncludeFilter((String) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
+			setExcludeFilter((String) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
+			getDisabledResources().clear();
+			getDisabledResources().addAll((Collection<? extends IPath>) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
+			getVariables().clear();
+			getVariables().addAll((Collection<? extends IVariable>) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
+			getCustomCode().clear();
+			getCustomCode().addAll((Collection<? extends ICode>) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
+			((EStructuralFeature.Setting) getFlags()).set(newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
+			setVersion((String) newValue);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
+			setResource(newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
-				setName(NAME_EDEFAULT);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
-				setDescription(DESCRIPTION_EDEFAULT);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
-				setIncludeFilter(INCLUDE_FILTER_EDEFAULT);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
-				setExcludeFilter(EXCLUDE_FILTER_EDEFAULT);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
-				getDisabledResources().clear();
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
-				getVariables().clear();
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
-				getCustomCode().clear();
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
-				getFlags().clear();
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
-				setVersion(VERSION_EDEFAULT);
-				return;
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
-				setResource(RESOURCE_EDEFAULT);
-				return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
+			setName(NAME_EDEFAULT);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
+			setDescription(DESCRIPTION_EDEFAULT);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
+			setIncludeFilter(INCLUDE_FILTER_EDEFAULT);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
+			setExcludeFilter(EXCLUDE_FILTER_EDEFAULT);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
+			getDisabledResources().clear();
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
+			getVariables().clear();
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
+			getCustomCode().clear();
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
+			getFlags().clear();
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
+			setVersion(VERSION_EDEFAULT);
+			return;
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
+			setResource(RESOURCE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
-				return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
-				return INCLUDE_FILTER_EDEFAULT == null ? includeFilter != null : !INCLUDE_FILTER_EDEFAULT.equals(includeFilter);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
-				return EXCLUDE_FILTER_EDEFAULT == null ? excludeFilter != null : !EXCLUDE_FILTER_EDEFAULT.equals(excludeFilter);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
-				return disabledResources != null && !disabledResources.isEmpty();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
-				return variables != null && !variables.isEmpty();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
-				return customCode != null && !customCode.isEmpty();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
-				return flags != null && !flags.isEmpty();
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
-				return VERSION_EDEFAULT == null ? version != null : !VERSION_EDEFAULT.equals(version);
-			case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
-				return RESOURCE_EDEFAULT == null ? resource != null : !RESOURCE_EDEFAULT.equals(resource);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__NAME:
+			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DESCRIPTION:
+			return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__INCLUDE_FILTER:
+			return INCLUDE_FILTER_EDEFAULT == null ? includeFilter != null : !INCLUDE_FILTER_EDEFAULT.equals(includeFilter);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__EXCLUDE_FILTER:
+			return EXCLUDE_FILTER_EDEFAULT == null ? excludeFilter != null : !EXCLUDE_FILTER_EDEFAULT.equals(excludeFilter);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__DISABLED_RESOURCES:
+			return (disabledResources != null) && !disabledResources.isEmpty();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VARIABLES:
+			return (variables != null) && !variables.isEmpty();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__CUSTOM_CODE:
+			return (customCode != null) && !customCode.isEmpty();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__FLAGS:
+			return (flags != null) && !flags.isEmpty();
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__VERSION:
+			return VERSION_EDEFAULT == null ? version != null : !VERSION_EDEFAULT.equals(version);
+		case IDefinitionPackage.TEST_SUITE_DEFINITION__RESOURCE:
+			return RESOURCE_EDEFAULT == null ? resource != null : !RESOURCE_EDEFAULT.equals(resource);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION___GET_CUSTOM_CODE__STRING:
-				return getCustomCode((String)arguments.get(0));
+		case IDefinitionPackage.TEST_SUITE_DEFINITION___GET_CUSTOM_CODE__STRING:
+			return getCustomCode((String) arguments.get(0));
+		case IDefinitionPackage.TEST_SUITE_DEFINITION___GET_VARIABLE__STRING:
+			return getVariable((String) arguments.get(0));
 		}
 		return super.eInvoke(operationID, arguments);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		final StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
 		result.append(", description: ");
