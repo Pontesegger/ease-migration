@@ -20,16 +20,19 @@ import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap;
 import org.eclipse.ease.lang.unittest.ui.Activator;
+import org.eclipse.ease.lang.unittest.ui.dialogs.HTMLContentDialog;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CCombo;
@@ -80,7 +83,7 @@ public class OverviewPage extends AbstractEditorPage {
 
 		final Section sctnDescription = managedForm.getToolkit().createSection(managedForm.getForm().getBody(),
 				ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
-		sctnDescription.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+		sctnDescription.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		managedForm.getToolkit().paintBordersFor(sctnDescription);
 		sctnDescription.setText("Description");
 		sctnDescription.setExpanded(true);
@@ -102,11 +105,14 @@ public class OverviewPage extends AbstractEditorPage {
 
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				// TODO provide popup to change content
+				final HTMLContentDialog htmlContentDialog = new HTMLContentDialog(getEditorSite().getShell(), getTestSuitDefinition().getDescription());
+				if (Window.OK == htmlContentDialog.open()) {
+					updateDescription(htmlContentDialog.getContent());
+					fBrowser.setText(htmlContentDialog.getContent());
+				}
 			}
 		});
 		managedForm.getToolkit().paintBordersFor(hprlnkEdit);
-		hprlnkEdit.setEnabled(false);
 
 		final Section sctnSummary = managedForm.getToolkit().createSection(managedForm.getForm().getBody(),
 				ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
@@ -286,6 +292,12 @@ public class OverviewPage extends AbstractEditorPage {
 		compoundCommand.append(addCommand);
 
 		compoundCommand.execute();
+	}
+
+	protected void updateDescription(String content) {
+		final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DESCRIPTION,
+				content);
+		command.execute();
 	}
 
 	@Override
