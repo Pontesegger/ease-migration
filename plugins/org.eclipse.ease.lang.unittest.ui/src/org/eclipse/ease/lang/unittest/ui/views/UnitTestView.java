@@ -341,6 +341,9 @@ public class UnitTestView extends ViewPart {
 		fFileTreeViewer.addDoubleClickListener(event -> {
 			final Object element = ((IStructuredSelection) event.getSelection()).getFirstElement();
 
+			if (element instanceof ITestSuite)
+				openEditor(((ITestSuite) element).getResource(), 0);
+
 			if (element instanceof ITestFile)
 				openEditor(((ITestFile) element).getResource(), 0);
 
