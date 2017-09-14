@@ -11,6 +11,8 @@ import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
+import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
+import org.eclipse.ease.lang.unittest.runtime.impl.RuntimePackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -116,11 +118,16 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 
 		isInited = true;
 
+		// Obtain or create and register interdependencies
+		RuntimePackage theRuntimePackage = (RuntimePackage)(EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) instanceof RuntimePackage ? EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) : IRuntimePackage.eINSTANCE);
+
 		// Create package meta-data objects
 		theDefinitionPackage.createPackageContents();
+		theRuntimePackage.createPackageContents();
 
 		// Initialize created meta-data
 		theDefinitionPackage.initializePackageContents();
+		theRuntimePackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theDefinitionPackage.freeze();

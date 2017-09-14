@@ -11,7 +11,6 @@
 
 package org.eclipse.ease.lang.unittest;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IDebugEngine;
@@ -149,15 +147,6 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 		if (definition != null) {
 
 			definition.setResource(script.getFile());
-
-			// set testsuite name
-			if (definition.getName() == null) {
-				if (definition.getResource() instanceof IFile)
-					definition.setName(((IFile) definition.getResource()).getName());
-
-				else if (definition.getResource() instanceof File)
-					definition.setName(((File) definition.getResource()).getName());
-			}
 
 			final ITestSuite runtimeSuite = UnitTestHelper.createRuntimeSuite(definition);
 			runtimeSuite.setResource(definition.getResource());

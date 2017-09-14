@@ -11,7 +11,6 @@
 
 package org.eclipse.ease.lang.unittest.ui.editor;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
@@ -19,8 +18,13 @@ import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap;
+import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
+import org.eclipse.ease.lang.unittest.runtime.ITestFile;
+import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.ease.lang.unittest.ui.dialogs.HTMLContentDialog;
+import org.eclipse.ease.lang.unittest.ui.views.SuiteRuntimeInformation;
+import org.eclipse.ease.lang.unittest.ui.views.UnitTestView;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.emf.common.command.Command;
@@ -65,6 +69,10 @@ public class OverviewPage extends AbstractEditorPage {
 	private ComboViewer fEngineComboViewer;
 	private Label fLblTestFilesCount;
 	private Label fLblDefinedVariablesCount;
+	private Label fLblDisabledFilesCount;
+	private Label fLblExpectedRuntime;
+	private Label fLblUsesSetupTeardown;
+	private Hyperlink fHprlnkSetupTeardownCode;
 
 	public OverviewPage(FormEditor editor, String id, String title) {
 		super(editor, id, title);
@@ -135,14 +143,14 @@ public class OverviewPage extends AbstractEditorPage {
 		final Label lblDisabledFiles = managedForm.getToolkit().createLabel(composite_1, "Disabled files", SWT.NONE);
 		lblDisabledFiles.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 
-		final Label label_2 = managedForm.getToolkit().createLabel(composite_1, "4", SWT.NONE);
-		label_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		fLblDisabledFilesCount = managedForm.getToolkit().createLabel(composite_1, "0", SWT.NONE);
+		fLblDisabledFilesCount.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		final Label lblExpectedExecutionTime = managedForm.getToolkit().createLabel(composite_1, "Expected execution time", SWT.NONE);
 		lblExpectedExecutionTime.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 
-		final Label lblS = managedForm.getToolkit().createLabel(composite_1, "24m 23s", SWT.NONE);
-		lblS.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		fLblExpectedRuntime = managedForm.getToolkit().createLabel(composite_1, "unknown", SWT.NONE);
+		fLblExpectedRuntime.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		final Hyperlink hprlnkDefinedVariables = managedForm.getToolkit().createHyperlink(composite_1, "Defined variables", SWT.NONE);
 		hprlnkDefinedVariables.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -158,17 +166,20 @@ public class OverviewPage extends AbstractEditorPage {
 		fLblDefinedVariablesCount = managedForm.getToolkit().createLabel(composite_1, "0", SWT.NONE);
 		fLblDefinedVariablesCount.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
-		managedForm.getToolkit().createLabel(composite_1, "Uses", SWT.NONE);
+		fLblUsesSetupTeardown = managedForm.getToolkit().createLabel(composite_1, "Uses", SWT.NONE);
+		fLblUsesSetupTeardown.setVisible(false);
 
-		final Hyperlink hprlnkSetupteardownCode = managedForm.getToolkit().createHyperlink(composite_1, "Setup/Teardown code", SWT.NONE);
-		managedForm.getToolkit().paintBordersFor(hprlnkSetupteardownCode);
-		hprlnkSetupteardownCode.addHyperlinkListener(new HyperlinkAdapter() {
+		fHprlnkSetupTeardownCode = managedForm.getToolkit().createHyperlink(composite_1, "Setup/Teardown code", SWT.NONE);
+		managedForm.getToolkit().paintBordersFor(fHprlnkSetupTeardownCode);
+		fHprlnkSetupTeardownCode.addHyperlinkListener(new HyperlinkAdapter() {
 
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				getEditor().setActivePage(TestSuiteEditor.CUSTOM_CODE_PAGE);
 			}
 		});
+		fHprlnkSetupTeardownCode.setVisible(false);
+
 		new Label(composite_1, SWT.NONE);
 
 		final Section sctnSettings = managedForm.getToolkit().createSection(managedForm.getForm().getBody(),
@@ -312,18 +323,6 @@ public class OverviewPage extends AbstractEditorPage {
 		fChkStopSuiteOnError.setSelection(getTestSuitDefinition().getFlag(Flag.STOP_SUITE_ON_ERROR, false));
 		fChkRunTeardownOnError.setSelection(getTestSuitDefinition().getFlag(Flag.RUN_TEARDOWN_ON_ERROR, true));
 
-		// update stats
-		final String[] includeFilters = getTestSuitDefinition().getIncludeFilter().split("\r?\n");
-		final String[] excludeFilters = getTestSuitDefinition().getExcludeFilter().split("\r?\n");
-
-		final Map<Object, String> acceptedFiles = UnitTestHelper.getTestFilesFromFilter(includeFilters, getFile());
-		final Map<Object, String> filteredFiles = UnitTestHelper.getTestFilesFromFilter(excludeFilters, getFile());
-
-		acceptedFiles.keySet().removeAll(filteredFiles.keySet());
-		fLblTestFilesCount.setText(Integer.toString(acceptedFiles.size()));
-
-		fLblDefinedVariablesCount.setText(Integer.toString(getTestSuitDefinition().getVariables().size()));
-
 		final String selectedEngine = getTestSuitDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, "");
 		if (!selectedEngine.isEmpty()) {
 			final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
@@ -343,4 +342,55 @@ public class OverviewPage extends AbstractEditorPage {
 	public Image getTitleImage() {
 		return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/testsuite.png", true);
 	}
+
+	@Override
+	public void setActive(boolean active) {
+		super.setActive(active);
+
+		if (active) {
+
+			if ((fLblTestFilesCount != null) && (!fLblTestFilesCount.isDisposed())) {
+				// update suite stats
+				final ITestSuite testSuite = UnitTestHelper.createRuntimeSuite(getTestSuitDefinition());
+
+				fLblTestFilesCount.setText(Integer.toString(UnitTestHelper.getTestFiles(testSuite).size()));
+				fLblDisabledFilesCount.setText(Integer.toString(getDisabledFilesCount(testSuite)));
+
+				fLblDefinedVariablesCount.setText(Integer.toString(getTestSuitDefinition().getVariables().size()));
+
+				final long runtime = calculateExpectedRuntime(testSuite);
+				if (runtime < 0)
+					fLblExpectedRuntime.setText("unknown");
+				else
+					fLblExpectedRuntime.setText(UnitTestView.getDurationString(runtime));
+
+				fLblUsesSetupTeardown.setVisible(!getTestSuitDefinition().getCustomCode().isEmpty());
+				fHprlnkSetupTeardownCode.setVisible(!getTestSuitDefinition().getCustomCode().isEmpty());
+			}
+		}
+	}
+
+	private long calculateExpectedRuntime(ITestSuite testSuite) {
+		final SuiteRuntimeInformation runtimeInformation = new SuiteRuntimeInformation(testSuite);
+
+		long totalEstimation = 0;
+		for (final ITestFile testFile : UnitTestHelper.getTestFiles(testSuite)) {
+			final long estimatedTestFileDuration = runtimeInformation.getEstimatedDuration(testFile.getFullPath().makeAbsolute());
+			if (estimatedTestFileDuration < 0)
+				return -1;
+
+			totalEstimation += estimatedTestFileDuration;
+		}
+
+		return totalEstimation;
+	}
+
+	private int getDisabledFilesCount(ITestContainer testContainer) {
+		int sum = 0;
+		for (final ITestFile testFile : UnitTestHelper.getTestFiles(testContainer))
+			sum += getTestSuitDefinition().getDisabledResources().contains(testFile.getFullPath().removeFirstSegments(1).makeAbsolute()) ? 1 : 0;
+
+		return sum;
+	}
+
 }

@@ -774,7 +774,7 @@ public class UnitTestView extends ViewPart {
 
 	}
 
-	private String getDurationString(long duration) {
+	public static String getDurationString(long duration) {
 		if (duration >= (60 * 60 * 1000))
 			// >= 1 hour
 			return new SimpleDateFormat("HH:mm:ss").format(duration);

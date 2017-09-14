@@ -65,6 +65,8 @@ public class TestSuiteEditor extends FormEditor {
 
 		try {
 			fTestSuite = UnitTestHelper.loadTestSuite(getFile().getContents());
+			fTestSuite.setResource(getFile());
+
 		} catch (final IOException e) {
 			// TODO handle this exception (but for now, at least know it happened)
 			throw new RuntimeException(e);

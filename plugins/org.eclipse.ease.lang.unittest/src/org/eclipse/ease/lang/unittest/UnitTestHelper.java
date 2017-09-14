@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,7 @@ import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.util.DefinitionResourceFactory;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory;
 import org.eclipse.ease.lang.unittest.runtime.IStackTraceContainer;
+import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestFile;
 import org.eclipse.ease.lang.unittest.runtime.ITestFolder;
@@ -328,5 +331,17 @@ public class UnitTestHelper {
 		testSuite.setDefinition(definition);
 
 		return testSuite;
+	}
+
+	public static Collection<ITestFile> getTestFiles(ITestContainer testContainer) {
+		if (testContainer instanceof ITestFile)
+			return Arrays.asList((ITestFile) testContainer);
+
+		final Collection<ITestFile> testFiles = new HashSet<>();
+
+		for (final ITestContainer child : testContainer.getChildContainers())
+			testFiles.addAll(getTestFiles(child));
+
+		return testFiles;
 	}
 }
