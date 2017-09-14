@@ -150,6 +150,16 @@
                tooltip="Create a test report">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ease.views.unittest">
+         <command
+               commandId="org.eclipse.ease.lang.unittest.ui.commands.runSelectedTests"
+               icon="icons/elcl16/run_all_tests.png"
+               label="Run"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -198,6 +208,28 @@
                            value="ERROR">
                      </test>
                   </or>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ease.lang.unittest.ui.handlers.RunSelectedTests"
+            commandId="org.eclipse.ease.lang.unittest.ui.commands.runSelectedTests">
+         <enabledWhen>
+            <with
+                  variable="org.eclipse.ease.lang.unittest.ui.testsuite">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.ease.lang.unittest.ui.testsuite.exists">
+                  </test>
+                  <not>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.ease.lang.unittest.ui.testsuite.status"
+                           value="RUNNING">
+                     </test>
+                  </not>
                </and>
             </with>
          </enabledWhen>
@@ -260,16 +292,16 @@
       </command>
       <command
             categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
-            description="Run all tests"
-            id="org.eclipse.ease.lang.unittest.ui.commands.runAllTests"
-            name="Run All Tests">
-      </command>
-      <command
-            categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
             defaultHandler="org.eclipse.ease.lang.unittest.ui.handlers.DebugTestSuiteFromEditor"
             description="Debug this Test Suite"
             id="org.eclipse.ease.lang.unittest.ui.commands.debugTestSuite"
             name="Debug Test Suite">
+      </command>
+      <command
+            categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
+            description="Run all tests"
+            id="org.eclipse.ease.lang.unittest.ui.commands.runAllTests"
+            name="Run All Tests">
       </command>
       <command
             categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
@@ -319,6 +351,12 @@
             categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
             id="org.eclipse.ease.lang.unittest.ui.commands.createReport"
             name="Create Report">
+      </command>
+      <command
+            categoryId="org.eclipse.ease.lang.unittest.ui.category.unittest"
+            description="Run selected tests"
+            id="org.eclipse.ease.lang.unittest.ui.commands.runSelectedTests"
+            name="Run Selected Tests">
       </command>
    </extension>
    <extension

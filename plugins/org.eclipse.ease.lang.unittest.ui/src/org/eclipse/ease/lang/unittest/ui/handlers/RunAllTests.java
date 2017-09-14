@@ -39,7 +39,7 @@ public class RunAllTests extends AbstractViewToolbarHandler {
 				engine.setErrorStream(console.getErrorStream());
 				engine.setInputStream(console.getInputStream());
 
-				engine.executeAsync(getTestRoot(testRoot));
+				engine.executeAsync(getTestRoot(testRoot, event));
 				engine.schedule();
 			}
 		}
@@ -52,9 +52,11 @@ public class RunAllTests extends AbstractViewToolbarHandler {
 	 *
 	 * @param testSuite
 	 *            test suite
+	 * @param event
+	 *            event that triggered this handler
 	 * @return object to be executed
 	 */
-	protected Object getTestRoot(ITestSuite testSuite) {
+	protected Object getTestRoot(ITestSuite testSuite, ExecutionEvent event) {
 		return testSuite;
 	}
 }

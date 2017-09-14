@@ -13,6 +13,7 @@ import org.eclipse.ease.lang.unittest.definition.ICode;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.execution.ITestExecutionStrategy;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
+import org.eclipse.ease.lang.unittest.runtime.ITest;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
@@ -289,7 +290,7 @@ public class TestSuite extends TestContainer implements ITestSuite {
 			// testsuite setup
 			runSetupTeardownCode(ITestSuiteDefinition.CODE_LOCATION_TESTSUITE_SETUP, strategy);
 
-			if (!hasError()) {
+			if (!hasSetupError()) {
 				// not calling super.run() here as we do want to have full control on the entityStatus
 				for (final Object child : getChildren().toArray()) {
 					if (!isTerminated()) {
@@ -313,6 +314,18 @@ public class TestSuite extends TestContainer implements ITestSuite {
 
 			setEntityStatus(TestStatus.FINISHED);
 		}
+	}
+
+	/**
+	 * @generated NOT
+	 */
+	private boolean hasSetupError() {
+		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0])) {
+			if ((child instanceof ITest) && (child.hasError()))
+				return true;
+		}
+
+		return false;
 	}
 
 	/**

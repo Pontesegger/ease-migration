@@ -11,30 +11,40 @@
 
 package org.eclipse.ease.lang.unittest.ui.handlers;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.ease.lang.unittest.FilteredTestCommand;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
-import org.eclipse.ease.lang.unittest.runtime.TestStatus;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class RunFailedTests extends RunAllTests {
-
-	private static Collection<ITestEntity> addTestsWithErrors(ITestContainer container, Collection<ITestEntity> containedTests) {
-		if ((TestStatus.ERROR.equals(container.getStatus())) || (TestStatus.FAILURE.equals(container.getStatus())))
-			containedTests.add(container);
-
-		for (final ITestContainer child : container.getChildContainers())
-			addTestsWithErrors(child, containedTests);
-
-		return containedTests;
-	}
+public class RunSelectedTests extends RunAllTests {
 
 	@Override
 	protected Object getTestRoot(ITestSuite testSuite, ExecutionEvent event) {
-		return new FilteredTestCommand(testSuite, addTestsWithErrors(testSuite, new HashSet<>()));
+		final ISelection menuSelection = HandlerUtil.getActiveMenuSelection(event);
+		if (menuSelection instanceof IStructuredSelection) {
+			final List<ITestEntity> selectedTests = new ArrayList<>();
+			for (final Object element : ((IStructuredSelection) menuSelection).toList()) {
+				if (element instanceof ITestContainer) {
+					selectedTests.add((ITestEntity) element);
+					ITestContainer parent = ((ITestContainer) element).getParent();
+					while (parent != null) {
+						selectedTests.add(parent);
+						parent = parent.getParent();
+					}
+				}
+			}
+
+			return new FilteredTestCommand(testSuite, selectedTests);
+
+		} else
+			return new FilteredTestCommand(testSuite, Collections.emptySet());
 	}
 }
