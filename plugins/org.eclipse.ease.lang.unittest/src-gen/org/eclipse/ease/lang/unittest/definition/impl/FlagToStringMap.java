@@ -17,24 +17,21 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Flag To String Map</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '<em><b>Flag To String Map</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap#getTypedKey <em>Key</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap#getTypedValue <em>Value</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap#getTypedKey <em>Key</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.FlagToStringMap#getTypedValue <em>Value</em>}</li>
  * </ul>
  *
  * @generated
  */
-public class FlagToStringMap extends MinimalEObjectImpl.Container implements BasicEMap.Entry<Flag,String> {
+public class FlagToStringMap extends MinimalEObjectImpl.Container implements BasicEMap.Entry<Flag, String> {
 	/**
-	 * The default value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The default value of the '{@link #getTypedKey() <em>Key</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTypedKey()
 	 * @generated
 	 * @ordered
@@ -42,9 +39,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	protected static final Flag KEY_EDEFAULT = Flag.UNDEFINED;
 
 	/**
-	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTypedKey() <em>Key</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTypedKey()
 	 * @generated
 	 * @ordered
@@ -52,9 +48,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	protected Flag key = KEY_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getTypedValue() <em>Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The default value of the '{@link #getTypedValue() <em>Value</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTypedValue()
 	 * @generated
 	 * @ordered
@@ -62,9 +57,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	protected static final String VALUE_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getTypedValue() <em>Value</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTypedValue() <em>Value</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getTypedValue()
 	 * @generated
 	 * @ordered
@@ -72,8 +66,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	protected String value = VALUE_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected FlagToStringMap() {
@@ -81,8 +75,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -91,8 +85,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Flag getTypedKey() {
@@ -100,8 +94,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTypedKey(Flag newKey) {
@@ -112,8 +106,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getTypedValue() {
@@ -121,8 +115,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setTypedValue(String newValue) {
@@ -133,81 +127,82 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
-				return getTypedKey();
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
-				return getTypedValue();
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
+			return getTypedKey();
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
+			return getTypedValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
-				setTypedKey((Flag)newValue);
-				return;
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
-				setTypedValue((String)newValue);
-				return;
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
+			setTypedKey((Flag) newValue);
+			return;
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
+			setTypedValue((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
-				setTypedKey(KEY_EDEFAULT);
-				return;
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
-				setTypedValue(VALUE_EDEFAULT);
-				return;
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
+			setTypedKey(KEY_EDEFAULT);
+			return;
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
+			setTypedValue(VALUE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
-				return key != KEY_EDEFAULT;
-			case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
-				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__KEY:
+			return key != KEY_EDEFAULT;
+		case IDefinitionPackage.FLAG_TO_STRING_MAP__VALUE:
+			return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (key: ");
@@ -219,15 +214,15 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected int hash = -1;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public int getHash() {
@@ -239,8 +234,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setHash(int hash) {
@@ -248,8 +243,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Flag getKey() {
@@ -257,8 +252,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void setKey(Flag key) {
@@ -266,8 +261,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String getValue() {
@@ -275,8 +270,8 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String setValue(String value) {
@@ -286,14 +281,14 @@ public class FlagToStringMap extends MinimalEObjectImpl.Container implements Bas
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	public EMap<Flag, String> getEMap() {
 		EObject container = eContainer();
-		return container == null ? null : (EMap<Flag, String>)container.eGet(eContainmentFeature());
+		return container == null ? null : (EMap<Flag, String>) container.eGet(eContainmentFeature());
 	}
 
-} //FlagToStringMap
+} // FlagToStringMap

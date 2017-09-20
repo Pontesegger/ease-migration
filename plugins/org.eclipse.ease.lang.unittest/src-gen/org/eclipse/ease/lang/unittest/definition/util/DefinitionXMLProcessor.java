@@ -14,28 +14,25 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.util.XMLProcessor;
 
 /**
- * This class contains helper methods to serialize and deserialize XML documents
- * <!-- begin-user-doc -->
- * <!-- end-user-doc -->
+ * This class contains helper methods to serialize and deserialize XML documents <!-- begin-user-doc --> <!-- end-user-doc -->
+ * 
  * @generated
  */
 public class DefinitionXMLProcessor extends XMLProcessor {
 
 	/**
-	 * Public constructor to instantiate the helper.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Public constructor to instantiate the helper. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DefinitionXMLProcessor() {
 		super(new EPackageRegistryImpl(EPackage.Registry.INSTANCE));
 		extendedMetaData.putPackage(null, IDefinitionPackage.eINSTANCE);
 	}
-	
+
 	/**
-	 * Register for "*" and "xml" file extensions the DefinitionResourceFactory factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Register for "*" and "xml" file extensions the DefinitionResourceFactory factory. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -48,4 +45,4 @@ public class DefinitionXMLProcessor extends XMLProcessor {
 		return registrations;
 	}
 
-} //DefinitionXMLProcessor
+} // DefinitionXMLProcessor

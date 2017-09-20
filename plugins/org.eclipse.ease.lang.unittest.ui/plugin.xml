@@ -5,6 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="org.eclipse.ease.lang.unittest.ui.editor.TestSuiteEditor"
+            contributorClass="org.eclipse.ease.lang.unittest.ui.editor.TestSuiteEditorActionBarContributor"
             default="true"
             extensions="suite"
             filenames="*.suite"
@@ -437,5 +438,18 @@
    </extension>
 
 
+
+   <extension point="org.eclipse.emf.edit.itemProviderAdapterFactories">
+      <!-- @generated TestDefinition -->
+      <factory
+            uri="http://eclipse.org/ease/unittest/testsuite/1.0"
+            class="org.eclipse.ease.lang.unittest.definition.provider.DefinitionItemProviderAdapterFactory"
+            supportedTypes=
+              "org.eclipse.emf.edit.provider.IEditingDomainItemProvider
+               org.eclipse.emf.edit.provider.IStructuredItemContentProvider
+               org.eclipse.emf.edit.provider.ITreeItemContentProvider
+               org.eclipse.emf.edit.provider.IItemLabelProvider
+               org.eclipse.emf.edit.provider.IItemPropertySource"/>
+   </extension>
 
 </plugin>

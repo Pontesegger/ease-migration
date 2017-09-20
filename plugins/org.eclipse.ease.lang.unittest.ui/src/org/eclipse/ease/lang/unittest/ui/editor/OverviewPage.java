@@ -280,7 +280,6 @@ public class OverviewPage extends AbstractEditorPage {
 				updateFlag(Flag.RUN_TEARDOWN_ON_ERROR, Boolean.toString(fChkRunTeardownOnError.getSelection()));
 			}
 		});
-
 	}
 
 	private void updateFlag(Flag flag, String value) {
@@ -302,13 +301,13 @@ public class OverviewPage extends AbstractEditorPage {
 				newentry);
 		compoundCommand.append(addCommand);
 
-		compoundCommand.execute();
+		executeCommand(compoundCommand);
 	}
 
 	protected void updateDescription(String content) {
 		final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DESCRIPTION,
 				content);
-		command.execute();
+		executeCommand(command);
 	}
 
 	@Override
@@ -348,7 +347,6 @@ public class OverviewPage extends AbstractEditorPage {
 		super.setActive(active);
 
 		if (active) {
-
 			if ((fLblTestFilesCount != null) && (!fLblTestFilesCount.isDisposed())) {
 				// update suite stats
 				final ITestSuite testSuite = UnitTestHelper.createRuntimeSuite(getTestSuitDefinition());
@@ -392,5 +390,4 @@ public class OverviewPage extends AbstractEditorPage {
 
 		return sum;
 	}
-
 }

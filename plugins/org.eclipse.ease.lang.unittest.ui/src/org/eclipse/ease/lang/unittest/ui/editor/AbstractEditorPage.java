@@ -12,6 +12,7 @@ package org.eclipse.ease.lang.unittest.ui.editor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Composite;
@@ -72,9 +73,6 @@ public abstract class AbstractEditorPage extends FormPage {
 		manager.update(true);
 	}
 
-	/**
-	 * @return
-	 */
 	abstract protected String getPageTitle();
 
 	/**
@@ -91,7 +89,7 @@ public abstract class AbstractEditorPage extends FormPage {
 		return (TestSuiteEditor) super.getEditor();
 	}
 
-	public AdapterFactoryEditingDomain getEditingDomain() {
+	protected AdapterFactoryEditingDomain getEditingDomain() {
 		return getEditor().getEditingDomain();
 	}
 
@@ -101,5 +99,9 @@ public abstract class AbstractEditorPage extends FormPage {
 			return ((FileEditorInput) input).getFile();
 
 		return null;
+	}
+
+	protected void executeCommand(Command command) {
+		getEditingDomain().getCommandStack().execute(command);
 	}
 }

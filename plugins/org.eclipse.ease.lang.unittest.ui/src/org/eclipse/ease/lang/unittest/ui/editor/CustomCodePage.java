@@ -119,7 +119,7 @@ public class CustomCodePage extends AbstractEditorPage {
 					if (code != null) {
 						// change existing code location
 						final Command command = SetCommand.create(getEditingDomain(), code, IDefinitionPackage.Literals.CODE__CONTENT, fTxtCode.getText());
-						command.execute();
+						executeCommand(command);
 
 					} else {
 						// new code location
@@ -129,7 +129,7 @@ public class CustomCodePage extends AbstractEditorPage {
 
 						final Command command = AddCommand.create(getEditingDomain(), getTestSuitDefinition(),
 								IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__CUSTOM_CODE, customCode);
-						command.execute();
+						executeCommand(command);
 					}
 				}
 			}

@@ -11,8 +11,6 @@ import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
-import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
-import org.eclipse.ease.lang.unittest.runtime.impl.RuntimePackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -24,64 +22,60 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model <b>Package</b>.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model <b>Package</b>. <!-- end-user-doc -->
+ * 
  * @generated
  */
 public class DefinitionPackage extends EPackageImpl implements IDefinitionPackage {
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EClass testSuiteDefinitionEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EClass variableEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EClass flagToStringMapEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EClass codeEClass = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EEnum flagEEnum = null;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private EDataType pathEDataType = null;
 
 	/**
-	 * Creates an instance of the model <b>Package</b>, registered with
-	 * {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package
-	 * package URI value.
-	 * <p>Note: the correct way to create the package is via the static
-	 * factory method {@link #init init()}, which also performs
-	 * initialization of the package, or returns the registered package,
-	 * if one already exists.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Creates an instance of the model <b>Package</b>, registered with {@link org.eclipse.emf.ecore.EPackage.Registry EPackage.Registry} by the package package
+	 * URI value.
+	 * <p>
+	 * Note: the correct way to create the package is via the static factory method {@link #init init()}, which also performs initialization of the package, or
+	 * returns the registered package, if one already exists. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see org.eclipse.emf.ecore.EPackage.Registry
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#eNS_URI
 	 * @see #init()
@@ -92,8 +86,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private static boolean isInited = false;
@@ -101,46 +95,43 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
 	 * 
-	 * <p>This method is used to initialize {@link IDefinitionPackage#eINSTANCE} when that field is accessed.
-	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <p>
+	 * This method is used to initialize {@link IDefinitionPackage#eINSTANCE} when that field is accessed. Clients should not invoke it directly. Instead, they
+	 * should simply access that field to obtain the package. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #eNS_URI
 	 * @see #createPackageContents()
 	 * @see #initializePackageContents()
 	 * @generated
 	 */
 	public static IDefinitionPackage init() {
-		if (isInited) return (IDefinitionPackage)EPackage.Registry.INSTANCE.getEPackage(IDefinitionPackage.eNS_URI);
+		if (isInited)
+			return (IDefinitionPackage) EPackage.Registry.INSTANCE.getEPackage(IDefinitionPackage.eNS_URI);
 
 		// Obtain or create and register package
-		DefinitionPackage theDefinitionPackage = (DefinitionPackage)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof DefinitionPackage ? EPackage.Registry.INSTANCE.get(eNS_URI) : new DefinitionPackage());
+		DefinitionPackage theDefinitionPackage = (DefinitionPackage) (EPackage.Registry.INSTANCE.get(eNS_URI) instanceof DefinitionPackage
+				? EPackage.Registry.INSTANCE.get(eNS_URI)
+				: new DefinitionPackage());
 
 		isInited = true;
 
-		// Obtain or create and register interdependencies
-		RuntimePackage theRuntimePackage = (RuntimePackage)(EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) instanceof RuntimePackage ? EPackage.Registry.INSTANCE.getEPackage(IRuntimePackage.eNS_URI) : IRuntimePackage.eINSTANCE);
-
 		// Create package meta-data objects
 		theDefinitionPackage.createPackageContents();
-		theRuntimePackage.createPackageContents();
 
 		// Initialize created meta-data
 		theDefinitionPackage.initializePackageContents();
-		theRuntimePackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theDefinitionPackage.freeze();
 
-  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(IDefinitionPackage.eNS_URI, theDefinitionPackage);
 		return theDefinitionPackage;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EClass getTestSuiteDefinition() {
@@ -148,98 +139,98 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_Name() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_Description() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_IncludeFilter() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(2);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_ExcludeFilter() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_DisabledResources() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(4);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EReference getTestSuiteDefinition_Variables() {
-		return (EReference)testSuiteDefinitionEClass.getEStructuralFeatures().get(5);
+		return (EReference) testSuiteDefinitionEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EReference getTestSuiteDefinition_CustomCode() {
-		return (EReference)testSuiteDefinitionEClass.getEStructuralFeatures().get(6);
+		return (EReference) testSuiteDefinitionEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EReference getTestSuiteDefinition_Flags() {
-		return (EReference)testSuiteDefinitionEClass.getEStructuralFeatures().get(7);
+		return (EReference) testSuiteDefinitionEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_Version() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(8);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getTestSuiteDefinition_Resource() {
-		return (EAttribute)testSuiteDefinitionEClass.getEStructuralFeatures().get(9);
+		return (EAttribute) testSuiteDefinitionEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EOperation getTestSuiteDefinition__GetCustomCode__String() {
@@ -247,8 +238,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EOperation getTestSuiteDefinition__GetVariable__String() {
@@ -256,8 +247,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EClass getVariable() {
@@ -265,44 +256,44 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getVariable_FullName() {
-		return (EAttribute)variableEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) variableEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getVariable_Content() {
-		return (EAttribute)variableEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) variableEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getVariable_Description() {
-		return (EAttribute)variableEClass.getEStructuralFeatures().get(2);
+		return (EAttribute) variableEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getVariable_EnumProviderID() {
-		return (EAttribute)variableEClass.getEStructuralFeatures().get(3);
+		return (EAttribute) variableEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EOperation getVariable__GetName() {
@@ -310,8 +301,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EOperation getVariable__GetPath() {
@@ -319,8 +310,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EClass getFlagToStringMap() {
@@ -328,26 +319,26 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getFlagToStringMap_Key() {
-		return (EAttribute)flagToStringMapEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) flagToStringMapEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getFlagToStringMap_Value() {
-		return (EAttribute)flagToStringMapEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) flagToStringMapEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EClass getCode() {
@@ -355,26 +346,26 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getCode_Location() {
-		return (EAttribute)codeEClass.getEStructuralFeatures().get(0);
+		return (EAttribute) codeEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EAttribute getCode_Content() {
-		return (EAttribute)codeEClass.getEStructuralFeatures().get(1);
+		return (EAttribute) codeEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EEnum getFlag() {
@@ -382,8 +373,8 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EDataType getPath() {
@@ -391,30 +382,30 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IDefinitionFactory getDefinitionFactory() {
-		return (IDefinitionFactory)getEFactoryInstance();
+		return (IDefinitionFactory) getEFactoryInstance();
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private boolean isCreated = false;
 
 	/**
-	 * Creates the meta-model objects for the package.  This method is
-	 * guarded to have no affect on any invocation but its first.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Creates the meta-model objects for the package. This method is guarded to have no affect on any invocation but its first. <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void createPackageContents() {
-		if (isCreated) return;
+		if (isCreated)
+			return;
 		isCreated = true;
 
 		// Create classes and their features
@@ -456,21 +447,21 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	private boolean isInitialized = false;
 
 	/**
-	 * Complete the initialization of the package and its meta-model.  This
-	 * method is guarded to have no affect on any invocation but its first.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Complete the initialization of the package and its meta-model. This method is guarded to have no affect on any invocation but its first. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public void initializePackageContents() {
-		if (isInitialized) return;
+		if (isInitialized)
+			return;
 		isInitialized = true;
 
 		// Initialize package
@@ -486,16 +477,26 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(testSuiteDefinitionEClass, ITestSuiteDefinition.class, "TestSuiteDefinition", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTestSuiteDefinition_Name(), ecorePackage.getEString(), "name", null, 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_Description(), ecorePackage.getEString(), "description", null, 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_IncludeFilter(), ecorePackage.getEString(), "includeFilter", "", 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_ExcludeFilter(), ecorePackage.getEString(), "excludeFilter", "", 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_DisabledResources(), this.getPath(), "disabledResources", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTestSuiteDefinition_Variables(), this.getVariable(), null, "variables", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTestSuiteDefinition_CustomCode(), this.getCode(), null, "customCode", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTestSuiteDefinition_Flags(), this.getFlagToStringMap(), null, "flags", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_Version(), ecorePackage.getEString(), "version", "", 1, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTestSuiteDefinition_Resource(), ecorePackage.getEJavaObject(), "resource", null, 0, 1, ITestSuiteDefinition.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_Name(), ecorePackage.getEString(), "name", null, 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_Description(), ecorePackage.getEString(), "description", null, 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_IncludeFilter(), ecorePackage.getEString(), "includeFilter", "", 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_ExcludeFilter(), ecorePackage.getEString(), "excludeFilter", "", 0, 1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_DisabledResources(), this.getPath(), "disabledResources", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTestSuiteDefinition_Variables(), this.getVariable(), null, "variables", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTestSuiteDefinition_CustomCode(), this.getCode(), null, "customCode", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTestSuiteDefinition_Flags(), this.getFlagToStringMap(), null, "flags", null, 0, -1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_Version(), ecorePackage.getEString(), "version", "", 1, 1, ITestSuiteDefinition.class, !IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTestSuiteDefinition_Resource(), ecorePackage.getEJavaObject(), "resource", null, 0, 1, ITestSuiteDefinition.class, IS_TRANSIENT,
+				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		EOperation op = initEOperation(getTestSuiteDefinition__GetCustomCode__String(), this.getCode(), "getCustomCode", 0, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, ecorePackage.getEString(), "location", 0, 1, IS_UNIQUE, IS_ORDERED);
@@ -504,22 +505,30 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 		addEParameter(op, ecorePackage.getEString(), "name", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(variableEClass, IVariable.class, "Variable", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getVariable_FullName(), this.getPath(), "fullName", null, 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVariable_Content(), ecorePackage.getEString(), "content", "", 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVariable_Description(), ecorePackage.getEString(), "description", "", 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVariable_EnumProviderID(), ecorePackage.getEString(), "enumProviderID", null, 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVariable_FullName(), this.getPath(), "fullName", null, 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVariable_Content(), ecorePackage.getEString(), "content", "", 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVariable_Description(), ecorePackage.getEString(), "description", "", 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVariable_EnumProviderID(), ecorePackage.getEString(), "enumProviderID", null, 0, 1, IVariable.class, !IS_TRANSIENT, !IS_VOLATILE,
+				IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEOperation(getVariable__GetName(), ecorePackage.getEString(), "getName", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEOperation(getVariable__GetPath(), this.getPath(), "getPath", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(flagToStringMapEClass, Map.Entry.class, "FlagToStringMap", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getFlagToStringMap_Key(), this.getFlag(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFlagToStringMap_Value(), ecorePackage.getEString(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFlagToStringMap_Key(), this.getFlag(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE,
+				!IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFlagToStringMap_Value(), ecorePackage.getEString(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(codeEClass, ICode.class, "Code", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getCode_Location(), ecorePackage.getEString(), "location", null, 0, 1, ICode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getCode_Content(), ecorePackage.getEString(), "content", "", 0, 1, ICode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getCode_Location(), ecorePackage.getEString(), "location", null, 0, 1, ICode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getCode_Content(), ecorePackage.getEString(), "content", "", 0, 1, ICode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
+				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(flagEEnum, Flag.class, "Flag");
@@ -542,91 +551,23 @@ public class DefinitionPackage extends EPackageImpl implements IDefinitionPackag
 	}
 
 	/**
-	 * Initializes the annotations for <b>http:///org/eclipse/emf/ecore/util/ExtendedMetaData</b>.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Initializes the annotations for <b>http:///org/eclipse/emf/ecore/util/ExtendedMetaData</b>. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected void createExtendedMetaDataAnnotations() {
-		String source = "http:///org/eclipse/emf/ecore/util/ExtendedMetaData";	
-		addAnnotation
-		  (this, 
-		   source, 
-		   new String[] {
-			 "qualified", "false"
-		   });	
-		addAnnotation
-		  (testSuiteDefinitionEClass, 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "TestSuite"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_Description(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "description"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_IncludeFilter(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "includeFilter"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_ExcludeFilter(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "excludeFilter"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_DisabledResources(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "disabledResource"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_Variables(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "variable",
-			 "namespace", "##targetNamespace"
-		   });	
-		addAnnotation
-		  (getTestSuiteDefinition_Flags(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "flag",
-			 "namespace", "##targetNamespace"
-		   });	
-		addAnnotation
-		  (getVariable_Content(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "content"
-		   });	
-		addAnnotation
-		  (getVariable_Description(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "description"
-		   });	
-		addAnnotation
-		  (getCode_Content(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "content"
-		   });
+		String source = "http:///org/eclipse/emf/ecore/util/ExtendedMetaData";
+		addAnnotation(this, source, new String[] { "qualified", "false" });
+		addAnnotation(testSuiteDefinitionEClass, source, new String[] { "kind", "element", "name", "TestSuite" });
+		addAnnotation(getTestSuiteDefinition_Description(), source, new String[] { "kind", "element", "name", "description" });
+		addAnnotation(getTestSuiteDefinition_IncludeFilter(), source, new String[] { "kind", "element", "name", "includeFilter" });
+		addAnnotation(getTestSuiteDefinition_ExcludeFilter(), source, new String[] { "kind", "element", "name", "excludeFilter" });
+		addAnnotation(getTestSuiteDefinition_DisabledResources(), source, new String[] { "kind", "element", "name", "disabledResource" });
+		addAnnotation(getTestSuiteDefinition_Variables(), source, new String[] { "kind", "element", "name", "variable", "namespace", "##targetNamespace" });
+		addAnnotation(getTestSuiteDefinition_Flags(), source, new String[] { "kind", "element", "name", "flag", "namespace", "##targetNamespace" });
+		addAnnotation(getVariable_Content(), source, new String[] { "kind", "element", "name", "content" });
+		addAnnotation(getVariable_Description(), source, new String[] { "kind", "element", "name", "description" });
+		addAnnotation(getCode_Content(), source, new String[] { "kind", "element", "name", "content" });
 	}
 
-} //DefinitionPackage
+} // DefinitionPackage

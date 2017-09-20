@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.lang.unittest.definition.provider.TestDefinitionEditPlugin;
+import org.eclipse.ease.lang.unittest.definition.provider.TestDefinitionEditPlugin.Implementation;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -34,6 +36,8 @@ public class Activator extends AbstractUIPlugin {
 
 	private BundleContext fContext;
 
+	private Implementation fEMFInstance;
+
 	public static Activator getDefault() {
 		return fInstance;
 	}
@@ -42,12 +46,17 @@ public class Activator extends AbstractUIPlugin {
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
 
+		fEMFInstance = new TestDefinitionEditPlugin.Implementation();
+		fEMFInstance.start(context);
+
 		fContext = context;
 		fInstance = this;
 	}
 
 	@Override
 	public void stop(final BundleContext context) throws Exception {
+		fEMFInstance.stop(context);
+
 		fInstance = null;
 		fContext = null;
 

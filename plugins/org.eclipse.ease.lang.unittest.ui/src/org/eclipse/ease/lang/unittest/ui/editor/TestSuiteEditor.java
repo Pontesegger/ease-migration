@@ -8,34 +8,38 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.lang.unittest.ui.editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
-import org.eclipse.ease.lang.unittest.definition.IVariable;
-import org.eclipse.ease.lang.unittest.definition.util.DefinitionAdapterFactory;
-import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
+import org.eclipse.ease.lang.unittest.definition.provider.DefinitionItemProviderAdapterFactory;
+import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.emf.common.command.BasicCommandStack;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.util.EContentAdapter;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
+import org.eclipse.emf.edit.domain.IEditingDomainProvider;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
+import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.part.FileEditorInput;
 
-public class TestSuiteEditor extends FormEditor {
+public class TestSuiteEditor extends FormEditor implements IEditingDomainProvider {
 
 	public static final String EDITOR_ID = "org.eclipse.ease.editor.suiteEditor";
 
@@ -56,6 +60,27 @@ public class TestSuiteEditor extends FormEditor {
 	private ITestSuiteDefinition fTestSuite = null;
 
 	private LocalResourceManager fResourceManager;
+
+	private ComposedAdapterFactory fAdapterFactory;
+
+	public TestSuiteEditor() {
+		initializeEditingDomain();
+	}
+
+	private void initializeEditingDomain() {
+		// Create an adapter factory that yields item providers.
+		fAdapterFactory = new ComposedAdapterFactory(ComposedAdapterFactory.Descriptor.Registry.INSTANCE);
+
+		fAdapterFactory.addAdapterFactory(new ResourceItemProviderAdapterFactory());
+		fAdapterFactory.addAdapterFactory(new DefinitionItemProviderAdapterFactory());
+		fAdapterFactory.addAdapterFactory(new ReflectiveItemProviderAdapterFactory());
+
+		// Create the command stack that will notify this editor as commands are executed.
+		final BasicCommandStack commandStack = new BasicCommandStack();
+
+		// Create the editing domain with a special command stack.
+		fEditingDomain = new AdapterFactoryEditingDomain(fAdapterFactory, commandStack, new HashMap<Resource, Boolean>());
+	}
 
 	@Override
 	public void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
@@ -79,6 +104,9 @@ public class TestSuiteEditor extends FormEditor {
 
 		setPartName(getFile().getName());
 		firePropertyChange(PROP_TITLE);
+
+		// TODO add resource change listener
+		// ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	@Override
@@ -91,24 +119,8 @@ public class TestSuiteEditor extends FormEditor {
 			addPage(new CustomCodePage(this, CUSTOM_CODE_PAGE, CUSTOM_CODE_PAGE));
 
 		} catch (final PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.error(Activator.PLUGIN_ID, "Could not create all pages for TestSuiteEditor", e);
 		}
-
-		getTestSuite().eAdapters().add(new EContentAdapter() {
-			@Override
-			public void notifyChanged(Notification notification) {
-				super.notifyChanged(notification);
-
-				fDirty = true;
-				firePropertyChange(IEditorPart.PROP_DIRTY);
-			}
-
-			@Override
-			public boolean isAdapterForType(Object type) {
-				return (type instanceof ITestSuite) || (type instanceof IVariable);
-			}
-		});
 	}
 
 	@Override
@@ -169,12 +181,8 @@ public class TestSuiteEditor extends FormEditor {
 		return null;
 	}
 
+	@Override
 	public AdapterFactoryEditingDomain getEditingDomain() {
-		if (fEditingDomain == null) {
-			final BasicCommandStack commandStack = new BasicCommandStack();
-			fEditingDomain = new AdapterFactoryEditingDomain(new DefinitionAdapterFactory(), commandStack);
-		}
-
 		return fEditingDomain;
 	}
 

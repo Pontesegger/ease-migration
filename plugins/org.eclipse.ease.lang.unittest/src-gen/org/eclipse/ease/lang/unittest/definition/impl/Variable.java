@@ -19,18 +19,18 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getFullName <em>Full Name</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getContent <em>Content</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getDescription <em>Description</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getEnumProviderID <em>Enum Provider ID</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getFullName <em>Full Name</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getContent <em>Content</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getDescription <em>Description</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.definition.impl.Variable#getEnumProviderID <em>Enum Provider ID</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class Variable extends MinimalEObjectImpl.Container implements IVariable {
 	/**
-	 * The default value of the '{@link #getFullName() <em>Full Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getFullName() <em>Full Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFullName()
 	 * @generated
 	 * @ordered
@@ -38,8 +38,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected static final IPath FULL_NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getFullName() <em>Full Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getFullName() <em>Full Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getFullName()
 	 * @generated
 	 * @ordered
@@ -47,8 +47,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected IPath fullName = FULL_NAME_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getContent() <em>Content</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getContent() <em>Content</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getContent()
 	 * @generated
 	 * @ordered
@@ -56,8 +56,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected static final String CONTENT_EDEFAULT = "";
 
 	/**
-	 * The cached value of the '{@link #getContent() <em>Content</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getContent() <em>Content</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getContent()
 	 * @generated
 	 * @ordered
@@ -65,8 +65,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected String content = CONTENT_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getDescription() <em>Description</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -74,8 +74,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected static final String DESCRIPTION_EDEFAULT = "";
 
 	/**
-	 * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -83,8 +83,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected String description = DESCRIPTION_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getEnumProviderID() <em>Enum Provider ID</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getEnumProviderID() <em>Enum Provider ID</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEnumProviderID()
 	 * @generated
 	 * @ordered
@@ -92,8 +92,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected static final String ENUM_PROVIDER_ID_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getEnumProviderID() <em>Enum Provider ID</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getEnumProviderID() <em>Enum Provider ID</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getEnumProviderID()
 	 * @generated
 	 * @ordered
@@ -101,8 +101,8 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 	protected String enumProviderID = ENUM_PROVIDER_ID_EDEFAULT;
 
 	/**
-	 * This is true if the Enum Provider ID attribute has been set.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * This is true if the Enum Provider ID attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -110,6 +110,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected Variable() {
@@ -118,6 +119,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -127,6 +129,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -136,6 +139,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -158,6 +162,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -167,6 +172,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -179,6 +185,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -188,6 +195,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -200,6 +208,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -209,6 +218,7 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -218,11 +228,13 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 		boolean oldEnumProviderIDESet = enumProviderIDESet;
 		enumProviderIDESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID, oldEnumProviderID, enumProviderID, !oldEnumProviderIDESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID, oldEnumProviderID, enumProviderID,
+					!oldEnumProviderIDESet));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -232,11 +244,13 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 		enumProviderID = ENUM_PROVIDER_ID_EDEFAULT;
 		enumProviderIDESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID, oldEnumProviderID, ENUM_PROVIDER_ID_EDEFAULT, oldEnumProviderIDESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID, oldEnumProviderID, ENUM_PROVIDER_ID_EDEFAULT,
+					oldEnumProviderIDESet));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -256,110 +270,117 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IDefinitionPackage.VARIABLE__FULL_NAME:
-				return getFullName();
-			case IDefinitionPackage.VARIABLE__CONTENT:
-				return getContent();
-			case IDefinitionPackage.VARIABLE__DESCRIPTION:
-				return getDescription();
-			case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
-				return getEnumProviderID();
+		case IDefinitionPackage.VARIABLE__FULL_NAME:
+			return getFullName();
+		case IDefinitionPackage.VARIABLE__CONTENT:
+			return getContent();
+		case IDefinitionPackage.VARIABLE__DESCRIPTION:
+			return getDescription();
+		case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
+			return getEnumProviderID();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IDefinitionPackage.VARIABLE__FULL_NAME:
-				setFullName((IPath)newValue);
-				return;
-			case IDefinitionPackage.VARIABLE__CONTENT:
-				setContent((String)newValue);
-				return;
-			case IDefinitionPackage.VARIABLE__DESCRIPTION:
-				setDescription((String)newValue);
-				return;
-			case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
-				setEnumProviderID((String)newValue);
-				return;
+		case IDefinitionPackage.VARIABLE__FULL_NAME:
+			setFullName((IPath) newValue);
+			return;
+		case IDefinitionPackage.VARIABLE__CONTENT:
+			setContent((String) newValue);
+			return;
+		case IDefinitionPackage.VARIABLE__DESCRIPTION:
+			setDescription((String) newValue);
+			return;
+		case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
+			setEnumProviderID((String) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.VARIABLE__FULL_NAME:
-				setFullName(FULL_NAME_EDEFAULT);
-				return;
-			case IDefinitionPackage.VARIABLE__CONTENT:
-				setContent(CONTENT_EDEFAULT);
-				return;
-			case IDefinitionPackage.VARIABLE__DESCRIPTION:
-				setDescription(DESCRIPTION_EDEFAULT);
-				return;
-			case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
-				unsetEnumProviderID();
-				return;
+		case IDefinitionPackage.VARIABLE__FULL_NAME:
+			setFullName(FULL_NAME_EDEFAULT);
+			return;
+		case IDefinitionPackage.VARIABLE__CONTENT:
+			setContent(CONTENT_EDEFAULT);
+			return;
+		case IDefinitionPackage.VARIABLE__DESCRIPTION:
+			setDescription(DESCRIPTION_EDEFAULT);
+			return;
+		case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
+			unsetEnumProviderID();
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IDefinitionPackage.VARIABLE__FULL_NAME:
-				return FULL_NAME_EDEFAULT == null ? fullName != null : !FULL_NAME_EDEFAULT.equals(fullName);
-			case IDefinitionPackage.VARIABLE__CONTENT:
-				return CONTENT_EDEFAULT == null ? content != null : !CONTENT_EDEFAULT.equals(content);
-			case IDefinitionPackage.VARIABLE__DESCRIPTION:
-				return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
-			case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
-				return isSetEnumProviderID();
+		case IDefinitionPackage.VARIABLE__FULL_NAME:
+			return FULL_NAME_EDEFAULT == null ? fullName != null : !FULL_NAME_EDEFAULT.equals(fullName);
+		case IDefinitionPackage.VARIABLE__CONTENT:
+			return CONTENT_EDEFAULT == null ? content != null : !CONTENT_EDEFAULT.equals(content);
+		case IDefinitionPackage.VARIABLE__DESCRIPTION:
+			return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
+		case IDefinitionPackage.VARIABLE__ENUM_PROVIDER_ID:
+			return isSetEnumProviderID();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
-			case IDefinitionPackage.VARIABLE___GET_NAME:
-				return getName();
-			case IDefinitionPackage.VARIABLE___GET_PATH:
-				return getPath();
+		case IDefinitionPackage.VARIABLE___GET_NAME:
+			return getName();
+		case IDefinitionPackage.VARIABLE___GET_PATH:
+			return getPath();
 		}
 		return super.eInvoke(operationID, arguments);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (fullName: ");
@@ -369,7 +390,10 @@ public class Variable extends MinimalEObjectImpl.Container implements IVariable 
 		result.append(", description: ");
 		result.append(description);
 		result.append(", enumProviderID: ");
-		if (enumProviderIDESet) result.append(enumProviderID); else result.append("<unset>");
+		if (enumProviderIDESet)
+			result.append(enumProviderID);
+		else
+			result.append("<unset>");
 		result.append(')');
 		return result.toString();
 	}

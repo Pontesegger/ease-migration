@@ -233,7 +233,7 @@ public class VariablesPage extends AbstractEditorPage {
 								final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
 										newFullName);
 
-								command.execute();
+								executeCommand(command);
 								fTreeViewer.update(element, null);
 							}
 						}
@@ -246,7 +246,7 @@ public class VariablesPage extends AbstractEditorPage {
 							final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
 									newFullName);
 
-							command.execute();
+							executeCommand(command);
 							fTreeViewer.refresh();
 						}
 					}
@@ -266,7 +266,7 @@ public class VariablesPage extends AbstractEditorPage {
 							}
 						}
 
-						compoundCommand.execute();
+						executeCommand(compoundCommand);
 						fTreeViewer.refresh();
 					}
 				}
@@ -319,7 +319,7 @@ public class VariablesPage extends AbstractEditorPage {
 					final String newContent = value.toString();
 					if (!oldContent.equals(newContent)) {
 						final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__CONTENT, newContent);
-						command.execute();
+						executeCommand(command);
 
 						fTreeViewer.update(element, null);
 					}
@@ -371,7 +371,7 @@ public class VariablesPage extends AbstractEditorPage {
 					if (!oldDescription.equals(newDescription)) {
 						final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__DESCRIPTION,
 								newDescription);
-						command.execute();
+						executeCommand(command);
 
 						fTreeViewer.update(element, null);
 					}
@@ -492,7 +492,7 @@ public class VariablesPage extends AbstractEditorPage {
 									}
 								}
 
-								compoundCommand.execute();
+								executeCommand(compoundCommand);
 								fTreeViewer.refresh();
 
 							} catch (final Exception e) {
@@ -508,9 +508,7 @@ public class VariablesPage extends AbstractEditorPage {
 						if (target == null)
 							target = Path.ROOT;
 
-						System.out.println(target);
 						if (target instanceof IPath) {
-							System.out.println(target);
 							final CompoundCommand compoundCommand = new CompoundCommand();
 
 							for (final Object element : ((IStructuredSelection) data).toList()) {
@@ -533,7 +531,7 @@ public class VariablesPage extends AbstractEditorPage {
 								}
 							}
 
-							compoundCommand.execute();
+							executeCommand(compoundCommand);
 							fTreeViewer.refresh();
 
 							return true;

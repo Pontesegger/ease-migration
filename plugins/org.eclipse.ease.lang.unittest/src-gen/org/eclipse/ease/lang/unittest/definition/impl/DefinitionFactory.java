@@ -16,30 +16,30 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!-- end-user-doc -->
+ * 
  * @generated
  */
 public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactory {
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static IDefinitionFactory init() {
 		try {
-			IDefinitionFactory theDefinitionFactory = (IDefinitionFactory)EPackage.Registry.INSTANCE.getEFactory(IDefinitionPackage.eNS_URI);
+			IDefinitionFactory theDefinitionFactory = (IDefinitionFactory) EPackage.Registry.INSTANCE.getEFactory(IDefinitionPackage.eNS_URI);
 			if (theDefinitionFactory != null) {
 				return theDefinitionFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new DefinitionFactory();
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DefinitionFactory() {
@@ -48,55 +48,62 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case IDefinitionPackage.TEST_SUITE_DEFINITION: return createTestSuiteDefinition();
-			case IDefinitionPackage.VARIABLE: return createVariable();
-			case IDefinitionPackage.FLAG_TO_STRING_MAP: return (EObject)createFlagToStringMap();
-			case IDefinitionPackage.CODE: return createCode();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case IDefinitionPackage.TEST_SUITE_DEFINITION:
+			return createTestSuiteDefinition();
+		case IDefinitionPackage.VARIABLE:
+			return createVariable();
+		case IDefinitionPackage.FLAG_TO_STRING_MAP:
+			return (EObject) createFlagToStringMap();
+		case IDefinitionPackage.CODE:
+			return createCode();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case IDefinitionPackage.FLAG:
-				return createFlagFromString(eDataType, initialValue);
-			case IDefinitionPackage.PATH:
-				return createPathFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IDefinitionPackage.FLAG:
+			return createFlagFromString(eDataType, initialValue);
+		case IDefinitionPackage.PATH:
+			return createPathFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case IDefinitionPackage.FLAG:
-				return convertFlagToString(eDataType, instanceValue);
-			case IDefinitionPackage.PATH:
-				return convertPathToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IDefinitionPackage.FLAG:
+			return convertFlagToString(eDataType, instanceValue);
+		case IDefinitionPackage.PATH:
+			return convertPathToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ITestSuiteDefinition createTestSuiteDefinition() {
@@ -106,6 +113,7 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -116,6 +124,7 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Flag, String> createFlagToStringMap() {
@@ -125,6 +134,7 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -135,16 +145,19 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Flag createFlagFromString(EDataType eDataType, String initialValue) {
 		Flag result = Flag.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertFlagToString(EDataType eDataType, Object instanceValue) {
@@ -174,15 +187,17 @@ public class DefinitionFactory extends EFactoryImpl implements IDefinitionFactor
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public IDefinitionPackage getDefinitionPackage() {
-		return (IDefinitionPackage)getEPackage();
+		return (IDefinitionPackage) getEPackage();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
