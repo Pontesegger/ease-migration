@@ -41,9 +41,11 @@ import org.eclipse.ease.lang.unittest.runtime.ITestResult;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.runtime.TestStatus;
 import org.eclipse.ease.modules.AbstractScriptModule;
+import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
+import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 
 /**
@@ -56,6 +58,10 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	private ITestClass fCurrentTestClass = null;
 	private ITest fCurrentTest = null;
 	private boolean fThrowOnFailure = false;
+
+	private ITestFile fInjectedTestFile;
+
+	private ITestSuite fInjectedTestSuite;
 
 	/**
 	 * Start a specific unit test. Started tests should be terminated by an {@link #endTest()}.
@@ -74,7 +80,8 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 			if (testFile != null)
 				container = testFile;
 			else
-				throw new RuntimeException("Could not detect current test file. The test framework is broken.");
+				// temporary container to allow to run tests as normal scripts
+				container = IRuntimeFactory.eINSTANCE.createTestFile();
 		}
 
 		fCurrentTest = IRuntimeFactory.eINSTANCE.createTest();
@@ -100,14 +107,71 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	}
 
 	/**
+	 * Get the current test suite.
+	 *
+	 * @return test suite instance
+	 */
+	@WrapToScript
+	public ITestSuite getTestSuite() {
+		if (getTestFile() != null)
+			return getTestFile().getTestSuite();
+
+		Object testSuite = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE);
+
+		if ((!(testSuite instanceof ITestSuite)) && (isPythonEngine())) {
+			getScriptEngine().inject(EnvironmentModule.getWrappedVariableName(this) + ".setTestSuite(__EASE_UnitTest_Suite)");
+			testSuite = fInjectedTestSuite;
+			fInjectedTestSuite = null;
+		}
+
+		return (testSuite instanceof ITestSuite) ? (ITestSuite) testSuite : null;
+	}
+
+	/**
+	 * Only to be called from Py4J engine to link this module to the current testsuite.
+	 *
+	 * @param testSuite
+	 *            testsuite to be set
+	 */
+	public void setTestSuite(ITestSuite testSuite) {
+		fInjectedTestSuite = testSuite;
+	}
+
+	/**
 	 * Get the currently executed test file instance. The test file is not a file instance but the runtime representation of a testsuite test file.
 	 *
 	 * @return test file instance
 	 */
 	@WrapToScript
 	public ITestFile getTestFile() {
-		final Object testFile = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
+		Object testFile = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
+
+		if ((!(testFile instanceof ITestFile)) && (isPythonEngine())) {
+			getScriptEngine().inject(EnvironmentModule.getWrappedVariableName(this) + ".setTestFile(__EASE_UnitTest_File)");
+			testFile = fInjectedTestFile;
+			fInjectedTestFile = null;
+		}
+
 		return (testFile instanceof ITestFile) ? (ITestFile) testFile : null;
+	}
+
+	/**
+	 * Only to be called from Py4J engine to link this module to the current testfile.
+	 *
+	 * @param testFile
+	 *            testfile to be set
+	 */
+	public void setTestFile(ITestFile testFile) {
+		fInjectedTestFile = testFile;
+	}
+
+	private boolean isPythonEngine() {
+		for (final ScriptType scriptType : getScriptEngine().getDescription().getSupportedScriptTypes()) {
+			if ("Python".equals(scriptType.getName()))
+				return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -276,7 +340,11 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	public String getPostExecutionCode(final Method method) {
 		if ("JavaScript".equals(getScriptEngine().getDescription().getSupportedScriptTypes().get(0).getName())) {
 			if (IAssertion.class.isAssignableFrom(method.getReturnType()))
-				return ASSERTION_FUNCION_NAME + "(" + IScriptFunctionModifier.RESULT_NAME + ");\n";
+				return EnvironmentModule.getWrappedVariableName(this) + "." + ASSERTION_FUNCION_NAME + "(" + IScriptFunctionModifier.RESULT_NAME + ");\n";
+
+		} else if ("Python".equals(getScriptEngine().getDescription().getSupportedScriptTypes().get(0).getName())) {
+			if (IAssertion.class.isAssignableFrom(method.getReturnType()))
+				return EnvironmentModule.getWrappedVariableName(this) + "." + ASSERTION_FUNCION_NAME + "(" + IScriptFunctionModifier.RESULT_NAME + ")\n";
 		}
 
 		return "";
@@ -355,7 +423,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 *            stacktrace of failure event
 	 */
 	public void failure(String message, ScriptStackTrace stackTrace) {
-		final ITestSuiteDefinition definition = getTestSuite().getDefinition();
+		final ITestSuiteDefinition definition = (getTestSuite() != null) ? getTestSuite().getDefinition() : null;
 		if ((definition != null) && (definition.getFlag(Flag.PROMOTE_FAILURE_TO_ERROR, false)))
 			error(message, stackTrace);
 		else
@@ -394,20 +462,6 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 		}
 
 		return fCurrentTest;
-	}
-
-	/**
-	 * Get the current test suite.
-	 *
-	 * @return test suite instance
-	 */
-	@WrapToScript
-	public ITestSuite getTestSuite() {
-		if (getTestFile() != null)
-			return getTestFile().getTestSuite();
-
-		final Object testSuite = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE);
-		return (testSuite instanceof ITestSuite) ? (ITestSuite) testSuite : null;
 	}
 
 	/**
@@ -458,7 +512,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public Object executeUserCode(String location) throws Exception {
-		final ITestSuiteDefinition definition = getTestSuite().getDefinition();
+		final ITestSuiteDefinition definition = (getTestSuite() != null) ? getTestSuite().getDefinition() : null;
 		if (definition != null) {
 			final ICode customCode = definition.getCustomCode(location);
 			if (customCode != null)

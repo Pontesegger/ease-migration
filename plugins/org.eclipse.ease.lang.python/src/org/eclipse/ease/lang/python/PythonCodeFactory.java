@@ -164,7 +164,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		body.append(")\n");
 
 		// insert hooked post execution code
-		body.append(getPostExecutionCode(environment, method));
+		body.append(indent(getPostExecutionCode(environment, method), "\t"));
 
 		// insert return statement
 		body.append("\treturn ").append(IScriptFunctionModifier.RESULT_NAME).append('\n');
@@ -183,6 +183,18 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		}
 
 		return pythonCode.toString();
+	}
+
+	/**
+	 * @param postExecutionCode
+	 * @param string
+	 * @return
+	 */
+	private static String indent(String code, String indentation) {
+		if (code.isEmpty())
+			return code;
+
+		return indentation + code.replaceAll("\n", "\n" + indentation).trim() + "\n";
 	}
 
 	@Override
