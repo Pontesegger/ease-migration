@@ -33,6 +33,7 @@ import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -65,6 +66,7 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 	public TestSuiteEditor() {
 		initializeEditingDomain();
+		addChangeListener();
 	}
 
 	private void initializeEditingDomain() {
@@ -80,6 +82,13 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 		// Create the editing domain with a special command stack.
 		fEditingDomain = new AdapterFactoryEditingDomain(fAdapterFactory, commandStack, new HashMap<Resource, Boolean>());
+	}
+
+	private void addChangeListener() {
+		fEditingDomain.getCommandStack().addCommandStackListener(event -> {
+			fDirty = true;
+			firePropertyChange(IEditorPart.PROP_DIRTY);
+		});
 	}
 
 	@Override
