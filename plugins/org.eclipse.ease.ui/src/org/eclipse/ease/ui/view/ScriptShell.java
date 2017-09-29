@@ -14,6 +14,7 @@ package org.eclipse.ease.ui.view;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +22,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.ICodeFactory;
+import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
@@ -31,8 +33,12 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.completion.AbstractCompletionProvider.DescriptorImageResolver;
 import org.eclipse.ease.ui.completion.CodeCompletionAggregator;
 import org.eclipse.ease.ui.completion.CompletionLabelProvider;
+import org.eclipse.ease.ui.completion.ICompletionProvider;
+import org.eclipse.ease.ui.completion.IImageResolver;
+import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.ease.ui.dnd.ShellDropTarget;
 import org.eclipse.ease.ui.help.hovers.ContentProposalModifier;
@@ -128,6 +134,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private Collection<IShellDropin> fDropins = Collections.emptySet();
 
+	private String[] fHistory;
+
 	/**
 	 * Default constructor.
 	 */
@@ -219,6 +227,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 					fInputCombo.add(node.getTextData());
 			}
 		}
+		fHistory = fInputCombo.getItems().clone();
 
 		addAutoCompletion();
 
@@ -270,6 +279,28 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 	}
 
 	private void addAutoCompletion() {
+		fCompletionDispatcher.addCompletionProvider(new ICompletionProvider() {
+
+			IImageResolver fImageResolver = new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/history.png"));
+
+			@Override
+			public boolean isActive(ICompletionContext context) {
+				return true;
+			}
+
+			@Override
+			public Collection<? extends ScriptCompletionProposal> getProposals(ICompletionContext context) {
+				final Collection<ScriptCompletionProposal> proposals = new HashSet<>();
+
+				for (final String history : fHistory) {
+					if (history.startsWith(context.getOriginalCode()))
+						proposals.add(new ScriptCompletionProposal(context, history, history, fImageResolver, ScriptCompletionProposal.ORDER_HISTORY, null));
+				}
+
+				return proposals;
+			}
+		});
+
 		fContentAssistAdapter = new ContentProposalModifier(fInputCombo, new ComboContentAdapter(), fCompletionDispatcher, KeyStroke.getInstance(SWT.CTRL, ' '),
 				fCompletionDispatcher.getActivationChars());
 
@@ -323,6 +354,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 				fInputCombo.remove(fInputCombo.getItemCount() - 1);
 
 			fInputCombo.add(input, 0);
+
+			fHistory = fInputCombo.getItems().clone();
 		});
 	}
 

@@ -11,10 +11,9 @@
 
 package org.eclipse.ease.ui.completion;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 	 * @return list of all matching {@link ICompletionProvider}s.
 	 */
 	private static Collection<ICompletionProvider> getProviders(final String scriptType) {
-		final Collection<ICompletionProvider> providers = new ArrayList<>();
+		final Collection<ICompletionProvider> providers = new HashSet<>();
 
 		final IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPLETION_PROCESSOR);
 		for (final IConfigurationElement element : elements) {
@@ -109,6 +108,9 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 
 	/** All registered {@link ICompletionProvider}s. */
 	private Collection<ICompletionProvider> fCompletionProviders = Collections.emptySet();
+
+	/** Manually added {@link ICompletionProvider}s. */
+	private final Collection<ICompletionProvider> fAddedCompletionProviders = new HashSet<>();
 
 	/** Registered script engine. */
 	private IScriptEngine fScriptEngine;
@@ -147,6 +149,11 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 	public void setScriptType(final ScriptType scriptType) {
 		setCodeParser(scriptType.getCodeParser());
 		fCompletionProviders = getProviders(scriptType.getName());
+		fCompletionProviders.addAll(fAddedCompletionProviders);
+	}
+
+	public void addCompletionProvider(ICompletionProvider completionProvider) {
+		fAddedCompletionProviders.add(completionProvider);
 	}
 
 	/**
@@ -186,7 +193,7 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 								if (provider.isActive(context))
 									proposals.addAll(provider.getProposals(context));
 
-							} catch (final Exception ex) {
+							} catch (final Throwable ex) {
 								Logger.error(Activator.PLUGIN_ID, "Could not get proposals from ICompletionProvider <" + provider.getClass().getName() + ">",
 										ex);
 							}
@@ -210,18 +217,11 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 				completionProcessorJob.wait(COMPLETION_TIMEOUT);
 			} catch (final InterruptedException e) {
 			}
-
-			return new ArrayList<>(proposals);
 		}
+
+		return proposals;
 	}
 
-	/**
-	 * @param resource
-	 * @param relevantText
-	 * @param selectionRange
-	 * @param insertOffset
-	 * @return
-	 */
 	private ICompletionContext createContext(final Object resource, final String relevantText, final int insertOffset, final int selectionRange) {
 		if (fCodeParser != null)
 			return fCodeParser.getContext(fScriptEngine, resource, relevantText, insertOffset, selectionRange);
@@ -232,15 +232,11 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 	@Override
 	public IContentProposal[] getProposals(final String contents, final int position) {
 		final List<ICompletionProposal> proposals = getCompletionProposals(null, contents, position, 0, null);
-		Collections.sort(proposals, new Comparator<ICompletionProposal>() {
+		Collections.sort(proposals, (o1, o2) -> {
+			if ((o1 instanceof ScriptCompletionProposal) && (o1 instanceof ScriptCompletionProposal))
+				return ((ScriptCompletionProposal) o1).compareTo((ScriptCompletionProposal) o2);
 
-			@Override
-			public int compare(final ICompletionProposal o1, final ICompletionProposal o2) {
-				if ((o1 instanceof ScriptCompletionProposal) && (o1 instanceof ScriptCompletionProposal))
-					return ((ScriptCompletionProposal) o1).compareTo((ScriptCompletionProposal) o2);
-
-				return o1.getDisplayString().compareTo(o2.getDisplayString());
-			}
+			return o1.getDisplayString().compareTo(o2.getDisplayString());
 		});
 
 		return proposals.toArray(new IContentProposal[proposals.size()]);

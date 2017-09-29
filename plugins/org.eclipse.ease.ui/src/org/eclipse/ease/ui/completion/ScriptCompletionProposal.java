@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.Point;
 public class ScriptCompletionProposal
 		implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6, IContentProposal, Comparable<ScriptCompletionProposal> {
 
+	public static final int ORDER_HISTORY = 0;
 	public static final int ORDER_FIELD = 20;
 	public static final int ORDER_METHOD = 40;
 	public static final int ORDER_PACKAGE = 60;
