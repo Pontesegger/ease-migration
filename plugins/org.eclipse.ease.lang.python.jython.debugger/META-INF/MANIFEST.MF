@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jython Debugger Support
 Bundle-SymbolicName: org.eclipse.ease.lang.python.jython.debugger;singleton:=true
-Bundle-Version: 0.5.0.qualifier
+Bundle-Version: 0.6.0.qualifier
 Bundle-Vendor: Eclipse.org
 Require-Bundle: org.eclipse.debug.core;bundle-version="[3.7.1,4.0.0)",
  org.jython;bundle-version="[2.5.3,3.0.0)",
