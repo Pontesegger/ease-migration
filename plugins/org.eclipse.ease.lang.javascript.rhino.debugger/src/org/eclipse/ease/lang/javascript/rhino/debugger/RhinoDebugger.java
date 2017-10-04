@@ -89,7 +89,9 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 				if (title == null)
 					title = "";
 
-				return title + ":" + fFunctionName + "()";
+				final String function = (fFunctionName != null) ? (":" + fFunctionName + "()") : "";
+
+				return title + function;
 
 			} else {
 				String title = getScript().getTitle();

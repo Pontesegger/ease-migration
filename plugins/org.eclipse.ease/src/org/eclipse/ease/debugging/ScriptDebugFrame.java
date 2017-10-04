@@ -15,7 +15,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +29,21 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 	private final Script fScript;
 	private int fLineNumber;
 	private final int fType;
+	private final String fName;
 
-	public ScriptDebugFrame(final Script script, final int lineNumber, final int type) {
+	public ScriptDebugFrame(final Script script, final int lineNumber, final int type, final String name) {
 		fScript = script;
 		fLineNumber = lineNumber;
 		fType = type;
+		fName = name;
+	}
+
+	public ScriptDebugFrame(final Script script, final int lineNumber, final int type) {
+		this(script, lineNumber, type, null);
 	}
 
 	public ScriptDebugFrame(final IScriptDebugFrame frame) {
-		this(frame.getScript(), frame.getLineNumber(), frame.getType());
+		this(frame.getScript(), frame.getLineNumber(), frame.getType(), frame.getName());
 	}
 
 	@Override
@@ -58,7 +63,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 	@Override
 	public String getName() {
-		return getScript().getTitle();
+		return (fName != null) ? fName : getScript().getTitle();
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 	@Override
 	public Map<String, Object> getVariables(final Object parent) {
-		Map<String, Object> variables = new LinkedHashMap<String, Object>();
+		final Map<String, Object> variables = new LinkedHashMap<>();
 
 		if ((parent != null) && (!ScriptDebugValue.isSimpleType(parent))) {
 			if (parent.getClass().isArray()) {
@@ -113,7 +118,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 			} else {
 				// handle java objects
-				for (Field field : getFields(parent.getClass())) {
+				for (final Field field : getFields(parent.getClass())) {
 					try {
 						if (!Modifier.isStatic(field.getModifiers())) {
 							if (!field.isAccessible())
@@ -121,7 +126,7 @@ public class ScriptDebugFrame implements IScriptDebugFrame {
 
 							variables.put(field.getName(), field.get(parent));
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 					}
 				}
 			}
