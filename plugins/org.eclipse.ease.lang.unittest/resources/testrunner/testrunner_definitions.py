@@ -12,3 +12,5 @@ class timeout(object):
             fn(*args, **kwargs)
             
         return decorated
+
+__name__ = "__ease_unittest__"   

@@ -126,9 +126,9 @@ class EASETestRunner(object):
         infos = []
         return result
 
-if __name__ == "__main__":
+if __name__ == "__ease_unittest__":
     # Dynamically create test suite to combine test cases
-    tests = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])
+    tests = unittest.TestLoader().loadTestsFromModule(sys.modules["__main__"])
     testSuite = unittest.TestSuite(tests)
     
     runner = EASETestRunner()

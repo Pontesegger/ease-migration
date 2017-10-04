@@ -206,6 +206,24 @@ public class TestFile extends TestContainer implements ITestFile {
 
 				// classic test execution
 				if (!hasError()) {
+
+					// load service directly to allow to work in headless mode
+					final IScriptService scriptService = ScriptService.getInstance();
+					final ScriptType scriptType = scriptService.getScriptType(getResource().toString());
+
+					if (scriptType.getName().equals("Python")) {
+						// load the unittest runner prefix
+						try {
+							final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner_definitions.py");
+							final ScriptResult executionResult = fScriptEngine.executeSync(url);
+							if (executionResult.hasException())
+								getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
+
+						} catch (final MalformedURLException e) {
+							getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
+						}
+					}
+
 					ScriptResult executionResult = fScriptEngine.executeSync(getResource());
 
 					if (executionResult.hasException()) {
@@ -237,10 +255,6 @@ public class TestFile extends TestContainer implements ITestFile {
 
 					// now check if there were any tests included. If not use testrunner to launch tests
 					if (getChildren().isEmpty()) {
-
-						// load service directly to allow to work in headless mode
-						final IScriptService scriptService = ScriptService.getInstance();
-						final ScriptType scriptType = scriptService.getScriptType(getResource().toString());
 
 						// TODO check if we can have a smarter binding than a string constant
 						if (scriptType.getName().equals("JavaScript")) {
