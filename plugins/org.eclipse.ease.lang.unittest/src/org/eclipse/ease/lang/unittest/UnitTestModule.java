@@ -441,7 +441,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 		else if (getScriptEngine() instanceof IDebugEngine)
 			result.setStackTrace(((IDebugEngine) getScriptEngine()).getStackTrace());
 
-		getCurrentTest().getResults().add(result);
+		getTest().getResults().add(result);
 	}
 
 	/**
@@ -450,7 +450,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 * @return the current test or a generic global test scope if called outside of a valid testcase
 	 */
 	@WrapToScript
-	public ITest getCurrentTest() {
+	public ITest getTest() {
 		if (fCurrentTest == null) {
 			if (getTestFile() != null)
 				return getTestFile().getTest(ITestEntity.GLOBAL_SCOPE_TEST);
@@ -498,7 +498,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	@WrapToScript
 	public void setTestTimeout(long timeout) {
 		if (fCurrentTest != null)
-			getCurrentTest().setDurationLimit(timeout);
+			getTest().setDurationLimit(timeout);
 	}
 
 	/**
