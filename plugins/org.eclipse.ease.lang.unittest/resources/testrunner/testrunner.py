@@ -50,7 +50,7 @@ class EASETestResult(unittest.result.TestResult):
             print("could not set stacktrace")
             pass
        
-        self.getUnitTestModule().getCurrentTest().getResults().add(result);       
+        self.getUnitTestModule().getTest().getResults().add(result);       
     
     def addSkip(self, test, reason):
         super(EASETestResult, self).addSkip(test, reason)
@@ -125,7 +125,7 @@ class EASETestRunner(object):
 
         infos = []
         return result
-   
+
 if __name__ == "__main__":
     # Dynamically create test suite to combine test cases
     tests = unittest.TestLoader().loadTestsFromModule(sys.modules[__name__])

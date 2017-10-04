@@ -59,7 +59,7 @@ var __EASE_UnitTest_TestRunner = {
 						var stackTrace = new org.eclipse.ease.debugging.ScriptStackTrace();
 						stackTrace.add(debugFrame);
 
-						this.getUnitTestModule().getCurrentTest().setStackTrace(stackTrace);
+						this.getUnitTestModule().getTest().setStackTrace(stackTrace);
 
 					} catch (e) {
 						// we could not set the stacktrace for the unit test start location, ignore
@@ -88,7 +88,7 @@ var __EASE_UnitTest_TestRunner = {
 								if (expectedException != null) {
 									this.getUnitTestModule().failure(
 											"Expected exception not thrown: " + expectedException,
-											this.getUnitTestModule().getCurrentTest().getStackTrace());
+											this.getUnitTestModule().getTest().getStackTrace());
 								}
 
 							} catch (e) {
