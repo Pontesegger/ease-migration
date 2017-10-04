@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
@@ -33,6 +35,9 @@ import org.mozilla.javascript.debug.Debugger;
 
 public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 
+	private static final Pattern PROTOTYPE_PATTERN = Pattern.compile("^(.*)\\.prototype\\.(.*)\\s*=\\s*function\\(.*$");
+	private static final Pattern PROPERTY_PATTERN = Pattern.compile("^\\s*(.*)\\s:\\sfunction\\(.*$");
+
 	public class RhinoDebugFrame extends ScriptDebugFrame implements DebugFrame, IScriptDebugFrame {
 
 		private final String fFunctionName;
@@ -41,7 +46,55 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 
 		public RhinoDebugFrame(final DebuggableScript fnOrScript) {
 			super(RhinoDebugger.this.getScript(fnOrScript), 0, fnOrScript.isFunction() ? TYPE_FUNCTION : TYPE_FILE);
-			fFunctionName = fnOrScript.getFunctionName();
+			fFunctionName = getFunctionName(fnOrScript);
+		}
+
+		private String getFunctionName(DebuggableScript fnOrScript) {
+			final String candidate = fnOrScript.getFunctionName();
+
+			if (candidate == null) {
+				// try to extract from source
+				final int[] lineNumbers = fnOrScript.getLineNumbers();
+				if (lineNumbers.length > 0) {
+					final int headerLineNumber = getFirstLineNumber(lineNumbers);
+					try {
+						final String definitionLine = getLineOfCode(getScript().getCode(), headerLineNumber);
+
+						if (definitionLine != null) {
+							Matcher matcher = PROTOTYPE_PATTERN.matcher(definitionLine);
+							if (matcher.matches())
+								return matcher.group(1).trim() + ":" + matcher.group(2).trim();
+
+							matcher = PROPERTY_PATTERN.matcher(definitionLine);
+							if (matcher.matches())
+								return matcher.group(1).trim();
+						}
+					} catch (final Exception e) {
+						// could not fetch source code, gracefully fail
+					}
+				}
+			}
+
+			return candidate;
+		}
+
+		private String getLineOfCode(String code, int lineNumber) {
+			final String[] lines = code.split("\n");
+
+			if (lines.length >= lineNumber)
+				return lines[lineNumber - 1];
+
+			return null;
+		}
+
+		private int getFirstLineNumber(int[] lineNumbers) {
+			int firstLine = lineNumbers[0];
+			for (final int lineNumber : lineNumbers) {
+				if (lineNumber < firstLine)
+					firstLine = lineNumber;
+			}
+
+			return firstLine;
 		}
 
 		@Override
