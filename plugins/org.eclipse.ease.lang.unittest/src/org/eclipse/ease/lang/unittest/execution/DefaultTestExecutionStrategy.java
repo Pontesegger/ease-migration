@@ -21,6 +21,7 @@ import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
+import org.eclipse.ease.lang.unittest.runtime.impl.TestFile;
 
 public class DefaultTestExecutionStrategy implements ITestExecutionStrategy {
 
@@ -73,6 +74,31 @@ public class DefaultTestExecutionStrategy implements ITestExecutionStrategy {
 
 	@Override
 	public IScriptEngine createScriptEngine(ITestSuite testSuite, Object resource) {
+		if (resource == null) {
+			// no resource provided, try to find out if all tests are using the same filetype
+			final Collection<String> extensions = new HashSet<>();
+
+			for (final ITestEntity testEntity : fActiveEntities) {
+				if (testEntity instanceof TestFile)
+					extensions.add(getFileExtension(testEntity.getResource()));
+			}
+
+			extensions.remove("");
+			if (extensions.size() == 1)
+				resource = "foo." + extensions.iterator().next();
+		}
+
 		return fEngine.createScriptEngine(testSuite, resource);
+	}
+
+	private static String getFileExtension(Object resource) {
+		if (resource != null) {
+			final String resourceString = resource.toString();
+			final int lastDot = resourceString.lastIndexOf('.');
+			if (lastDot > 0)
+				return resourceString.substring(lastDot + 1);
+		}
+
+		return "";
 	}
 }

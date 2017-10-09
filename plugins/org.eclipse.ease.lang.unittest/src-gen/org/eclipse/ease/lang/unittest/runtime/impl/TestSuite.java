@@ -356,7 +356,8 @@ public class TestSuite extends TestContainer implements ITestSuite {
 						return;
 					}
 				} else {
-					getTest("[" + codeLocation + "]").addError("Could not create setup/teardown engine", null);
+					getTest("[" + codeLocation + "]").addError(
+							"Could not create setup/teardown engine. Please select an appropriate engine on the Overview tab of the *.suite file.", null);
 					return;
 				}
 			}
