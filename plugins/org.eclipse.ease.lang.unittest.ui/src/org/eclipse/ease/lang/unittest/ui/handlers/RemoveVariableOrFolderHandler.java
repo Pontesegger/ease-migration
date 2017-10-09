@@ -55,7 +55,7 @@ public class RemoveVariableOrFolderHandler extends AbstractHandler implements IH
 					}
 				}
 
-				compoundCommand.execute();
+				((TestSuiteEditor) editorWindow).executeCommand(compoundCommand);
 			}
 		}
 

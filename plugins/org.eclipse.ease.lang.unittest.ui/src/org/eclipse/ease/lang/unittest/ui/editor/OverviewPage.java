@@ -301,13 +301,13 @@ public class OverviewPage extends AbstractEditorPage {
 				newentry);
 		compoundCommand.append(addCommand);
 
-		executeCommand(compoundCommand);
+		getEditor().executeCommand(compoundCommand);
 	}
 
 	protected void updateDescription(String content) {
 		final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DESCRIPTION,
 				content);
-		executeCommand(command);
+		getEditor().executeCommand(command);
 	}
 
 	@Override

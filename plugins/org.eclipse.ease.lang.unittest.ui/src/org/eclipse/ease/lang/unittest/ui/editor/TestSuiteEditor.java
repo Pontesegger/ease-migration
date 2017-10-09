@@ -24,6 +24,7 @@ import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.provider.DefinitionItemProviderAdapterFactory;
 import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.emf.common.command.BasicCommandStack;
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.IEditingDomainProvider;
@@ -204,5 +205,9 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 	public LocalResourceManager getResourceManager() {
 		return fResourceManager;
+	}
+
+	public void executeCommand(Command command) {
+		getEditingDomain().getCommandStack().execute(command);
 	}
 }

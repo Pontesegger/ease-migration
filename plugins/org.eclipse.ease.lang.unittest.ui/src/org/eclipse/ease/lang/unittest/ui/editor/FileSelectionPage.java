@@ -300,7 +300,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 				if (!fTxtIncludeFilters.getText().equals(fInitialContent)) {
 					final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(),
 							IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__INCLUDE_FILTER, fTxtIncludeFilters.getText());
-					executeCommand(command);
+					getEditor().executeCommand(command);
 
 					updateTestFiles();
 				}
@@ -321,7 +321,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 				if (!fTxtExcludeFilters.getText().equals(fInitialContent)) {
 					final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(),
 							IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__EXCLUDE_FILTER, fTxtExcludeFilters.getText());
-					executeCommand(command);
+					getEditor().executeCommand(command);
 
 					updateTestFiles();
 				}
@@ -335,7 +335,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 
 				populateModelUpdateForUncheckedTests(element, event.getChecked(), compoundCommand);
 
-				executeCommand(compoundCommand);
+				getEditor().executeCommand(compoundCommand);
 			}
 		});
 	}

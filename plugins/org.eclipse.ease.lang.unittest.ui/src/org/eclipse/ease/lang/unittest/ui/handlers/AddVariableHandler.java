@@ -76,7 +76,8 @@ public class AddVariableHandler extends AbstractHandler implements IHandler {
 
 					final Command command = AddCommand.create(((TestSuiteEditor) editorWindow).getEditingDomain(),
 							((TestSuiteEditor) editorWindow).getTestSuite(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__VARIABLES, variable);
-					command.execute();
+
+					((TestSuiteEditor) editorWindow).executeCommand(command);
 				}
 			}
 		}
