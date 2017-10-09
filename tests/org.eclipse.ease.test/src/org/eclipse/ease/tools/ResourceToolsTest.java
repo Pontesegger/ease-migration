@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -602,5 +603,30 @@ public class ResourceToolsTest {
 		assertFalse(fProject.getFolder(folderName).exists());
 		ResourceTools.createFolder(fProject.getFolder(folderName));
 		assertTrue(fProject.getFolder(folderName).exists());
+	}
+
+	@Test
+	public void resolveScriptLocation() throws MalformedURLException {
+		assertEquals(new URL("script://SimpleScript.js"), ResourceTools.resolve("script://SimpleScript.js"));
+	}
+
+	@Test
+	public void resolveScriptLocationWithSpacesInDomain() throws MalformedURLException {
+		assertEquals(new URL("script://Simple Script.js"), ResourceTools.resolve("script://Simple Script.js"));
+	}
+
+	@Test
+	public void resolveScriptLocationWithSpacesInPath() throws MalformedURLException {
+		assertEquals(new URL("script://domain/Simple Script.js"), ResourceTools.resolve("script://domain/Simple Script.js"));
+	}
+
+	@Test
+	public void resolveScriptLocationWithSpecialCharactersInDomain() throws MalformedURLException {
+		assertEquals(new URL("script://Simple_Script.js"), ResourceTools.resolve("script://Simple_Script.js"));
+	}
+
+	@Test
+	public void resolveScriptLocationWithSpecialCharactersInPath() throws MalformedURLException {
+		assertEquals(new URL("script://domain/Simple_Script.js"), ResourceTools.resolve("script://domain/Simple_Script.js"));
 	}
 }

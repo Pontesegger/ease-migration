@@ -102,6 +102,8 @@ public final class ResourceTools {
 	private static final String FILE_SCHEME = "file";
 	private static final String FILE_PREFIX = FILE_SCHEME + "://";
 
+	private static final String SCRIPT_SCHEME = "script";
+
 	private static final Pattern WINDOWS_LOCAL_FILE_PATTERN = Pattern.compile("(?:file:///?)?([A-Z]:[/\\\\].*)");
 	private static final Pattern WINDOWS_NETWORK_FILE_PATTERN = Pattern.compile("(?:file\\:)?((?://|\\\\\\\\)[^:/][^:]*)");
 
@@ -350,6 +352,15 @@ public final class ResourceTools {
 						return new File(locationStr);
 				}
 
+			} else if (locationStr.startsWith(SCRIPT_SCHEME)) {
+				// script scheme needs to resolve to URLs to be usable
+				try {
+					return new URL(locationStr);
+				} catch (final MalformedURLException e1) {
+					// TODO handle this exception (but for now, at least know it happened)
+					throw new RuntimeException(e1);
+				}
+
 			} else if (locationStr.contains("://")) {
 				// simple check for URI schemes
 				try {
@@ -471,7 +482,7 @@ public final class ResourceTools {
 
 	/**
 	 * Create a relative path from one resource to another.
-	 * 
+	 *
 	 * @param resource
 	 *            resource to create a relative path for
 	 * @param parent
