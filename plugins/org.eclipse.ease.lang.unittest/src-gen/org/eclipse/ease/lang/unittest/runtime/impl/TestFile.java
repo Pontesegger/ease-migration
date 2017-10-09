@@ -5,12 +5,14 @@ package org.eclipse.ease.lang.unittest.runtime.impl;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.lang.unittest.TestSuiteScriptEngine;
+import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ICode;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
@@ -361,6 +363,10 @@ public class TestFile extends TestContainer implements ITestFile {
 	 */
 	@Override
 	public void reset() {
+		final Object resource = getResource();
+		if (resource instanceof IFile)
+			UnitTestHelper.removeErrorMarkers((IFile) resource);
+
 		// remove single tests
 		for (final Object child : getChildren().toArray()) {
 			if (child instanceof ITestClass)
@@ -369,7 +375,7 @@ public class TestFile extends TestContainer implements ITestFile {
 
 		super.reset();
 
-		// disable if set in test suite (needs to be done after super.reset() as wew change the status here)
+		// disable if set in test suite (needs to be done after super.reset() as we change the status here)
 		final ITestSuite testSuite = getTestSuite();
 		if (testSuite != null) {
 			final ITestSuiteDefinition definition = getTestSuite().getDefinition();
