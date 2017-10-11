@@ -98,20 +98,20 @@ public class VariablesPage extends AbstractEditorPage {
 			}
 
 			for (final IPath additionalPath : fAdditionalPaths)
-				registerPath(additionalPath.makeAbsolute());
+				registerPath(additionalPath);
 		}
 
 		public void addPath(IPath path) {
-			fAdditionalPaths.add(path);
+			fAdditionalPaths.add(path.makeAbsolute());
 			registerPath(path);
 		}
 
 		public void removePath(IPath path) {
-			fAdditionalPaths.remove(path);
+			fAdditionalPaths.remove(path.makeAbsolute());
 		}
 
 		public boolean containsPath(IPath path) {
-			return fAdditionalPaths.contains(path);
+			return fAdditionalPaths.contains(path.makeAbsolute());
 		}
 	}
 
@@ -252,21 +252,26 @@ public class VariablesPage extends AbstractEditorPage {
 					}
 
 				} else if (element instanceof IPath) {
-					final IPath newPath = new Path(value.toString());
+					final IPath newPath = ((IPath) element).removeLastSegments(1).append(value.toString()).makeAbsolute();
 					if (!element.equals(newPath)) {
-						final IPath replacement = newPath.isAbsolute() ? newPath : ((IPath) element).removeLastSegments(1).append(newPath);
 
 						final CompoundCommand compoundCommand = new CompoundCommand();
 						for (final IVariable variable : getTestSuitDefinition().getVariables()) {
 							if (((IPath) element).isPrefixOf(variable.getFullName())) {
-								final IPath updatedName = replacement.append(variable.getFullName().removeFirstSegments(((IPath) element).segmentCount()));
+								final IPath updatedName = newPath.append(variable.getFullName().removeFirstSegments(((IPath) element).segmentCount()));
 								final Command command = SetCommand.create(getEditingDomain(), variable, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
 										updatedName);
 								compoundCommand.append(command);
 							}
 						}
 
-						getEditor().executeCommand(compoundCommand);
+						if (!compoundCommand.isEmpty())
+							getEditor().executeCommand(compoundCommand);
+
+						// deal with pure virtual paths
+						removePath((IPath) element);
+						addPath(newPath);
+
 						fTreeViewer.refresh();
 					}
 				}
