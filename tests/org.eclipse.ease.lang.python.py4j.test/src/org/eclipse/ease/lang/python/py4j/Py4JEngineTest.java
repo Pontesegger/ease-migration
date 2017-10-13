@@ -24,17 +24,22 @@ public class Py4JEngineTest extends Py4JEngineTestBase {
 		push("def a(i):", true);
 		push(" return i + 1", true);
 		push("", false);
+
 		// define b function script mode
 		assertResultIsNone(executeCode("def b(i):\n\treturn i + 2", false));
 
 		// try to use each function from the other mode
-		assertEquals("11", printExpression("a(10)"));
-		assertEquals("12", printExpression("b(10)"));
+		final ScriptResult resultScript_a = executeCode("a(20)", false);
+		assertNull(resultScript_a.getException());
+		assertEquals(21, resultScript_a.getResult());
+		final ScriptResult resultScript_b = executeCode("b(10)", false);
+		assertNull(resultScript_b.getException());
+		assertEquals(12, resultScript_b.getResult());
 
-		ScriptResult result21 = executeCode("a(20)", true);
+		final ScriptResult result21 = executeCode("a(20)", true);
 		assertNull(result21.getException());
 		assertEquals(21, result21.getResult());
-		ScriptResult result22 = executeCode("b(20)", true);
+		final ScriptResult result22 = executeCode("b(20)", true);
 		assertNull(result22.getException());
 		assertEquals(22, result22.getResult());
 	}

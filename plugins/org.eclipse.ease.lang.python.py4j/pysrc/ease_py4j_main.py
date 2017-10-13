@@ -1,4 +1,4 @@
-#################################################################################
+###############################################################################
 # Copyright (c) 2016 Kichwa Coders and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v1.0
@@ -7,18 +7,31 @@
 #
 # Contributors:
 #     Jonah Graham (Kichwa Coders) - initial API and implementation
-#################################################################################
+###############################################################################
 
 import code
 import os
 import py4j
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
-from py4j.java_collections import MapConverter
-from py4j.java_gateway import JavaObject
+from py4j.java_collections import MapConverter, ListConverter, SetConverter
+from py4j.java_gateway import JavaObject, JavaClass
 from py4j.protocol import Py4JJavaError, get_command_part
 import sys
 import threading
 import __main__
+import ast
+try:
+    from six import integer_types
+    from six import string_types
+except ImportError:
+    import sys
+    if sys.version_info.major == 2:
+        integer_types = (int, long)
+        string_types = (basestring, )
+    else:
+        integer_types = (int,)
+        string_types = (str,)
+
 
 # To ease some debugging of the py4j engine itself it is useful to turn logging on,
 # uncomment the following lines for one way to do that
@@ -26,6 +39,73 @@ import __main__
 # logger = logging.getLogger("py4j")
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
+def convert_value(value, gw):
+    '''
+    Tries to convert the given value using different strategies.
+
+    Used because default py4j converters have some issues with e.g.
+    nested collections.
+
+    :param value:    Value to be converted.
+    :param gw:       py4j gateway necessary for converters.
+    '''
+    # None will be mapped to Java null
+    if value is None:
+        return value
+
+    # Integers can be send directly
+    if isinstance(value, integer_types):
+        return value
+
+    # Strings can be send directly
+    if isinstance(value, string_types):
+        return value
+
+    # Recursively check collections
+    if isinstance(value, dict):
+        return MapConverter().convert({
+            convert_value(k, gw): convert_value(v, gw)
+            for k, v in value.items()
+        }, gw)
+    if isinstance(value, list):
+        return ListConverter().convert([
+            convert_value(v, gw) for v in value
+        ], gw)
+    if isinstance(value, set):
+        return SetConverter().convert({
+            convert_value(v, gw) for v in value
+        }, gw)
+
+    # Try registered converters
+    for converter in gw.converters:
+        if converter.can_convert(value):
+            try:
+                return converter.convert(value, gw)
+            except Exception:
+                # TODO: Actually find out what this might throw
+                pass
+
+    # Issues with marshalling Java class objects
+    if isinstance(value, JavaClass):
+        return repr(value)
+
+    # Check if we have a Java object
+    if isinstance(value, py4j.java_gateway.JavaObject):
+        return value
+
+    # Check if we implement a Java interface
+    if hasattr(value, 'Java') and hasattr(getattr(value, 'Java'), 'implements'):
+        if hasattr(value, '_get_obj_id'):
+            if callable(value._get_obj_id):
+                return value
+        else:
+            # Issue with invalid implementations
+            if hasattr(value, 'toString'):
+                return value
+
+    # Last resort use string representation
+    return repr(value)
+
 
 class EaseInteractiveConsole(code.InteractiveConsole):
     '''
@@ -35,15 +115,42 @@ class EaseInteractiveConsole(code.InteractiveConsole):
     def __init__(self, engine, *args, **kwargs):
         code.InteractiveConsole.__init__(self, *args, **kwargs)
         self.engine = engine
+
     def write(self, data):
         # Python 3 write the whole error in one write, Python 2 does multiple writes
         if self.engine.except_data is None:
             self.engine.except_data = [data]
         else:
             self.engine.except_data.append(data)
+
     def runcode(self, code):
         try:
-            exec(code, self.locals)
+            # If we have compiled code we cannot use AST
+            if isinstance(code, string_types):
+                # Parse code input
+                tree = ast.parse(code)
+
+                # Check if we have multiline statement
+                if len(tree.body) > 1:
+                    module = ast.Module(tree.body[:-1])
+                    compiled = compile(module, '<...>', 'exec')
+                    exec(compiled, self.locals)
+
+                # Check if at least one line given
+                if len(tree.body):
+                    if isinstance(tree.body[-1], ast.Expr):
+                        # Only expressions can be evaluated
+                        expression = ast.Expression(tree.body[-1].value)
+                        compiled = compile(expression, '<...>', 'eval')
+                        result = eval(compiled, self.locals)
+                        return result, False
+                    else:
+                        module = ast.Module([tree.body[-1]])
+                        compiled = compile(module, '<...>', 'exec')
+                        exec(compiled, self.locals)
+            else:
+                exec(code, self.locals)
+
         except SystemExit:
             raise
         except Py4JJavaError as e:
@@ -54,51 +161,47 @@ class EaseInteractiveConsole(code.InteractiveConsole):
             else:
                 # No java exception here, fallback to normal case
                 self.showtraceback()
-        except:
+        except Exception:
             # create information that will end up in a
             # ScriptExecutionException
             self.showtraceback()
 
+
+# Sentinel object for no result (different than None)
+NO_RESULT = object()
 class InteractiveReturn(object):
     '''
     Instance of Java's IInteractiveReturn.
     This class encapsulates the return state from the
     ScriptEngineExecute.executeInteractive() method
     '''
-    def __init__(self, gateway_client, display_data=None, except_data=None):
+    def __init__(self, gateway_client, display_data=None, except_data=None, result=NO_RESULT):
         self.gateway_client = gateway_client
         self.display_data = display_data
         self.except_data = except_data
+        self.result = result
+
     def getException(self):
         data = self.except_data
         if data is None:
             return None
         if isinstance(data, JavaObject):
-            return data;
-        return "".join(data)
-    def getResult(self):
-        data = self.display_data
-
-        try:
-            # test if py4j understands this type
-            get_command_part(data, dict())
-            # py4j knows how to convert this to Java,
-            # just return it as is
             return data
-        except:
-            pass
+        return "".join(data)
 
-        # try registered converters
-        for converter in self.gateway_client.converters:
-            if converter.can_convert(data):
-                return converter.convert(data, self.gateway_client)
+    def getResult(self):
+        # Check if we did not receive result
+        if self.result is NO_RESULT:
+            data = self.display_data
+        else:
+            data = self.result
 
-        # data cannot be represented in Java, return a string representation
-        # instead
-        return repr(data)
+        # Use conversion just to be sure
+        return convert_value(data, self.gateway_client)
 
     class Java:
         implements = ['org.eclipse.ease.lang.python.py4j.internal.IInteractiveReturn']
+
 
 class ScriptEngineExecute(object):
     '''
@@ -135,7 +238,16 @@ class ScriptEngineExecute(object):
     def executeCommon(self, code_text, code_exec):
         self.display_data = None
         self.except_data = None
-        needMore = code_exec(code_text)
+        execution_result = code_exec(code_text)
+
+        # Check if we received a tuple, meaning that we are in script mode 
+        if isinstance(execution_result, tuple) and len(execution_result) == 2:
+            result, needMore = execution_result
+        else:
+            # Set result to NO_RESULT to distinguish from None result
+            result = NO_RESULT
+            needMore = execution_result
+
         if needMore:
             # TODO, need to handle this with prompts, this message
             # is a workaround
@@ -145,7 +257,7 @@ class ScriptEngineExecute(object):
             except_data = self.except_data
             self.display_data = None
             self.except_data = None
-            return InteractiveReturn(self.gateway._gateway_client, display_data=display_data, except_data=except_data)
+            return InteractiveReturn(self.gateway._gateway_client, display_data=display_data, except_data=except_data, result=result)
 
     def executeScript(self, code_text, filename=None):
         # TODO: Handle filename
@@ -155,15 +267,17 @@ class ScriptEngineExecute(object):
         return self.executeCommon(code_text, self.interp.push)
 
     def internalGetVariable(self, name):
-        return repr(self.locals.get(name))
+        return convert_value(self.locals.get(name), self.gateway._gateway_client)
 
     def internalGetVariables(self):
-        locals_repr = dict()
-        for k, v in self.locals.items():
-            if not k.startswith("__"):
-                locals_repr[k] = repr(v)
-        converted = MapConverter().convert(locals_repr, self.gateway._gateway_client)
-        return converted
+        # Filter out data we do not want
+        filtered = {
+            k: convert_value(v, self.gateway._gateway_client)
+            for k, v in self.locals.items()
+            if not k.startswith('__')
+        }
+
+        return MapConverter().convert(filtered, self.gateway._gateway_client)
 
     def internalHasVariable(self, name):
         return name in self.locals
@@ -226,6 +340,7 @@ def main(argv):
 
     gateway.shutdown_callback_server()
     gateway.shutdown()
+
 
 if __name__ == '__main__':
     main(sys.argv)

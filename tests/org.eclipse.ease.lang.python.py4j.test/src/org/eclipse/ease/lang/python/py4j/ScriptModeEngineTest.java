@@ -13,8 +13,8 @@ package org.eclipse.ease.lang.python.py4j;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
@@ -23,61 +23,26 @@ import org.eclipse.ease.ScriptResult;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ScriptModeEngineTest extends Py4JEngineTestBase {
+public class ScriptModeEngineTest extends ModeTestBase {
 
+	@Override
 	protected ScriptResult executeCode(String code) throws Exception {
 		return super.executeCode(code, false);
 	}
 
-	@Test
-	public void pythonInteger() throws Exception {
-		assertEquals("42", printExpression("40 + 2"));
-	}
-
-	@Test
-	public void pythonString() throws Exception {
-		assertEquals("42", printExpression("'42'"));
-	}
-
-	@Test
-	public void javaInteger() throws Exception {
-		assertEquals("42", printExpression("java.lang.Integer(42)"));
-	}
-
-	@Test
-	public void javaString() throws Exception {
-		assertEquals("42", printExpression("java.lang.String('42')"));
-	}
-
-	@Test
-	public void createJavaType() throws Exception {
-		assertEquals(new java.io.File("/").toString(), printExpression("java.io.File('/')"));
-	}
-
-	@Test
-	public void createEclipseClass() throws Exception {
-		assertEquals(new org.eclipse.core.runtime.Path("/").toString(), printExpression("org.eclipse.core.runtime.Path('/')"));
-	}
-
-	@Test
-	public void createPythonObject() throws Exception {
-		assertThat(printExpression("object()"), startsWith("<object object at "));
-	}
-
-	@Test
-	public void testMultiple() throws Exception {
-		javaInteger();
-		javaString();
-		createJavaType();
-		createEclipseClass();
-		javaInteger();
-		javaString();
+	@Override
+	protected void executeCode(String code, Object target) throws Exception {
+		final ScriptResult result = super.executeCode(code, false);
+		assertNotNull(result);
+		assertNull(result.getException());
+		assertNotNull(result.getResult());
+		assertEquals(target, result.getResult());
 	}
 
 	@Test
 	@Ignore("Disabled until Bug 493677 is resolved")
 	public void callExit() throws Exception {
-		ScriptResult result = executeCode("print_('this should be output', False)\nexit()\nprint_('this should not appear')");
+		final ScriptResult result = executeCode("print_('this should be output', False)\nexit()\nprint_('this should not appear')");
 		assertResultIsNone(result);
 		assertEquals("this should be output", fOutputStream.getAndClearOutput());
 	}
@@ -89,7 +54,7 @@ public class ScriptModeEngineTest extends Py4JEngineTestBase {
 
 	@Test
 	public void incompleteStatement() throws Exception {
-		ScriptResult result = executeCode("def a():");
+		final ScriptResult result = executeCode("def a():");
 		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
 		assertThat(fErrorStream.getAndClearOutput(), containsString("SyntaxError"));
 		assertNull(result.getResult());
@@ -109,8 +74,7 @@ public class ScriptModeEngineTest extends Py4JEngineTestBase {
 
 	@Test
 	public void multiLineStatement() throws Exception {
-		assertResultIsNone(executeCode("def a():\n\treturn 42"));
-		assertEquals("42", printExpression("a()"));
+		executeCode("def a():\n\treturn 42\na()", 42);
 	}
 
 	@Test

@@ -13,112 +13,36 @@ package org.eclipse.ease.lang.python.py4j;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ShellModeEngineTest extends Py4JEngineTestBase {
+public class ShellModeEngineTest extends ModeTestBase {
 
+	@Override
 	protected ScriptResult executeCode(String code) throws Exception {
 		return super.executeCode(code, true);
 	}
 
-	@Test
-	public void simpleScriptCode() throws Exception {
-		ScriptResult result = executeCode("40 + 2");
+	@Override
+	protected void executeCode(String code, Object target) throws Exception {
+		final ScriptResult result = super.executeCode(code, true);
+		assertNotNull(result);
 		assertNull(result.getException());
-		assertEquals(42, result.getResult());
-	}
-
-	@Test
-	public void createAutoConvertedJavaInteger() throws Exception {
-		ScriptResult result = executeCode("java.lang.Integer(42)");
-		assertNull(result.getException());
-		assertEquals(42, result.getResult());
-	}
-
-	@Test
-	public void createAutoConvertedJavaString() throws Exception {
-		ScriptResult result = executeCode("java.lang.String('42')");
-		assertNull(result.getException());
-		assertEquals("42", result.getResult());
-	}
-
-	@Test
-	public void createList() throws Exception {
-		ScriptResult result = executeCode("[1, 2, 3]");
-		assertNull(result.getException());
-		assertEquals(Arrays.asList(1, 2, 3), result.getResult());
-	}
-
-	@Test
-	public void createMap() throws Exception {
-		ScriptResult result = executeCode("dict(a=1, b=2, c=3)");
-		assertNull(result.getException());
-		Map<Object, Object> map = new HashMap<>();
-		map.put("a", 1);
-		map.put("b", 2);
-		map.put("c", 3);
-		assertEquals(map, result.getResult());
-	}
-
-	@Test
-	public void createSet() throws Exception {
-		ScriptResult result = executeCode("set([1, 2, 3])");
-		assertNull(result.getException());
-		Set<Object> set = new HashSet<>();
-		set.add(1);
-		set.add(2);
-		set.add(3);
-		assertEquals(set, result.getResult());
-	}
-
-	@Test
-	public void createJavaType() throws Exception {
-		ScriptResult result = executeCode("java.io.File('/')");
-		assertNull(result.getException());
-		assertEquals(new java.io.File("/"), result.getResult());
-	}
-
-	@Test
-	public void createEclipseClass() throws Exception {
-		ScriptResult result = executeCode("org.eclipse.core.runtime.Path('/')");
-		assertNull(result.getException());
-		assertEquals(new org.eclipse.core.runtime.Path("/"), result.getResult());
-	}
-
-	@Test
-	public void createPythonObject() throws Exception {
-		ScriptResult result = executeCode("object()");
-		assertNull(result.getException());
-		assertThat(result.getResult(), instanceOf(String.class));
-		assertThat((String) result.getResult(), startsWith("<object object at "));
-	}
-
-	@Test
-	public void testMultiple() throws Exception {
-		simpleScriptCode();
-		createJavaType();
-		createEclipseClass();
-		simpleScriptCode();
+		assertNotNull(result.getResult());
+		assertEquals(target, result.getResult());
 	}
 
 	@Test
 	public void callModuleCode() throws Exception {
-		ScriptResult result = executeCode("exit(\"done\")");
+		final ScriptResult result = executeCode("exit(\"done\")");
 		assertNull(result.getException());
 		assertEquals("done", result.getResult());
 	}
@@ -130,7 +54,7 @@ public class ShellModeEngineTest extends Py4JEngineTestBase {
 
 	@Test
 	public void getScriptEngine() throws Exception {
-		ScriptResult result = executeCode("getScriptEngine()");
+		final ScriptResult result = executeCode("getScriptEngine()");
 		assertNull(result.getException());
 		assertSame(fEngine, result.getResult());
 	}
@@ -172,15 +96,16 @@ public class ShellModeEngineTest extends Py4JEngineTestBase {
 	public void multiLineStatement() throws Exception {
 		push("def a():", true);
 		push("    return 42", true);
-		assertResultIsNone(push("", false));
-		ScriptResult result = push("a()", false);
+		push("", false);
+		// assertResultIsNone(push("", false));final
+		final ScriptResult result = push("a()", false);
 		assertNull(result.getException());
 		assertEquals(42, result.getResult());
 	}
 
 	@Test
 	public void invalidSyntax() throws Exception {
-		ScriptResult result = executeCode("1++");
+		final ScriptResult result = executeCode("1++");
 		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
 		assertThat(fErrorStream.getAndClearOutput(), containsString("SyntaxError"));
 		assertNull(result.getResult());
@@ -188,7 +113,7 @@ public class ShellModeEngineTest extends Py4JEngineTestBase {
 
 	@Test
 	public void runtimeError() throws Exception {
-		ScriptResult result = executeCode("x");
+		final ScriptResult result = executeCode("x");
 		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
 		assertThat(fErrorStream.getAndClearOutput(), containsString("NameError"));
 		assertNull(result.getResult());
