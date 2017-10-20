@@ -83,7 +83,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 
 		final IMemento propertiesNode = suiteNode.createChild("properties");
 		for (final IMetadata metadata : testEntity.getMetadata()) {
-			final IMemento propertyNode = propertiesNode.createChild("property ");
+			final IMemento propertyNode = propertiesNode.createChild("property");
 			propertyNode.putString("name", escape(metadata.getKey()));
 			propertyNode.putString("value", escape((metadata.getValue() != null) ? metadata.getValue().toString() : "null"));
 		}
