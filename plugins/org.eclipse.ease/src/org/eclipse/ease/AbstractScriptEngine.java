@@ -247,7 +247,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 				else
 					notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_END);
 
-				fStackTrace.remove(0);
+				if (!fStackTrace.isEmpty())
+					fStackTrace.remove(0);
 			}
 		}
 
