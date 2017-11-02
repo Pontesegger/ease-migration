@@ -1,10 +1,13 @@
 var __EASE_UnitTest_TestRunner = {
 
+	easeModule : loadModule("/Unittest", true),
+
 	/**
 	 * Execute all unit tests.
 	 */
 	run : function() {
-		this.getUnitTestModule().setThrowOnFailure(true);
+		print("running, yeah")
+		this.easeModule.javaInstance.setThrowOnFailure(true);
 
 		var iterator = getScriptEngine().getVariables().entrySet().iterator();
 		while (iterator.hasNext()) {
@@ -12,7 +15,7 @@ var __EASE_UnitTest_TestRunner = {
 			var candidate = candidateEntry.getValue();
 			if (this.isUnitTest(candidate)) {
 				// this is a unit test class
-				var testClass = this.getUnitTestModule().addTestClass(candidateEntry.getKey());
+				var testClass = this.easeModule.javaInstance.addTestClass(candidateEntry.getKey());
 				if (candidate.hasOwnProperty("__description"))
 					testClass.setDescription(candidate.__description);
 
@@ -44,7 +47,7 @@ var __EASE_UnitTest_TestRunner = {
 					var test = testcases[index];
 					var annotations = this.getAnnotations(candidate[test]);
 
-					this.getUnitTestModule().startTest(test, annotations["description"]);
+					this.easeModule.startTest(test, annotations["description"]);
 
 					// register test start location
 					try {
@@ -59,17 +62,18 @@ var __EASE_UnitTest_TestRunner = {
 						var stackTrace = new org.eclipse.ease.debugging.ScriptStackTrace();
 						stackTrace.add(debugFrame);
 
-						this.getUnitTestModule().getTest().setStackTrace(stackTrace);
+						this.easeModule.getTest().setStackTrace(stackTrace);
 
 					} catch (e) {
-						// we could not set the stacktrace for the unit test start location, ignore
+						// we could not set the stacktrace for the unit test
+						// start location, ignore
 					}
 
 					if (candidate.hasOwnProperty("__ignore")) {
-						this.getUnitTestModule().ignoreTest(candidate["__ignore"]);
+						this.easeModule.ignoreTest(candidate["__ignore"]);
 
 					} else if (annotations.hasOwnProperty("ignore")) {
-						this.getUnitTestModule().ignoreTest(annotations["ignore"]);
+						this.easeModule.ignoreTest(annotations["ignore"]);
 
 					} else {
 
@@ -78,7 +82,7 @@ var __EASE_UnitTest_TestRunner = {
 								candidate[testSetup]();
 
 							try {
-								this.getUnitTestModule().setTestTimeout(this.getTimeout(annotations));
+								this.easeModule.setTestTimeout(this.getTimeout(annotations));
 
 								// execute the test
 								candidate[test]();
@@ -86,20 +90,19 @@ var __EASE_UnitTest_TestRunner = {
 								// check for expected exception
 								var expectedException = this.getExpectedException(annotations);
 								if (expectedException != null) {
-									this.getUnitTestModule().failure(
-											"Expected exception not thrown: " + expectedException,
-											this.getUnitTestModule().getTest().getStackTrace());
+									this.easeModule.javaInstance.failure("Expected exception not thrown: "
+											+ expectedException, this.easeModule.getTest().getStackTrace());
 								}
 
 							} catch (e) {
 								if (this.isAssertion(e)) {
 									// test failure
 									try {
-										this.getUnitTestModule().failure(e.javaException.getMessage(),
+										this.easeModule.javaInstance.failure(e.javaException.getMessage(),
 												getScriptEngine().getExceptionStackTrace());
 									} catch (e1) {
 										// no exception stacktrace available
-										this.getUnitTestModule().failure(e.javaException.getMessage());
+										this.easeModule.failure(e.javaException.getMessage());
 									}
 
 								} else if (this.isExpectedException(annotations, e)) {
@@ -109,11 +112,11 @@ var __EASE_UnitTest_TestRunner = {
 									var message = (typeof (e.javaException) !== 'undefined') ? e.javaException
 											.getMessage() : e;
 									try {
-										this.getUnitTestModule().error(message,
-												getScriptEngine().getExceptionStackTrace());
+										this.easeModule.javaInstance.error(message, getScriptEngine()
+												.getExceptionStackTrace());
 									} catch (e1) {
 										// no exception stacktrace available
-										this.getUnitTestModule().error(message);
+										this.easeModule.error(message);
 									}
 								}
 							} finally {
@@ -126,11 +129,11 @@ var __EASE_UnitTest_TestRunner = {
 									var message = (typeof (e.javaException) !== 'undefined') ? e.javaException
 											.getMessage() : e;
 									try {
-										this.getUnitTestModule().error("Test teardown error: " + message,
+										this.easeModule.javaInstance.error("Test teardown error: " + message,
 												getScriptEngine().getExceptionStackTrace());
 									} catch (e1) {
 										// no exception stacktrace available
-										this.getUnitTestModule().error("Test teardown error: " + message);
+										this.easeModule.error("Test teardown error: " + message);
 									}
 								}
 							}
@@ -139,22 +142,22 @@ var __EASE_UnitTest_TestRunner = {
 							// test setup error
 							var message = (typeof (e.javaException) !== 'undefined') ? e.javaException.getMessage() : e;
 							try {
-								this.getUnitTestModule().error("Test setup error: " + message,
-										getScriptEngine().getExceptionStackTrace());
+								this.easeModule.javaInstance.error("Test setup error: " + message, getScriptEngine()
+										.getExceptionStackTrace());
 							} catch (e1) {
 								// no exception stacktrace available
-								this.getUnitTestModule().error("Test setup error: " + message);
+								this.easeModule.error("Test setup error: " + message);
 							}
 						}
 					}
 
-					this.getUnitTestModule().endTest();
+					this.easeModule.endTest();
 				}
 
 				if ((test.length > 0) && (testClassTeardown != null))
 					candidate[testClassTeardown]();
 
-				this.getUnitTestModule().addTestClass(null);
+				this.easeModule.javaInstance.addTestClass(null);
 			}
 		}
 	},
@@ -290,21 +293,6 @@ var __EASE_UnitTest_TestRunner = {
 			return parseInt(annotations["timeout"]);
 
 		return 0;
-	},
-
-	/**
-	 * Get instance of EASE unittest module. Will be loaded on demand.
-	 * 
-	 * @return unittest module
-	 */
-	getUnitTestModule : function() {
-		var module = getScriptEngine().getVariable("__MOD_org_eclipse_ease_lang_unittest_UnitTestModule");
-		if (module == null) {
-			loadModule("/Unittest", true);
-			module = getScriptEngine().getVariable("__MOD_org_eclipse_ease_lang_unittest_UnitTestModule");
-		}
-		
-		return module;
 	},
 }
 
