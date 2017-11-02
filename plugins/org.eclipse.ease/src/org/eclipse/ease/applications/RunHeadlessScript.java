@@ -83,16 +83,11 @@ public class RunHeadlessScript implements IApplication {
 							// no file available, try to include to resolve URIs
 							scriptObject = "include(\"" + parameters.get("script") + "\")";
 
-						final ScriptResult scriptResult = engine.executeAsync(scriptObject);
-						engine.schedule();
-
-						synchronized (scriptResult) {
-							if (!scriptResult.isReady())
-								scriptResult.wait();
-						}
-
-						if (scriptResult.hasException())
+						final ScriptResult scriptResult = engine.executeSync(scriptObject);
+						if (scriptResult.hasException()) {
+							scriptResult.getException().printStackTrace(System.err);
 							return -1;
+						}
 
 						final Object result = scriptResult.getResult();
 						if (result != null) {
