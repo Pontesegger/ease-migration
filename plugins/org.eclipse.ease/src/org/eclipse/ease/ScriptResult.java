@@ -62,6 +62,24 @@ public class ScriptResult {
 	}
 
 	/**
+	 * Blocks execution until the execution result is ready or the timeout is reached. Once this method returns you still need to query {@link #isReady()} as
+	 * the timeout might have depleted.
+	 *
+	 * @param timeout
+	 *            the maximum time to wait in milliseconds.
+	 */
+	public final synchronized void waitForResult(long timeout) {
+		final long stopTimestamp = System.currentTimeMillis() + timeout;
+
+		while ((!isReady()) && (System.currentTimeMillis() < stopTimestamp)) {
+			try {
+				this.wait(Math.max(0, System.currentTimeMillis() - stopTimestamp));
+			} catch (final InterruptedException e) {
+			}
+		}
+	}
+
+	/**
 	 * Get the result value stored.
 	 *
 	 * @return result value
