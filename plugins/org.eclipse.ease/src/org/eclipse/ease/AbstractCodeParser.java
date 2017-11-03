@@ -40,30 +40,32 @@ public abstract class AbstractCodeParser implements ICodeParser {
 	public static Map<String, String> extractKeywords(String comment) {
 		final Map<String, String> keywords = new HashMap<>();
 
-		String key = null;
-		for (String line : comment.split("\\r?\\n")) {
-			final Matcher matcher = PARAMETER_PATTERN.matcher(line);
-			if (matcher.matches()) {
-				// key value pair found
-				key = matcher.group(1);
-				keywords.put(key, matcher.group(2).trim());
+		if (comment != null) {
+			String key = null;
+			for (String line : comment.split("\\r?\\n")) {
+				final Matcher matcher = PARAMETER_PATTERN.matcher(line);
+				if (matcher.matches()) {
+					// key value pair found
+					key = matcher.group(1);
+					keywords.put(key, matcher.group(2).trim());
 
-			} else if (key != null) {
-				if (!line.trim().isEmpty()) {
-					// check that we do not have a delimiter line (all same chars)
-					line = line.trim();
-					if (!Pattern.matches("[" + line.charAt(0) + "]+", line))
-						// line belongs to previous key value pair
-						keywords.put(key, keywords.get(key) + " " + line.trim());
-					else
-						// line does not belong to previous key anymore
+				} else if (key != null) {
+					if (!line.trim().isEmpty()) {
+						// check that we do not have a delimiter line (all same chars)
+						line = line.trim();
+						if (!Pattern.matches("[" + line.charAt(0) + "]+", line))
+							// line belongs to previous key value pair
+							keywords.put(key, keywords.get(key) + " " + line.trim());
+						else
+							// line does not belong to previous key anymore
+							key = null;
+					} else
+						// remove cached key as we hit an empty line
 						key = null;
-				} else
-					// remove cached key as we hit an empty line
-					key = null;
-			}
+				}
 
-			// any other line will be ignored
+				// any other line will be ignored
+			}
 		}
 
 		return keywords;
