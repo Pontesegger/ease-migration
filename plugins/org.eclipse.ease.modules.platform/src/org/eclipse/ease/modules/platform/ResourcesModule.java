@@ -338,7 +338,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	@WrapToScript
 	public void deleteFolder(final Object source) throws CoreException {
 		final Object folder = ResourceTools.resolve(source, getScriptEngine().getExecutedFile());
-		if (ResourceTools.isFile(folder)) {
+		if (ResourceTools.isFolder(folder)) {
 			if (folder instanceof IFolder)
 				((IFolder) folder).delete(true, new NullProgressMonitor());
 
