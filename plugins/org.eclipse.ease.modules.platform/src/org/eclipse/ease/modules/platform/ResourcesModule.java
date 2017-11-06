@@ -768,7 +768,6 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	/**
 	 * Refresh a given resource and all its child elements.
 	 *
-	 * @scriptExample updateResource(getProject("my project")) to update the project and all its subfolders
 	 * @param resource
 	 *            {@link IFile}, {@link IFolder}, {@link IProject} or workspace root to update
 	 * @throws CoreException
@@ -777,24 +776,13 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 *             <li>Resource changes are disallowed during certain types of resource change event notification. See {@link IResourceChangeEvent} for more
 	 *             details.</li>
 	 *             </ul>
+	 * @scriptExample refreshResource(getProject("my project")) to update the project and all its subfolders
 	 */
 	@WrapToScript
-	public void refreshResource(final IResource resource) throws CoreException {
-
-		final ProgressMonitor monitor = new ProgressMonitor();
-		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-
-		while (!monitor.isDone()) {
-			synchronized (monitor) {
-				try {
-					// check every second for completion
-					System.out.println("waiting");
-					monitor.wait(1000);
-					System.out.println("wakeup");
-				} catch (final InterruptedException e) {
-				}
-			}
-		}
+	public void refreshResource(final Object resource) throws CoreException {
+		final Object resolvedResource = ResourceTools.resolve(resource);
+		if (resolvedResource instanceof IResource)
+			((IResource) resolvedResource).refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
 
 	/**
