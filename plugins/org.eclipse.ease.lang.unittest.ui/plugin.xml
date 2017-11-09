@@ -159,6 +159,24 @@
                icon="icons/elcl16/run_all_tests.png"
                label="Run"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.eclipse.ease.lang.unittest.runtime.ITestFile">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.ease.lang.unittest.runtime.ITestSuite">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
       </menuContribution>
    </extension>

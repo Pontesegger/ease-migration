@@ -6,7 +6,6 @@ var __EASE_UnitTest_TestRunner = {
 		 * Execute all unit tests.
 		 */
 		run : function() {
-			print("running, yeah")
 			this.easeModule.javaInstance.setThrowOnFailure(true);
 
 			var iterator = getScriptEngine().getVariables().entrySet().iterator();
