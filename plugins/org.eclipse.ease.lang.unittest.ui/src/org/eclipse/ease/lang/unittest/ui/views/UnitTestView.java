@@ -157,7 +157,7 @@ public class UnitTestView extends ViewPart {
 	 * @param lineNumber
 	 *            line number to jump to in editor
 	 */
-	private static void openEditor(Object resource, int lineNumber) {
+	public static void openEditor(Object resource, int lineNumber) {
 		if (resource instanceof IFile) {
 			IEditorDescriptor descriptor = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(((IFile) resource).getName());
 			if (descriptor == null)

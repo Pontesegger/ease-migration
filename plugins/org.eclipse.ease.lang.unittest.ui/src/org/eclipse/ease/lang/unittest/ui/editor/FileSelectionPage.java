@@ -13,7 +13,6 @@ package org.eclipse.ease.lang.unittest.ui.editor;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
@@ -23,6 +22,7 @@ import org.eclipse.ease.lang.unittest.runtime.ITestFile;
 import org.eclipse.ease.lang.unittest.runtime.ITestFolder;
 import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.ease.lang.unittest.ui.views.TestSuiteLabelProvider;
+import org.eclipse.ease.lang.unittest.ui.views.UnitTestView;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.edit.command.AddCommand;
@@ -262,16 +262,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 				final Object element = selection.getFirstElement();
 				if (element instanceof ITestFile) {
 					final Object resource = ((ITestFile) element).getResource();
-					if (resource instanceof IFile) {
-						try {
-							// TODO not implemented so far
-							// UIModule.showEditor((IFile) element);
-						} catch (final Throwable e) {
-							// TODO handle this exception (but for now, at
-							// least know it happened)
-							throw new RuntimeException(e);
-						}
-					}
+					UnitTestView.openEditor(resource, 0);
 				}
 			}
 		});
