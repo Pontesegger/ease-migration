@@ -97,6 +97,12 @@
             id="org.eclipse.ease.commands.sign.contextMenu"
             name="Perform Signature...">
       </command>
+      <command
+            categoryId="org.eclipse.ease.commands.category.scriptShell"
+            defaultHandler="org.eclipse.ease.ui.handler.PasteTextToScriptShell"
+            id="org.eclipse.ease.commands.scriptShell.pasteToShell"
+            name="Paste Text to Script Shell">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -510,5 +516,14 @@
             %moduledocDisplayFontDefiniton.description
          </description>
       </fontDefinition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.ease.commands.scriptShell.pasteToShell"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+E">
+      </key>
    </extension>
 </plugin>
