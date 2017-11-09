@@ -25,6 +25,7 @@ Require-Bundle: org.eclipse.ui.forms;bundle-version="[3.6.100,4.0.0)",
  org.eclipse.core.expressions;bundle-version="[3.4.600,4.0.0)",
  org.eclipse.ui.console;bundle-version="[3.5.300,4.0.0)",
  org.eclipse.ui.editors;bundle-version="[3.8.200,4.0.0)",
- org.eclipse.emf.edit.ui
+ org.eclipse.emf.edit.ui,
+ org.eclipse.ui.navigator
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.ease.lang.unittest.ui.Activator

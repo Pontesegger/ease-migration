@@ -407,6 +407,9 @@
                relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="false">
          </view>
+         <newWizardShortcut
+               id="org.eclipse.ease.lang.unittest.ui.wizard.newTestSuiteWizard">
+         </newWizardShortcut>
       </perspectiveExtension>
    </extension>
    <extension
@@ -468,6 +471,14 @@
                org.eclipse.emf.edit.provider.ITreeItemContentProvider
                org.eclipse.emf.edit.provider.IItemLabelProvider
                org.eclipse.emf.edit.provider.IItemPropertySource"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonWizard
+            type="new"
+            wizardId="org.eclipse.ease.lang.unittest.ui.wizard.newTestSuiteWizard">
+         <enablement></enablement>
+      </commonWizard>
    </extension>
 
 </plugin>
