@@ -40,79 +40,91 @@ public class RunHeadlessScript implements IApplication {
 			if (parameters != null) {
 
 				// create workspace
+				Location location = null;
 				if (parameters.containsKey("workspace")) {
 
-					final Location location = Platform.getInstanceLocation();
+					location = Platform.getInstanceLocation();
 					// stick to the deprecated method as file.toURI().toURL() will not work on paths containing spaces
 					final URL workspaceURL = new File(parameters.get("workspace").toString()).toURL();
 
 					// check if workspace location has not been set yet (can be set only once!)
 					if (!location.isSet()) {
-						location.release();
-						location.set(workspaceURL, true);
-
-					} else if (!location.getURL().toString().equals(workspaceURL.toString()))
-						System.err.println("WARNING: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
-				}
-
-				// execute script
-				if (parameters.containsKey("script")) {
-					// find script engine
-					EngineDescription engineDescription = null;
-					final IScriptService scriptService = ScriptService.getInstance();
-
-					if (parameters.containsKey("engine"))
-						// locate engine by ID
-						engineDescription = scriptService.getEngineByID(parameters.get("engine").toString());
-
-					else {
-						// locate engine by file extension
-						final ScriptType scriptType = scriptService.getScriptType(parameters.get("script").toString());
-						if (scriptType != null)
-							engineDescription = scriptService.getEngine(scriptType.getName());
-					}
-
-					if (engineDescription != null) {
-						// create engine
-						final IScriptEngine engine = engineDescription.createEngine();
-						engine.setVariable("argv", ((List) parameters.get("args")).toArray(new String[0]));
-
-						// TODO implement better URI handling - eg create URI and pass to script engine
-						Object scriptObject = ResourceTools.resolve(parameters.get("script"));
-						if (scriptObject == null)
-							// no file available, try to include to resolve URIs
-							scriptObject = "include(\"" + parameters.get("script") + "\")";
-
-						final ScriptResult scriptResult = engine.executeSync(scriptObject);
-						if (scriptResult.hasException()) {
-							scriptResult.getException().printStackTrace(System.err);
+						if (!location.set(workspaceURL, true)) {
+							// could not lock the workspace.
+							System.err.println("ERROR: Could not set the workspace to \"" + location.getURL() + "\"");
 							return -1;
 						}
 
-						final Object result = scriptResult.getResult();
-						if (result != null) {
-							try {
-								return Integer.parseInt(result.toString());
-							} catch (final Exception e) {
-								// no integer
-							}
-
-							try {
-								return new Double(Double.parseDouble(result.toString())).intValue();
-							} catch (final Exception e) {
-								// no double
-							}
-
-							try {
-								return Boolean.parseBoolean(result.toString()) ? 0 : -1;
-							} catch (final Exception e) {
-								// no boolean
-							}
-
-							// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
-						} else
-							return 0;
+					} else if (!location.getURL().toString().equals(workspaceURL.toString())) {
+						System.err.println("ERROR: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
+						return -1;
 					}
+				}
+
+				try {
+					// execute script
+					if (parameters.containsKey("script")) {
+						// find script engine
+						EngineDescription engineDescription = null;
+						final IScriptService scriptService = ScriptService.getInstance();
+
+						if (parameters.containsKey("engine"))
+							// locate engine by ID
+							engineDescription = scriptService.getEngineByID(parameters.get("engine").toString());
+
+						else {
+							// locate engine by file extension
+							final ScriptType scriptType = scriptService.getScriptType(parameters.get("script").toString());
+							if (scriptType != null)
+								engineDescription = scriptService.getEngine(scriptType.getName());
+						}
+
+						if (engineDescription != null) {
+							// create engine
+							final IScriptEngine engine = engineDescription.createEngine();
+							engine.setVariable("argv", ((List) parameters.get("args")).toArray(new String[0]));
+
+							// TODO implement better URI handling - eg create URI and pass to script engine
+							Object scriptObject = ResourceTools.resolve(parameters.get("script"));
+							if (scriptObject == null)
+								// no file available, try to include to resolve URIs
+								scriptObject = "include(\"" + parameters.get("script") + "\")";
+
+							final ScriptResult scriptResult = engine.executeSync(scriptObject);
+							if (scriptResult.hasException()) {
+								scriptResult.getException().printStackTrace(System.err);
+								return -1;
+							}
+
+							final Object result = scriptResult.getResult();
+							if (result != null) {
+								try {
+									return Integer.parseInt(result.toString());
+								} catch (final Exception e) {
+									// no integer
+								}
+
+								try {
+									return new Double(Double.parseDouble(result.toString())).intValue();
+								} catch (final Exception e) {
+									// no double
+								}
+
+								try {
+									return Boolean.parseBoolean(result.toString()) ? 0 : -1;
+								} catch (final Exception e) {
+									// no boolean
+								}
+
+								// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
+							} else
+								return 0;
+						}
+					}
+				} finally {
+					// make sure we do not lock the workspace permanently
+					if (location != null)
+						location.release();
 				}
 
 				System.err.println("ERROR: Could not access file \"" + parameters.get("script") + "\"");
