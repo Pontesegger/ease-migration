@@ -458,7 +458,8 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 			if (getTestSuite() != null)
 				return getTestSuite().getTest(ITestEntity.GLOBAL_SCOPE_TEST);
 
-			throw new RuntimeException("No test container available.");
+			// executed outside of unit test framework, return dummy test instance
+			return IRuntimeFactory.eINSTANCE.createTest();
 		}
 
 		return fCurrentTest;
