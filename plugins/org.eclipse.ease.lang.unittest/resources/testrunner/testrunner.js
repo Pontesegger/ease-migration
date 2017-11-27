@@ -108,8 +108,14 @@ var __EASE_UnitTest_TestRunner = {
 										// nothing to do, test is pass
 									} else {
 										// test error
-										var message = (typeof (e.javaException) !== 'undefined') ? e.javaException
-												.getMessage() : e;
+										var message = e;
+										if (typeof (e.javaException) !== 'undefined') {
+											if (e.javaException.getMessage() != null)
+												message = e.javaException.getMessage();
+											else
+												message = e.javaException.getClass().getSimpleName() + " thrown";
+										}
+												
 										try {
 											this.easeModule.javaInstance.error(message, getScriptEngine()
 													.getExceptionStackTrace());
