@@ -164,24 +164,25 @@ public abstract class AbstractLaunchDelegate implements ILaunchShortcut, ILaunch
 
 		if (file instanceof IFile) {
 			// try to save dirty editors
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().saveAllEditors(true);
+			final boolean saveSucceeded = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().saveAllEditors(true);
+			if (saveSucceeded) {
+				try {
+					ILaunchConfiguration[] configurations = getLaunchConfigurations(file, mode);
 
-			try {
-				ILaunchConfiguration[] configurations = getLaunchConfigurations(file, mode);
+					if (configurations.length == 0) {
+						final ILaunchConfiguration configuration = createLaunchConfiguration(file, mode);
 
-				if (configurations.length == 0) {
-					final ILaunchConfiguration configuration = createLaunchConfiguration(file, mode);
+						configurations = new ILaunchConfiguration[] { configuration };
+					}
 
-					configurations = new ILaunchConfiguration[] { configuration };
+					// launch
+					configurations[0].launch(mode, new NullProgressMonitor());
+
+				} catch (final CoreException e) {
+					// could not launch configuration, giving up
+					MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch Error", "Could not launch \"" + file + "\"");
+					Logger.error(Activator.PLUGIN_ID, "Could not launch \"" + file + "\"", e);
 				}
-
-				// launch
-				configurations[0].launch(mode, new NullProgressMonitor());
-
-			} catch (final CoreException e) {
-				// could not launch configuration, giving up
-				MessageDialog.openError(Display.getDefault().getActiveShell(), "Launch Error", "Could not launch \"" + file + "\"");
-				Logger.error(Activator.PLUGIN_ID, "Could not launch \"" + file + "\"", e);
 			}
 		}
 	}
