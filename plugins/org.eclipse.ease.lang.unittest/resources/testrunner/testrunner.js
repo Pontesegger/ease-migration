@@ -117,6 +117,10 @@ var __EASE_UnitTest_TestRunner = {
 											// no exception stacktrace available
 											this.easeModule.error(message);
 										}
+										
+										// print exception to console
+										if (typeof (e.javaException) !== 'undefined')
+											e.javaException.printStackTrace(getScriptEngine().getErrorStream());
 									}
 								} finally {
 
