@@ -26,7 +26,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.lang.python.PythonHelper;
@@ -53,7 +53,7 @@ import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.util.InteractiveInterpreter;
 
-public class JythonScriptEngine extends AbstractScriptEngine {
+public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 	protected InteractiveInterpreter mEngine;
 
@@ -301,10 +301,5 @@ public class JythonScriptEngine extends AbstractScriptEngine {
 
 		getEngine().set(name, content);
 
-	}
-
-	@Override
-	protected Object internalRemoveVariable(final String name) {
-		throw new RuntimeException("not supported");
 	}
 }

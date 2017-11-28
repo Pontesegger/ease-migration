@@ -30,6 +30,7 @@ import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.service.EngineDescription;
@@ -145,7 +146,8 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 			}
 
 			final IScriptEngine engine = engineDescription.createEngine();
-			engine.setTerminateOnIdle(true);
+			if (engine instanceof IReplEngine)
+				((IReplEngine) engine).setTerminateOnIdle(true);
 
 			// initialize console
 			final ScriptConsole console = ScriptConsole.create(engine.getName() + ": " + resource, engine);

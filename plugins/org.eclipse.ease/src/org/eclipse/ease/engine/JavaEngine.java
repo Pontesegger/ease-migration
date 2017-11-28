@@ -37,8 +37,6 @@ public class JavaEngine implements IScriptEngine {
 	private final Map<String, Object> fVariables = new HashMap<>();
 	private final IEnvironment fEnvironment;
 
-	private EngineDescription fDescription;
-
 	public JavaEngine() {
 		fEnvironment = new NativeEnvironment();
 		((NativeEnvironment) fEnvironment).initialize(this, fEnvironment);
@@ -70,16 +68,6 @@ public class JavaEngine implements IScriptEngine {
 	}
 
 	@Override
-	public void setTerminateOnIdle(final boolean terminate) {
-		// do nothing
-	}
-
-	@Override
-	public boolean getTerminateOnIdle() {
-		return false;
-	}
-
-	@Override
 	public void schedule() {
 		// do nothing
 	}
@@ -102,11 +90,6 @@ public class JavaEngine implements IScriptEngine {
 	@Override
 	public void removeExecutionListener(final IExecutionListener listener) {
 		// do nothing
-	}
-
-	@Override
-	public boolean isIdle() {
-		return true;
 	}
 
 	@Override
@@ -177,11 +160,6 @@ public class JavaEngine implements IScriptEngine {
 	}
 
 	@Override
-	public Object removeVariable(final String name) {
-		return getVariables().remove(name);
-	}
-
-	@Override
 	public Map<String, Object> getVariables() {
 		return fVariables;
 	}
@@ -196,13 +174,9 @@ public class JavaEngine implements IScriptEngine {
 	}
 
 	@Override
-	public void setEngineDescription(final EngineDescription description) {
-		fDescription = description;
-	}
-
-	@Override
 	public EngineDescription getDescription() {
-		return fDescription;
+		// FIXME statically fetch description
+		throw new RuntimeException("not supported");
 	}
 
 	@Override

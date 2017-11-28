@@ -13,7 +13,6 @@ package org.eclipse.ease.ui.view;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,37 +40,34 @@ public final class EngineContributionFactory extends CompoundContributionItem im
 	@Override
 	protected IContributionItem[] getContributionItems() {
 
-		List<IContributionItem> contributions = new ArrayList<IContributionItem>();
+		final List<IContributionItem> contributions = new ArrayList<>();
 
-		IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		if (scriptService != null) {
-			Collection<EngineDescription> engines = scriptService.getEngines();
+			final Collection<EngineDescription> engines = scriptService.getEngines();
 
-			final List<CommandContributionItemParameter> items = new ArrayList<CommandContributionItemParameter>();
+			final List<CommandContributionItemParameter> items = new ArrayList<>();
 			for (final EngineDescription description : engines) {
 
-				// set parameter for command
-				final HashMap<String, String> parameters = new HashMap<String, String>();
-				parameters.put(SwitchEngine.PARAMETER_ID, description.getID());
+				if (description.isReplShell()) {
 
-				final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(fServiceLocator, null,
-						SwitchEngine.COMMAND_ID, CommandContributionItem.STYLE_PUSH);
-				contributionParameter.parameters = parameters;
-				contributionParameter.label = description.getName();
-				contributionParameter.visibleEnabled = true;
-				contributionParameter.icon = Activator.getImageDescriptor("/icons/eobj16/engine.png");
+					// set parameter for command
+					final HashMap<String, String> parameters = new HashMap<>();
+					parameters.put(SwitchEngine.PARAMETER_ID, description.getID());
 
-				items.add(contributionParameter);
+					final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(fServiceLocator, null,
+							SwitchEngine.COMMAND_ID, CommandContributionItem.STYLE_PUSH);
+					contributionParameter.parameters = parameters;
+					contributionParameter.label = description.getName();
+					contributionParameter.visibleEnabled = true;
+					contributionParameter.icon = Activator.getImageDescriptor("/icons/eobj16/engine.png");
+
+					items.add(contributionParameter);
+				}
 			}
 
 			// sort contributions
-			Collections.sort(items, new Comparator<CommandContributionItemParameter>() {
-
-				@Override
-				public int compare(final CommandContributionItemParameter o1, final CommandContributionItemParameter o2) {
-					return o1.label.compareTo(o2.label);
-				}
-			});
+			Collections.sort(items, (o1, o2) -> o1.label.compareTo(o2.label));
 
 			for (final CommandContributionItemParameter item : items)
 				contributions.add(new CommandContributionItem(item));

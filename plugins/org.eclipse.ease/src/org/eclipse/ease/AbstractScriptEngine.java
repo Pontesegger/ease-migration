@@ -87,9 +87,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	private final ListenerList fExecutionListeners = new ListenerList();
 
-	/** Indicator to terminate once this Job gets IDLE. */
-	private volatile boolean fTerminateOnIdle = true;
-
 	private PrintStream fOutputStream = null;
 
 	private PrintStream fErrorStream = null;
@@ -419,35 +416,12 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			fErrorStream = new PrintStream(errorStream);
 	}
 
-	@Override
-	public final void setTerminateOnIdle(final boolean terminate) {
-		fTerminateOnIdle = terminate;
-		synchronized (this) {
-			notifyAll();
-		}
-	}
-
-	@Override
-	public boolean getTerminateOnIdle() {
-		return fTerminateOnIdle;
-	}
-
 	/**
 	 * Get termination status of the interpreter. A terminated interpreter cannot be restarted.
 	 *
 	 * @return true if interpreter is terminated.
 	 */
-	private boolean isTerminated() {
-		return fTerminateOnIdle && fScheduledScripts.isEmpty();
-	}
-
-	/**
-	 * Get idle status of the interpreter. The interpreter is IDLE if there are no pending execution requests and the interpreter is not terminated.
-	 *
-	 * @return true if interpreter is IDLE
-	 */
-	@Override
-	public boolean isIdle() {
+	protected boolean isTerminated() {
 		return fScheduledScripts.isEmpty();
 	}
 
@@ -468,7 +442,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	@Override
 	public void terminate() {
-		setTerminateOnIdle(true);
 		fScheduledScripts.clear();
 		terminateCurrent();
 
@@ -498,7 +471,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return null;
 	}
 
-	@Override
 	public void setEngineDescription(final EngineDescription description) {
 		fDescription = description;
 	}
@@ -526,14 +498,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			return internalHasVariable(name);
 
 		return fBufferedVariables.containsKey(name);
-	}
-
-	@Override
-	public Object removeVariable(final String name) {
-		if (fSetupDone)
-			return internalRemoveVariable(name);
-
-		return fBufferedVariables.remove(name);
 	}
 
 	@Override
@@ -617,11 +581,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 * Internal version of {@link #setVariable(String, Object)}. Only called after script engine was initialized successfully.
 	 */
 	protected abstract void internalSetVariable(String name, Object content);
-
-	/**
-	 * Internal version of {@link #removeVariable(String)}. Only called after script engine was initialized successfully.
-	 */
-	protected abstract Object internalRemoveVariable(String name);
 
 	/**
 	 * Setup method for script engine. Run directly after the engine is activated.

@@ -88,11 +88,6 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 	}
 
 	@Override
-	protected Object internalRemoveVariable(final String name) {
-		return fVariables.remove(name);
-	}
-
-	@Override
 	public String getSaveVariableName(final String name) {
 		return getSaveName(name);
 	}

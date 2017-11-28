@@ -126,7 +126,7 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 	}
 
 	@Override
-	protected Object internalRemoveVariable(String name) {
+	public Object removeVariable(String name) {
 		return fVariables.remove(name);
 	}
 

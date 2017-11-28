@@ -50,6 +50,14 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 	}
 
 	@Override
+	public Object removeVariable(String name) {
+		final Object result = getVariable(name);
+		getScope().delete(name);
+
+		return result;
+	}
+
+	@Override
 	public void setOptimizationLevel(final int level) {
 		// ignore as debugging requires not to use optimizations
 	}

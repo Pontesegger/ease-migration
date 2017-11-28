@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
 import org.junit.After;
@@ -23,7 +23,7 @@ import org.junit.Before;
 
 public abstract class Py4JEngineTestBase extends EaseTestBase {
 
-	protected IScriptEngine fEngine;
+	protected IReplEngine fEngine;
 	protected ByteArrayPrintStream fErrorStream;
 	protected ByteArrayPrintStream fOutputStream;
 
@@ -44,7 +44,7 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	}
 
 	protected ScriptResult push(String line, boolean expectMore) throws Exception {
-		ScriptResult result = executeCode(line, true);
+		final ScriptResult result = executeCode(line, true);
 		if (expectMore) {
 			assertNull(result.getException());
 			assertThat(result.getResult(), instanceOf(String.class));
@@ -54,7 +54,7 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	}
 
 	protected ScriptResult executeCode(String code, boolean shellMode) throws Exception {
-		Script scriptFromShell = new Script("test code", code, shellMode);
+		final Script scriptFromShell = new Script("test code", code, shellMode);
 		return fEngine.executeSync(scriptFromShell);
 	}
 
@@ -62,8 +62,8 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	 * Evaluate the given expression by printing the str and return the standard output.
 	 */
 	protected String printExpression(String expression) throws Exception {
-		Script scriptFromShell = new Script("test code", "import sys; sys.stdout.write(str(" + expression + ")); sys.stdout.flush()", false);
-		ScriptResult result = fEngine.executeSync(scriptFromShell);
+		final Script scriptFromShell = new Script("test code", "import sys; sys.stdout.write(str(" + expression + ")); sys.stdout.flush()", false);
+		final ScriptResult result = fEngine.executeSync(scriptFromShell);
 		assertResultIsNone(result);
 		/* TODO: Until Bug 493677 is resolved we need a delay here to ensure data has been received by the stream gobbler */
 		Thread.sleep(1000);

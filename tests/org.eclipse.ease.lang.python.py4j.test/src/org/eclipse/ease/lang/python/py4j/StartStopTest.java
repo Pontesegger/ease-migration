@@ -11,16 +11,16 @@
 
 package org.eclipse.ease.lang.python.py4j;
 
-import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IReplEngine;
 import org.junit.Test;
 
 public class StartStopTest extends EaseTestBase {
 
 	@Test
 	public void startStop() throws Exception {
-		IScriptEngine engine = createEngine();
-		ByteArrayPrintStream errorStream = ((ByteArrayPrintStream) engine.getErrorStream());
-		ByteArrayPrintStream outputStream = ((ByteArrayPrintStream) engine.getErrorStream());
+		final IReplEngine engine = createEngine();
+		final ByteArrayPrintStream errorStream = ((ByteArrayPrintStream) engine.getErrorStream());
+		final ByteArrayPrintStream outputStream = ((ByteArrayPrintStream) engine.getErrorStream());
 		engine.setTerminateOnIdle(false);
 		assertNotStarted(engine);
 		engine.schedule();
@@ -33,9 +33,9 @@ public class StartStopTest extends EaseTestBase {
 
 	@Test
 	public void startStopShellNoBootstrap() throws Exception {
-		IScriptEngine engine = createEngineWithoutBootstrap();
-		ByteArrayPrintStream errorStream = ((ByteArrayPrintStream) engine.getErrorStream());
-		ByteArrayPrintStream outputStream = ((ByteArrayPrintStream) engine.getErrorStream());
+		final IReplEngine engine = createEngineWithoutBootstrap();
+		final ByteArrayPrintStream errorStream = ((ByteArrayPrintStream) engine.getErrorStream());
+		final ByteArrayPrintStream outputStream = ((ByteArrayPrintStream) engine.getErrorStream());
 		engine.setTerminateOnIdle(false);
 		assertNotStarted(engine);
 		engine.schedule();
@@ -48,12 +48,12 @@ public class StartStopTest extends EaseTestBase {
 
 	@Test
 	public void multiStartStop() throws Exception {
-		IScriptEngine engine1 = createEngine();
-		IScriptEngine engine2 = createEngine();
-		ByteArrayPrintStream errorStream1 = ((ByteArrayPrintStream) engine1.getErrorStream());
-		ByteArrayPrintStream outputStream1 = ((ByteArrayPrintStream) engine1.getErrorStream());
-		ByteArrayPrintStream errorStream2 = ((ByteArrayPrintStream) engine2.getErrorStream());
-		ByteArrayPrintStream outputStream2 = ((ByteArrayPrintStream) engine2.getErrorStream());
+		final IReplEngine engine1 = createEngine();
+		final IReplEngine engine2 = createEngine();
+		final ByteArrayPrintStream errorStream1 = ((ByteArrayPrintStream) engine1.getErrorStream());
+		final ByteArrayPrintStream outputStream1 = ((ByteArrayPrintStream) engine1.getErrorStream());
+		final ByteArrayPrintStream errorStream2 = ((ByteArrayPrintStream) engine2.getErrorStream());
+		final ByteArrayPrintStream outputStream2 = ((ByteArrayPrintStream) engine2.getErrorStream());
 		engine1.setTerminateOnIdle(false);
 		engine2.setTerminateOnIdle(false);
 		assertNotStarted(engine1);

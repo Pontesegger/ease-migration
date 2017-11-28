@@ -16,15 +16,15 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractScriptEngineTest {
+public class AbstractReplScriptEngineTest {
 
 	private static final String SAMPLE_CODE = "Hello world";
 
-	private AbstractScriptEngine fTestEngine;
+	private AbstractReplScriptEngine fTestEngine;
 
 	@Before
 	public void setup() {
-		fTestEngine = new AbstractScriptEngine("Test engine") {
+		fTestEngine = new AbstractReplScriptEngine("Test engine") {
 
 			@Override
 			public void terminateCurrent() {
@@ -49,11 +49,6 @@ public class AbstractScriptEngineTest {
 
 			@Override
 			protected void internalSetVariable(final String name, final Object content) {
-			}
-
-			@Override
-			protected Object internalRemoveVariable(final String name) {
-				return null;
 			}
 
 			@Override

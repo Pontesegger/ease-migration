@@ -120,22 +120,6 @@ public interface IScriptEngine {
 	void setCloseStreamsOnTerminate(final boolean closeStreams);
 
 	/**
-	 * Set a marker that the interpreter should terminate instead entering IDLE mode. If set, the interpreter will execute all pending requests and terminate
-	 * afterwards.
-	 *
-	 * @param terminate
-	 *            <code>true</code> to request termination
-	 */
-	void setTerminateOnIdle(final boolean terminate);
-
-	/**
-	 * Get termination condition when engine is idle.
-	 *
-	 * @return <code>true</code> when engine is terminated when idle
-	 */
-	boolean getTerminateOnIdle();
-
-	/**
 	 * Schedule script execution. This will start the script engine that either waits for input or immediate starts execution of previously scheduled input.
 	 */
 	void schedule();
@@ -153,14 +137,6 @@ public interface IScriptEngine {
 	void addExecutionListener(IExecutionListener listener);
 
 	void removeExecutionListener(IExecutionListener listener);
-
-	/**
-	 * Returns the execution state of the engine. If the engine is processing code or is terminated this will return <code>false</code>. If the engine is
-	 * waiting for further scripts to execute this will return <code>true</code>.
-	 *
-	 * @return execution state.
-	 */
-	boolean isIdle();
 
 	/**
 	 * Get the engine name.
@@ -215,23 +191,6 @@ public interface IScriptEngine {
 	 * @return engine description
 	 */
 	EngineDescription getDescription();
-
-	/**
-	 * Set engine description for current engine. This method gets called by the script service right after the engine constructor is called.
-	 *
-	 * @param description
-	 *            engine description
-	 */
-	void setEngineDescription(EngineDescription description);
-
-	/**
-	 * Remove a variable from the scope.
-	 *
-	 * @param name
-	 *            variable to be removed.
-	 * @return
-	 */
-	Object removeVariable(final String name);
 
 	/**
 	 * Get all variables from the scope.

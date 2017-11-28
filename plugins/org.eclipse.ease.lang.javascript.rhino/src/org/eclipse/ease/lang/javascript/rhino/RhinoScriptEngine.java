@@ -18,7 +18,7 @@ import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.classloader.EaseClassLoader;
@@ -46,7 +46,7 @@ import org.mozilla.javascript.WrappedException;
 /**
  * A script engine to execute JavaScript code on a Rhino interpreter.
  */
-public class RhinoScriptEngine extends AbstractScriptEngine {
+public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 	private static final EaseClassLoader CLASSLOADER;
 
@@ -327,14 +327,6 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 		scope.put(name, scope, jsOut);
 	}
 
-	@Override
-	protected Object internalRemoveVariable(final String name) {
-		final Object result = getVariable(name);
-		fScope.delete(name);
-
-		return result;
-	}
-
 	private Object internaljavaToJS(final Object value, final Scriptable scope) {
 		Object result = null;
 		if (isPrimitiveType(value) || (value instanceof Scriptable)) {
@@ -356,12 +348,17 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
 	public String getSaveVariableName(final String name) {
 		return JavaScriptHelper.getSaveName(name);
 	}
+
 	/**
 	 * Method to get the global scope of this engine.
-	 * @return 
-	 * 			fScope
+	 *
+	 * @return fScope
 	 */
 	public ScriptableObject getScope() {
 		return fScope;
+	}
+
+	protected Context getCurrentContext() {
+		return fContext;
 	}
 }

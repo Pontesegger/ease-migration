@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.lang.python.py4j.internal.Py4jScriptEngine;
@@ -58,7 +59,7 @@ public abstract class EaseTestBase {
 
 	protected static class TeeOutput extends OutputStream {
 
-		private OutputStream[] fStreams;
+		private final OutputStream[] fStreams;
 
 		public TeeOutput(OutputStream... streams) {
 			fStreams = streams;
@@ -66,28 +67,28 @@ public abstract class EaseTestBase {
 
 		@Override
 		public void write(int b) throws IOException {
-			for (OutputStream outputStream : fStreams) {
+			for (final OutputStream outputStream : fStreams) {
 				outputStream.write(b);
 			}
 		}
 
 		@Override
 		public void write(byte[] b, int off, int len) throws IOException {
-			for (OutputStream outputStream : fStreams) {
+			for (final OutputStream outputStream : fStreams) {
 				outputStream.write(b, off, len);
 			}
 		}
 
 		@Override
 		public void flush() throws IOException {
-			for (OutputStream outputStream : fStreams) {
+			for (final OutputStream outputStream : fStreams) {
 				outputStream.flush();
 			}
 		}
 
 		@Override
 		public void close() throws IOException {
-			for (OutputStream outputStream : fStreams) {
+			for (final OutputStream outputStream : fStreams) {
 				outputStream.close();
 			}
 		}
@@ -100,10 +101,10 @@ public abstract class EaseTestBase {
 	 */
 	protected static class ByteArrayPrintStream extends PrintStream {
 		public static final String ENCODING = "UTF-8";
-		private ByteArrayOutputStream fByteArrayOutputStream;
+		private final ByteArrayOutputStream fByteArrayOutputStream;
 
 		protected static ByteArrayPrintStream build(OutputStream tee) throws UnsupportedEncodingException {
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			OutputStream out = byteArrayOutputStream;
 			// Uncomment this line of code to "tee" the output to stdout/err
 			out = new TeeOutput(byteArrayOutputStream, tee);
@@ -121,16 +122,16 @@ public abstract class EaseTestBase {
 
 		public String getAndClearOutput() throws Exception {
 			synchronized (fByteArrayOutputStream) {
-				String streamString = getOutput();
+				final String streamString = getOutput();
 				fByteArrayOutputStream.reset();
 				return streamString;
 			}
 		}
 
 		public String getOutput() throws Exception {
-			byte[] streamBytes = fByteArrayOutputStream.toByteArray();
+			final byte[] streamBytes = fByteArrayOutputStream.toByteArray();
 			// We do the conversion to String so that we get to compare strings in the asserts instead of arrays
-			String streamString = new String(streamBytes, ByteArrayPrintStream.ENCODING);
+			final String streamString = new String(streamBytes, ByteArrayPrintStream.ENCODING);
 			return streamString;
 		}
 	}
@@ -141,29 +142,29 @@ public abstract class EaseTestBase {
 		engine.setErrorStream(ByteArrayPrintStream.build(engine.getErrorStream()));
 	}
 
-	protected IScriptEngine createEngineWithoutBootstrap() throws Exception {
-		IScriptService scriptService = ScriptService.getService();
-		EngineDescription description = scriptService.getEngineByID(Py4jScriptEngine.ENGINE_ID);
+	protected IReplEngine createEngineWithoutBootstrap() throws Exception {
+		final IScriptService scriptService = ScriptService.getService();
+		final EngineDescription description = scriptService.getEngineByID(Py4jScriptEngine.ENGINE_ID);
 
 		// this is what description.createEngine() does, excluding the bootstrapping
-		Py4jScriptEngine engine = new Py4jScriptEngine();
+		final Py4jScriptEngine engine = new Py4jScriptEngine();
 		engine.setEngineDescription(description);
 		setStreamsForTest(engine);
 		return engine;
 	}
 
-	protected IScriptEngine createEngine() throws Exception {
+	protected IReplEngine createEngine() throws Exception {
 		// we need to retrieve the service singleton as the workspace is not available in headless tests
-		IScriptService scriptService = ScriptService.getService();
-		EngineDescription description = scriptService.getEngineByID(Py4jScriptEngine.ENGINE_ID);
-		IScriptEngine engine = description.createEngine();
+		final IScriptService scriptService = ScriptService.getService();
+		final EngineDescription description = scriptService.getEngineByID(Py4jScriptEngine.ENGINE_ID);
+		final IScriptEngine engine = description.createEngine();
 		setStreamsForTest(engine);
-		return engine;
+		return (IReplEngine) engine;
 	}
 
 	protected void waitUntil(long millis, Callable<Boolean> callable) throws Exception {
-		long endTime = System.currentTimeMillis() + millis;
-		while (!callable.call() && System.currentTimeMillis() < endTime) {
+		final long endTime = System.currentTimeMillis() + millis;
+		while (!callable.call() && (System.currentTimeMillis() < endTime)) {
 			Thread.sleep(100);
 		}
 		assertTrue(callable.call());
@@ -174,20 +175,20 @@ public abstract class EaseTestBase {
 	}
 
 	protected void assertRunning(IScriptEngine engine) throws Exception {
-		IAdaptable adaptable = (IAdaptable) engine;
-		waitUntil(() -> (adaptable.getAdapter(Process.class) != null && adaptable.getAdapter(Process.class).isAlive()) && !engine.isFinished());
+		final IAdaptable adaptable = (IAdaptable) engine;
+		waitUntil(() -> ((adaptable.getAdapter(Process.class) != null) && adaptable.getAdapter(Process.class).isAlive()) && !engine.isFinished());
 	}
 
 	protected void assertNotStarted(IScriptEngine engine) throws Exception {
-		IAdaptable adaptable = (IAdaptable) engine;
-		Process adapter = adaptable.getAdapter(Process.class);
-		waitUntil(() -> (adaptable.getAdapter(Process.class) == null || !adapter.isAlive()) && !engine.isFinished());
+		final IAdaptable adaptable = (IAdaptable) engine;
+		final Process adapter = adaptable.getAdapter(Process.class);
+		waitUntil(() -> ((adaptable.getAdapter(Process.class) == null) || !adapter.isAlive()) && !engine.isFinished());
 	}
 
 	protected void assertEngineTerminated(IScriptEngine engine) throws Exception {
-		IAdaptable adaptable = (IAdaptable) engine;
-		Process adapter = adaptable.getAdapter(Process.class);
-		waitUntil(() -> (adaptable.getAdapter(Process.class) == null || !adapter.isAlive()) && engine.isFinished());
+		final IAdaptable adaptable = (IAdaptable) engine;
+		final Process adapter = adaptable.getAdapter(Process.class);
+		waitUntil(() -> ((adaptable.getAdapter(Process.class) == null) || !adapter.isAlive()) && engine.isFinished());
 	}
 
 	protected void assertResultIsNone(ScriptResult result) {

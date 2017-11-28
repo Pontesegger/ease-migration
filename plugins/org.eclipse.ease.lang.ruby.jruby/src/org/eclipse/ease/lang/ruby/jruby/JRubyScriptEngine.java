@@ -84,9 +84,4 @@ public class JRubyScriptEngine extends AbstractScriptEngine {
 	protected void internalSetVariable(final String name, final Object content) {
 		fEngine.put("$" + name, content);
 	}
-
-	@Override
-	protected Object internalRemoveVariable(final String name) {
-		throw new RuntimeException("Oeration not supported");
-	}
 }

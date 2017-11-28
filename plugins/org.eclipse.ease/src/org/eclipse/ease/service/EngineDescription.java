@@ -17,8 +17,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.IDebugEngine;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
@@ -51,7 +53,7 @@ public class EngineDescription {
 	//
 	public List<ScriptType> getSupportedScriptTypes() {
 		if (fTypes == null) {
-			fTypes = new ArrayList<ScriptType>();
+			fTypes = new ArrayList<>();
 			final IScriptService scriptService = ScriptService.getService();
 
 			for (final IConfigurationElement child : fConfigurationElement.getChildren(BINDING)) {
@@ -90,7 +92,8 @@ public class EngineDescription {
 			final Object object = fConfigurationElement.createExecutableExtension(CLASS);
 			if (object instanceof IScriptEngine) {
 				// configure engine
-				((IScriptEngine) object).setEngineDescription(this);
+				if (object instanceof AbstractScriptEngine)
+					((AbstractScriptEngine) object).setEngineDescription(this);
 
 				// engine loaded, now load launch extensions
 				final IScriptService scriptService = ScriptService.getService();
@@ -128,17 +131,17 @@ public class EngineDescription {
 
 		// try to resolve by content type
 		try {
-			IContentType fileContentType = file.getContentDescription().getContentType();
+			final IContentType fileContentType = file.getContentDescription().getContentType();
 
-			for (ScriptType type : getSupportedScriptTypes()) {
-				for (String contentType : type.getContentTypes())
+			for (final ScriptType type : getSupportedScriptTypes()) {
+				for (final String contentType : type.getContentTypes())
 					if (contentType.equals(fileContentType.getId()))
 						return true;
 			}
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// did not work. Fall back to file extension
-			for (ScriptType type : getSupportedScriptTypes()) {
+			for (final ScriptType type : getSupportedScriptTypes()) {
 				if (file.getFileExtension().equalsIgnoreCase(type.getDefaultExtension()))
 					return true;
 			}
@@ -162,6 +165,18 @@ public class EngineDescription {
 			// not found, seems to be an invalid extension configuration
 			Logger.error(Activator.PLUGIN_ID, "Plugin extension configuration error for engine: " + toString(), e);
 			return false;
+		}
+	}
+
+	public boolean isReplShell() {
+		final String className = fConfigurationElement.getAttribute(CLASS);
+		try {
+			final Class<?> engineClass = getClass().getClassLoader().loadClass(className);
+			return IReplEngine.class.isAssignableFrom(engineClass);
+
+		} catch (final ClassNotFoundException e) {
+			// fallback, create instance and test
+			return createEngine() instanceof IReplEngine;
 		}
 	}
 }

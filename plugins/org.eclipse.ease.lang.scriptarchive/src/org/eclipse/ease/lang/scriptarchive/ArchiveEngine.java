@@ -357,9 +357,4 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 		else
 			throw new RuntimeException("Not supported");
 	}
-
-	@Override
-	protected Object internalRemoveVariable(String name) {
-		throw new RuntimeException("Not supported");
-	}
 }

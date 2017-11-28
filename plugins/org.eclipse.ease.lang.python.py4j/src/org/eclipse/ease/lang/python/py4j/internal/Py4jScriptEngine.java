@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
-import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
@@ -43,7 +43,7 @@ import py4j.ClientServer;
 import py4j.ClientServer.ClientServerBuilder;
 import py4j.JavaServer;
 
-public class Py4jScriptEngine extends AbstractScriptEngine {
+public class Py4jScriptEngine extends AbstractReplScriptEngine {
 
 	/**
 	 * The ID of the Engine, to match the declaration in the plugin.xml
@@ -337,11 +337,6 @@ public class Py4jScriptEngine extends AbstractScriptEngine {
 	@Override
 	protected void internalSetVariable(String name, Object content) {
 		fPythonSideEngine.internalSetVariable(name, content);
-	}
-
-	@Override
-	protected Object internalRemoveVariable(String name) {
-		throw new UnsupportedOperationException();
 	}
 
 	@SuppressWarnings("unchecked")

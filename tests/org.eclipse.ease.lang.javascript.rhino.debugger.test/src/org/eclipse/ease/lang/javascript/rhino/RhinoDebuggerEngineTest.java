@@ -26,7 +26,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.IDebugEngine;
-import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -243,7 +243,7 @@ public class RhinoDebuggerEngineTest {
 	@Test
 	public void getExceptionStackTrace() throws InterruptedException {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final IScriptEngine engine = scriptService.getEngineByID("org.eclipse.ease.javascript.rhinoDebugger").createEngine();
+		final IReplEngine engine = (IReplEngine) scriptService.getEngineByID("org.eclipse.ease.javascript.rhinoDebugger").createEngine();
 		// make sure engine does not terminate automatically (would discard the exception stacktrace)
 		engine.setTerminateOnIdle(false);
 		engine.executeSync(fMainFile);

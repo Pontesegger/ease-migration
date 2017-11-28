@@ -8,6 +8,7 @@ import java.net.URL;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.IDebugEngine;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
@@ -200,7 +201,9 @@ public class TestFile extends TestContainer implements ITestFile {
 			try {
 				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE, this);
 				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, getTestSuite());
-				fScriptEngine.setTerminateOnIdle(false);
+				if (fScriptEngine instanceof IReplEngine)
+					((IReplEngine) fScriptEngine).setTerminateOnIdle(false);
+
 				fScriptEngine.schedule();
 
 				// testfile setup

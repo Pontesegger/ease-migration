@@ -84,4 +84,9 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 		// FIXME to be implemented
 		return null;
 	}
+
+	@Override
+	public Object removeVariable(String name) {
+		throw new UnsupportedOperationException();
+	}
 }

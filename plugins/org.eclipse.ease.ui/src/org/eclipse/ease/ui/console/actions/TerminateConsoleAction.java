@@ -13,6 +13,7 @@ package org.eclipse.ease.ui.console.actions;
 import org.eclipse.debug.internal.ui.DebugPluginImages;
 import org.eclipse.debug.internal.ui.IDebugHelpContextIds;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.jface.action.Action;
@@ -25,11 +26,11 @@ import org.eclipse.ui.texteditor.IUpdate;
  */
 public class TerminateConsoleAction extends Action implements IUpdate {
 
-	private ScriptConsole mConsole;
+	private ScriptConsole fConsole;
 
 	/**
 	 * Creates a terminate action for the console
-	 * 
+	 *
 	 * @param window
 	 *            the window
 	 * @param console
@@ -38,7 +39,7 @@ public class TerminateConsoleAction extends Action implements IUpdate {
 	public TerminateConsoleAction(final IWorkbenchWindow window, final ScriptConsole console) {
 		super(ConsoleMessages.ConsoleTerminateAction_0);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IDebugHelpContextIds.CONSOLE_TERMINATE_ACTION);
-		mConsole = console;
+		fConsole = console;
 		setToolTipText(ConsoleMessages.ConsoleTerminateAction_1);
 		setImageDescriptor(DebugPluginImages.getImageDescriptor(IInternalDebugUIConstants.IMG_LCL_TERMINATE));
 		setDisabledImageDescriptor(DebugPluginImages.getImageDescriptor(IInternalDebugUIConstants.IMG_DLCL_TERMINATE));
@@ -47,28 +48,18 @@ public class TerminateConsoleAction extends Action implements IUpdate {
 		update();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.texteditor.IUpdate#update()
-	 */
 	@Override
 	public void update() {
-		IScriptEngine engine = mConsole.getScriptEngine();
+		final IScriptEngine engine = fConsole.getScriptEngine();
 		setEnabled(engine != null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.IAction#run()
-	 */
 	@Override
 	public void run() {
-		IScriptEngine engine = mConsole.getScriptEngine();
+		final IScriptEngine engine = fConsole.getScriptEngine();
 		if (engine != null) {
 
-			if (engine.getTerminateOnIdle())
+			if ((engine instanceof IReplEngine) && (((IReplEngine) engine).getTerminateOnIdle()))
 				// terminate completely
 				engine.terminate();
 
@@ -79,6 +70,6 @@ public class TerminateConsoleAction extends Action implements IUpdate {
 	}
 
 	public void dispose() {
-		mConsole = null;
+		fConsole = null;
 	}
 }

@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.IExecutionListener;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.Logger;
@@ -116,7 +117,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private int[] fSashWeights = new int[] { 70, 30 };
 
-	private IScriptEngine fScriptEngine;
+	private IReplEngine fScriptEngine;
 
 	private IMemento fInitMemento;
 
@@ -455,7 +456,11 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		}
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		fScriptEngine = scriptService.getEngineByID(id).createEngine();
+		final IScriptEngine candidate = scriptService.getEngineByID(id).createEngine();
+		if (candidate instanceof IReplEngine)
+			fScriptEngine = (IReplEngine) candidate;
+		else
+			throw new RuntimeException("Invalid engine selected for shell");
 
 		if (fScriptEngine != null) {
 			fScriptEngine.setTerminateOnIdle(false);

@@ -10,13 +10,12 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.eclipse.ease.AbstractScriptEngine;
-import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 
-public class NashornScriptEngine extends AbstractScriptEngine implements IScriptEngine {
+public class NashornScriptEngine extends AbstractReplScriptEngine {
 
 	private ScriptEngine fEngine;
 
@@ -36,9 +35,9 @@ public class NashornScriptEngine extends AbstractScriptEngine implements IScript
 
 	@Override
 	protected Map<String, Object> internalGetVariables() {
-		Map<String, Object> variables = new HashMap<String, Object>();
-		Bindings bindings = fEngine.getBindings(ScriptContext.ENGINE_SCOPE);
-		for (Entry<String, Object> entry : bindings.entrySet())
+		final Map<String, Object> variables = new HashMap<>();
+		final Bindings bindings = fEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+		for (final Entry<String, Object> entry : bindings.entrySet())
 			variables.put(entry.getKey(), entry.getValue());
 
 		return variables;
@@ -58,11 +57,6 @@ public class NashornScriptEngine extends AbstractScriptEngine implements IScript
 	}
 
 	@Override
-	protected Object internalRemoveVariable(final String name) {
-		return fEngine.getBindings(ScriptContext.ENGINE_SCOPE).remove(name);
-	}
-
-	@Override
 	public String getSaveVariableName(final String name) {
 		return JavaScriptHelper.getSaveName(name);
 	}
@@ -74,7 +68,7 @@ public class NashornScriptEngine extends AbstractScriptEngine implements IScript
 
 	@Override
 	protected void setupEngine() throws ScriptEngineException {
-		ScriptEngineManager engineManager = new ScriptEngineManager();
+		final ScriptEngineManager engineManager = new ScriptEngineManager();
 		fEngine = engineManager.getEngineByName("nashorn");
 
 		if (fEngine == null) {

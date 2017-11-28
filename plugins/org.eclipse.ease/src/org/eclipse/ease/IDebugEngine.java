@@ -36,4 +36,13 @@ public interface IDebugEngine extends IScriptEngine {
 	ScriptStackTrace getExceptionStackTrace();
 
 	void setupDebugger(ILaunch launch, boolean suspendOnStartup, boolean suspendOnScriptLoad, boolean showDynamicCode);
+
+	/**
+	 * Remove a variable from the scope.
+	 *
+	 * @param name
+	 *            variable to be removed.
+	 * @return
+	 */
+	Object removeVariable(final String name);
 }

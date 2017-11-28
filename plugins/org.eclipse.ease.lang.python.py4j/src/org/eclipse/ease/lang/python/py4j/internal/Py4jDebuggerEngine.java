@@ -83,4 +83,9 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 		// FIXME to be implemented
 		return null;
 	}
+
+	@Override
+	public Object removeVariable(String name) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -107,11 +107,6 @@ public class GroovyScriptEngine extends AbstractScriptEngine {
 	}
 
 	@Override
-	protected Object internalRemoveVariable(final String name) {
-		throw new RuntimeException("not implemented");
-	}
-
-	@Override
 	public String getSaveVariableName(final String name) {
 		return GroovyHelper.getSaveName(name);
 	}
