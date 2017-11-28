@@ -327,14 +327,6 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 	}
 
 	@Override
-	public String getSaveVariableName(String name) {
-		if (fInternalEngine != null)
-			return fInternalEngine.getSaveVariableName(name);
-
-		throw new RuntimeException("Not supported");
-	}
-
-	@Override
 	protected Object internalGetVariable(String name) {
 		throw new RuntimeException("Not supported");
 	}

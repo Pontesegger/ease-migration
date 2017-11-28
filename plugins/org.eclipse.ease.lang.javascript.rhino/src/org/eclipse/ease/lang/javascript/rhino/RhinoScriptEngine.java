@@ -344,11 +344,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return (value instanceof String) || (value instanceof Number) || (value instanceof Boolean);
 	}
 
-	@Override
-	public String getSaveVariableName(final String name) {
-		return JavaScriptHelper.getSaveName(name);
-	}
-
 	/**
 	 * Method to get the global scope of this engine.
 	 *

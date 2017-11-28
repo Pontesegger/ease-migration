@@ -11,7 +11,6 @@
 package org.eclipse.ease.modules;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -47,7 +46,8 @@ public class EnvironmentModule extends AbstractEnvironment {
 	@WrapToScript
 	public Object wrap(final Object toBeWrapped, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
 		// register new variable in script engine
-		final String identifier = getScriptEngine().getSaveVariableName(getWrappedVariableName(toBeWrapped));
+
+		final String identifier = getCodeFactory().getSaveVariableName(getWrappedVariableName(toBeWrapped));
 
 		final boolean reloaded = getScriptEngine().hasVariable(identifier);
 		getScriptEngine().setVariable(identifier, toBeWrapped);

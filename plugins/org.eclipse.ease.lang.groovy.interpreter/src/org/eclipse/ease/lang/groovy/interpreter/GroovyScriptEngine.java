@@ -9,7 +9,6 @@ import java.util.Map;
 import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.classloader.EaseClassLoader;
-import org.eclipse.ease.lang.groovy.GroovyHelper;
 
 import groovy.lang.GroovyShell;
 
@@ -104,11 +103,6 @@ public class GroovyScriptEngine extends AbstractScriptEngine {
 	@Override
 	protected void internalSetVariable(final String name, final Object content) {
 		fEngine.getContext().setVariable(name, content);
-	}
-
-	@Override
-	public String getSaveVariableName(final String name) {
-		return GroovyHelper.getSaveName(name);
 	}
 
 	@Override

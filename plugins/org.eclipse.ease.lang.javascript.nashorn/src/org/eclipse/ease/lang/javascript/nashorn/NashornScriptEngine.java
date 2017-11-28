@@ -57,11 +57,6 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	public String getSaveVariableName(final String name) {
-		return JavaScriptHelper.getSaveName(name);
-	}
-
-	@Override
 	public void registerJar(final URL url) {
 		// TODO Auto-generated method stub
 	}

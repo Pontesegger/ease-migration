@@ -34,7 +34,6 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.debugging.ScriptStackTrace;
-import org.eclipse.ease.lang.python.PythonHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
@@ -307,11 +306,6 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-	}
-
-	@Override
-	public String getSaveVariableName(final String name) {
-		return PythonHelper.getSaveName(name);
 	}
 
 	@Override

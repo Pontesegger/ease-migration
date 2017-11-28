@@ -176,16 +176,6 @@ public interface IScriptEngine {
 	boolean hasVariable(String name);
 
 	/**
-	 * Return a save name to be used for a variable. The returned value denotes a valid name to be used for a variable within this engine. The returned name
-	 * might already be in use.
-	 *
-	 * @param name
-	 *            variable name candidate
-	 * @return converted variable name
-	 */
-	String getSaveVariableName(String name);
-
-	/**
 	 * Get engine description for current engine.
 	 *
 	 * @return engine description

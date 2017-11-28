@@ -96,11 +96,6 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 	}
 
 	@Override
-	public String getSaveVariableName(String name) {
-		return name;
-	}
-
-	@Override
 	public void registerJar(URL url) {
 		fRegisteredJars.add(url);
 	}

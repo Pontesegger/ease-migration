@@ -35,11 +35,6 @@ public class AbstractReplScriptEngineTest {
 			}
 
 			@Override
-			public String getSaveVariableName(final String name) {
-				return null;
-			}
-
-			@Override
 			protected void teardownEngine() throws ScriptEngineException {
 			}
 

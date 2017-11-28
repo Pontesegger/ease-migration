@@ -250,11 +250,6 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	public String getSaveVariableName(final String name) {
-		return PythonHelper.getSaveName(name);
-	}
-
-	@Override
 	public void registerJar(final URL url) {
 		// FIXME implement jar classloader
 		throw new RuntimeException("Registering JARs is not supported for python");

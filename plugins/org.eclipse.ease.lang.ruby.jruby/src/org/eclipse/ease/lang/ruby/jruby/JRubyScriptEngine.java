@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.lang.ruby.RubyHelper;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 
@@ -53,11 +52,6 @@ public class JRubyScriptEngine extends AbstractScriptEngine {
 	@Override
 	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
 		return fEngine.runScriptlet(script.getCodeStream(), fileName);
-	}
-
-	@Override
-	public String getSaveVariableName(final String name) {
-		return RubyHelper.getSaveName(name);
 	}
 
 	@Override

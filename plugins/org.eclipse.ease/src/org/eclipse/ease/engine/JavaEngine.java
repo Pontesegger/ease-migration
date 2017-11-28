@@ -113,11 +113,6 @@ public class JavaEngine implements IScriptEngine {
 	}
 
 	@Override
-	public String getSaveVariableName(final String name) {
-		return name;
-	}
-
-	@Override
 	public PrintStream getOutputStream() {
 		return (fOutStream != null) ? fOutStream : System.out;
 	}
