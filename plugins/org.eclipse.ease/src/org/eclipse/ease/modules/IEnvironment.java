@@ -16,6 +16,15 @@ import org.eclipse.ease.IScriptEngine;
 
 public interface IEnvironment {
 
+	static IEnvironment getEnvironment(final IScriptEngine engine) {
+		for (final Object variable : engine.getVariables().values()) {
+			if (variable instanceof IEnvironment)
+				return (IEnvironment) variable;
+		}
+
+		return null;
+	}
+
 	IScriptEngine getScriptEngine();
 
 	Object getModule(final String name);

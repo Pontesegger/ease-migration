@@ -13,7 +13,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)";visibili
 Export-Package: org.eclipse.ease,
  org.eclipse.ease.debugging,
  org.eclipse.ease.debugging.events,
- org.eclipse.ease.engine,
  org.eclipse.ease.modules,
  org.eclipse.ease.service,
  org.eclipse.ease.sign,

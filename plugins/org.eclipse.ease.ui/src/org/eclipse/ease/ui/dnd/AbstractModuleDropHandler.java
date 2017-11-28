@@ -13,7 +13,6 @@ package org.eclipse.ease.ui.dnd;
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
-import org.eclipse.ease.modules.AbstractEnvironment;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ModuleHelper;
@@ -38,7 +37,7 @@ public abstract class AbstractModuleDropHandler implements IShellDropHandler {
 	 */
 	protected Object loadModule(final IScriptEngine scriptEngine, final String moduleID, final boolean force) {
 
-		final IEnvironment environment = AbstractEnvironment.getEnvironment(scriptEngine);
+		final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
 		if (environment != null) {
 			if ((force) || (environment.getModule(moduleID) == null)) {
 				if (ModuleHelper.resolveName(moduleID) != null) {

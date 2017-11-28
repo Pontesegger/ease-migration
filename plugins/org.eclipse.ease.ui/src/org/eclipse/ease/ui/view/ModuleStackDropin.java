@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.modules.AbstractEnvironment;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.IScriptService;
@@ -77,7 +76,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 
 		fModulesTable.setContentProvider((IStructuredContentProvider) inputElement -> {
 			if (inputElement instanceof IScriptEngine) {
-				final IEnvironment environment = AbstractEnvironment.getEnvironment((IScriptEngine) inputElement);
+				final IEnvironment environment = IEnvironment.getEnvironment((IScriptEngine) inputElement);
 				if (environment != null) {
 					final List<ModuleDefinition> loadedModules = new ArrayList<>();
 					for (final Object element : new ArrayList<>(environment.getModules())) {
