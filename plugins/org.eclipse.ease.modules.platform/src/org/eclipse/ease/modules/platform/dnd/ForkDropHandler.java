@@ -15,7 +15,6 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.modules.AbstractEnvironment;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.platform.ScriptingModule;
 import org.eclipse.ease.service.IScriptService;
@@ -40,7 +39,7 @@ public class ForkDropHandler implements IShellDropHandler {
 
 		if (scriptType != null) {
 			// resource not supported by current engine, spawn new one
-			final IEnvironment environment = AbstractEnvironment.getEnvironment(scriptEngine);
+			final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
 			if (environment != null) {
 				if (environment.getModule(ScriptingModule.class) == null) {
 					if (environment.loadModule(ScriptingModule.MODULE_ID, false) == null)
