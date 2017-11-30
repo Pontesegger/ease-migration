@@ -16,12 +16,12 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.ScriptDebugTarget;
+import org.eclipse.ease.debugging.model.EaseDebugTarget;
 
 /**
  * ScriptDebugTarget for communication between Eclipse framework and Python debugger.
  */
-public class PythonDebugTarget extends ScriptDebugTarget {
+public class PythonDebugTarget extends EaseDebugTarget {
 	private static final String pyBreakpointType = PythonDebugModelPresentation.ID;
 
 	/**

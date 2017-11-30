@@ -11,6 +11,7 @@
 
 package org.eclipse.ease.debugging;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ScriptStackTrace extends LinkedList<IScriptDebugFrame> {
@@ -22,8 +23,8 @@ public class ScriptStackTrace extends LinkedList<IScriptDebugFrame> {
 
 		final ScriptStackTrace result = new ScriptStackTrace();
 
-		for (final IScriptDebugFrame frame : this)
-			result.add(new ScriptDebugFrame(frame));
+		for (final IScriptDebugFrame frame : new ArrayList<>(this))
+			result.add(new EaseDebugFrame(frame));
 
 		return result;
 	}

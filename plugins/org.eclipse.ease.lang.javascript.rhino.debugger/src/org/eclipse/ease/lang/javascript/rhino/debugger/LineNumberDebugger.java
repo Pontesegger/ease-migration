@@ -12,17 +12,11 @@ package org.eclipse.ease.lang.javascript.rhino.debugger;
 
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.events.IDebugEvent;
 
 public class LineNumberDebugger extends RhinoDebugger {
 
 	public LineNumberDebugger(IDebugEngine engine) {
 		super(engine, false);
-	}
-
-	@Override
-	protected void fireDispatchEvent(final IDebugEvent event) {
-		// nothing to do
 	}
 
 	@Override

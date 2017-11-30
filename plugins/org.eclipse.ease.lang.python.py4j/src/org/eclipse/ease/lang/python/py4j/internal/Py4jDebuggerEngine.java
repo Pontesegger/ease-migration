@@ -11,12 +11,16 @@
 package org.eclipse.ease.lang.python.py4j.internal;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map.Entry;
 
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
-import org.eclipse.ease.debugging.EventDispatchJob;
 import org.eclipse.ease.debugging.ScriptStackTrace;
+import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.lang.python.debugger.IPythonDebugEngine;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
@@ -72,10 +76,7 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 
 		setDebugger(debugger);
 
-		final EventDispatchJob dispatcher = new EventDispatchJob(target, debugger);
-		target.setDispatcher(dispatcher);
-		debugger.setDispatcher(dispatcher);
-		dispatcher.schedule();
+		new EventDispatchJob(target, debugger);
 	}
 
 	@Override
@@ -87,5 +88,17 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	@Override
 	public Object removeVariable(String name) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Collection<EaseDebugVariable> getVariables(Object scope) {
+		// FIXME to be implemented correctly on the scope
+
+		final Collection<EaseDebugVariable> variables = new ArrayList<>();
+
+		for (final Entry<String, Object> entry : getVariables().entrySet())
+			variables.add(new EaseDebugVariable(entry.getKey(), entry.getValue(), "Python"));
+
+		return variables;
 	}
 }

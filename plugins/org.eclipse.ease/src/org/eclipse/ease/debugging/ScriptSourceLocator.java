@@ -14,13 +14,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IPersistableSourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.ease.debugging.model.EaseDebugStackFrame;
 
 public class ScriptSourceLocator implements IPersistableSourceLocator {
 
 	@Override
 	public Object getSourceElement(final IStackFrame stackFrame) {
-		if (stackFrame instanceof ScriptDebugStackFrame)
-			return ((ScriptDebugStackFrame) stackFrame).getScript();
+		if (stackFrame instanceof EaseDebugStackFrame)
+			return ((EaseDebugStackFrame) stackFrame).getScript();
 
 		return null;
 	}

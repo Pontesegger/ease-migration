@@ -12,5 +12,5 @@ org.eclipse.ease/debug/scriptEngine=false
 # trace enablement for module wrappers
 org.eclipse.ease/debug/moduleWrapper=false
 
-# trace enablement for debugging event dispatch
-org.eclipse.ease/debug/eventDispatch=false
+# trace enablement for debugger events
+org.eclipse.ease/debug/debuggerEvents=false

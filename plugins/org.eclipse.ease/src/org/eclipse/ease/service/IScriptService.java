@@ -23,7 +23,7 @@ import org.eclipse.ease.modules.ModuleDefinition;
  * Global service to create script engines and to query configuration data from the scripting extensions. To get the service instance use
  *
  * <pre>
- * final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
+ * final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
  * </pre>
  */
 public interface IScriptService {

@@ -15,9 +15,9 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.ScriptDebugTarget;
+import org.eclipse.ease.debugging.model.EaseDebugTarget;
 
-public class RhinoDebugTarget extends ScriptDebugTarget {
+public class RhinoDebugTarget extends EaseDebugTarget {
 
 	public RhinoDebugTarget(final ILaunch launch, final boolean suspendOnStartup, final boolean suspendOnScriptLoad, final boolean showDynamicCode) {
 		super(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);
@@ -28,10 +28,6 @@ public class RhinoDebugTarget extends ScriptDebugTarget {
 		return "EASE Rhino Debugger";
 	}
 
-	// ************************************************************
-	// IEventProcessor
-	// ************************************************************
-
 	@Override
 	protected IBreakpoint[] getBreakpoints(final Script script) {
 		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints("org.eclipse.wst.jsdt.debug.model");
@@ -40,6 +36,11 @@ public class RhinoDebugTarget extends ScriptDebugTarget {
 	@Override
 	public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
 		return true;
+	}
+
+	@Override
+	public boolean canSuspend() {
+		return false;
 	}
 
 	@Override

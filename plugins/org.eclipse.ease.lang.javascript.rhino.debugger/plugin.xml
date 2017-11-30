@@ -66,5 +66,12 @@
          </action>
       </viewContribution>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.watchExpressionDelegates">
+      <watchExpressionDelegate
+            debugModel="org.eclipse.ease.debugModelPresentation.rhino"
+            delegateClass="org.eclipse.ease.debugging.model.EaseWatchExpressionDelegate">
+      </watchExpressionDelegate>
+   </extension>
 
 </plugin>

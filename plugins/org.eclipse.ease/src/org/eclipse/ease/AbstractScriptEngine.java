@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.ISecurityCheck.ActionType;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
-import org.eclipse.ease.debugging.ScriptDebugFrame;
+import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
@@ -205,7 +205,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			try {
 				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Executing script (" + script.getTitle() + "):", script.getCode());
 
-				fStackTrace.add(0, new ScriptDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE));
+				fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE));
 
 				// apply security checks
 				final List<ISecurityCheck> securityChecks = fSecurityChecks.get(ActionType.INJECT_CODE);

@@ -11,34 +11,31 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino.debugger;
 
+import java.io.StringReader;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.AbstractScriptDebugger;
+import org.eclipse.ease.debugging.AbstractEaseDebugger;
+import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
-import org.eclipse.ease.debugging.ScriptDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.debug.DebugFrame;
 import org.mozilla.javascript.debug.DebuggableScript;
 import org.mozilla.javascript.debug.Debugger;
 
-public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
+public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 	private static final Pattern PROTOTYPE_PATTERN = Pattern.compile("^(.*)\\.prototype\\.(.*)\\s*=\\s*function\\(.*$");
 	private static final Pattern PROPERTY_PATTERN = Pattern.compile("^\\s*(.*)\\s:\\sfunction\\(.*$");
 
-	public class RhinoDebugFrame extends ScriptDebugFrame implements DebugFrame, IScriptDebugFrame {
+	public class RhinoDebugFrame extends EaseDebugFrame implements DebugFrame, IScriptDebugFrame {
 
 		private final String fFunctionName;
 
@@ -155,7 +152,6 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 			}
 		}
 
-		@Override
 		public Map<String, Object> getVariables() {
 			final Map<String, Object> result = RhinoScriptEngine.getVariables(fScope);
 
@@ -163,23 +159,19 @@ public class RhinoDebugger extends AbstractScriptDebugger implements Debugger {
 		}
 
 		@Override
-		public Map<String, Object> getVariables(final Object parent) {
-			if (parent instanceof NativeObject) {
-				final Map<String, Object> children = new TreeMap<>();
-				for (final Object key : ((NativeObject) parent).getIds())
-					children.put(key.toString(), ((NativeObject) parent).get(key));
+		public void setVariable(String name, Object content) {
+			((RhinoDebuggerEngine) getEngine()).setVariable(name, content, fScope);
+		}
 
-				return children;
-			} else if (parent instanceof NativeArray) {
-				final Map<String, Object> children = new LinkedHashMap<>();
-
-				for (final Object key : ((NativeArray) parent).getIds())
-					children.put("[" + key + "]", ((NativeArray) parent).get(key));
-
-				return children;
+		@Override
+		public Object inject(String expression) throws Throwable {
+			try {
+				final StringReader reader = new StringReader(expression);
+				return RhinoScriptEngine.getContext().evaluateReader(fScope, reader, null, 1, null);
+			} catch (final Throwable e) {
+				// FIXME: move to script engine to get correct error handling
+				throw e;
 			}
-
-			return super.getVariables(parent);
 		}
 	}
 

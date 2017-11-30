@@ -24,31 +24,29 @@ import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.AbstractScriptDebugger;
-import org.eclipse.ease.debugging.IEventProcessor;
+import org.eclipse.ease.debugging.AbstractEaseDebugger;
+import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
-import org.eclipse.ease.debugging.ScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
+import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.debugging.events.IDebugEvent;
-import org.eclipse.ease.debugging.events.TerminateRequest;
+import org.eclipse.ease.debugging.events.model.TerminateRequest;
 
 /**
  * Debugger class handling communication between Python and Eclipse.
  */
-public class PythonDebugger extends AbstractScriptDebugger implements IEventProcessor, IExecutionListener {
+public class PythonDebugger extends AbstractEaseDebugger implements IEventProcessor, IExecutionListener {
 	/**
-	 * Variable name for {@link PythonDebugger} in Python engine.
-	 * <p>
-	 * During setup phase set this variable <b>BEFORE</b> calling edb.py
+	 * Variable name for {@link PythonDebugger} in Python engine. During setup phase set this variable <b>BEFORE</b> calling edb.py.
 	 */
 	public static final String PYTHON_DEBUGGER_VARIABLE = "_pyease_debugger";
 
 	/**
-	 * Custom {@link ScriptDebugFrame} parsing the data from {@link IPyFrame} to more usable format.
+	 * Custom {@link EaseDebugFrame} parsing the data from {@link IPyFrame} to more usable format.
 	 */
-	public class PythonDebugFrame extends ScriptDebugFrame implements IScriptDebugFrame {
+	public class PythonDebugFrame extends EaseDebugFrame implements IScriptDebugFrame {
 		/**
-		 * Constructor parses information from {@link IPyFrame} to correct parameters for {@link ScriptDebugFrame#ScriptDebugFrame(Script, int, int)}.
+		 * Constructor parses information from {@link IPyFrame} to correct parameters for {@link EaseDebugFrame#ScriptDebugFrame(Script, int, int)}.
 		 *
 		 * @param frame
 		 *            {@link IPyFrame} with information about the current execution frame.
@@ -57,11 +55,6 @@ public class PythonDebugger extends AbstractScriptDebugger implements IEventProc
 			super(fScriptRegistry.get(frame.getFilename()), frame.getLineNumber(), TYPE_FILE);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.ease.debugging.ScriptDebugFrame#getName()
-		 */
 		@Override
 		public String getName() {
 			final Script script = getScript();
@@ -85,20 +78,6 @@ public class PythonDebugger extends AbstractScriptDebugger implements IEventProc
 
 			return "(unknown source)";
 		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.ease.debugging.ScriptDebugFrame#getVariables()
-		 */
-		@Override
-		public Map<String, Object> getVariables() {
-			// Check to avoid NPE if shut down
-			if (getEngine() != null) {
-				return getEngine().getVariables();
-			}
-			return null;
-		}
 	}
 
 	/**
@@ -107,7 +86,7 @@ public class PythonDebugger extends AbstractScriptDebugger implements IEventProc
 	private ICodeTracer fCodeTracer;
 
 	/**
-	 * @see AbstractScriptDebugger#AbstractScriptDebugger(IScriptEngine, boolean)
+	 * @see AbstractEaseDebugger#AbstractScriptDebugger(IScriptEngine, boolean)
 	 */
 	public PythonDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		super(engine, showDynamicCode);

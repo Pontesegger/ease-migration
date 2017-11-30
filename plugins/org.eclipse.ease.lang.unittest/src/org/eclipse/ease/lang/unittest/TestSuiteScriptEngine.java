@@ -13,6 +13,7 @@ package org.eclipse.ease.lang.unittest;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.debugging.ScriptStackTrace;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
@@ -321,5 +323,10 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 			engine.registerJar(jarLocation);
 
 		return engine;
+	}
+
+	@Override
+	public Collection<EaseDebugVariable> getVariables(Object scope) {
+		throw new UnsupportedOperationException();
 	}
 }

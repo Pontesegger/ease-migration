@@ -22,8 +22,8 @@ import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.classloader.EaseClassLoader;
+import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
-import org.eclipse.ease.debugging.ScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
@@ -168,6 +168,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	private Object internalExecute(final Script script, final Object reference, final String fileName) throws Throwable {
+
 		// remove an eventually cached terminate request
 		((ObservingContextFactory) ContextFactory.getGlobal()).cancelTerminate(getContext());
 
@@ -205,7 +206,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			fExceptionStackTrace = getStackTrace().clone();
 			if ((fExceptionStackTrace.isEmpty()) || (((script != null) && (!script.equals(fExceptionStackTrace.get(0).getScript()))))) {
 				// topmost script is not what we expected, seems it was not put on the stack
-				fExceptionStackTrace.add(0, new ScriptDebugFrame(script, e.lineNumber(), IScriptDebugFrame.TYPE_FILE));
+				fExceptionStackTrace.add(0, new EaseDebugFrame(script, e.lineNumber(), IScriptDebugFrame.TYPE_FILE));
 			}
 
 			// now handle error
@@ -327,7 +328,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		scope.put(name, scope, jsOut);
 	}
 
-	private Object internaljavaToJS(final Object value, final Scriptable scope) {
+	protected Object internaljavaToJS(final Object value, final Scriptable scope) {
 		Object result = null;
 		if (isPrimitiveType(value) || (value instanceof Scriptable)) {
 			result = value;

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.debugger.actions;
 
-import org.eclipse.ease.debugging.ScriptDebugVariable;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
@@ -35,8 +35,8 @@ public class FrameworkFilterAction extends ViewFilterAction {
 	 */
 	@Override
 	public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-		if (element instanceof ScriptDebugVariable) {
-			final ScriptDebugVariable variable = (ScriptDebugVariable) element;
+		if (element instanceof EaseDebugVariable) {
+			final EaseDebugVariable variable = (EaseDebugVariable) element;
 			return !variable.getName().startsWith("_pyease_");
 		}
 

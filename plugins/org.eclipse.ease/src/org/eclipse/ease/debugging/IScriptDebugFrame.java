@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging;
 
-import java.util.Map;
-
 import org.eclipse.ease.Script;
 
 public interface IScriptDebugFrame {
@@ -28,9 +26,9 @@ public interface IScriptDebugFrame {
 
 	String getName();
 
-	Map<String, Object> getVariables();
-
-	Map<String, Object> getVariables(Object parent);
-
 	void setLineNumber(int lineNumber);
+
+	void setVariable(String name, Object content);
+
+	Object inject(String expression) throws Throwable;
 }

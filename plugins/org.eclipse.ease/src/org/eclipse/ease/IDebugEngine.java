@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.util.Collection;
+
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.debugging.ScriptStackTrace;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
 
 /**
  * Interface to be implemented by a script debug engine.
@@ -45,4 +48,13 @@ public interface IDebugEngine extends IScriptEngine {
 	 * @return
 	 */
 	Object removeVariable(final String name);
+
+	/**
+	 * Get variables within a specific scope or child elements for a given object
+	 *
+	 * @param scope
+	 *            scope or parent object
+	 * @return variables assigned to scope
+	 */
+	Collection<EaseDebugVariable> getVariables(Object scope);
 }

@@ -16,7 +16,7 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.DynamicContentEditorInput;
-import org.eclipse.ease.debugging.ScriptDebugStackFrame;
+import org.eclipse.ease.debugging.model.EaseDebugStackFrame;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorDescriptor;
@@ -36,9 +36,9 @@ public class PythonDebugModelPresentation implements IDebugModelPresentation {
 
 	@Override
 	public String getText(final Object element) {
-		if (element instanceof ScriptDebugStackFrame) {
+		if (element instanceof EaseDebugStackFrame) {
 			// FIXME ScriptDebugStackFrame.getName needs refactoring
-			return ((ScriptDebugStackFrame) element).getDebugFrame().getName();
+			return ((EaseDebugStackFrame) element).getDebugFrame().getName();
 		}
 
 		return null;
