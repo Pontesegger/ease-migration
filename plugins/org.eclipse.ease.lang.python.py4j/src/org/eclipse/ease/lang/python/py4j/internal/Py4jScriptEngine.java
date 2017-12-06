@@ -80,7 +80,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		private final OutputStream fWriter;
 		private final String fStreamName;
 
-		public StreamGobbler(InputStream stream, OutputStream output, String streamName) {
+		public StreamGobbler(final InputStream stream, final OutputStream output, final String streamName) {
 			fReader = stream;
 			fWriter = output;
 			fStreamName = streamName;
@@ -138,7 +138,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		}
 	}
 
-	private Process startPythonProcess(int javaListeningPort) throws IOException, MalformedURLException, URISyntaxException, CoreException {
+	private Process startPythonProcess(final int javaListeningPort) throws IOException, MalformedURLException, URISyntaxException, CoreException {
 		final ProcessBuilder pb = new ProcessBuilder();
 
 		// Patch Python path to also be aware of Py4J
@@ -201,15 +201,15 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		return py4jEaseMain;
 	}
 
-	public void pythonStartupComplete(int pythonPort, IPythonSideEngine pythonSideEngine) {
+	public void pythonStartupComplete(final int pythonPort, final IPythonSideEngine pythonSideEngine) {
 		final JavaServer javaServer = (JavaServer) fGatewayServer.getJavaServer();
 		javaServer.resetCallbackClient(javaServer.getCallbackClient().getAddress(), pythonPort);
-		this.fPythonSideEngine = pythonSideEngine;
+		fPythonSideEngine = pythonSideEngine;
 		fPythonStartupComplete.countDown();
 	}
 
 	@Override
-	protected Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable {
+	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Throwable {
 		if (uiThread) {
 			// run in UI thread
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
@@ -228,7 +228,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		}
 	}
 
-	protected Object internalExecute(Script script, String fileName) throws Throwable, Exception {
+	protected Object internalExecute(final Script script, final String fileName) throws Throwable, Exception {
 		IInteractiveReturn interactiveReturn;
 		if (script.isShellMode()) {
 			interactiveReturn = fPythonSideEngine.executeInteractive(script.getCode());
@@ -309,12 +309,12 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	public void registerJar(URL url) {
+	public void registerJar(final URL url) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	protected Object internalGetVariable(String name) {
+	protected Object internalGetVariable(final String name) {
 		return fPythonSideEngine.internalGetVariable(name);
 	}
 
@@ -324,18 +324,18 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected boolean internalHasVariable(String name) {
+	protected boolean internalHasVariable(final String name) {
 		return fPythonSideEngine.internalHasVariable(name);
 	}
 
 	@Override
-	protected void internalSetVariable(String name, Object content) {
+	protected void internalSetVariable(final String name, final Object content) {
 		fPythonSideEngine.internalSetVariable(name, content);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public <T> T getAdapter(final Class<T> adapter) {
 		if (adapter.isInstance(fPythonProcess)) {
 			return (T) fPythonProcess;
 		}

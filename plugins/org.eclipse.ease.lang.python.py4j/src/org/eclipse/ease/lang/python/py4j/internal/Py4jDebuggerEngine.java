@@ -86,7 +86,7 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	}
 
 	@Override
-	public Object removeVariable(String name) {
+	public Object removeVariable(final String name) {
 		throw new UnsupportedOperationException();
 	}
 

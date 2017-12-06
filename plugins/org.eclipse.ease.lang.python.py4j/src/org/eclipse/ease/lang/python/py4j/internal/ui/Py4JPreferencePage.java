@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -39,13 +40,13 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 	}
 
 	@Override
-	public void init(IWorkbench workbench) {
+	public void init(final IWorkbench workbench) {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
 	@Override
 	protected void createFieldEditors() {
-		addField(new FileFieldEditor(Py4JScriptEnginePrefConstants.INTERPRETER, "Python location:", false, FileFieldEditor.VALIDATE_ON_KEY_STROKE,
+		addField(new FileFieldEditor(Py4JScriptEnginePrefConstants.INTERPRETER, "Python location:", false, StringFieldEditor.VALIDATE_ON_KEY_STROKE,
 				getFieldEditorParent()) {
 			private Button variablesButton;
 
@@ -59,10 +60,10 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 			}
 
 			protected void variablesPressed() {
-				StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getTextControl().getShell());
+				final StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getTextControl().getShell());
 				if (dialog.open() == Window.OK) {
 					getTextControl().insert(dialog.getVariableExpression());
-	                valueChanged();
+					valueChanged();
 				}
 			}
 
@@ -72,14 +73,14 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 			 * @param parent
 			 * @return Button
 			 */
-			protected Button getVariablesControl(Composite parent) {
+			protected Button getVariablesControl(final Composite parent) {
 				if (variablesButton == null) {
 					variablesButton = new Button(parent, SWT.PUSH);
 					variablesButton.setText("Variables...");
 					variablesButton.setFont(parent.getFont());
 					variablesButton.addSelectionListener(new SelectionAdapter() {
 						@Override
-						public void widgetSelected(SelectionEvent evt) {
+						public void widgetSelected(final SelectionEvent evt) {
 							variablesPressed();
 						}
 					});
@@ -91,12 +92,12 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 			}
 
 			@Override
-			protected void doFillIntoGrid(Composite parent, int numColumns) {
+			protected void doFillIntoGrid(final Composite parent, final int numColumns) {
 				super.doFillIntoGrid(parent, numColumns - 1);
 				variablesButton = getVariablesControl(parent);
-				GridData gd = new GridData();
+				final GridData gd = new GridData();
 				gd.horizontalAlignment = GridData.FILL;
-				int widthHint = convertHorizontalDLUsToPixels(variablesButton, IDialogConstants.BUTTON_WIDTH);
+				final int widthHint = convertHorizontalDLUsToPixels(variablesButton, IDialogConstants.BUTTON_WIDTH);
 				gd.widthHint = Math.max(widthHint, variablesButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
 				variablesButton.setLayoutData(gd);
 			}
@@ -107,31 +108,42 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 				String msg = null;
 				String info = null;
 
-				String path = getTextControl().getText();
-				if (path != null) {
-					path = path.trim();
+				String rawPath = getTextControl().getText();
+				if (rawPath != null) {
+					rawPath = rawPath.trim();
 				} else {
-					path = "";//$NON-NLS-1$
+					rawPath = "";//$NON-NLS-1$
 				}
 
-				IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+				final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
+				String resolvedPath;
 				try {
-					path = variableManager.performStringSubstitution(path);
-				} catch (CoreException e) {
+					resolvedPath = variableManager.performStringSubstitution(rawPath);
+				} catch (final CoreException e) {
 					msg = e.getLocalizedMessage();
+					resolvedPath = "";
 				}
 
 				if (msg == null) {
-					if (path.isEmpty()) {
-						msg = getErrorMessage();
-					} else {
-						File file = new File(path);
-						if (file.isFile() && file.isAbsolute()) {
-							// all good
-						} else if (file.isDirectory() || path.contains("/") || path.contains("\\")) {
+					if (resolvedPath.isEmpty()) {
+						if (rawPath.isEmpty()) {
 							msg = getErrorMessage();
 						} else {
-							info = "Python will be launched from System PATH unless an absolute location for Python is provided.";
+							msg = "Variable used in Python location has not resolved to anything";
+						}
+					} else {
+						final File file = new File(resolvedPath);
+						if (file.isFile() && file.isAbsolute()) {
+							if (resolvedPath.equals(rawPath)) {
+								// all good and the user can see what is going to be used
+							} else {
+								// show the user how the path has been resolved
+								info = "'" + resolvedPath + "' will be used as the Python location.";
+							}
+						} else if (file.isDirectory() || resolvedPath.contains("/") || resolvedPath.contains("\\")) {
+							msg = getErrorMessage() + ". The current setting is resolving to '" + resolvedPath + "'.";
+						} else {
+							info = "'" + resolvedPath + "' will be launched from PATH unless an absolute location is provided.";
 						}
 					}
 				}
