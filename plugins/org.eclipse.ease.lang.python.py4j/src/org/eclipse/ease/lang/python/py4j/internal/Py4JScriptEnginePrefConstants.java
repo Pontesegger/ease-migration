@@ -16,4 +16,7 @@ public interface Py4JScriptEnginePrefConstants {
 
 	String INTERPRETER = PREFIX + "INTERPRETER";
 	String DEFAULT_INTERPRETER = "python"; //$NON-NLS-1$
+
+	String IGNORE_PYTHON_ENV_VARIABLES = PREFIX + "IGNORE_PYTHON_ENV_VARIABLES";
+	boolean DEFAULT_IGNORE_PYTHON_ENV_VARIABLES = false;
 }

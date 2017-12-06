@@ -21,6 +21,7 @@ import org.eclipse.ease.lang.python.py4j.internal.Activator;
 import org.eclipse.ease.lang.python.py4j.internal.Py4JScriptEnginePrefConstants;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -169,6 +170,12 @@ public class Py4JPreferencePage extends FieldEditorPreferencePage implements IWo
 			}
 		});
 
+		final Composite fieldEditorParent = getFieldEditorParent();
+		final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(Py4JScriptEnginePrefConstants.IGNORE_PYTHON_ENV_VARIABLES,
+				"Ignore all PYTHON* environment variables when launching Python", fieldEditorParent);
+		booleanFieldEditor.getDescriptionControl(fieldEditorParent).setToolTipText(
+				"Ignore all PYTHON* environment variables, e.g. PYTHONPATH and PYTHONHOME, that might be set. (-E command line option to Python)");
+		addField(booleanFieldEditor);
 	}
 
 }

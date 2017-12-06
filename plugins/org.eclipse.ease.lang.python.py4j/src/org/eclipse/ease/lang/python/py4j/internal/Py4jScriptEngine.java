@@ -18,6 +18,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +37,7 @@ import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.tools.RunnableWithResult;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
@@ -141,15 +144,9 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	private Process startPythonProcess(final int javaListeningPort) throws IOException, MalformedURLException, URISyntaxException, CoreException {
 		final ProcessBuilder pb = new ProcessBuilder();
 
-		// Patch Python path to also be aware of Py4J
-		String pythonPath = System.getenv("PYTHONPATH");
-		final String pathSeparator = System.getProperty("path.separator");
+		final List<String> prependsPythonPath = new ArrayList<>();
 
-		if (pythonPath != null) {
-			pythonPath = getPy4jPythonSrc().toString() + pathSeparator + pythonPath;
-		} else {
-			pythonPath = getPy4jPythonSrc().toString();
-		}
+		prependsPythonPath.add(getPy4jPythonSrc().toString());
 
 		// Add EASE Python directory to python path
 		final Bundle bundle = Platform.getBundle("org.eclipse.ease.lang.python");
@@ -157,25 +154,27 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 			URL url = bundle.getEntry("pysrc");
 			url = FileLocator.toFileURL(url);
 			final URI uri = new URI(url.getProtocol(), url.getPath(), null);
-			pythonPath += pathSeparator + new File(uri).getAbsolutePath();
+			prependsPythonPath.add(new File(uri).getAbsolutePath());
 		} catch (final IllegalStateException e) {
 			Logger.error(Activator.PLUGIN_ID, "Cannot get entry pysrc because the plugin has not been initialized properly.", e);
 		} catch (final IOException | URISyntaxException e) {
 			Logger.error(Activator.PLUGIN_ID, "Cannot append additional Python modules to search path.", e);
 		}
 
-		pb.environment().put("PYTHONPATH", pythonPath);
-
-		String interpreter = Activator.getDefault().getPreferenceStore().getString(Py4JScriptEnginePrefConstants.INTERPRETER);
+		final IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
+		String interpreter = preferenceStore.getString(Py4JScriptEnginePrefConstants.INTERPRETER);
+		final boolean ignorePythonEnvVariables = preferenceStore.getBoolean(Py4JScriptEnginePrefConstants.IGNORE_PYTHON_ENV_VARIABLES);
 		final IStringVariableManager variableManager = VariablesPlugin.getDefault().getStringVariableManager();
 		interpreter = variableManager.performStringSubstitution(interpreter);
 
 		pb.command().add(interpreter);
 		pb.command().add("-u");
-		pb.command().add(
-
-				getPy4jEaseMainPy().toString());
+		if (ignorePythonEnvVariables) {
+			pb.command().add("-E");
+		}
+		pb.command().add(getPy4jEaseMainPy().toString());
 		pb.command().add(Integer.toString(javaListeningPort));
+		pb.command().addAll(prependsPythonPath);
 
 		final Process start = pb.start();
 		return start;

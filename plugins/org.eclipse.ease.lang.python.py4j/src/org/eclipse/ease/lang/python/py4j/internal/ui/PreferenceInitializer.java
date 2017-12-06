@@ -14,12 +14,16 @@ package org.eclipse.ease.lang.python.py4j.internal.ui;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.ease.lang.python.py4j.internal.Activator;
 import org.eclipse.ease.lang.python.py4j.internal.Py4JScriptEnginePrefConstants;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		Activator.getDefault().getPreferenceStore().setDefault(Py4JScriptEnginePrefConstants.INTERPRETER, Py4JScriptEnginePrefConstants.DEFAULT_INTERPRETER);
+		final IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
+		preferenceStore.setDefault(Py4JScriptEnginePrefConstants.INTERPRETER, Py4JScriptEnginePrefConstants.DEFAULT_INTERPRETER);
+		preferenceStore.setDefault(Py4JScriptEnginePrefConstants.IGNORE_PYTHON_ENV_VARIABLES,
+				Py4JScriptEnginePrefConstants.DEFAULT_IGNORE_PYTHON_ENV_VARIABLES);
 	}
 
 }

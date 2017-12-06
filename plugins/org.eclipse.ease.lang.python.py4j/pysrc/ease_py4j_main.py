@@ -9,6 +9,15 @@
 #     Jonah Graham (Kichwa Coders) - initial API and implementation
 ###############################################################################
 
+if __name__ == '__main__':
+	# To be able to import all the py4j and related items, we need to add to the PYTHONPATH
+	# all the correct paths. Because we may be launched with -E, the command line provides
+	# all the paths to what we need.
+	# sys.argv[1] - required - the port to conenct o
+	# sys.argv[2:] - optional - paths to prepend on sys.path
+	import sys
+	sys.path[0:0] = sys.argv[2:]
+
 import code
 import os
 import py4j
