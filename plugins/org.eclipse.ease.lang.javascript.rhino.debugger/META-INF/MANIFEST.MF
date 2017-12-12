@@ -14,6 +14,9 @@ Require-Bundle: org.mozilla.javascript;bundle-version="[1.7.2,2.0.0)",
  org.eclipse.ui.editors;bundle-version="[3.7.0,4.0.0)",
  org.eclipse.ease.lang.javascript.rhino,
  org.eclipse.ease.lang.javascript,
+ org.eclipse.wst.jsdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.wst.jsdt.debug.ui,
  org.eclipse.ease.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Eclipse-BuddyPolicy: global

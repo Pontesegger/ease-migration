@@ -73,5 +73,13 @@
             delegateClass="org.eclipse.ease.debugging.model.EaseWatchExpressionDelegate">
       </watchExpressionDelegate>
    </extension>
+   <extension
+         point="org.eclipse.wst.jsdt.ui.javaEditorTextHovers">
+      <hover
+            activate="false"
+            class="org.eclipse.ease.lang.javascript.rhino.debugger.editor.VariablesTextHover"
+            id="org.eclipse.ease.lang.javascript.rhino.debugger.hover">
+      </hover>
+   </extension>
 
 </plugin>
