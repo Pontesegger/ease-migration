@@ -6,6 +6,6 @@ Bundle-Version: 0.6.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Eclipse-BuddyPolicy: global
 Require-Bundle: org.eclipse.osgi,
- org.eclipse.ease
+ org.eclipse.core.jobs
 Export-Package: org.eclipse.ease.classloader
 Bundle-Vendor: Eclipse.org

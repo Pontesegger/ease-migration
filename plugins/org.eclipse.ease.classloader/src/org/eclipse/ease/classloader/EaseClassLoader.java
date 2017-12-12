@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ease.IScriptEngine;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.wiring.BundleWiring;
 
@@ -29,7 +28,7 @@ import org.osgi.framework.wiring.BundleWiring;
  */
 public class EaseClassLoader extends ClassLoader {
 
-	private final Map<IScriptEngine, URLClassLoader> fRegisteredJars = new HashMap<>();
+	private final Map<Job, URLClassLoader> fRegisteredJars = new HashMap<>();
 
 	/** Marker that we are currently looking within a specific URLClassLoader. */
 	private final Collection<URLClassLoader> fTraversingURLClassLoader = new HashSet<>();
@@ -86,7 +85,7 @@ public class EaseClassLoader extends ClassLoader {
 	 * @param url
 	 *            url to add to classpath
 	 */
-	public void registerURL(final IScriptEngine engine, final URL url) {
+	public void registerURL(final Job engine, final URL url) {
 		// engine needs to be registered as we use a single classloader for multiple script engines.
 		if (!fRegisteredJars.containsKey(engine))
 			fRegisteredJars.put(engine, URLClassLoader.newInstance(new URL[] { url }, this));
@@ -103,7 +102,7 @@ public class EaseClassLoader extends ClassLoader {
 		}
 	}
 
-	public void unregisterEngine(final IScriptEngine engine) {
+	public void unregisterEngine(final Job engine) {
 		fRegisteredJars.remove(engine);
 	}
 }

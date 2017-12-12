@@ -24,6 +24,7 @@ import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.classloader.EaseClassLoader;
 
 public class EngineDescription {
 
@@ -156,27 +157,19 @@ public class EngineDescription {
 	}
 
 	public boolean supportsDebugging() {
-		try {
-			// TODO try to find out class without creating an instance
-			final Object engine = fConfigurationElement.createExecutableExtension(CLASS);
-			return IDebugEngine.class.isAssignableFrom(engine.getClass());
-
-		} catch (final CoreException e) {
-			// not found, seems to be an invalid extension configuration
-			Logger.error(Activator.PLUGIN_ID, "Plugin extension configuration error for engine: " + toString(), e);
-			return false;
-		}
+		return IDebugEngine.class.isAssignableFrom(getEngineClass());
 	}
 
 	public boolean isReplShell() {
+		return IReplEngine.class.isAssignableFrom(getEngineClass());
+	}
+
+	private Class<?> getEngineClass() {
 		final String className = fConfigurationElement.getAttribute(CLASS);
 		try {
-			final Class<?> engineClass = getClass().getClassLoader().loadClass(className);
-			return IReplEngine.class.isAssignableFrom(engineClass);
-
+			return new EaseClassLoader().loadClass(className);
 		} catch (final ClassNotFoundException e) {
-			// fallback, create instance and test
-			return createEngine() instanceof IReplEngine;
+			return createEngine().getClass();
 		}
 	}
 }
