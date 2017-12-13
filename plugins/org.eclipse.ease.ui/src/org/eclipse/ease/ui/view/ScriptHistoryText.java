@@ -90,8 +90,10 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	}
 
 	public void removeScriptEngine(final IScriptEngine engine) {
-		if (engine != null)
+		if (engine != null) {
 			engine.removeExecutionListener(this);
+			Display.getDefault().asyncExec(() -> setBackground(fResourceManager.createColor(fColorDefaultBackground)));
+		}
 	}
 
 	private void initialize() {
@@ -177,28 +179,24 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	public void localPrint(final String message, final int style) {
 		if (message != null) {
 			// // print to output pane
-			Display.getDefault().asyncExec(new Runnable() {
+			Display.getDefault().asyncExec(() -> {
+				String out = message;
+				if (style != STYLE_COMMAND)
+					// indent message
+					out = "\t" + message.replaceAll("\\r?\\n", "\n\t");
 
-				@Override
-				public void run() {
-					String out = message;
-					if (style != STYLE_COMMAND)
-						// indent message
-						out = "\t" + message.replaceAll("\\r?\\n", "\n\t");
+				if (!isDisposed()) {
+					append("\n");
 
-					if (!isDisposed()) {
-						append("\n");
+					// create new style range
+					final StyleRange styleRange = getStyle(style, getText().length(), out.length());
 
-						// create new style range
-						final StyleRange styleRange = getStyle(style, getText().length(), out.length());
+					append(out);
+					setStyleRange(styleRange);
 
-						append(out);
-						setStyleRange(styleRange);
-
-						// scroll to end of window
-						setHorizontalPixel(0);
-						setTopPixel(getLineHeight() * getLineCount());
-					}
+					// scroll to end of window
+					setHorizontalPixel(0);
+					setTopPixel(getLineHeight() * getLineCount());
 				}
 			});
 		}
