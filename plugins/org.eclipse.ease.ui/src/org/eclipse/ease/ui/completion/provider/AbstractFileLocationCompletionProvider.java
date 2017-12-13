@@ -118,12 +118,12 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 								new ResourceImageResolver(child), ORDER_PROJECT, null);
 
 					} else if (child instanceof IContainer) {
-						addProposal(((IContainer) child).getName(), resolver.getParentString() + ((IContainer) child).getName() + '/',
+						addProposal(((IContainer) child).getName(), resolver.getParentString() + '/' + ((IContainer) child).getName() + '/',
 								new ResourceImageResolver(child), ORDER_FOLDER, null);
 
 					} else {
-						addProposal(((IResource) child).getName(), resolver.getParentString() + ((IResource) child).getName(), new ResourceImageResolver(child),
-								ORDER_FILE, null);
+						addProposal(((IResource) child).getName(), resolver.getParentString() + '/' + ((IResource) child).getName(),
+								new ResourceImageResolver(child), ORDER_FILE, null);
 					}
 				}
 			}
