@@ -187,7 +187,7 @@ public class UnitTestHelper {
 		if (folder instanceof File)
 			return ((File) folder).listFiles();
 
-		return null;
+		return new Object[0];
 	}
 
 	private static Pattern buildPattern(String filter) {
