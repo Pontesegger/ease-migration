@@ -100,7 +100,7 @@ public class EaseDebugThread extends EaseDebugElement implements IThread {
 			}
 		}
 
-		fireChangeEvent(DebugEvent.CHANGE);
+		fireChangeEvent(DebugEvent.CONTENT);
 	}
 
 	@Override

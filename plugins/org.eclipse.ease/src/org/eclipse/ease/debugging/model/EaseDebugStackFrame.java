@@ -135,4 +135,9 @@ public class EaseDebugStackFrame extends EaseDebugElement implements IStackFrame
 
 		fDirty = false;
 	}
+
+	@Override
+	public String toString() {
+		return getScript().getTitle() + ":" + getDebugFrame().getName() + " line: " + getDebugFrame().getLineNumber();
+	}
 }

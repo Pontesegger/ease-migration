@@ -54,7 +54,7 @@ public class EaseDebugFrame implements IScriptDebugFrame {
 
 	@Override
 	public String getName() {
-		return (fName != null) ? fName : getScript().getTitle();
+		return (fName != null) ? fName : "";
 	}
 
 	@Override

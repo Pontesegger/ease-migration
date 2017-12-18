@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.events.AbstractEvent;
+import org.eclipse.ease.debugging.events.model.ResumeRequest;
 
 public class SuspendedEvent extends AbstractEvent implements IDebuggerEvent {
 
@@ -43,6 +44,6 @@ public class SuspendedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	@Override
 	public String toString() {
-		return super.toString() + " (" + fType + ")";
+		return super.toString() + " (" + ResumeRequest.getTypeName(fType) + ((fDebugFrames != null) ? ", " + fDebugFrames.size() + " debug frames)" : ")");
 	}
 }

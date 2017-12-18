@@ -288,7 +288,7 @@ public class RhinoDebugTest extends WorkspaceTest {
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("var result = testMethod(2, 3);") + 1, getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber("var result = testMethod(2, 3);"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -371,7 +371,7 @@ public class RhinoDebugTest extends WorkspaceTest {
 		assertTrue(getDebugTarget().isTerminated());
 		assertTrue(getProcess().isTerminated());
 		assertTrue(getThread().isTerminated());
-		assertTrue(getTopmostStackFrame().isTerminated());
+		assertEquals(0, getThread().getStackFrames().length);
 
 		assertEquals(1, suspendedEvents);
 	}
@@ -412,7 +412,7 @@ public class RhinoDebugTest extends WorkspaceTest {
 			assertTrue(getDebugTarget().isDisconnected());
 			assertTrue(getProcess().isDisconnected());
 			assertTrue(getThread().isDisconnected());
-			assertTrue(getTopmostStackFrame().isDisconnected());
+			assertEquals(0, getThread().getStackFrames().length);
 		});
 
 		assertEquals(1, suspendedEvents);

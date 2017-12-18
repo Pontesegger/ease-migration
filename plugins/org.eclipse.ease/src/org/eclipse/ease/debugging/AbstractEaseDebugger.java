@@ -72,6 +72,8 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 
 	private boolean fTerminated = false;
 
+	private int fResumeLineNumber = 0;
+
 	public AbstractEaseDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		fEngine = engine;
 		fShowDynamicCode = showDynamicCode;
@@ -108,6 +110,8 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			fSuspended = true;
 			fireDispatchEvent(event);
 
+			DebugTracer.debug("Debugger", "\t engine suspended");
+
 			try {
 				while (fSuspended)
 					fEngine.wait();
@@ -115,6 +119,8 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			} catch (final InterruptedException e) {
 				fSuspended = false;
 			}
+
+			DebugTracer.debug("Debugger", "\t engine resumed");
 
 			fireDispatchEvent(new ResumedEvent(Thread.currentThread(), getResumeType()));
 		}
@@ -125,6 +131,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		if (resumeType != DebugEvent.UNSPECIFIED) {
 			fResumeType = resumeType;
 			fResumeStackSize = getStacktrace().size();
+			fResumeLineNumber = (fResumeStackSize > 0) ? getStacktrace().get(0).getLineNumber() : 0;
 		}
 
 		synchronized (fEngine) {
@@ -323,6 +330,17 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	 */
 	protected void processLine(final Script script, final int lineNumber) {
 
+		if (!isTrackedScript(script))
+			return;
+
+		if (lineNumber < 1)
+			return;
+
+		if (getStacktrace().isEmpty())
+			return;
+
+		DebugTracer.debug("Debugger", "\t... processing line " + script.getTitle() + ":" + lineNumber);
+
 		// check breakpoints
 		final IBreakpoint breakpoint = getBreakpoint(script, lineNumber);
 		if (breakpoint != null) {
@@ -333,14 +351,20 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		// no breakpoint, check for step events
 		switch (getResumeType()) {
 		case DebugEvent.STEP_INTO:
-			if (fResumeStackSize <= getStacktrace().size())
-				suspend(new SuspendedEvent(DebugEvent.STEP_END, ((AbstractScriptEngine) fEngine).getThread(), getStacktrace()));
-
+			suspend(new SuspendedEvent(DebugEvent.STEP_END, ((AbstractScriptEngine) fEngine).getThread(), getStacktrace()));
 			break;
 
 		case DebugEvent.STEP_OVER:
-			if (fResumeStackSize >= getStacktrace().size())
-				suspend(new SuspendedEvent(DebugEvent.STEP_END, ((AbstractScriptEngine) fEngine).getThread(), getStacktrace()));
+			if (fResumeStackSize > getStacktrace().size()) {
+				// stacktrace got smaller, we stepped out of a function or file
+				if (!getStacktrace().isEmpty())
+					suspend(new SuspendedEvent(DebugEvent.STEP_END, ((AbstractScriptEngine) fEngine).getThread(), getStacktrace()));
+
+			} else if (fResumeStackSize == getStacktrace().size()) {
+				// same stacktrace, check if line number changed
+				if (fResumeLineNumber != getStacktrace().get(0).getLineNumber())
+					suspend(new SuspendedEvent(DebugEvent.STEP_END, ((AbstractScriptEngine) fEngine).getThread(), getStacktrace()));
+			}
 
 			break;
 

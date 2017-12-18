@@ -14,7 +14,6 @@ package org.eclipse.ease.ui.debugging.model;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.DynamicContentEditorInput;
-import org.eclipse.ease.debugging.model.EaseDebugStackFrame;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseJavaFieldVariable;
 import org.eclipse.ease.ui.Activator;
@@ -88,11 +87,6 @@ public abstract class AbstractEaseDebugModelPresentation implements ILabelProvid
 
 	@Override
 	public String getText(final Object element) {
-		if (element instanceof EaseDebugStackFrame) {
-			// FIXME EaseDebugStackFrame.getName needs refactoring
-			return ((EaseDebugStackFrame) element).getDebugFrame().getName();
-		}
-
 		return element.toString();
 	}
 

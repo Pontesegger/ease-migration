@@ -41,8 +41,8 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 		private Scriptable fScope;
 
-		public RhinoDebugFrame(final DebuggableScript fnOrScript) {
-			super(RhinoDebugger.this.getScript(fnOrScript), 0, fnOrScript.isFunction() ? TYPE_FUNCTION : TYPE_FILE);
+		public RhinoDebugFrame(final DebuggableScript fnOrScript, Script script) {
+			super(script, 0, fnOrScript.isFunction() ? TYPE_FUNCTION : TYPE_FILE);
 			fFunctionName = getFunctionName(fnOrScript);
 		}
 
@@ -98,17 +98,15 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		public void onEnter(final Context cx, final Scriptable activation, final Scriptable thisObj, final Object[] args) {
 			// nothing to do
 			fScope = activation;
+
+			processLine(getScript(), getLineNumber());
 		}
 
 		@Override
 		public void onLineChange(final Context cx, final int lineNumber) {
 			setLineNumber(lineNumber);
-			if (isTrackedScript(getScript())) {
-				// static code or dynamic code activated
-
-				// TODO in future we should not add stuff to the stack we do not track anyway, so we can get rid of the "if" statement
-				processLine(getScript(), lineNumber);
-			}
+			
+			processLine(getScript(), getLineNumber());
 		}
 
 		@Override
@@ -125,6 +123,8 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 			// we do not need the scope any longer
 			fScope = null;
+
+			processLine(getScript(), getLineNumber());
 		}
 
 		@Override
@@ -134,22 +134,10 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 		@Override
 		public String getName() {
-			if (getType() == IScriptDebugFrame.TYPE_FUNCTION) {
-				String title = getScript().getTitle();
-				if (title == null)
-					title = "";
+			if (getType() == IScriptDebugFrame.TYPE_FUNCTION)
+				return (fFunctionName != null) ? (fFunctionName + "()") : "";
 
-				final String function = (fFunctionName != null) ? (":" + fFunctionName + "()") : "";
-
-				return title + function;
-
-			} else {
-				String title = getScript().getTitle();
-				if (title == null)
-					title = "(Dynamic)";
-
-				return title;
-			}
+			return "";
 		}
 
 		public Map<String, Object> getVariables() {
@@ -197,13 +185,33 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		if (script == null)
 			return null;
 
+//		System.err.println(script.getTitle() + ": " + fnOrScript.getFunctionCount() + " functions");
+
 		// register script source
+		// if (fnOrScript.getParent() == null) {
+		// // see if we should clean up old scrips
+		// try {
+		// final int newSourceHash = script.getCode().hashCode();
+		// for (final Entry<Integer, Script> entry : new HashSet<>(fFrameToSource.entrySet())) {
+		// final int registeredSourceHash = entry.getValue().getCode().hashCode();
+		//
+		// if (newSourceHash == registeredSourceHash)
+		// fFrameToSource.remove(entry.getKey());
+		// }
+		// } catch (final Exception e) {
+		// // TODO handle this exception (but for now, at least know it happened)
+		// throw new RuntimeException(e);
+		// }
+		//
+		// register script
 		final DebuggableScript parentScript = getParentScript(fnOrScript);
-		if (!fFrameToSource.containsKey(parentScript.hashCode()))
+		if (!fFrameToSource.containsKey(parentScript.hashCode())) {
 			fFrameToSource.put(parentScript.hashCode(), script);
+		}
+		// }
 
 		// create debug frame
-		final RhinoDebugFrame debugFrame = new RhinoDebugFrame(fnOrScript);
+		final RhinoDebugFrame debugFrame = new RhinoDebugFrame(fnOrScript, script);
 		// mDebugFrames.add(0, debugFrame);
 
 		getStacktrace().add(0, debugFrame);

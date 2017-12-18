@@ -11,13 +11,13 @@
 package org.eclipse.ease.debugging.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -54,9 +54,6 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	private enum State {
 		NOT_STARTED, SUSPENDED, RESUMED, STEPPING, TERMINATED, DISCONNECTED
 	}
-
-	private static final boolean DEBUG = org.eclipse.ease.Activator.getDefault().isDebugging()
-			&& "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.ease/debug/debuggerEvents"));;
 
 	private EventDispatchJob fDispatcher;
 
@@ -232,6 +229,8 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 			debugPlugin.getBreakpointManager().removeBreakpointListener(this);
 
 		fState = State.TERMINATED;
+
+		getThreads()[0].setStackFrames(Collections.emptyList());
 		fireTerminateEvent();
 	}
 

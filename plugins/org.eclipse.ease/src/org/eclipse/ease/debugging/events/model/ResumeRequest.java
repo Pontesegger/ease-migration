@@ -15,6 +15,28 @@ import org.eclipse.ease.debugging.events.AbstractEvent;
 
 public class ResumeRequest extends AbstractEvent implements IModelRequest {
 
+	public static String getTypeName(int type) {
+		switch (type) {
+		case DebugEvent.CLIENT_REQUEST:
+			return "CLIENT_REQUEST";
+
+		case DebugEvent.STEP_INTO:
+			return "STEP_INTO";
+
+		case DebugEvent.STEP_OVER:
+			return "STEP_OVER";
+
+		case DebugEvent.STEP_RETURN:
+			return "STEP_RETURN";
+
+		case DebugEvent.STEP_END:
+			return "STEP_END";
+
+		default:
+			return "<unknown>";
+		}
+	}
+
 	/** See {@link DebugEvent}. */
 	private final int fType;
 
@@ -36,25 +58,6 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 
 	@Override
 	public String toString() {
-		return super.toString() + " (" + getTypeName() + ")";
-	}
-
-	private String getTypeName() {
-		switch (fType) {
-		case DebugEvent.CLIENT_REQUEST:
-			return "CLIENT_REQUEST";
-
-		case DebugEvent.STEP_INTO:
-			return "STEP_INTO";
-
-		case DebugEvent.STEP_OVER:
-			return "STEP_OVER";
-
-		case DebugEvent.STEP_RETURN:
-			return "STEP_RETURN";
-
-		default:
-			return "<unknown>";
-		}
+		return super.toString() + " (" + getTypeName(fType) + ")";
 	}
 }
