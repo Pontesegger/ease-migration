@@ -20,8 +20,7 @@ public class LineNumberDebugger extends RhinoDebugger {
 	}
 
 	@Override
-	protected boolean isTrackedScript(Script script) {
+	protected void processLine(Script script, int lineNumber) {
 		// we do not want to check for breakpoints, etc
-		return false;
 	}
 }

@@ -105,24 +105,27 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 
 	protected void suspend(final IDebuggerEvent event) {
 
-		synchronized (fEngine) {
-			// need to fire event in synchronized code to avoid getting a resume event too soon
-			fSuspended = true;
-			fireDispatchEvent(event);
+		// only suspend if there possibly exists someone to wake us up again
+		if (fDispatcher != null) {
+			synchronized (fEngine) {
+				// need to fire event in synchronized code to avoid getting a resume event too soon
+				fSuspended = true;
+				fireDispatchEvent(event);
 
-			DebugTracer.debug("Debugger", "\t engine suspended");
+				DebugTracer.debug("Debugger", "\t engine suspended");
 
-			try {
-				while (fSuspended)
-					fEngine.wait();
+				try {
+					while (fSuspended)
+						fEngine.wait();
 
-			} catch (final InterruptedException e) {
-				fSuspended = false;
+				} catch (final InterruptedException e) {
+					fSuspended = false;
+				}
+
+				DebugTracer.debug("Debugger", "\t engine resumed");
+
+				fireDispatchEvent(new ResumedEvent(Thread.currentThread(), getResumeType()));
 			}
-
-			DebugTracer.debug("Debugger", "\t engine resumed");
-
-			fireDispatchEvent(new ResumedEvent(Thread.currentThread(), getResumeType()));
 		}
 	}
 

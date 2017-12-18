@@ -35,6 +35,13 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 	private static final Pattern PROTOTYPE_PATTERN = Pattern.compile("^(.*)\\.prototype\\.(.*)\\s*=\\s*function\\(.*$");
 	private static final Pattern PROPERTY_PATTERN = Pattern.compile("^\\s*(.*)\\s:\\sfunction\\(.*$");
 
+	private static DebuggableScript getParentScript(DebuggableScript rhinoScript) {
+		while (rhinoScript.getParent() != null)
+			rhinoScript = rhinoScript.getParent();
+
+		return rhinoScript;
+	}
+
 	public class RhinoDebugFrame extends EaseDebugFrame implements DebugFrame, IScriptDebugFrame {
 
 		private final String fFunctionName;
@@ -49,7 +56,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		private String getFunctionName(DebuggableScript fnOrScript) {
 			final String candidate = fnOrScript.getFunctionName();
 
-			if (candidate == null) {
+			if ((candidate == null) && (getScript() != null)) {
 				// try to extract from source
 				final int[] lineNumbers = fnOrScript.getLineNumbers();
 				if (lineNumbers.length > 0) {
@@ -99,14 +106,16 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			// nothing to do
 			fScope = activation;
 
-			processLine(getScript(), getLineNumber());
+			if (getScript() != null)
+				processLine(getScript(), getLineNumber());
 		}
 
 		@Override
 		public void onLineChange(final Context cx, final int lineNumber) {
 			setLineNumber(lineNumber);
-			
-			processLine(getScript(), getLineNumber());
+
+			if (getScript() != null)
+				processLine(getScript(), getLineNumber());
 		}
 
 		@Override
@@ -124,7 +133,8 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			// we do not need the scope any longer
 			fScope = null;
 
-			processLine(getScript(), getLineNumber());
+			if (getScript() != null)
+				processLine(getScript(), getLineNumber());
 		}
 
 		@Override
@@ -178,42 +188,14 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 	@Override
 	public DebugFrame getFrame(final Context cx, final DebuggableScript fnOrScript) {
 
-		Script script = getScript(fnOrScript);
-		if (script == null)
-			script = fLastScript;
-
-		if (script == null)
-			return null;
-
-//		System.err.println(script.getTitle() + ": " + fnOrScript.getFunctionCount() + " functions");
-
-		// register script source
-		// if (fnOrScript.getParent() == null) {
-		// // see if we should clean up old scrips
-		// try {
-		// final int newSourceHash = script.getCode().hashCode();
-		// for (final Entry<Integer, Script> entry : new HashSet<>(fFrameToSource.entrySet())) {
-		// final int registeredSourceHash = entry.getValue().getCode().hashCode();
-		//
-		// if (newSourceHash == registeredSourceHash)
-		// fFrameToSource.remove(entry.getKey());
-		// }
-		// } catch (final Exception e) {
-		// // TODO handle this exception (but for now, at least know it happened)
-		// throw new RuntimeException(e);
-		// }
-		//
-		// register script
-		final DebuggableScript parentScript = getParentScript(fnOrScript);
-		if (!fFrameToSource.containsKey(parentScript.hashCode())) {
-			fFrameToSource.put(parentScript.hashCode(), script);
+		if (fnOrScript.getParent() == null) {
+			if (isTrackedScript(fLastScript))
+				fFrameToSource.put(fnOrScript.hashCode(), fLastScript);
 		}
-		// }
 
-		// create debug frame
+		final Script script = fFrameToSource.get(getParentScript(fnOrScript).hashCode());
+
 		final RhinoDebugFrame debugFrame = new RhinoDebugFrame(fnOrScript, script);
-		// mDebugFrames.add(0, debugFrame);
-
 		getStacktrace().add(0, debugFrame);
 
 		return debugFrame;
@@ -240,16 +222,5 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		}
 
 		super.notify(engine, script, status);
-	}
-
-	private Script getScript(final DebuggableScript rhinoScript) {
-		return fFrameToSource.get(getParentScript(rhinoScript).hashCode());
-	}
-
-	private static DebuggableScript getParentScript(DebuggableScript rhinoScript) {
-		while (rhinoScript.getParent() != null)
-			rhinoScript = rhinoScript.getParent();
-
-		return rhinoScript;
 	}
 }
