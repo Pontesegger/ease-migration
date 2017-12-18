@@ -93,7 +93,7 @@ public abstract class AbstractEaseDebugModelPresentation implements ILabelProvid
 			return ((EaseDebugStackFrame) element).getDebugFrame().getName();
 		}
 
-		return null;
+		return element.toString();
 	}
 
 	public void setAttribute(final String attribute, final Object value) {

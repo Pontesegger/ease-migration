@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino.debugger.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -24,7 +23,7 @@ public class RhinoDebugTarget extends EaseDebugTarget {
 	}
 
 	@Override
-	public String getName() throws DebugException {
+	public String getName() {
 		return "EASE Rhino Debugger";
 	}
 

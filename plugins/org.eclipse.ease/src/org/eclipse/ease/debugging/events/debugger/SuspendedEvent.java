@@ -40,4 +40,9 @@ public class SuspendedEvent extends AbstractEvent implements IDebuggerEvent {
 	public List<IScriptDebugFrame> getDebugFrames() {
 		return fDebugFrames;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " (" + fType + ")";
+	}
 }

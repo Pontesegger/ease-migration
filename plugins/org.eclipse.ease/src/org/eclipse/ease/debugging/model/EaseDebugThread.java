@@ -34,7 +34,7 @@ public class EaseDebugThread extends EaseDebugElement implements IThread {
 	}
 
 	@Override
-	public String getName() throws DebugException {
+	public String getName() {
 		return "Thread: " + fThread.getName();
 	}
 
@@ -101,5 +101,10 @@ public class EaseDebugThread extends EaseDebugElement implements IThread {
 		}
 
 		fireChangeEvent(DebugEvent.CHANGE);
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 }

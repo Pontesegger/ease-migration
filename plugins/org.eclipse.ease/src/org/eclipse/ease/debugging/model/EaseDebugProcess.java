@@ -49,4 +49,9 @@ public class EaseDebugProcess extends EaseDebugElement implements IProcess {
 	public int getExitValue() throws DebugException {
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return getLabel();
+	}
 }

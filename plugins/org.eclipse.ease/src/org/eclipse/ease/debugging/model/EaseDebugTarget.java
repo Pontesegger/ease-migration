@@ -91,7 +91,7 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	}
 
 	@Override
-	public String getName() throws DebugException {
+	public String getName() {
 		return "EASE Debugger";
 	}
 
@@ -116,13 +116,18 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	}
 
 	@Override
-	public boolean hasThreads() throws DebugException {
+	public boolean hasThreads() {
 		return !fThreads.isEmpty();
 	}
 
 	public void fireDispatchEvent(final IModelRequest event) {
 		if (fDispatcher != null)
 			fDispatcher.addEvent(event);
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 	// ************************************************************
