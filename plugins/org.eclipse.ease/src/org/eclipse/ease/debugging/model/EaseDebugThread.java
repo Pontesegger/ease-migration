@@ -97,8 +97,13 @@ public class EaseDebugThread extends EaseDebugElement implements IThread {
 				stackFrame = new EaseDebugStackFrame(this, debugFrame);
 				fStackFrames.add(stackFrame);
 				stackFrame.fireCreationEvent();
-			}
+
+			} else
+				oldStackFrames.remove(stackFrame);
 		}
+
+		for (final EaseDebugStackFrame stackFrame : oldStackFrames)
+			stackFrame.fireTerminateEvent();
 
 		fireChangeEvent(DebugEvent.CONTENT);
 	}
