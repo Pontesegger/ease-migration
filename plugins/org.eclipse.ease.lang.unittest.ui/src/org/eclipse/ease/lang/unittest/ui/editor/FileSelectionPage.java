@@ -386,7 +386,14 @@ public class FileSelectionPage extends AbstractEditorPage {
 		}
 	}
 
-	private void updateTestFiles() {
+	@Override
+	public void setActive(boolean active) {
+		super.setActive(active);
+
+		updateTestFiles();
+	}
+
+	public void updateTestFiles() {
 		final String[] includeFilters = fTxtIncludeFilters.getText().split("\r?\n");
 		final String[] excludeFilters = fTxtExcludeFilters.getText().split("\r?\n");
 

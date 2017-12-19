@@ -88,6 +88,11 @@ public abstract class AbstractEditorPage extends FormPage {
 		return (TestSuiteEditor) super.getEditor();
 	}
 
+	@Override
+	public IEditorInput getEditorInput() {
+		return getEditor().getEditorInput();
+	}
+
 	protected AdapterFactoryEditingDomain getEditingDomain() {
 		return getEditor().getEditingDomain();
 	}

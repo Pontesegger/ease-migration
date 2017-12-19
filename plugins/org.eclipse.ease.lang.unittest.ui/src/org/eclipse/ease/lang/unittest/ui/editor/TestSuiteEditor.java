@@ -17,7 +17,12 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
@@ -34,6 +39,7 @@ import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
 import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -43,7 +49,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.part.FileEditorInput;
 
-public class TestSuiteEditor extends FormEditor implements IEditingDomainProvider {
+public class TestSuiteEditor extends FormEditor implements IEditingDomainProvider, IResourceChangeListener {
 
 	public static final String EDITOR_ID = "org.eclipse.ease.editor.suiteEditor";
 
@@ -119,8 +125,7 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 		setPartName(getEditorInput().getName());
 		firePropertyChange(PROP_TITLE);
 
-		// TODO add resource change listener
-		// ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	@Override
@@ -213,6 +218,7 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 	@Override
 	public void dispose() {
 		fResourceManager.dispose();
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 
 		super.dispose();
 	}
@@ -223,5 +229,35 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 	public void executeCommand(Command command) {
 		getEditingDomain().getCommandStack().execute(command);
+	}
+
+	@Override
+	public void resourceChanged(final IResourceChangeEvent event) {
+
+		IResourceDelta delta = event.getDelta();
+		delta = delta.findMember(getFile().getFullPath());
+		if (delta == null)
+			return;
+
+		if (delta.getKind() == IResourceDelta.REMOVED) {
+			if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+				final IPath newPath = delta.getMovedToPath();
+
+				final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(newPath);
+				if (file != null) {
+					System.out.println("Setting input to: " + file);
+					setInput(new FileEditorInput(file));
+
+					setPartName(getEditorInput().getName());
+					firePropertyChange(PROP_TITLE);
+
+					Display.getDefault().asyncExec(() -> {
+						final IFormPage activePage = getActivePageInstance();
+						if (activePage instanceof FileSelectionPage)
+							((FileSelectionPage) activePage).updateTestFiles();
+					});
+				}
+			}
+		}
 	}
 }
