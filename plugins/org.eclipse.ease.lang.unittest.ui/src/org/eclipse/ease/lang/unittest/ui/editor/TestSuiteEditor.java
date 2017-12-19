@@ -13,6 +13,7 @@ package org.eclipse.ease.lang.unittest.ui.editor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -36,6 +37,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
@@ -99,7 +101,10 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 		fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 		try {
-			fTestSuite = UnitTestHelper.loadTestSuite(getFile().getContents());
+			final InputStream content = getInputContent();
+			fTestSuite = UnitTestHelper.loadTestSuite(content);
+			content.close();
+
 			fTestSuite.setResource(getFile());
 
 		} catch (final IOException e) {
@@ -109,10 +114,9 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 		} catch (final CoreException e) {
 			// TODO handle this exception (but for now, at least know it happened)
 			throw new RuntimeException(e);
-
 		}
 
-		setPartName(getFile().getName());
+		setPartName(getEditorInput().getName());
 		firePropertyChange(PROP_TITLE);
 
 		// TODO add resource change listener
@@ -140,12 +144,11 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 	@Override
 	public boolean isSaveAsAllowed() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public void doSave(final IProgressMonitor monitor) {
-
 		try {
 			final byte[] xmlContent = UnitTestHelper.serializeTestSuite(getTestSuite());
 			getFile().setContents(new ByteArrayInputStream(xmlContent), true, true, null);
@@ -180,13 +183,24 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 
 	@Override
 	public boolean isDirty() {
-		return super.isDirty() | fDirty;
+		return (super.isDirty() | fDirty) && (getFile() != null);
 	}
 
-	public IFile getFile() {
+	private IFile getFile() {
 		final IEditorInput input = getEditorInput();
 		if (input instanceof FileEditorInput)
 			return ((FileEditorInput) input).getFile();
+
+		return null;
+	}
+
+	private InputStream getInputContent() throws CoreException {
+		final IEditorInput editorInput = getEditorInput();
+		if (editorInput instanceof FileEditorInput)
+			return ((FileEditorInput) editorInput).getFile().getContents();
+
+		if (editorInput instanceof IStorageEditorInput)
+			return ((IStorageEditorInput) editorInput).getStorage().getContents();
 
 		return null;
 	}

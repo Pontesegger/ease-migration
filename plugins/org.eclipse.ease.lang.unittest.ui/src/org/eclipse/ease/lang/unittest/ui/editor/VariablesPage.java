@@ -256,7 +256,7 @@ public class VariablesPage extends AbstractEditorPage {
 					if (!element.equals(newPath)) {
 
 						final CompoundCommand compoundCommand = new CompoundCommand();
-						for (final IVariable variable : getTestSuitDefinition().getVariables()) {
+						for (final IVariable variable : getTestSuiteDefinition().getVariables()) {
 							if (((IPath) element).isPrefixOf(variable.getFullName())) {
 								final IPath updatedName = newPath.append(variable.getFullName().removeFirstSegments(((IPath) element).segmentCount()));
 								final Command command = SetCommand.create(getEditingDomain(), variable, IDefinitionPackage.Literals.VARIABLE__FULL_NAME,
@@ -413,7 +413,7 @@ public class VariablesPage extends AbstractEditorPage {
 		populateContent();
 
 		// adapter triggering when variables are added or removed (eg from context menu commands)
-		getTestSuitDefinition().eAdapters().add(new EContentAdapter() {
+		getTestSuiteDefinition().eAdapters().add(new EContentAdapter() {
 			@Override
 			public void notifyChanged(Notification notification) {
 				super.notifyChanged(notification);
@@ -432,7 +432,7 @@ public class VariablesPage extends AbstractEditorPage {
 
 	@Override
 	protected void populateContent() {
-		fTreeViewer.setInput(getTestSuitDefinition());
+		fTreeViewer.setInput(getTestSuiteDefinition());
 		fTreeViewer.refresh();
 		fTreeViewer.expandAll();
 	}
@@ -485,13 +485,13 @@ public class VariablesPage extends AbstractEditorPage {
 
 								final CompoundCommand compoundCommand = new CompoundCommand();
 								for (final IVariable variable : droppedDefinition.getVariables()) {
-									final IVariable existingVariable = getTestSuitDefinition().getVariable(variable.getName());
+									final IVariable existingVariable = getTestSuiteDefinition().getVariable(variable.getName());
 									if (existingVariable != null) {
 										final Command command = SetCommand.create(getEditingDomain(), existingVariable,
 												IDefinitionPackage.Literals.VARIABLE__CONTENT, variable.getContent());
 										compoundCommand.append(command);
 									} else {
-										final Command command = AddCommand.create(getEditingDomain(), getTestSuitDefinition(),
+										final Command command = AddCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 												IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__VARIABLES, variable);
 										compoundCommand.append(command);
 									}
@@ -525,7 +525,7 @@ public class VariablesPage extends AbstractEditorPage {
 									compoundCommand.append(command);
 
 								} else if (element instanceof IPath) {
-									for (final IVariable variable : getTestSuitDefinition().getVariables()) {
+									for (final IVariable variable : getTestSuiteDefinition().getVariables()) {
 										if (((IPath) element).isPrefixOf(variable.getFullName())) {
 											final IPath updatedName = ((IPath) target).append(variable.getName());
 											final Command command = SetCommand.create(getEditingDomain(), variable,
@@ -559,7 +559,7 @@ public class VariablesPage extends AbstractEditorPage {
 	 * @return <code>true</code> when name is unique (= currently not used)
 	 */
 	public boolean isUniqueName(final String name) {
-		for (final IVariable variable : getTestSuitDefinition().getVariables()) {
+		for (final IVariable variable : getTestSuiteDefinition().getVariables()) {
 			if (name.equals(variable.getName()))
 				return false;
 		}

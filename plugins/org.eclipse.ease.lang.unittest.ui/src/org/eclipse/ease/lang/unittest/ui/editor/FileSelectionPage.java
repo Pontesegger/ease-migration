@@ -28,6 +28,7 @@ import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.command.SetCommand;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -193,6 +194,10 @@ public class FileSelectionPage extends AbstractEditorPage {
 		toolkit.paintBordersFor(body);
 		managedForm.getForm().getBody().setLayout(new FillLayout(SWT.HORIZONTAL));
 
+		if (getFile() == null)
+			managedForm.getForm().setMessage("Suite file not located in workspace, Test File Selection might not be populated correctly.",
+					IMessageProvider.WARNING);
+
 		final Composite composite = managedForm.getToolkit().createComposite(managedForm.getForm().getBody(), SWT.NONE);
 		managedForm.getToolkit().paintBordersFor(composite);
 		composite.setLayout(new GridLayout(1, false));
@@ -289,7 +294,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if (!fTxtIncludeFilters.getText().equals(fInitialContent)) {
-					final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(),
+					final Command command = SetCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 							IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__INCLUDE_FILTER, fTxtIncludeFilters.getText());
 					getEditor().executeCommand(command);
 
@@ -310,7 +315,7 @@ public class FileSelectionPage extends AbstractEditorPage {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if (!fTxtExcludeFilters.getText().equals(fInitialContent)) {
-					final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(),
+					final Command command = SetCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 							IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__EXCLUDE_FILTER, fTxtExcludeFilters.getText());
 					getEditor().executeCommand(command);
 
@@ -346,14 +351,14 @@ public class FileSelectionPage extends AbstractEditorPage {
 			final IPath entityPath = ((ITestContainer) element).getFullPath();
 
 			// update resource state in testsuite
-			if ((getTestSuitDefinition().getDisabledResources().contains(entityPath)) && (checked)) {
+			if ((getTestSuiteDefinition().getDisabledResources().contains(entityPath)) && (checked)) {
 				// remove resource from list of disabled resources
-				final Command command = RemoveCommand.create(getEditingDomain(), getTestSuitDefinition(),
+				final Command command = RemoveCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 						IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DISABLED_RESOURCES, entityPath);
 				compoundCommand.append(command);
-			} else if ((!getTestSuitDefinition().getDisabledResources().contains(entityPath)) && (!checked)) {
+			} else if ((!getTestSuiteDefinition().getDisabledResources().contains(entityPath)) && (!checked)) {
 				// remove resource from list of disabled resources
-				final Command command = AddCommand.create(getEditingDomain(), getTestSuitDefinition(),
+				final Command command = AddCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 						IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DISABLED_RESOURCES, entityPath);
 				compoundCommand.append(command);
 			}
@@ -365,15 +370,15 @@ public class FileSelectionPage extends AbstractEditorPage {
 
 	@Override
 	protected void populateContent() {
-		fTxtIncludeFilters.setText(getTestSuitDefinition().getIncludeFilter());
-		fTxtExcludeFilters.setText(getTestSuitDefinition().getExcludeFilter());
+		fTxtIncludeFilters.setText(getTestSuiteDefinition().getIncludeFilter());
+		fTxtExcludeFilters.setText(getTestSuiteDefinition().getExcludeFilter());
 
 		updateTestFiles();
 	}
 
 	private void setCheckedState(ITestContainer element) {
 		final IPath entityPath = element.getFullPath();
-		fTestFilesTreeViewer.setChecked(element, !getTestSuitDefinition().getDisabledResources().contains(entityPath));
+		fTestFilesTreeViewer.setChecked(element, !getTestSuiteDefinition().getDisabledResources().contains(entityPath));
 
 		for (final ITestEntity child : element.getChildren()) {
 			if (child instanceof ITestContainer)
@@ -385,21 +390,23 @@ public class FileSelectionPage extends AbstractEditorPage {
 		final String[] includeFilters = fTxtIncludeFilters.getText().split("\r?\n");
 		final String[] excludeFilters = fTxtExcludeFilters.getText().split("\r?\n");
 
-		final Map<Object, String> acceptedFiles = UnitTestHelper.getTestFilesFromFilter(includeFilters, getFile());
-		fFilteredFiles = UnitTestHelper.getTestFilesFromFilter(excludeFilters, getFile());
+		if (getFile() != null) {
+			final Map<Object, String> acceptedFiles = UnitTestHelper.getTestFilesFromFilter(includeFilters, getFile());
+			fFilteredFiles = UnitTestHelper.getTestFilesFromFilter(excludeFilters, getFile());
 
-		acceptedFiles.keySet().removeAll(fFilteredFiles.keySet());
+			acceptedFiles.keySet().removeAll(fFilteredFiles.keySet());
 
-		final List<ITestEntity> testStructure = UnitTestHelper.createTestStructure(acceptedFiles);
+			final List<ITestEntity> testStructure = UnitTestHelper.createTestStructure(acceptedFiles);
 
-		fTestFilesTreeViewer.setInput(testStructure);
-		fTestFilesTreeViewer.refresh();
+			fTestFilesTreeViewer.setInput(testStructure);
+			fTestFilesTreeViewer.refresh();
 
-		fTestFilesTreeViewer.expandAll();
+			fTestFilesTreeViewer.expandAll();
 
-		for (final ITestEntity element : testStructure) {
-			if (element instanceof ITestContainer)
-				setCheckedState((ITestContainer) element);
+			for (final ITestEntity element : testStructure) {
+				if (element instanceof ITestContainer)
+					setCheckedState((ITestContainer) element);
+			}
 		}
 	}
 

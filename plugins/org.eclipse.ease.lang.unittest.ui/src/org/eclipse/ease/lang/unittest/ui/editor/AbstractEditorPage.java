@@ -79,7 +79,7 @@ public abstract class AbstractEditorPage extends FormPage {
 	 */
 	abstract protected void populateContent();
 
-	protected ITestSuiteDefinition getTestSuitDefinition() {
+	protected ITestSuiteDefinition getTestSuiteDefinition() {
 		return getEditor().getTestSuite();
 	}
 

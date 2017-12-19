@@ -99,7 +99,7 @@ public class CustomCodePage extends AbstractEditorPage {
 
 		fCmbCodeLocation.addSelectionChangedListener(event -> {
 			final String location = event.getStructuredSelection().getFirstElement().toString();
-			final ICode customCode = getTestSuitDefinition().getCustomCode(location);
+			final ICode customCode = getTestSuiteDefinition().getCustomCode(location);
 			final String code = (customCode != null) ? customCode.getContent() : null;
 
 			fEnableChangeTracker = false;
@@ -115,7 +115,7 @@ public class CustomCodePage extends AbstractEditorPage {
 				if (element != null) {
 					final String location = element.toString();
 
-					final ICode code = getTestSuitDefinition().getCustomCode(location);
+					final ICode code = getTestSuiteDefinition().getCustomCode(location);
 					if (code != null) {
 						// change existing code location
 						final Command command = SetCommand.create(getEditingDomain(), code, IDefinitionPackage.Literals.CODE__CONTENT, fTxtCode.getText());
@@ -127,7 +127,7 @@ public class CustomCodePage extends AbstractEditorPage {
 						customCode.setLocation(location);
 						customCode.setContent(fTxtCode.getText());
 
-						final Command command = AddCommand.create(getEditingDomain(), getTestSuitDefinition(),
+						final Command command = AddCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 								IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__CUSTOM_CODE, customCode);
 						getEditor().executeCommand(command);
 					}
@@ -149,7 +149,7 @@ public class CustomCodePage extends AbstractEditorPage {
 		result.add(ITestSuiteDefinition.CODE_LOCATION_TESTFILE_TEARDOWN);
 		result.add(ITestSuiteDefinition.CODE_LOCATION_TESTSUITE_TEARDOWN);
 
-		for (final ICode code : getTestSuitDefinition().getCustomCode()) {
+		for (final ICode code : getTestSuiteDefinition().getCustomCode()) {
 			if (!result.contains(code.getLocation()))
 				result.add(code.getLocation());
 		}

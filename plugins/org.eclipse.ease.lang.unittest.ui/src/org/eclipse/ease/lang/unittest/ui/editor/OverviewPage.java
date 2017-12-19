@@ -113,7 +113,7 @@ public class OverviewPage extends AbstractEditorPage {
 
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				final HTMLContentDialog htmlContentDialog = new HTMLContentDialog(getEditorSite().getShell(), getTestSuitDefinition().getDescription());
+				final HTMLContentDialog htmlContentDialog = new HTMLContentDialog(getEditorSite().getShell(), getTestSuiteDefinition().getDescription());
 				if (Window.OK == htmlContentDialog.open()) {
 					updateDescription(htmlContentDialog.getContent());
 					fBrowser.setText(htmlContentDialog.getContent());
@@ -285,11 +285,11 @@ public class OverviewPage extends AbstractEditorPage {
 	private void updateFlag(Flag flag, String value) {
 		final CompoundCommand compoundCommand = new CompoundCommand();
 
-		if (getTestSuitDefinition().getFlags().containsKey(flag)) {
+		if (getTestSuiteDefinition().getFlags().containsKey(flag)) {
 			// already there, modify
-			final Entry<Flag, String> entry = getTestSuitDefinition().getFlags().get(getTestSuitDefinition().getFlags().indexOfKey(flag));
+			final Entry<Flag, String> entry = getTestSuiteDefinition().getFlags().get(getTestSuiteDefinition().getFlags().indexOfKey(flag));
 
-			final Command removeCommand = RemoveCommand.create(getEditingDomain(), getTestSuitDefinition(),
+			final Command removeCommand = RemoveCommand.create(getEditingDomain(), getTestSuiteDefinition(),
 					IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__FLAGS, entry);
 			compoundCommand.append(removeCommand);
 		}
@@ -297,7 +297,7 @@ public class OverviewPage extends AbstractEditorPage {
 		final FlagToStringMap newentry = (FlagToStringMap) IDefinitionFactory.eINSTANCE.create(IDefinitionPackage.Literals.FLAG_TO_STRING_MAP);
 		newentry.setKey(flag);
 		newentry.setValue(value);
-		final Command addCommand = AddCommand.create(getEditingDomain(), getTestSuitDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__FLAGS,
+		final Command addCommand = AddCommand.create(getEditingDomain(), getTestSuiteDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__FLAGS,
 				newentry);
 		compoundCommand.append(addCommand);
 
@@ -305,24 +305,24 @@ public class OverviewPage extends AbstractEditorPage {
 	}
 
 	protected void updateDescription(String content) {
-		final Command command = SetCommand.create(getEditingDomain(), getTestSuitDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DESCRIPTION,
+		final Command command = SetCommand.create(getEditingDomain(), getTestSuiteDefinition(), IDefinitionPackage.Literals.TEST_SUITE_DEFINITION__DESCRIPTION,
 				content);
 		getEditor().executeCommand(command);
 	}
 
 	@Override
 	protected void populateContent() {
-		final String description = getTestSuitDefinition().getDescription();
+		final String description = getTestSuiteDefinition().getDescription();
 		if (description != null)
 			fBrowser.setText(description);
 
-		fTxtThreads.setText(Integer.toString(getTestSuitDefinition().getFlag(Flag.THREAD_COUNT, 1)));
+		fTxtThreads.setText(Integer.toString(getTestSuiteDefinition().getFlag(Flag.THREAD_COUNT, 1)));
 
-		fChkPromoteFailuresToErrors.setSelection(getTestSuitDefinition().getFlag(Flag.PROMOTE_FAILURE_TO_ERROR, false));
-		fChkStopSuiteOnError.setSelection(getTestSuitDefinition().getFlag(Flag.STOP_SUITE_ON_ERROR, false));
-		fChkRunTeardownOnError.setSelection(getTestSuitDefinition().getFlag(Flag.RUN_TEARDOWN_ON_ERROR, true));
+		fChkPromoteFailuresToErrors.setSelection(getTestSuiteDefinition().getFlag(Flag.PROMOTE_FAILURE_TO_ERROR, false));
+		fChkStopSuiteOnError.setSelection(getTestSuiteDefinition().getFlag(Flag.STOP_SUITE_ON_ERROR, false));
+		fChkRunTeardownOnError.setSelection(getTestSuiteDefinition().getFlag(Flag.RUN_TEARDOWN_ON_ERROR, true));
 
-		final String selectedEngine = getTestSuitDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, "");
+		final String selectedEngine = getTestSuiteDefinition().getFlag(Flag.PREFERRED_ENGINE_ID, "");
 		if (!selectedEngine.isEmpty()) {
 			final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 			final EngineDescription engineDescription = scriptService.getEngineByID(selectedEngine);
@@ -333,7 +333,7 @@ public class OverviewPage extends AbstractEditorPage {
 
 	@Override
 	protected String getPageTitle() {
-		final String name = getTestSuitDefinition().getName();
+		final String name = getTestSuiteDefinition().getName();
 		return ((name != null) && (!name.isEmpty())) ? name : "Overview";
 	}
 
@@ -349,12 +349,12 @@ public class OverviewPage extends AbstractEditorPage {
 		if (active) {
 			if ((fLblTestFilesCount != null) && (!fLblTestFilesCount.isDisposed())) {
 				// update suite stats
-				final ITestSuite testSuite = UnitTestHelper.createRuntimeSuite(getTestSuitDefinition());
+				final ITestSuite testSuite = UnitTestHelper.createRuntimeSuite(getTestSuiteDefinition());
 
 				fLblTestFilesCount.setText(Integer.toString(UnitTestHelper.getTestFiles(testSuite).size()));
 				fLblDisabledFilesCount.setText(Integer.toString(getDisabledFilesCount(testSuite)));
 
-				fLblDefinedVariablesCount.setText(Integer.toString(getTestSuitDefinition().getVariables().size()));
+				fLblDefinedVariablesCount.setText(Integer.toString(getTestSuiteDefinition().getVariables().size()));
 
 				final long runtime = calculateExpectedRuntime(testSuite);
 				if (runtime < 0)
@@ -362,8 +362,8 @@ public class OverviewPage extends AbstractEditorPage {
 				else
 					fLblExpectedRuntime.setText(UnitTestView.getDurationString(runtime));
 
-				fLblUsesSetupTeardown.setVisible(!getTestSuitDefinition().getCustomCode().isEmpty());
-				fHprlnkSetupTeardownCode.setVisible(!getTestSuitDefinition().getCustomCode().isEmpty());
+				fLblUsesSetupTeardown.setVisible(!getTestSuiteDefinition().getCustomCode().isEmpty());
+				fHprlnkSetupTeardownCode.setVisible(!getTestSuiteDefinition().getCustomCode().isEmpty());
 			}
 		}
 	}
@@ -386,7 +386,7 @@ public class OverviewPage extends AbstractEditorPage {
 	private int getDisabledFilesCount(ITestContainer testContainer) {
 		int sum = 0;
 		for (final ITestFile testFile : UnitTestHelper.getTestFiles(testContainer))
-			sum += getTestSuitDefinition().getDisabledResources().contains(testFile.getFullPath().removeFirstSegments(1).makeAbsolute()) ? 1 : 0;
+			sum += getTestSuiteDefinition().getDisabledResources().contains(testFile.getFullPath().removeFirstSegments(1).makeAbsolute()) ? 1 : 0;
 
 		return sum;
 	}
