@@ -76,16 +76,18 @@ public class UnitTestHelper {
 
 			if (trace != null) {
 				for (final IScriptDebugFrame element : trace) {
-					final Object file = element.getScript().getFile();
-					if ((file instanceof IFile) && (((IFile) file).exists())) {
-						try {
-							final HashMap<String, Object> attributes = new HashMap<>();
-							attributes.put(IMarker.LINE_NUMBER, element.getLineNumber());
-							attributes.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-							attributes.put(IMarker.MESSAGE, result.getMessage());
-							MarkerUtilities.createMarker((IFile) file, attributes, PluginConstants.PLUGIN_ID + ".scriptassertion");
-						} catch (final CoreException e) {
-							// silently fail; if we create log infos here this might flood the error log
+					if (element.getScript() != null) {
+						final Object file = element.getScript().getFile();
+						if ((file instanceof IFile) && (((IFile) file).exists())) {
+							try {
+								final HashMap<String, Object> attributes = new HashMap<>();
+								attributes.put(IMarker.LINE_NUMBER, element.getLineNumber());
+								attributes.put(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+								attributes.put(IMarker.MESSAGE, result.getMessage());
+								MarkerUtilities.createMarker((IFile) file, attributes, PluginConstants.PLUGIN_ID + ".scriptassertion");
+							} catch (final CoreException e) {
+								// silently fail; if we create log infos here this might flood the error log
+							}
 						}
 					}
 				}
