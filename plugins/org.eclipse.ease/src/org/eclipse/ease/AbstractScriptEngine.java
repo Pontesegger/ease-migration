@@ -27,8 +27,8 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.ISecurityCheck.ActionType;
-import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.EaseDebugFrame;
+import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
@@ -462,9 +462,11 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	public Object getExecutedFile() {
 		for (final IScriptDebugFrame trace : getStackTrace()) {
 			if (trace.getType() == IScriptDebugFrame.TYPE_FILE) {
-				final Object file = trace.getScript().getFile();
-				if (file != null)
-					return file;
+				if (trace.getScript() != null) {
+					final Object file = trace.getScript().getFile();
+					if (file != null)
+						return file;
+				}
 			}
 		}
 
