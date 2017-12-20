@@ -13,6 +13,9 @@ package org.eclipse.ease.ui.console;
 import java.io.IOException;
 
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
@@ -22,6 +25,7 @@ import org.eclipse.ease.ui.preferences.IPreferenceConstants;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Display;
@@ -50,11 +54,11 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 		return create(engine.getName(), engine);
 	}
 
-	private IOConsoleOutputStream mOutputStream = null;
-	private IOConsoleOutputStream mErrorStream = null;
-	private IScriptEngine mEngine = null;
-	private ILaunch mLaunch = null;
-	private ScriptConsolePageParticipant mScriptConsolePageParticipant;
+	private IOConsoleOutputStream fOutputStream = null;
+	private IOConsoleOutputStream fErrorStream = null;
+	private IScriptEngine fEngine = null;
+	private ILaunch fLaunch = null;
+	private ScriptConsolePageParticipant fScriptConsolePageParticipant;
 
 	private ScriptConsole(final String name, final IScriptEngine engine) {
 		this(name, getConsoleType(), null, engine);
@@ -68,6 +72,30 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 		initializeStreams();
 
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+	}
+
+	@Override
+	protected void init() {
+		super.init();
+
+		final IPreferenceStore store = DebugUIPlugin.getDefault().getPreferenceStore();
+		store.addPropertyChangeListener(this);
+		JFaceResources.getFontRegistry().addListener(this);
+		if (store.getBoolean(IDebugPreferenceConstants.CONSOLE_WRAP)) {
+			setConsoleWidth(store.getInt(IDebugPreferenceConstants.CONSOLE_WIDTH));
+		}
+		setTabWidth(store.getInt(IDebugPreferenceConstants.CONSOLE_TAB_WIDTH));
+
+		if (store.getBoolean(IDebugPreferenceConstants.CONSOLE_LIMIT_CONSOLE_OUTPUT)) {
+			final int highWater = store.getInt(IDebugPreferenceConstants.CONSOLE_HIGH_WATER_MARK);
+			final int lowWater = store.getInt(IDebugPreferenceConstants.CONSOLE_LOW_WATER_MARK);
+			setWaterMarks(lowWater, highWater);
+		}
+
+		Display.getDefault().asyncExec(() -> {
+			setFont(JFaceResources.getFont(IDebugUIConstants.PREF_CONSOLE_FONT));
+			setBackground(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR));
+		});
 	}
 
 	private void initializeStreams() {
@@ -93,17 +121,17 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 	}
 
 	public IOConsoleOutputStream getErrorStream() {
-		if ((mErrorStream == null) || (mErrorStream.isClosed()))
-			mErrorStream = newOutputStream();
+		if ((fErrorStream == null) || (fErrorStream.isClosed()))
+			fErrorStream = newOutputStream();
 
-		return mErrorStream;
+		return fErrorStream;
 	}
 
 	public IOConsoleOutputStream getOutputStream() {
-		if ((mOutputStream == null) || (mOutputStream.isClosed()))
-			mOutputStream = newOutputStream();
+		if ((fOutputStream == null) || (fOutputStream.isClosed()))
+			fOutputStream = newOutputStream();
 
-		return mOutputStream;
+		return fOutputStream;
 	}
 
 	@Override
@@ -130,13 +158,7 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 	}
 
 	public synchronized void terminate() {
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				setName(getName() + TITLE_TERMINATED);
-			}
-		});
+		Display.getDefault().asyncExec(() -> setName(getName() + TITLE_TERMINATED));
 
 		setScriptEngine(null);
 		closeStreams();
@@ -145,33 +167,34 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 	private void closeStreams() {
 		// close streams
 		try {
-			if (mOutputStream != null)
-				mOutputStream.close();
+			if (fOutputStream != null)
+				fOutputStream.close();
 		} catch (final IOException e) {
 
 		}
 		try {
-			if (mErrorStream != null)
-				mErrorStream.close();
+			if (fErrorStream != null)
+				fErrorStream.close();
 		} catch (final IOException e) {
 		}
 	}
 
 	@Override
 	public IScriptEngine getScriptEngine() {
-		return mEngine;
+		return fEngine;
 	}
 
 	public void setLaunch(final ILaunch launch) {
-		mLaunch = launch;
+		fLaunch = launch;
 	}
 
 	public ILaunch getLaunch() {
-		return mLaunch;
+		return fLaunch;
 	}
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
+		final IPreferenceStore store = DebugUIPlugin.getDefault().getPreferenceStore();
 		final String property = event.getProperty();
 
 		if (property.equals(IPreferenceConstants.CONSOLE_BASE + "." + getName() + "." + IPreferenceConstants.CONSOLE_OPEN_ON_OUT))
@@ -179,28 +202,74 @@ public class ScriptConsole extends IOConsole implements IExecutionListener, IScr
 
 		else if (property.equals(IPreferenceConstants.CONSOLE_BASE + "." + getName() + "." + IPreferenceConstants.CONSOLE_OPEN_ON_ERR))
 			getErrorStream().setActivateOnWrite((Boolean) event.getNewValue());
+
+		else if (property.equals(IDebugPreferenceConstants.CONSOLE_WRAP) || property.equals(IDebugPreferenceConstants.CONSOLE_WIDTH)) {
+			final boolean fixedWidth = store.getBoolean(IDebugPreferenceConstants.CONSOLE_WRAP);
+			if (fixedWidth) {
+				final int width = store.getInt(IDebugPreferenceConstants.CONSOLE_WIDTH);
+				setConsoleWidth(width);
+			} else {
+				setConsoleWidth(-1);
+			}
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_LIMIT_CONSOLE_OUTPUT) || property.equals(IDebugPreferenceConstants.CONSOLE_HIGH_WATER_MARK)
+				|| property.equals(IDebugPreferenceConstants.CONSOLE_LOW_WATER_MARK)) {
+			final boolean limitBufferSize = store.getBoolean(IDebugPreferenceConstants.CONSOLE_LIMIT_CONSOLE_OUTPUT);
+			if (limitBufferSize) {
+				final int highWater = store.getInt(IDebugPreferenceConstants.CONSOLE_HIGH_WATER_MARK);
+				final int lowWater = store.getInt(IDebugPreferenceConstants.CONSOLE_LOW_WATER_MARK);
+				if (highWater > lowWater) {
+					setWaterMarks(lowWater, highWater);
+				}
+			} else {
+				setWaterMarks(-1, -1);
+			}
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_TAB_WIDTH)) {
+			final int tabWidth = store.getInt(IDebugPreferenceConstants.CONSOLE_TAB_WIDTH);
+			setTabWidth(tabWidth);
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR)) {
+			if (fOutputStream != null)
+				fOutputStream.setColor(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR));
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_SYS_ERR_COLOR)) {
+			if (fErrorStream != null)
+				fErrorStream.setColor(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_SYS_ERR_COLOR));
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_SYS_IN_COLOR)) {
+			// if (fInput != null && fInput instanceof IOConsoleInputStream) {
+			// ((IOConsoleInputStream) fInput).setColor(fColorProvider.getColor(IDebugUIConstants.ID_STANDARD_INPUT_STREAM));
+			// }
+
+		} else if (property.equals(IDebugUIConstants.PREF_CONSOLE_FONT)) {
+			setFont(JFaceResources.getFont(IDebugUIConstants.PREF_CONSOLE_FONT));
+
+		} else if (property.equals(IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR)) {
+			setBackground(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR));
+		}
 	}
 
 	public synchronized void setScriptEngine(final IScriptEngine scriptEngine) {
-		if ((scriptEngine == null) || (!scriptEngine.equals(mEngine))) {
+		if ((scriptEngine == null) || (!scriptEngine.equals(fEngine))) {
 			// new engine detected
 
-			if (mEngine != null) {
-				mEngine.removeExecutionListener(this);
+			if (fEngine != null) {
+				fEngine.removeExecutionListener(this);
 				closeStreams();
 			}
 
-			mEngine = scriptEngine;
+			fEngine = scriptEngine;
 
-			if (mEngine != null)
-				mEngine.addExecutionListener(this);
+			if (fEngine != null)
+				fEngine.addExecutionListener(this);
 
-			if (mScriptConsolePageParticipant != null)
-				mScriptConsolePageParticipant.engineChanged();
+			if (fScriptConsolePageParticipant != null)
+				fScriptConsolePageParticipant.engineChanged();
 		}
 	}
 
 	public void setPageParticipant(final ScriptConsolePageParticipant scriptConsolePageParticipant) {
-		mScriptConsolePageParticipant = scriptConsolePageParticipant;
+		fScriptConsolePageParticipant = scriptConsolePageParticipant;
 	}
 }
