@@ -4,6 +4,7 @@ package org.eclipse.ease.lang.unittest.runtime.impl;
 
 import java.util.Collection;
 
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
@@ -343,6 +344,9 @@ public class TestSuite extends TestContainer implements ITestSuite {
 				if (fSetupEngine != null) {
 					if (fSetupEngine instanceof IReplEngine)
 						((IReplEngine) fSetupEngine).setTerminateOnIdle(false);
+
+					if (fSetupEngine instanceof AbstractScriptEngine)
+						((AbstractScriptEngine) fSetupEngine).setExecutionRootFile(getResource());
 
 					fSetupEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, this);
 

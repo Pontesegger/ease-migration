@@ -107,7 +107,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	private boolean fTerminated = false;
 
 	/** Registered security checks for engine actions. */
-	private final HashMap<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();;
+	private final HashMap<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();
+
+	private Object fExecutionRootFile;;
 
 	/**
 	 * Constructor. Sets the name for the underlying job.
@@ -470,7 +472,11 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			}
 		}
 
-		return null;
+		return fExecutionRootFile;
+	}
+
+	public void setExecutionRootFile(Object executionRootFile) {
+		fExecutionRootFile = executionRootFile;
 	}
 
 	public void setEngineDescription(final EngineDescription description) {
