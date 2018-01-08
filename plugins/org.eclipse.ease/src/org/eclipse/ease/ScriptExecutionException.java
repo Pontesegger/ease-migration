@@ -11,8 +11,10 @@
 
 package org.eclipse.ease;
 
+import java.io.File;
 import java.io.PrintStream;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 
@@ -106,9 +108,16 @@ public class ScriptExecutionException extends RuntimeException {
 
 		if (fScriptStackTrace != null) {
 			for (final IScriptDebugFrame traceElement : fScriptStackTrace) {
-				final String source = (traceElement.getName() != null) ? traceElement.getName() : "unknown script";
+				String fileName = "<unknown source>";
+				final Object file = traceElement.getScript().getFile();
+				if (file instanceof IFile)
+					fileName = ((IFile) file).getName();
+				else if (file instanceof File)
+					fileName = ((File) file).getName();
+
+				final String name = ((traceElement.getName() != null) && (!traceElement.getName().isEmpty())) ? ("," + traceElement.getName()) : "";
 				final String lineInfo = (traceElement.getLineNumber() > 0) ? ":" + traceElement.getLineNumber() : "";
-				s.println("\tat " + source + lineInfo);
+				s.println("\tat " + fileName + name + lineInfo);
 			}
 		}
 

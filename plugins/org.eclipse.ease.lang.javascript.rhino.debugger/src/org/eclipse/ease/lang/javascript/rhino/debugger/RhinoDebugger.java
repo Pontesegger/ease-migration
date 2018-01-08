@@ -34,6 +34,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 	private static final Pattern PROTOTYPE_PATTERN = Pattern.compile("^(.*)\\.prototype\\.(.*)\\s*=\\s*function\\(.*$");
 	private static final Pattern PROPERTY_PATTERN = Pattern.compile("^\\s*(.*)\\s:\\sfunction\\(.*$");
+	private static final Pattern ANONYMOUS_PATTERN = Pattern.compile("^.*function\\(.*$");
 
 	private static DebuggableScript getParentScript(DebuggableScript rhinoScript) {
 		while (rhinoScript.getParent() != null)
@@ -62,9 +63,10 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 				if (lineNumbers.length > 0) {
 					final int headerLineNumber = getFirstLineNumber(lineNumbers);
 					try {
-						final String definitionLine = getLineOfCode(getScript().getCode(), headerLineNumber);
+						String definitionLine = getLineOfCode(getScript().getCode(), headerLineNumber);
 
 						if (definitionLine != null) {
+							definitionLine = definitionLine.trim();
 							Matcher matcher = PROTOTYPE_PATTERN.matcher(definitionLine);
 							if (matcher.matches())
 								return matcher.group(1).trim() + ":" + matcher.group(2).trim();
@@ -72,6 +74,9 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 							matcher = PROPERTY_PATTERN.matcher(definitionLine);
 							if (matcher.matches())
 								return matcher.group(1).trim();
+
+							if (ANONYMOUS_PATTERN.matcher(definitionLine).matches())
+								return "<anonymous function>";
 						}
 					} catch (final Exception e) {
 						// could not fetch source code, gracefully fail
