@@ -102,9 +102,16 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 		// display proposals
 		for (final Object child : resolver.getChildren()) {
 			if (child instanceof File) {
-				final String name = ((File) child).getName();
+				String name = ((File) child).getName();
 				final String suffix = (((File) child).isDirectory()) ? "/" : "";
-				final String parentFolder = resolver.getParentString();
+				String parentFolder = resolver.getParentString();
+
+				if ((name.isEmpty()) && (ResourceTools.isWindows())) {
+					// this is a windows root folder
+					name = ((File) child).getPath().substring(0, 2);
+					parentFolder = "file:///";
+				}
+
 				final String replacement = parentFolder + ((parentFolder.endsWith("/") ? "" : "/")) + name + suffix;
 
 				if ((matchesIgnoreCase(resolver.getFilterPart(), name)) && (showCandidate(child)))

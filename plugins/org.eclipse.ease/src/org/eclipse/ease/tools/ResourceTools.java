@@ -386,7 +386,7 @@ public final class ResourceTools {
 		return null;
 	}
 
-	private static boolean isWindows() {
+	public static boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().startsWith("windows");
 	}
 
