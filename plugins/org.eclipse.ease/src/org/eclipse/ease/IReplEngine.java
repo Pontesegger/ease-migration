@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.util.Collection;
+
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
+
 public interface IReplEngine extends IScriptEngine {
 	/**
 	 * Returns the execution state of the engine. If the engine is processing code or is terminated this will return <code>false</code>. If the engine is
@@ -34,5 +38,12 @@ public interface IReplEngine extends IScriptEngine {
 	 * @return <code>true</code> when engine is terminated when idle
 	 */
 	boolean getTerminateOnIdle();
+
+	/**
+	 * Get variables defined on the top level scope of the script engine.
+	 *
+	 * @return defined variables
+	 */
+	Collection<EaseDebugVariable> getDefinedVariables();
 
 }

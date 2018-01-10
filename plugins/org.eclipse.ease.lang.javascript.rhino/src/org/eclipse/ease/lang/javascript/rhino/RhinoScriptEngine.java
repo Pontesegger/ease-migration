@@ -15,7 +15,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.ease.AbstractReplScriptEngine;
@@ -25,6 +29,8 @@ import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
+import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
@@ -34,8 +40,10 @@ import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeFunction;
 import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
@@ -73,6 +81,47 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		}
 
 		return context;
+	}
+
+	private static String getReferenceType(Object value) {
+		if (value != null) {
+			if (value instanceof NativeArray)
+				return "JavaScript Array";
+
+			if (value instanceof NativeObject)
+				return "JavaScript Object";
+
+			if (value.getClass().getName().startsWith("org.mozilla.javascript"))
+				return "Generic JavaScript";
+
+			if (value instanceof Integer)
+				return "int";
+
+			if (value instanceof Byte)
+				return "byte";
+
+			if (value instanceof Short)
+				return "short";
+
+			if (value instanceof Boolean)
+				return "boolean";
+
+			if (value instanceof Character)
+				return "char";
+
+			if (value instanceof Long)
+				return "long";
+
+			if (value instanceof Double)
+				return "double";
+
+			if (value instanceof Float)
+				return "float";
+
+			return "Java Object";
+
+		} else
+			return "";
 	}
 
 	/** Rhino Scope. Created when interpreter is initialized */
@@ -356,5 +405,119 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 	protected Context getCurrentContext() {
 		return fContext;
+	}
+
+	@Override
+	public Collection<EaseDebugVariable> getDefinedVariables() {
+		return getDefinedVariables(getScope());
+	}
+
+	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
+		final Collection<EaseDebugVariable> result = new HashSet<>();
+
+		if (scope instanceof ImporterTopLevel) {
+			final Object[] objectIDs = ((ImporterTopLevel) scope).getIds();
+
+			for (final Object id : objectIDs) {
+				final Object object = ((ImporterTopLevel) scope).get(id);
+				if (acceptVariable(object)) {
+					final EaseDebugVariable variable = createVariable(id.toString(), object);
+					result.add(variable);
+				}
+			}
+
+		} else if (scope instanceof NativeArray) {
+			for (final int indexId : ((NativeArray) scope).getIndexIds()) {
+				final EaseDebugVariable variable = createVariable("[" + indexId + "]", ((NativeArray) scope).get(indexId));
+				result.add(variable);
+			}
+
+			for (final Object id : ((NativeArray) scope).getIds()) {
+				// integers are already handled by the previous loop
+				if (!(id instanceof Integer)) {
+					final EaseDebugVariable variable = createVariable(id.toString(), ((NativeArray) scope).get(id));
+					result.add(variable);
+				}
+			}
+
+		} else if (scope instanceof NativeObject) {
+			for (final Entry<String, Object> entry : getNativeChildObjects((NativeObject) scope).entrySet()) {
+				final EaseDebugVariable variable = createVariable(entry.getKey(), entry.getValue());
+				result.add(variable);
+			}
+
+		} else if (scope instanceof Scriptable) {
+			if ("org.mozilla.javascript.Arguments".equals(scope.getClass().getName())) {
+				for (int id = 0; id < ((Scriptable) scope).getIds().length; id++) {
+					final EaseDebugVariable variable = createVariable("[" + id + "]", ((Scriptable) scope).get(id, (Scriptable) scope));
+					result.add(variable);
+				}
+
+			} else {
+				for (final Object id : ((Scriptable) scope).getIds()) {
+					final EaseDebugVariable variable = createVariable(id.toString(), ((Scriptable) scope).get(id.toString(), (Scriptable) scope));
+					result.add(variable);
+				}
+			}
+
+		} else if (hasNoChildElements(scope))
+			return result;
+
+		else
+			// marker that child variables should be resolved dynamically
+			return null;
+
+		return result;
+	}
+
+	private static boolean hasNoChildElements(Object scope) {
+		if (scope instanceof Double)
+			return true;
+
+		if (scope == null)
+			return true;
+
+		return false;
+	}
+
+	protected EaseDebugVariable createVariable(String name, Object value) {
+		final String referenceType = getReferenceType(value);
+		final EaseDebugVariable variable = new EaseDebugVariable(name, value, referenceType);
+		if (value instanceof NativeArray) {
+			variable.getValue().setValueString("array[" + ((NativeArray) value).getIds().length + "]");
+			variable.setType(Type.NATIVE_ARRAY);
+		}
+
+		if (value instanceof NativeObject) {
+			variable.getValue().setValueString("object{" + getNativeChildObjects((NativeObject) value).size() + "}");
+			variable.setType(Type.NATIVE_OBJECT);
+		}
+
+		// TODO find nicer approach to set type
+		if ("Java Object".equals(referenceType))
+			variable.setType(Type.JAVA_OBJECT);
+
+		variable.getValue().setVariables(getDefinedVariables(value));
+
+		return variable;
+	}
+
+	private Map<String, Object> getNativeChildObjects(NativeObject parent) {
+		final HashMap<String, Object> childObjects = new HashMap<>();
+
+		for (final Object id : parent.getIds()) {
+			final Object object = parent.get(id);
+			if (acceptVariable(object))
+				childObjects.put(id.toString(), object);
+		}
+
+		return childObjects;
+	}
+
+	protected boolean acceptVariable(Object value) {
+		if ((value != null) && (value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
+			return false;
+
+		return true;
 	}
 }

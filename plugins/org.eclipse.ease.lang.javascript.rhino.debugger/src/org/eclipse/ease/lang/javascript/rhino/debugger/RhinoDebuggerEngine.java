@@ -17,18 +17,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.IDebugEngine;
+import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
+import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
-import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebugger.RhinoDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.debugger.model.RhinoDebugTarget;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -41,47 +41,6 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 	public static boolean isSimpleType(final Object value) {
 		return (value instanceof Integer) || (value instanceof Byte) || (value instanceof Short) || (value instanceof Boolean) || (value instanceof Character)
 				|| (value instanceof Long) || (value instanceof Double) || (value instanceof Float);
-	}
-
-	private static String getReferenceType(Object value) {
-		if (value != null) {
-			if (value instanceof NativeArray)
-				return "JavaScript Array";
-
-			if (value instanceof NativeObject)
-				return "JavaScript Object";
-
-			if (value.getClass().getName().startsWith("org.mozilla.javascript"))
-				return "Generic JavaScript";
-
-			if (value instanceof Integer)
-				return "int";
-
-			if (value instanceof Byte)
-				return "byte";
-
-			if (value instanceof Short)
-				return "short";
-
-			if (value instanceof Boolean)
-				return "boolean";
-
-			if (value instanceof Character)
-				return "char";
-
-			if (value instanceof Long)
-				return "long";
-
-			if (value instanceof Double)
-				return "double";
-
-			if (value instanceof Float)
-				return "float";
-
-			return "Java Object";
-
-		} else
-			return "";
 	}
 
 	private RhinoDebugger fDebugger;
@@ -107,34 +66,12 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 		context.setDebugger(fDebugger, null);
 	}
 
-	private EaseDebugVariable createVariable(String name, Object value) {
-		final String referenceType = getReferenceType(value);
-		final EaseDebugVariable variable = new EaseDebugVariable(name, value, referenceType);
-		if (value instanceof NativeArray) {
-			variable.getValue().setValueString("array[" + ((NativeArray) value).getIds().length + "]");
-			variable.setType(Type.NATIVE_ARRAY);
-		}
-
-		if (value instanceof NativeObject) {
-			variable.getValue().setValueString("object{" + ((NativeObject) value).getIds().length + "}");
-			variable.setType(Type.NATIVE_OBJECT);
-		}
-
-		// TODO find nicer approach to set type
-		if ("Java Object".equals(referenceType))
-			variable.setType(Type.JAVA_OBJECT);
-
-		variable.getValue().setVariables(getVariables(value));
-
-		return variable;
-	}
-
 	@Override
-	public Collection<EaseDebugVariable> getVariables(Object scope) {
-		final Collection<EaseDebugVariable> result = new HashSet<>();
+	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
 
 		if (scope instanceof RhinoDebugFrame) {
 			// rhino stackframe
+			final Collection<EaseDebugVariable> result = new HashSet<>();
 			final Map<String, Object> variables = ((RhinoDebugFrame) scope).getVariables();
 
 			for (final Entry<String, Object> entry : variables.entrySet()) {
@@ -144,59 +81,34 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 				}
 			}
 
-		} else if (scope instanceof NativeArray) {
-			for (final int indexId : ((NativeArray) scope).getIndexIds()) {
-				final EaseDebugVariable variable = createVariable("[" + indexId + "]", ((NativeArray) scope).get(indexId));
-				result.add(variable);
-			}
-
-			for (final Object id : ((NativeArray) scope).getIds()) {
-				// integers are already handled by the previous loop
-				if (!(id instanceof Integer)) {
-					final EaseDebugVariable variable = createVariable(id.toString(), ((NativeArray) scope).get(id));
-					result.add(variable);
-				}
-			}
-
-		} else if (scope instanceof NativeObject) {
-			for (final Object id : ((NativeObject) scope).getIds()) {
-				final EaseDebugVariable variable = createVariable(id.toString(), ((NativeObject) scope).get(id));
-				result.add(variable);
-			}
-
-		} else if (scope instanceof Scriptable) {
-			if ("org.mozilla.javascript.Arguments".equals(scope.getClass().getName())) {
-				for (int id = 0; id < ((Scriptable) scope).getIds().length; id++) {
-					final EaseDebugVariable variable = createVariable("[" + id + "]", ((Scriptable) scope).get(id, (Scriptable) scope));
-					result.add(variable);
+			final EaseDebugTarget debugTarget = new EaseDebugTarget(null, false, false, false) {
+				@Override
+				protected IBreakpoint[] getBreakpoints(Script script) {
+					return null;
 				}
 
-			} else {
-				for (final Object id : ((Scriptable) scope).getIds()) {
-					final EaseDebugVariable variable = createVariable(id.toString(), ((Scriptable) scope).get(id.toString(), (Scriptable) scope));
-					result.add(variable);
+				@Override
+				public boolean supportsBreakpoint(IBreakpoint breakpoint) {
+					return false;
 				}
-			}
-		} else if (hasNoChildElements(scope))
+			};
+
+			for (final EaseDebugVariable entry : result)
+				entry.setParent(debugTarget);
+
 			return result;
+		}
 
-		else
-			return null;
-
-		return result;
+		return super.getDefinedVariables(scope);
 	}
 
-	private boolean hasNoChildElements(Object scope) {
-		if (scope instanceof Double)
-			return true;
-
-		if (scope == null)
-			return true;
-
-		return false;
+	@Override
+	public Collection<EaseDebugVariable> getVariables(Object scope) {
+		return getDefinedVariables(scope);
 	}
 
-	private boolean acceptVariable(Object value) {
+	@Override
+	protected boolean acceptVariable(Object value) {
 		if ((value != null) && ("org.mozilla.javascript.InterpretedFunction".equals(value.getClass().getName())))
 			return false;
 

@@ -96,17 +96,23 @@ public class EaseDebugValue implements IValue {
 			return fValue.toString();
 
 		if (fValue instanceof String)
-			return "\"" + fValue + "\" (id=" + getDebugTarget().getUniqueVariableId(getValue()) + ")";
+			return "\"" + fValue + "\" (id=" + getUniqueID(getValue()) + ")";
 
 		if (getValue() != null) {
 			if (getValue().getClass().isArray())
-				return fValue.getClass().getComponentType().getSimpleName() + "[" + Array.getLength(getValue()) + "] (id="
-						+ getDebugTarget().getUniqueVariableId(getValue()) + ")";
+				return fValue.getClass().getComponentType().getSimpleName() + "[" + Array.getLength(getValue()) + "] (id=" + getUniqueID(getValue()) + ")";
 
-			return fValue.getClass().getSimpleName() + " (id=" + getDebugTarget().getUniqueVariableId(getValue()) + ")";
+			return fValue.getClass().getSimpleName() + " (id=" + getUniqueID(getValue()) + ")";
 
 		} else
 			return "null";
+	}
+
+	private String getUniqueID(Object value) {
+		if (getDebugTarget() != null)
+			return Integer.toString(getDebugTarget().getUniqueVariableId(value));
+
+		return "<none>";
 	}
 
 	@Override
@@ -125,7 +131,10 @@ public class EaseDebugValue implements IValue {
 	@Override
 	public EaseDebugTarget getDebugTarget() {
 		// FIXME can we change fParent to EaseDebugElement?
-		return (EaseDebugTarget) fParent.getDebugTarget();
+		if (fParent != null)
+			return (EaseDebugTarget) fParent.getDebugTarget();
+
+		return null;
 	}
 
 	@Override

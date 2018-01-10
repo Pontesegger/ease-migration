@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
+
 /**
  * Adds generic REPL support to the AbstractScriptEngine.
  */
@@ -66,5 +71,10 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 		setTerminateOnIdle(true);
 
 		super.terminate();
+	}
+
+	@Override
+	public Collection<EaseDebugVariable> getDefinedVariables() {
+		return Collections.emptySet();
 	}
 }

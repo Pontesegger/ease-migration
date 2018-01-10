@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ModuleHelper;
@@ -176,7 +177,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
 		final StringBuilder scriptCode = new StringBuilder();
 
-		scriptCode.append("__EASE_temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
+		scriptCode.append(EnvironmentModule.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
 		scriptCode.append("\tjavaInstance: ").append(identifier).append(',').append(StringTools.LINE_DELIMITER);
 
 		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// field definitions").append(StringTools.LINE_DELIMITER);
