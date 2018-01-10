@@ -24,6 +24,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
@@ -114,12 +116,14 @@ public class TestSuiteEditor extends FormEditor implements IEditingDomainProvide
 			fTestSuite.setResource(getFile());
 
 		} catch (final IOException e) {
-			// TODO handle this exception (but for now, at least know it happened)
-			throw new RuntimeException(e);
+			// read error on file resource
+			final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
+			throw new PartInitException(status);
 
 		} catch (final CoreException e) {
-			// TODO handle this exception (but for now, at least know it happened)
-			throw new RuntimeException(e);
+			// file not found
+			final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
+			throw new PartInitException(status);
 		}
 
 		setPartName(getEditorInput().getName());
