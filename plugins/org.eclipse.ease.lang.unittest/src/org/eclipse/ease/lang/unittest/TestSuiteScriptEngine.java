@@ -315,8 +315,15 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 		}
 
 		// pass variables from suite
-		for (final Entry<String, Object> variable : getVariables().entrySet())
+		for (final Entry<String, Object> variable : getVariables().entrySet()) {
+			if (TEST_FILE_VARIABLE.equals(variable.getKey()))
+				continue;
+
+			if (TEST_SUITE_VARIABLE.equals(variable.getKey()))
+				continue;
+
 			engine.setVariable(variable.getKey(), variable.getValue());
+		}
 
 		// add registered jars rom suite
 		for (final URL jarLocation : fRegisteredJars)
