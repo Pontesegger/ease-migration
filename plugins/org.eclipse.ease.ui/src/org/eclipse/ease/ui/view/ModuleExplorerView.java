@@ -30,6 +30,7 @@ import org.eclipse.ease.ui.modules.ui.ModulesComposite;
 import org.eclipse.ease.ui.modules.ui.ModulesContentProvider;
 import org.eclipse.ease.ui.modules.ui.ModulesFilter;
 import org.eclipse.ease.ui.modules.ui.ModulesTools.ModuleEntry;
+import org.eclipse.ease.ui.tools.TextWithImage;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.internal.text.html.BrowserInformationControl;
@@ -48,7 +49,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
@@ -164,7 +164,7 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 	}
 
 	private ModulesComposite fModulesComposite;
-	private Text txtSearch;
+	private TextWithImage txtSearch;
 
 	private UpdateTreeJob fUpdateJob = null;
 
@@ -182,9 +182,10 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 		gl_parent.horizontalSpacing = 0;
 		parent.setLayout(gl_parent);
 
-		txtSearch = new Text(parent, SWT.BORDER);
+		txtSearch = new TextWithImage(parent, SWT.BORDER);
 		txtSearch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		txtSearch.addKeyListener(new KeyAdapter() {
+		txtSearch.setImage(Activator.getImage(Activator.PLUGIN_ID, "/icons/elcl16/filter.png", true));
+		txtSearch.getTextElement().addKeyListener(new KeyAdapter() {
 
 			@Override
 			public void keyReleased(final KeyEvent e) {
@@ -195,7 +196,7 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 			}
 		});
 		txtSearch.setText(SEARCH_DEFAULT_TEXT);
-		txtSearch.addFocusListener(new FocusAdapter() {
+		txtSearch.getTextElement().addFocusListener(new FocusAdapter() {
 
 			@Override
 			public void focusGained(final FocusEvent e) {
