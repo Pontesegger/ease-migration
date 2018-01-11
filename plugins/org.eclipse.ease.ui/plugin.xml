@@ -272,6 +272,12 @@
                visible="false">
          </separator>
          <command
+               commandId="org.eclipse.ui.navigate.collapseAll"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/elcl16/collapseall.png"
+               label="Collapse All"
+               style="push">
+         </command>
+         <command
                commandId="org.eclipse.ease.commands.ModulesExplorer.openPreferences"
                icon="icons/elcl16/preferences.png"
                label="Show Module Preferences"

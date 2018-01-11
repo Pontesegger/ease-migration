@@ -49,6 +49,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.handlers.CollapseAllHandler;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
@@ -168,6 +170,8 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 
 	private UpdateTreeJob fUpdateJob = null;
 
+	private CollapseAllHandler fCollapseAllHandler;
+
 	/**
 	 * Create contents of the view part.
 	 *
@@ -237,7 +241,7 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 			@Override
 			public String getContent(Object origin, Object detail) {
 				if (detail instanceof ModuleEntry<?>)
-					detail = ((ModuleEntry) detail).getEntry();
+					detail = ((ModuleEntry<?>) detail).getEntry();
 
 				if (detail instanceof ModuleDefinition)
 					return ModuleHelp.getModuleHelpTip((ModuleDefinition) detail);
@@ -256,6 +260,11 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 
 		// listen for preference changes on visible modules
 		((IEclipsePreferences) InstanceScope.INSTANCE.getNode(org.eclipse.ease.Activator.PLUGIN_ID).node("modules")).addPreferenceChangeListener(this);
+
+		// add collapseAll handler
+		final IHandlerService handlerService = getSite().getService(IHandlerService.class);
+		fCollapseAllHandler = new CollapseAllHandler(fModulesComposite.getTreeViewer());
+		handlerService.activateHandler(CollapseAllHandler.COMMAND_ID, fCollapseAllHandler);
 	}
 
 	@Override
@@ -265,6 +274,9 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 	@Override
 	public void dispose() {
 		((IEclipsePreferences) InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).node("modules")).removePreferenceChangeListener(this);
+
+		if (fCollapseAllHandler != null)
+			fCollapseAllHandler.dispose();
 	}
 
 	@Override
