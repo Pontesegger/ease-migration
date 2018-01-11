@@ -83,47 +83,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return context;
 	}
 
-	private static String getReferenceType(Object value) {
-		if (value != null) {
-			if (value instanceof NativeArray)
-				return "JavaScript Array";
-
-			if (value instanceof NativeObject)
-				return "JavaScript Object";
-
-			if (value.getClass().getName().startsWith("org.mozilla.javascript"))
-				return "Generic JavaScript";
-
-			if (value instanceof Integer)
-				return "int";
-
-			if (value instanceof Byte)
-				return "byte";
-
-			if (value instanceof Short)
-				return "short";
-
-			if (value instanceof Boolean)
-				return "boolean";
-
-			if (value instanceof Character)
-				return "char";
-
-			if (value instanceof Long)
-				return "long";
-
-			if (value instanceof Double)
-				return "double";
-
-			if (value instanceof Float)
-				return "float";
-
-			return "Java Object";
-
-		} else
-			return "";
-	}
-
 	/** Rhino Scope. Created when interpreter is initialized */
 	private ScriptableObject fScope;
 
@@ -408,10 +367,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	public Collection<EaseDebugVariable> getDefinedVariables() {
-		return getDefinedVariables(getScope());
-	}
-
 	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
 		final Collection<EaseDebugVariable> result = new HashSet<>();
 
@@ -480,24 +435,18 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return false;
 	}
 
+	@Override
 	protected EaseDebugVariable createVariable(String name, Object value) {
-		final String referenceType = getReferenceType(value);
-		final EaseDebugVariable variable = new EaseDebugVariable(name, value, referenceType);
+		final EaseDebugVariable variable = super.createVariable(name, value);
+
 		if (value instanceof NativeArray) {
 			variable.getValue().setValueString("array[" + ((NativeArray) value).getIds().length + "]");
 			variable.setType(Type.NATIVE_ARRAY);
-		}
 
-		if (value instanceof NativeObject) {
+		} else if (value instanceof NativeObject) {
 			variable.getValue().setValueString("object{" + getNativeChildObjects((NativeObject) value).size() + "}");
 			variable.setType(Type.NATIVE_OBJECT);
 		}
-
-		// TODO find nicer approach to set type
-		if ("Java Object".equals(referenceType))
-			variable.setType(Type.JAVA_OBJECT);
-
-		variable.getValue().setVariables(getDefinedVariables(value));
 
 		return variable;
 	}
@@ -514,10 +463,27 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return childObjects;
 	}
 
+	@Override
 	protected boolean acceptVariable(Object value) {
 		if ((value != null) && (value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
 			return false;
 
 		return true;
+	}
+
+	@Override
+	protected String getReferenceType(Object value) {
+		if (value != null) {
+			if (value instanceof NativeArray)
+				return "JavaScript Array";
+
+			if (value instanceof NativeObject)
+				return "JavaScript Object";
+
+			if (value.getClass().getName().startsWith("org.mozilla.javascript"))
+				return "Generic JavaScript";
+		}
+
+		return super.getReferenceType(value);
 	}
 }

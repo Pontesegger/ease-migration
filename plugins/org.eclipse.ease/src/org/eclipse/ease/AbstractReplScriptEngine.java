@@ -11,9 +11,11 @@
 package org.eclipse.ease;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
+import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 
 /**
  * Adds generic REPL support to the AbstractScriptEngine.
@@ -75,6 +77,68 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 
 	@Override
 	public Collection<EaseDebugVariable> getDefinedVariables() {
-		return Collections.emptySet();
+		final Collection<EaseDebugVariable> result = new HashSet<>();
+
+		for (final Entry<String, Object> entry : getVariables().entrySet()) {
+			if (acceptVariable(entry.getValue())) {
+				final EaseDebugVariable variable = createVariable(entry.getKey(), entry.getValue());
+				result.add(variable);
+			}
+		}
+
+		return result;
+	}
+
+	protected boolean acceptVariable(Object value) {
+		return true;
+	}
+
+	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
+		return null;
+	}
+
+	protected EaseDebugVariable createVariable(String name, Object value) {
+		final String referenceType = getReferenceType(value);
+		final EaseDebugVariable variable = new EaseDebugVariable(name, value, referenceType);
+
+		// TODO find nicer approach to set type
+		if ("Java Object".equals(referenceType))
+			variable.setType(Type.JAVA_OBJECT);
+
+		variable.getValue().setVariables(getDefinedVariables(value));
+
+		return variable;
+	}
+
+	protected String getReferenceType(Object value) {
+		if (value != null) {
+			if (value instanceof Integer)
+				return "int";
+
+			if (value instanceof Byte)
+				return "byte";
+
+			if (value instanceof Short)
+				return "short";
+
+			if (value instanceof Boolean)
+				return "boolean";
+
+			if (value instanceof Character)
+				return "char";
+
+			if (value instanceof Long)
+				return "long";
+
+			if (value instanceof Double)
+				return "double";
+
+			if (value instanceof Float)
+				return "float";
+
+			return "Java Object";
+
+		} else
+			return "";
 	}
 }

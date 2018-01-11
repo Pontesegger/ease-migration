@@ -1,7 +1,10 @@
 package org.eclipse.ease.lang.javascript.nashorn;
 
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,6 +16,8 @@ import javax.script.ScriptEngineManager;
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
+import org.eclipse.ease.debugging.model.EaseDebugVariable;
+import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 
 public class NashornScriptEngine extends AbstractReplScriptEngine {
@@ -79,5 +84,150 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	@Override
 	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
 		return fEngine.eval(script.getCode());
+	}
+
+	@Override
+	protected boolean acceptVariable(Object value) {
+		if (isFunction(value))
+			return false;
+
+		return super.acceptVariable(value);
+	}
+
+	@Override
+	protected String getReferenceType(Object value) {
+		if (value != null) {
+			if (isArray(value))
+				return "JavaScript Array";
+
+			if (isFunction(value))
+				return "JavaScript Object";
+		}
+
+		return super.getReferenceType(value);
+	}
+
+	@Override
+	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
+		final Collection<EaseDebugVariable> result = new HashSet<>();
+
+		if (isScriptObject(scope)) {
+			final Map<String, Object> childElements = getChildElements(scope);
+
+			if (isArray(scope)) {
+				for (final Entry<String, Object> child : childElements.entrySet()) {
+					final EaseDebugVariable variable = createVariable("[" + child.getKey() + "]", child.getValue());
+					result.add(variable);
+				}
+
+			} else {
+				for (final Entry<String, Object> child : childElements.entrySet()) {
+					final EaseDebugVariable variable = createVariable(child.getKey(), child.getValue());
+					result.add(variable);
+				}
+
+			}
+
+			return result;
+
+		} else
+			return super.getDefinedVariables(scope);
+	}
+
+	@Override
+	protected EaseDebugVariable createVariable(String name, Object value) {
+		final EaseDebugVariable variable = super.createVariable(name, value);
+
+		if (isArray(value)) {
+			variable.getValue().setValueString("array[" + getChildElements(value).size() + "]");
+			variable.setType(Type.NATIVE_ARRAY);
+
+		} else if (isScriptObject(value)) {
+			variable.getValue().setValueString("object{" + getChildElements(value).size() + "}");
+			variable.setType(Type.NATIVE_OBJECT);
+		}
+
+		return variable;
+	}
+
+	private static boolean isScriptObject(Object value) {
+		return (value != null) && ("jdk.nashorn.api.scripting.ScriptObjectMirror".equals(value.getClass().getName()));
+	}
+
+	/**
+	 * Get child elements from a given script object. Child elements will be filtered using acceptVariable(). We are using reflection as we have class loading
+	 * restricions on the nashorn packages in eclipse.
+	 *
+	 * @param parent
+	 *            script object to investigate
+	 * @return map of <identifier, childElement>
+	 */
+	private Map<String, Object> getChildElements(Object parent) {
+		final Map<String, Object> children = new HashMap<>();
+
+		if (isScriptObject(parent)) {
+			try {
+				final Method keySetMethod = parent.getClass().getMethod("keySet");
+				final Method getMethod = parent.getClass().getMethod("get", Object.class);
+				if ((keySetMethod != null) && (getMethod != null)) {
+					final Object keys = keySetMethod.invoke(parent, new Object[0]);
+					if (keys instanceof Collection<?>) {
+						for (final Object key : (Collection<?>) keys) {
+							final Object childValue = getMethod.invoke(parent, key);
+							if (acceptVariable(childValue))
+								children.put(key.toString(), childValue);
+						}
+					}
+				}
+
+			} catch (final ReflectiveOperationException e) {
+				// ignore
+			} catch (final SecurityException e) {
+				// ignore
+			} catch (final IllegalArgumentException e) {
+				// ignore
+			}
+		}
+
+		return children;
+	}
+
+	private static boolean isFunction(Object value) {
+		return invokeBooleanMethod(value, "isFunction");
+	}
+
+	private static boolean isArray(Object value) {
+		return invokeBooleanMethod(value, "isArray");
+	}
+
+	/**
+	 * Invode a method without parameters and cast the return value to boolean. We are using reflection as we have class loading restricions on the nashorn
+	 * packages in eclipse.
+	 *
+	 * @param value
+	 *            instance to invoke method on
+	 * @param methodName
+	 *            method name to invoke
+	 * @return method invokation result
+	 */
+	private static boolean invokeBooleanMethod(Object value, String methodName) {
+		if (isScriptObject(value)) {
+			try {
+				final Method method = value.getClass().getMethod(methodName);
+				if (method != null) {
+					final Object isFunction = method.invoke(value, new Object[0]);
+					return Boolean.parseBoolean(isFunction.toString());
+				}
+
+			} catch (final ReflectiveOperationException e) {
+				// ignore
+			} catch (final SecurityException e) {
+				// ignore
+			} catch (final IllegalArgumentException e) {
+				// ignore
+			}
+		}
+
+		return false;
 	}
 }
