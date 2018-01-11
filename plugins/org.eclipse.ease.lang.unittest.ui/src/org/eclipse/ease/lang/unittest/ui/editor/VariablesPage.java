@@ -39,6 +39,7 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -170,6 +171,9 @@ public class VariablesPage extends AbstractEditorPage {
 		tree.setLinesVisible(true);
 		managedForm.getToolkit().paintBordersFor(tree);
 
+		// enable tooltip support
+		ColumnViewerToolTipSupport.enableFor(fTreeViewer);
+
 		fTreeViewer.setContentProvider(new VariablesTreeContentProvider());
 
 		fTreeViewer.setComparator(new ViewerComparator() {
@@ -212,6 +216,17 @@ public class VariablesPage extends AbstractEditorPage {
 					return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 
 				return super.getImage(element);
+			}
+
+			@Override
+			public String getToolTipText(Object element) {
+				if (element instanceof IVariable) {
+					final String description = ((IVariable) element).getDescription();
+					if (description != null)
+						return description.replaceAll("\\\\n", "\n");
+				}
+
+				return super.getToolTipText(element);
 			}
 		});
 
