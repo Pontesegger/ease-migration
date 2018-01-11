@@ -116,6 +116,12 @@
             id="org.eclipse.ease.commands.category.ModulesExplorer"
             name="Modules Explorer">
       </category>
+      <command
+            categoryId="org.eclipse.ease.commands.category.ModulesExplorer"
+            defaultHandler="org.eclipse.ease.ui.handler.OpenModulesPreferences"
+            id="org.eclipse.ease.commands.ModulesExplorer.openPreferences"
+            name="Show Module Preferences">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -257,6 +263,24 @@
                </or>
             </visibleWhen>
          </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="toolbar:org.eclipse.ease.ui.views.modulesExplorer">
+         <separator
+               name="top"
+               visible="false">
+         </separator>
+         <command
+               commandId="org.eclipse.ease.commands.ModulesExplorer.openPreferences"
+               icon="icons/elcl16/preferences.png"
+               label="Show Module Preferences"
+               style="push">
+         </command>
+         <separator
+               name="additions"
+               visible="false">
+         </separator>
       </menuContribution>
    </extension>
    <extension

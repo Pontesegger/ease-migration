@@ -57,8 +57,8 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 				return ((ModuleDefinition) element).isVisible() == fShowVisible;
 
 			if (element instanceof IPath) {
-				final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
-				for (ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+				final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+				for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
 					if ((((IPath) element).isPrefixOf(definition.getPath())) && (definition.isVisible() == fShowVisible))
 						return true;
 				}
@@ -69,6 +69,8 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 			return true;
 		}
 	};
+
+	public static final String PREFERENCES_ID = "org.eclipse.ease.preferences.modules";
 
 	private IWorkbench fWorkbench;
 	private TreeViewer visibleTreeViewer;
@@ -85,21 +87,21 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 	@Override
 	protected Control createContents(final Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
+		final Composite composite = new Composite(parent, SWT.NULL);
 		composite.setLayout(new GridLayout(2, false));
 
-		Label lblUseDragAnd = new Label(composite, SWT.NONE);
+		final Label lblUseDragAnd = new Label(composite, SWT.NONE);
 		lblUseDragAnd.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		lblUseDragAnd.setText("Use drag and drop to organize module visibility.");
 
-		Label lblVisibleModules = new Label(composite, SWT.NONE);
+		final Label lblVisibleModules = new Label(composite, SWT.NONE);
 		lblVisibleModules.setText("Visible Modules");
 
-		Label lblHiddenModules = new Label(composite, SWT.NONE);
+		final Label lblHiddenModules = new Label(composite, SWT.NONE);
 		lblHiddenModules.setText("Hidden Modules");
 
 		visibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
-		Tree tree = visibleTreeViewer.getTree();
+		final Tree tree = visibleTreeViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 		visibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
 		visibleTreeViewer.setContentProvider(new ModulesContentProvider());
@@ -113,7 +115,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		addDNDSupport(visibleTreeViewer, true);
 
 		invisibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
-		Tree tree_1 = invisibleTreeViewer.getTree();
+		final Tree tree_1 = invisibleTreeViewer.getTree();
 		tree_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 		invisibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
 		invisibleTreeViewer.setContentProvider(new ModulesContentProvider());
@@ -126,8 +128,8 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		invisibleTreeViewer.setFilters(new ViewerFilter[] { new VisibilityFilter(false) });
 		addDNDSupport(invisibleTreeViewer, false);
 
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
-		Collection<ModuleDefinition> modules = scriptService.getAvailableModules().values();
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final Collection<ModuleDefinition> modules = scriptService.getAvailableModules().values();
 		visibleTreeViewer.setInput(modules);
 		invisibleTreeViewer.setInput(modules);
 
@@ -150,14 +152,14 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		viewer.addDropSupport(DND.DROP_COPY | DND.DROP_MOVE, new Transfer[] { LocalSelectionTransfer.getTransfer() }, new DropTargetAdapter() {
 			@Override
 			public void drop(final DropTargetEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
-				for (Object element : selection.toArray()) {
+				final IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
+				for (final Object element : selection.toArray()) {
 					if (element instanceof ModuleDefinition)
 						((ModuleDefinition) element).setVisible(dropVisible);
 
 					else if (element instanceof IPath) {
-						final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
-						for (ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+						final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+						for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
 							if (((IPath) element).isPrefixOf(definition.getPath()))
 								definition.setVisible(dropVisible);
 						}
@@ -172,8 +174,8 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 	@Override
 	protected void performDefaults() {
-		final IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
-		for (ModuleDefinition definition : scriptService.getAvailableModules().values())
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		for (final ModuleDefinition definition : scriptService.getAvailableModules().values())
 			definition.resetVisible();
 
 		visibleTreeViewer.refresh();
