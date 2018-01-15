@@ -16,6 +16,7 @@ import javax.script.ScriptEngineManager;
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
+import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
@@ -95,16 +96,31 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected String getReferenceType(Object value) {
-		if (value != null) {
-			if (isArray(value))
-				return "JavaScript Array";
+	public ScriptObjectType getType(Object object) {
+		if (object != null) {
+			if (isArray(object))
+				return ScriptObjectType.NATIVE_ARRAY;
 
-			if (isFunction(value))
-				return "JavaScript Object";
+			if (isFunction(object))
+				return ScriptObjectType.NATIVE_OBJECT;
 		}
 
-		return super.getReferenceType(value);
+		return super.getType(object);
+	}
+
+	@Override
+	protected String getTypeName(Object value) {
+		final ScriptObjectType type = getType(value);
+		switch (type) {
+		case NATIVE_ARRAY:
+			return "JavaScript Array";
+
+		case NATIVE_OBJECT:
+			return "JavaScript Object";
+
+		default:
+			return super.getTypeName(value);
+		}
 	}
 
 	@Override

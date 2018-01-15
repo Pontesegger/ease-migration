@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
+import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -472,18 +473,35 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected String getReferenceType(Object value) {
-		if (value != null) {
-			if (value instanceof NativeArray)
-				return "JavaScript Array";
+	protected String getTypeName(Object object) {
+		switch (getType(object)) {
+		case NATIVE_ARRAY:
+			return "JavaScript Array";
 
-			if (value instanceof NativeObject)
-				return "JavaScript Object";
+		case NATIVE_OBJECT:
+			return "JavaScript Object";
 
-			if (value.getClass().getName().startsWith("org.mozilla.javascript"))
-				return "Generic JavaScript";
+		case NATIVE:
+			return "Generic JavaScript";
+
+		default:
+			return super.getTypeName(object);
+		}
+	}
+
+	@Override
+	public ScriptObjectType getType(Object object) {
+		if (object != null) {
+			if (object instanceof NativeArray)
+				return ScriptObjectType.NATIVE_ARRAY;
+
+			if (object instanceof NativeObject)
+				return ScriptObjectType.NATIVE_OBJECT;
+
+			if (object.getClass().getName().startsWith("org.mozilla.javascript"))
+				return ScriptObjectType.NATIVE;
 		}
 
-		return super.getReferenceType(value);
+		return super.getType(object);
 	}
 }

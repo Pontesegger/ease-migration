@@ -15,6 +15,7 @@ import java.util.Collection;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 
 public interface IReplEngine extends IScriptEngine {
+
 	/**
 	 * Returns the execution state of the engine. If the engine is processing code or is terminated this will return <code>false</code>. If the engine is
 	 * waiting for further scripts to execute this will return <code>true</code>.
@@ -46,4 +47,12 @@ public interface IReplEngine extends IScriptEngine {
 	 */
 	Collection<EaseDebugVariable> getDefinedVariables();
 
+	/**
+	 * Get type information on a given script object
+	 *
+	 * @param object
+	 *            object to inspect
+	 * @return object type
+	 */
+	ScriptObjectType getType(Object object);
 }

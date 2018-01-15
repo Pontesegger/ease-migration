@@ -98,7 +98,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	}
 
 	protected EaseDebugVariable createVariable(String name, Object value) {
-		final String referenceType = getReferenceType(value);
+		final String referenceType = getTypeName(value);
 		final EaseDebugVariable variable = new EaseDebugVariable(name, value, referenceType);
 
 		// TODO find nicer approach to set type
@@ -110,35 +110,52 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 		return variable;
 	}
 
-	protected String getReferenceType(Object value) {
-		if (value != null) {
-			if (value instanceof Integer)
-				return "int";
-
-			if (value instanceof Byte)
-				return "byte";
-
-			if (value instanceof Short)
-				return "short";
-
-			if (value instanceof Boolean)
-				return "boolean";
-
-			if (value instanceof Character)
-				return "char";
-
-			if (value instanceof Long)
-				return "long";
-
-			if (value instanceof Double)
-				return "double";
-
-			if (value instanceof Float)
-				return "float";
-
+	protected String getTypeName(Object object) {
+		switch (getType(object)) {
+		case JAVA_OBJECT:
 			return "Java Object";
 
-		} else
+		case JAVA_PRIMITIVE:
+			if (object instanceof Integer)
+				return "int";
+
+			if (object instanceof Byte)
+				return "byte";
+
+			if (object instanceof Short)
+				return "short";
+
+			if (object instanceof Boolean)
+				return "boolean";
+
+			if (object instanceof Character)
+				return "char";
+
+			if (object instanceof Long)
+				return "long";
+
+			if (object instanceof Double)
+				return "double";
+
+			if (object instanceof Float)
+				return "float";
+
+			// fall through
+		default:
 			return "";
+		}
+	}
+
+	@Override
+	public ScriptObjectType getType(Object object) {
+		if (object != null) {
+			if ((object instanceof Integer) || (object instanceof Byte) || (object instanceof Short) || (object instanceof Boolean)
+					|| (object instanceof Character) || (object instanceof Long) || (object instanceof Double) || (object instanceof Float))
+				return ScriptObjectType.JAVA_PRIMITIVE;
+
+			return ScriptObjectType.JAVA_OBJECT;
+
+		} else
+			return ScriptObjectType.UNKNOWN;
 	}
 }
