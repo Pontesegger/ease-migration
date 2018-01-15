@@ -2,9 +2,12 @@ package org.eclipse.ease.lang.javascript.nashorn;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -166,13 +169,45 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 		return variable;
 	}
 
+	@Override
+	public String toString(Object object) {
+		if (isArray(object)) {
+			final Map<String, Object> childElements = getChildElements(object);
+
+			// sort array keys
+			final List<String> keys = new ArrayList<>(childElements.keySet());
+			Collections.sort(keys, (o1, o2) -> {
+				try {
+					final int index1 = Integer.parseInt(o1);
+					final int index2 = Integer.parseInt(o2);
+					return index2 - index1;
+				} catch (final NumberFormatException e) {
+					return o1.compareTo(o2);
+				}
+			});
+
+			final List<Object> elements = new ArrayList<>();
+			for (final String index : keys)
+				elements.add(childElements.get(index));
+
+			return buildArrayString(elements);
+		}
+
+		if (isFunction(object)) {
+			final Map<String, Object> childElements = getChildElements(object);
+			return buildObjectString(childElements);
+		}
+
+		return super.toString(object);
+	}
+
 	private static boolean isScriptObject(Object value) {
 		return (value != null) && ("jdk.nashorn.api.scripting.ScriptObjectMirror".equals(value.getClass().getName()));
 	}
 
 	/**
 	 * Get child elements from a given script object. Child elements will be filtered using acceptVariable(). We are using reflection as we have class loading
-	 * restricions on the nashorn packages in eclipse.
+	 * restrictions on the nashorn packages in eclipse.
 	 *
 	 * @param parent
 	 *            script object to investigate
@@ -217,7 +252,7 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	/**
-	 * Invode a method without parameters and cast the return value to boolean. We are using reflection as we have class loading restricions on the nashorn
+	 * Invoke a method without parameters and cast the return value to boolean. We are using reflection as we have class loading restrictions on the nashorn
 	 * packages in eclipse.
 	 *
 	 * @param value

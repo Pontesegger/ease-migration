@@ -50,19 +50,17 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 		case JAVA_OBJECT:
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_java_class.png", true);
 
-		case JAVA_PRIMITIVE:
-			// fall through
-		case NATIVE:
-			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_local_variable.png", true);
-
 		case NATIVE_ARRAY:
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_local_array.png", true);
 
 		case NATIVE_OBJECT:
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_local_object.png", true);
 
+		case VOID:
+			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/void_type.png", true);
+
 		default:
-			return null;
+			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_local_variable.png", true);
 		}
 	}
 
@@ -219,12 +217,13 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 			// print to output pane
 			Display.getDefault().asyncExec(() -> {
 				if (!isDisposed()) {
-					append("\n");
+					if (!getText().isEmpty())
+						append("\n");
 
 					// create new style range
-					final StyleRange styleRange = getStyle(STYLE_COMMAND, getText().length(), message.length());
+					final StyleRange styleRange = getStyle(STYLE_COMMAND, getText().length(), message.trim().length());
 
-					append(message);
+					append(message.trim());
 					setStyleRange(styleRange);
 
 					// scroll to end of window
@@ -242,18 +241,8 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 *            script execution result
 	 */
 	private void printResult(ScriptResult result) {
-		String message;
+		final String message = getResultMesage(result);
 		final Image image = getResultImage(result);
-		if (result.hasException())
-			message = result.getException().getLocalizedMessage();
-
-		else {
-			final Object executionResult = result.getResult();
-			if (executionResult != null) {
-				message = executionResult.toString();
-			} else
-				message = "[null]";
-		}
 
 		// // print to output pane
 		Display.getDefault().asyncExec(() -> {
@@ -290,7 +279,27 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	}
 
 	/**
-	 * Get an image to represent the result type of the script
+	 * Get a text representation for the script execution result.
+	 *
+	 * @param result
+	 *            script result
+	 * @return text string
+	 */
+	private String getResultMesage(ScriptResult result) {
+		if (result.hasException())
+			return result.getException().getLocalizedMessage();
+
+		else {
+			final Object executionResult = result.getResult();
+			if (fCurrentEngine != null)
+				return fCurrentEngine.toString(executionResult);
+			else
+				return (executionResult != null) ? executionResult.toString() : "null";
+		}
+	}
+
+	/**
+	 * Get an image representation for the script execution result.
 	 *
 	 * @param result
 	 *            script result

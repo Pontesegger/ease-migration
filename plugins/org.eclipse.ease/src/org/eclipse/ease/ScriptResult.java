@@ -16,6 +16,14 @@ package org.eclipse.ease;
  */
 public class ScriptResult {
 
+	/** Special void object for script methods not returning a result. */
+	public static final Object VOID = new Object() {
+		@Override
+		public final String toString() {
+			return "<void>";
+		}
+	};
+
 	/** script execution result. */
 	private Object fResult = null;
 

@@ -55,4 +55,13 @@ public interface IReplEngine extends IScriptEngine {
 	 * @return object type
 	 */
 	ScriptObjectType getType(Object object);
+
+	/**
+	 * Get the String representation of a script object. A script object can be an execution result or a variable content.
+	 *
+	 * @param object
+	 *            script object
+	 * @return String representation
+	 */
+	String toString(Object object);
 }

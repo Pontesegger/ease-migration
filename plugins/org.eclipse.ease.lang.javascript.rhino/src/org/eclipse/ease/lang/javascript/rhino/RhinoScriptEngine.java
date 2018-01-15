@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptObjectType;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -199,7 +201,10 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			}
 
 			// evaluate result
-			if ((result == null) || (result instanceof Undefined))
+			if (result instanceof Undefined)
+				return ScriptResult.VOID;
+
+			if (result == null)
 				return null;
 
 			else if (result instanceof NativeJavaObject)
@@ -503,5 +508,27 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		}
 
 		return super.getType(object);
+	}
+
+	@Override
+	public String toString(Object object) {
+		if (ScriptResult.VOID.equals(object))
+			return "<undefined>";
+
+		if (object instanceof NativeArray) {
+			final ArrayList<Object> elements = new ArrayList<>();
+			for (final int indexId : ((NativeArray) object).getIndexIds())
+				elements.add(((NativeArray) object).get(indexId));
+
+			return buildArrayString(elements);
+		}
+
+		if (object instanceof NativeObject)
+			return buildObjectString(getNativeChildObjects((NativeObject) object));
+
+		if (getType(object) == ScriptObjectType.NATIVE)
+			return "{}";
+
+		return super.toString(object);
 	}
 }

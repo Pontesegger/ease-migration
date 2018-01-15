@@ -12,6 +12,8 @@ package org.eclipse.ease;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
@@ -153,9 +155,48 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 					|| (object instanceof Character) || (object instanceof Long) || (object instanceof Double) || (object instanceof Float))
 				return ScriptObjectType.JAVA_PRIMITIVE;
 
+			if (ScriptResult.VOID.equals(object))
+				return ScriptObjectType.VOID;
+
 			return ScriptObjectType.JAVA_OBJECT;
 
 		} else
-			return ScriptObjectType.UNKNOWN;
+			return ScriptObjectType.NULL;
+	}
+
+	@Override
+	public String toString(Object object) {
+		if (object != null)
+			return object.toString();
+
+		return "null";
+	}
+
+	protected final String buildArrayString(List<Object> elements) {
+		final StringBuilder output = new StringBuilder("[");
+
+		for (final Object element : elements)
+			output.append(", ").append(toString(element));
+
+		output.append(']');
+
+		if (output.length() > 4)
+			output.delete(1, 3);
+
+		return output.toString();
+	}
+
+	protected final String buildObjectString(Map<String, Object> elements) {
+		final StringBuilder output = new StringBuilder("{");
+
+		for (final Entry<String, Object> entry : elements.entrySet())
+			output.append(", ").append(entry.getKey()).append(": ").append(toString(entry.getValue()));
+
+		output.append('}');
+
+		if (output.length() > 4)
+			output.delete(1, 3);
+
+		return output.toString();
 	}
 }
