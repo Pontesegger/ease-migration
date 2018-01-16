@@ -11,12 +11,14 @@
 package org.eclipse.ease.ui.view;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
 import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.modules.EnvironmentModule;
@@ -86,7 +88,12 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 					}
 				} });
 
-		fVariablesTree.setComparator(new ViewerComparator());
+		fVariablesTree.setComparator(new ViewerComparator() {
+			@Override
+			public int category(Object element) {
+				return (element instanceof EaseDebugLastExecutionResult) ? 1 : 2;
+			}
+		});
 
 		fVariablesTree.setContentProvider(new ITreeContentProvider() {
 
@@ -123,7 +130,12 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 						}
 					};
 
-					final Collection<EaseDebugVariable> variables = ((IReplEngine) inputElement).getDefinedVariables();
+					// get variables
+					final Collection<EaseDebugVariable> variables = new HashSet<>(((IReplEngine) inputElement).getDefinedVariables());
+
+					// add last execution result
+					final EaseDebugVariable lastScriptResult = ((IReplEngine) inputElement).getLastExecutionResult();
+					variables.add(lastScriptResult);
 
 					for (final EaseDebugVariable entry : variables)
 						entry.setParent(debugTarget);

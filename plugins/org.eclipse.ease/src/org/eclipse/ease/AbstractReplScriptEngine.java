@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 
@@ -26,6 +27,9 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 
 	/** Indicator to terminate once this Job gets IDLE. */
 	private volatile boolean fTerminateOnIdle = true;
+
+	/** Result of last script execution. */
+	private ScriptResult fLastExecutionResult = null;
 
 	/**
 	 * Constructor. Sets the name for the underlying job.
@@ -198,5 +202,35 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 			output.delete(1, 3);
 
 		return output.toString();
+	}
+
+	@Override
+	protected void notifyExecutionListeners(Script script, int status) {
+		if (IExecutionListener.SCRIPT_END == status)
+			fLastExecutionResult = script.getResult();
+
+		super.notifyExecutionListeners(script, status);
+	}
+
+	@Override
+	public EaseDebugVariable getLastExecutionResult() {
+		if (fLastExecutionResult != null) {
+			if (ScriptResult.VOID.equals(fLastExecutionResult.getResult())) {
+				return new EaseDebugLastExecutionResult("no method return value", ScriptResult.VOID, "");
+
+			} else if (fLastExecutionResult.hasException()) {
+				return new EaseDebugLastExecutionResult("script exception", fLastExecutionResult.getException());
+
+			} else {
+				final EaseDebugVariable variable = createVariable("script returned", fLastExecutionResult.getResult());
+				return new EaseDebugLastExecutionResult(variable);
+			}
+		} else
+			return new EaseDebugLastExecutionResult("no method return value", null, "");
+	}
+
+	@Override
+	protected void teardownEngine() throws ScriptEngineException {
+		fLastExecutionResult = null;
 	}
 }

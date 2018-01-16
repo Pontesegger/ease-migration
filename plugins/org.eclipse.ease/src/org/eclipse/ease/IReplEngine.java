@@ -64,4 +64,11 @@ public interface IReplEngine extends IScriptEngine {
 	 * @return String representation
 	 */
 	String toString(Object object);
+
+	/**
+	 * Get the result of the last script execution.
+	 *
+	 * @return script result of last execution
+	 */
+	EaseDebugVariable getLastExecutionResult();
 }

@@ -13,7 +13,9 @@ package org.eclipse.ease.ui.debugging.model;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.debugging.DynamicContentEditorInput;
+import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseJavaFieldVariable;
 import org.eclipse.ease.ui.Activator;
@@ -44,7 +46,19 @@ public abstract class AbstractEaseDebugModelPresentation implements ILabelProvid
 
 	@Override
 	public Image getImage(Object element) {
+
 		if (element instanceof EaseDebugVariable) {
+			if (element instanceof EaseDebugLastExecutionResult) {
+				if (((EaseDebugLastExecutionResult) element).isException())
+					return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_method_return_exception.png", true);
+
+				else if (ScriptResult.VOID.equals(((EaseDebugVariable) element).getValue().getValue()))
+					return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_method_return_null.png", true);
+
+				else
+					return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_method_return_value.png", true);
+			}
+
 			switch (((EaseDebugVariable) element).getType()) {
 			case JAVA_OBJECT:
 				if (element instanceof EaseJavaFieldVariable) {
