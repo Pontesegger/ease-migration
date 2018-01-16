@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.ease.AbstractReplScriptEngine;
+import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptObjectType;
@@ -530,5 +531,17 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			return "{}";
 
 		return super.toString(object);
+	}
+
+	@Override
+	protected void notifyExecutionListeners(Script script, int status) {
+		if (!getTerminateOnIdle()) {
+			// high probability to run in interactive shell mode
+
+			if (IExecutionListener.SCRIPT_END == status)
+				setVariable("_", script.getResult().getResult());
+		}
+
+		super.notifyExecutionListeners(script, status);
 	}
 }

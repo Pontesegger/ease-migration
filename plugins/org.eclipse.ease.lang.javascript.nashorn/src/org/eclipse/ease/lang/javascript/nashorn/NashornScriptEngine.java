@@ -17,6 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.eclipse.ease.AbstractReplScriptEngine;
+import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptObjectType;
@@ -280,5 +281,17 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 		}
 
 		return false;
+	}
+
+	@Override
+	protected void notifyExecutionListeners(Script script, int status) {
+		if (!getTerminateOnIdle()) {
+			// high probability to run in interactive shell mode
+
+			if (IExecutionListener.SCRIPT_END == status)
+				setVariable("_", script.getResult().getResult());
+		}
+
+		super.notifyExecutionListeners(script, status);
 	}
 }
