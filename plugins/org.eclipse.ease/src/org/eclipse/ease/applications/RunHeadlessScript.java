@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ScriptResult;
@@ -28,6 +30,7 @@ import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
+import org.eclipse.ui.IStartup;
 
 public class RunHeadlessScript implements IApplication {
 
@@ -60,6 +63,8 @@ public class RunHeadlessScript implements IApplication {
 						return -1;
 					}
 				}
+
+				loadEarlyStartupExtensions();
 
 				try {
 					// execute script
@@ -135,6 +140,29 @@ public class RunHeadlessScript implements IApplication {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * Load eclipse extensions for extension point: org.eclipse.ui.startup.
+	 */
+	private void loadEarlyStartupExtensions() {
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.startup");
+		for (final IConfigurationElement e : config) {
+			if (e.getName().equals("startup")) {
+				try {
+					final Object earlyStartupParticipant = e.createExecutableExtension("class");
+					if (earlyStartupParticipant instanceof IStartup) {
+						try {
+							((IStartup) earlyStartupParticipant).earlyStartup();
+						} catch (final Throwable e1) {
+							System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
+						}
+					}
+				} catch (final CoreException e1) {
+					System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
+				}
+			}
+		}
 	}
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {

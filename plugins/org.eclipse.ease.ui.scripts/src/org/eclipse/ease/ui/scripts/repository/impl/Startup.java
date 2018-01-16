@@ -18,6 +18,10 @@ public class Startup implements IStartup {
 	public void earlyStartup() {
 		// make sure the service gets started automatically
 		// TODO this might be achieved by auto starting the bundle and activating the service from the bundle activator
-		RepositoryService.getInstance();
+		try {
+			RepositoryService.getInstance();
+		} catch (final IllegalStateException e) {
+			// workbench not started, possibly we are running in headless mode?
+		}
 	}
 }
