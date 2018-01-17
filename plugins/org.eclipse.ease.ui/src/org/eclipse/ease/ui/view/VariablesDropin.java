@@ -205,7 +205,6 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 	public void notify(IScriptEngine engine, Script script, int status) {
 		switch (status) {
 		case IExecutionListener.SCRIPT_END:
-		case IExecutionListener.SCRIPT_INJECTION_END:
 			Display.getDefault().asyncExec(() -> fVariablesTree.refresh());
 			break;
 

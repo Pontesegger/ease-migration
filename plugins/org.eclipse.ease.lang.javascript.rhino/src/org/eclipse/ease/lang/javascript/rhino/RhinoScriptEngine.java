@@ -453,6 +453,18 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		} else if (value instanceof NativeObject) {
 			variable.getValue().setValueString("object{" + getNativeChildObjects((NativeObject) value).size() + "}");
 			variable.setType(Type.NATIVE_OBJECT);
+
+		} else if (value instanceof String) {
+			try {
+				if (hasVariable(name)) {
+					// test for java string objects
+					final Object inject = inject(name + ".length;");
+					if (inject instanceof Integer)
+						variable.setType(Type.NATIVE_OBJECT);
+				}
+			} catch (final Exception e) {
+				// could not execute type check, ignore
+			}
 		}
 
 		return variable;
