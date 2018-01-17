@@ -21,9 +21,12 @@ import org.eclipse.ease.modules.charting.views.Chart;
 import org.eclipse.ease.modules.charting.views.ChartView;
 import org.eclipse.ease.modules.platform.UIModule;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.nebula.visualization.xygraph.figures.Annotation;
+import org.eclipse.nebula.visualization.xygraph.figures.Annotation.CursorLineStyle;
 import org.eclipse.nebula.visualization.xygraph.figures.Axis;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 
@@ -34,6 +37,10 @@ public class ChartingModule extends AbstractScriptModule {
 	public static final String MODULE_NAME = "Charting";
 
 	private Chart fChart = null;
+
+	private XYGraph fXYGraph = null;
+
+	private Trace fCurrentPlot = null;
 
 	private static int fFigureIterator = 1;
 
@@ -54,7 +61,7 @@ public class ChartingModule extends AbstractScriptModule {
 		final ChartView view = (ChartView) UIModule.showView(ChartView.VIEW_ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 		view.setViewName(secondaryId);
 		fChart = view.getChart();
-		fChart.setPlotTitle(secondaryId);
+		fXYGraph = fChart.setPlotTitle(secondaryId);
 		return fChart;
 	}
 
@@ -310,7 +317,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public Trace plotPoint(final double x, final double y) throws Throwable {
-		return getChart().plot(x, y);
+		fCurrentPlot = getChart().plot(x, y);
+		return fCurrentPlot;
 	}
 
 	/**
@@ -325,7 +333,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public Trace plot(final double[] x, final double[] y) throws Throwable {
-		return getChart().plot(x, y);
+		fCurrentPlot = getChart().plot(x, y);
+		return fCurrentPlot;
 	}
 
 	/**
@@ -418,6 +427,13 @@ public class ChartingModule extends AbstractScriptModule {
 	public void clear() throws PartInitException {
 		if (fChart != null)
 			fChart.clear();
+
+		Display.getDefault().asyncExec(() -> {
+			if (fXYGraph != null)
+				fXYGraph.removeAll();
+		});
+
+		fCurrentPlot = null;
 	}
 
 	/**
@@ -448,5 +464,43 @@ public class ChartingModule extends AbstractScriptModule {
 	@WrapToScript
 	public void removeSeries(final String seriesName) throws Throwable {
 		getChart().removeSeries(seriesName);
+	}
+
+	/**
+	 * Add a marker to the chart. A marker is a text label that points to a grid location. By default the marker will point to the data point that was added
+	 * last. If positions are provided always <i>xPosition</i> and <i>yPosition</i> need to be provided. The returned marker can be further customized in the UI
+	 * thread.
+	 *
+	 * @param text
+	 *            text to display
+	 * @param xPosition
+	 *            if set, this will be the X position the marker points to
+	 * @param yPosition
+	 *            if set, this will be the Y position the marker points to
+	 * @return marker implementation
+	 */
+	@WrapToScript
+	public Annotation addMarker(String text, @ScriptParameter(defaultValue = ScriptParameter.NULL) Double xPosition,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Double yPosition) {
+
+		if (fCurrentPlot != null) {
+			final Annotation annotation = new Annotation(text, fCurrentPlot);
+			annotation.setEnabled(true);
+			annotation.setCursorLineStyle(CursorLineStyle.NONE);
+
+			Display.getDefault().asyncExec(() -> {
+				fXYGraph.addAnnotation(annotation);
+
+				// we need to schedule a fresh UI Job as it seems XY Chart needs to render the annotation first. Only after that it can be moved.
+				Display.getDefault().asyncExec(() -> {
+					if ((xPosition != null) && (yPosition != null))
+						annotation.setValues(xPosition, yPosition);
+				});
+			});
+
+			return annotation;
+		}
+
+		return null;
 	}
 }
