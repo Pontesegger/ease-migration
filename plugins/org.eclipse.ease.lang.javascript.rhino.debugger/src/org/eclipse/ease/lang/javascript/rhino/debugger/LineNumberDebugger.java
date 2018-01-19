@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino.debugger;
 
-import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
 
 public class LineNumberDebugger extends RhinoDebugger {
 
-	public LineNumberDebugger(IDebugEngine engine) {
+	public LineNumberDebugger(RhinoDebuggerEngine engine) {
 		super(engine, false);
 	}
 

@@ -301,7 +301,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return getVariables(fScope);
 	}
 
-	public static Map<String, Object> getVariables(final Scriptable scope) {
+	public Map<String, Object> getVariables(final Scriptable scope) {
 		final Map<String, Object> result = new TreeMap<>();
 
 		for (final Object key : scope.getIds()) {
@@ -318,29 +318,57 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return result;
 	}
 
-	public static Object getVariable(final Scriptable scope, final String name) {
-		final Object value = scope.get(name, scope);
-		if (value instanceof NativeJavaObject)
-			return ((NativeJavaObject) value).unwrap();
-
-		return value;
+	private Object getVariable(final Scriptable scope, final String name) {
+		return runInJobContext(new RunnableWithResult<Object>() {
+			@Override
+			public void run() {
+				final Object value = scope.get(name, scope);
+				if (value instanceof NativeJavaObject)
+					setResult(((NativeJavaObject) value).unwrap());
+				else
+					setResult(value);
+			}
+		});
 	}
 
 	@Override
 	protected boolean internalHasVariable(final String name) {
-		final Object value = fScope.get(name, fScope);
-		return !Scriptable.NOT_FOUND.equals(value);
+
+		return runInJobContext(new RunnableWithResult<Boolean>() {
+			@Override
+			public void run() {
+				final Object value = fScope.get(name, fScope);
+				setResult(!Scriptable.NOT_FOUND.equals(value));
+			}
+		});
+	}
+
+	private <T> T runInJobContext(RunnableWithResult<T> runnable) {
+		if (Context.getCurrentContext() != null) {
+			runnable.run();
+			return runnable.getResult();
+		} else {
+			getContext();
+			runnable.run();
+			Context.exit();
+			return runnable.getResult();
+		}
 	}
 
 	@Override
 	protected void internalSetVariable(final String name, final Object content) {
-		if (!JavaScriptHelper.isSaveName(name))
-			throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
+		runInJobContext(new RunnableWithResult<Boolean>() {
+			@Override
+			public void run() {
+				if (!JavaScriptHelper.isSaveName(name))
+					throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
 
-		final Scriptable scope = fScope;
+				final Scriptable scope = fScope;
 
-		final Object jsOut = internaljavaToJS(content, scope);
-		scope.put(name, scope, jsOut);
+				final Object jsOut = internaljavaToJS(content, scope);
+				scope.put(name, scope, jsOut);
+			}
+		});
 	}
 
 	protected Object internaljavaToJS(final Object value, final Scriptable scope) {

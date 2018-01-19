@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.AbstractEaseDebugger;
@@ -156,14 +155,14 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		}
 
 		public Map<String, Object> getVariables() {
-			final Map<String, Object> result = RhinoScriptEngine.getVariables(fScope);
+			final Map<String, Object> result = getEngine().getVariables(fScope);
 
 			return result;
 		}
 
 		@Override
 		public void setVariable(String name, Object content) {
-			((RhinoDebuggerEngine) getEngine()).setVariable(name, content, fScope);
+			getEngine().setVariable(name, content, fScope);
 		}
 
 		@Override
@@ -182,8 +181,13 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 	private Script fLastScript = null;
 
-	public RhinoDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
+	public RhinoDebugger(final RhinoDebuggerEngine engine, final boolean showDynamicCode) {
 		super(engine, showDynamicCode);
+	}
+
+	@Override
+	protected RhinoDebuggerEngine getEngine() {
+		return (RhinoDebuggerEngine) super.getEngine();
 	}
 
 	@Override
