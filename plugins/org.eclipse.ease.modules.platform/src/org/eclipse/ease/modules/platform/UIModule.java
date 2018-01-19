@@ -23,8 +23,10 @@ import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -44,6 +46,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsoleInputStream;
+import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.IViewDescriptor;
@@ -180,6 +183,85 @@ public class UIModule extends AbstractScriptModule {
 					final InputDialog dialog = new InputDialog(Display.getDefault().getActiveShell(), title, message, initialValue, null);
 					if (dialog.open() == Window.OK)
 						setResult(dialog.getValue());
+				}
+			};
+
+			Display.getDefault().syncExec(runnable);
+
+			return runnable.getResult();
+		}
+	}
+
+	/**
+	 * Displays a selection dialog. Selection elements need to provide a useful toString() method. Uses the engine I/O streams in headless mode.
+	 *
+	 * @param elements
+	 *            array of elements to choose from
+	 * @param message
+	 *            dialog message
+	 * @param title
+	 *            dialog title
+	 * @return selected element or <code>null</code> in case the user aborted/closed the dialog
+	 */
+	@WrapToScript
+	public Object showSelectionDialog(final Object[] elements, @ScriptParameter(defaultValue = "") String message,
+			@ScriptParameter(defaultValue = "Selection request") final String title) {
+		if (isHeadless()) {
+			try {
+				getEnvironment().print(message + "\n", true);
+
+				for (int index = 0; index < elements.length; index++) {
+					getEnvironment().print("\t[" + index + "] " + elements[index].toString(), true);
+				}
+
+				final StringBuilder result = new StringBuilder();
+				while (true) {
+					final int character = getScriptEngine().getInputStream().read();
+					if (character == -1)
+						// EOF reached
+						return null;
+
+					if (Character.toLowerCase(character) == '\n') {
+						try {
+							final int index = Integer.parseInt(result.toString().trim());
+							if ((elements.length > index) && (index >= 0))
+								return elements[index];
+
+						} catch (final NumberFormatException e) {
+							// invalid input
+						}
+
+						return null;
+					}
+
+					result.append((char) character);
+				}
+
+			} catch (final IOException e) {
+				// could not read from input
+				return null;
+			}
+
+		} else {
+			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
+
+				@Override
+				public void run() {
+					final ListDialog selectionDialog = new ListDialog(Display.getDefault().getActiveShell());
+
+					selectionDialog.setTitle(title);
+					selectionDialog.setMessage(message);
+					selectionDialog.setContentProvider(ArrayContentProvider.getInstance());
+					selectionDialog.setLabelProvider(new LabelProvider());
+					selectionDialog.setInput(elements);
+
+					if (selectionDialog.open() == Window.OK) {
+						final Object[] result = selectionDialog.getResult();
+						if ((result != null) && (result.length > 0))
+							setResult(result[0]);
+						else
+							setResult(null);
+					}
 				}
 			};
 
