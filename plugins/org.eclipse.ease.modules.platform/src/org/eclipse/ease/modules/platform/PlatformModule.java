@@ -112,17 +112,20 @@ public class PlatformModule {
 	}
 
 	/**
-	 * Run an external process. The process is started in the background and a {@link Future} object is returned. Query the result for finished state, output
+	 * Run an external process. The process is started in the background and a {@link FutureX} object is returned. Query the result for finished state, output
 	 * and error streams of the executed process.
 	 *
 	 * @param name
 	 *            program to run (with full path if necessary)
 	 * @param args
 	 *            program arguments
-	 * @return {@link Future} object tracking the program
+	 * @return
+	 * @return {@link FutureX} object tracking the program
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	@WrapToScript
-	public static Future runProcess(final String name, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] args) {
+	public static Process runProcess(final String name, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] args) throws IOException {
 		final List<String> arguments = new ArrayList<>();
 		arguments.add(name);
 		if (args != null) {
@@ -131,11 +134,7 @@ public class PlatformModule {
 		}
 
 		final ProcessBuilder builder = new ProcessBuilder(arguments);
-		try {
-			return new Future(builder.start());
-		} catch (final IOException e) {
-			return new Future(e);
-		}
+		return builder.start();
 	}
 
 	/**

@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.eclipse.ease.service.IScriptService;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,10 +58,10 @@ public class PlatformModuleTest extends AbstractModuleTest {
 	}
 
 	@Test(timeout = 3000)
-	public void runProcess() {
-		Future process = PlatformModule.runProcess("ls", new String[] { "-la" });
-		process.join();
+	public void runProcess() throws IOException, InterruptedException {
+		final Process process = PlatformModule.runProcess("ls", new String[] { "-la" });
+		process.waitFor();
 
-		assertNotNull(process.getOutput());
+		assertTrue(process.getInputStream().available() > 0);
 	}
 }
