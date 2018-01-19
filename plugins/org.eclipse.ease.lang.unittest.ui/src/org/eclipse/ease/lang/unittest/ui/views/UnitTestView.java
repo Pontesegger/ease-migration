@@ -64,7 +64,6 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -746,13 +745,13 @@ public class UnitTestView extends ViewPart {
 			if (fProgressBar.getMaximum() == 1) {
 				// not initialized
 				fProgressBar.setMaximum(getTestFileCount(testSuite));
-				fProgressBar.setForeground(null);
+				fProgressBar.setState(SWT.PAUSED);
 			}
 
 			if (fProgressBar.getSelection() != fFinishedFileCount) {
 				fProgressBar.setSelection(fFinishedFileCount);
 				if (testSuite.hasError())
-					fProgressBar.setForeground(fResourceManager.createColor(new RGB(207, 36, 43)));
+					fProgressBar.setState(SWT.ERROR);
 			}
 
 			if (testSuite.getStatus() != TestStatus.RUNNING) {
@@ -761,10 +760,11 @@ public class UnitTestView extends ViewPart {
 
 				switch (testSuite.getStatus()) {
 				case ERROR:
-					fProgressBar.setForeground(fResourceManager.createColor(new RGB(207, 36, 43)));
+				case FAILURE:
+					fProgressBar.setState(SWT.ERROR);
 					break;
-				case PASS:
-					fProgressBar.setForeground(fResourceManager.createColor(new RGB(92, 167, 86)));
+				default:
+					fProgressBar.setState(SWT.NORMAL);
 					break;
 				}
 			}
