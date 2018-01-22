@@ -14,6 +14,7 @@ package org.eclipse.ease.lang.unittest.ui.editor;
 import org.eclipse.emf.edit.ui.action.EditingDomainActionBarContributor;
 import org.eclipse.emf.edit.ui.action.RedoAction;
 import org.eclipse.emf.edit.ui.action.UndoAction;
+import org.eclipse.ui.actions.TextActionHandler;
 import org.eclipse.ui.forms.editor.IFormPage;
 
 public class TestSuiteEditorActionBarContributor extends EditingDomainActionBarContributor {
@@ -59,5 +60,8 @@ public class TestSuiteEditorActionBarContributor extends EditingDomainActionBarC
 		super.activate();
 
 		getActiveEditor().getEditingDomain().getCommandStack().addCommandStackListener(event -> update());
+
+		// add support for 'classic' cut/copy/paste handlers
+		new TextActionHandler(getActionBars());
 	}
 }
