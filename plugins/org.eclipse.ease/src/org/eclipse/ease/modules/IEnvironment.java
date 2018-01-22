@@ -12,6 +12,7 @@ package org.eclipse.ease.modules;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.IScriptEngine;
 
 public interface IEnvironment {
@@ -21,6 +22,14 @@ public interface IEnvironment {
 			if (variable instanceof IEnvironment)
 				return (IEnvironment) variable;
 		}
+
+		return null;
+	}
+
+	static IEnvironment getEnvironment() {
+		final Job currentJob = Job.getJobManager().currentJob();
+		if (currentJob instanceof IScriptEngine)
+			return getEnvironment((IScriptEngine) currentJob);
 
 		return null;
 	}
@@ -82,4 +91,12 @@ public interface IEnvironment {
 	 * @return wrapped object instance or java class when put to global namespace
 	 */
 	Object wrap(final Object toBeWrapped, boolean useCustomNamespace);
+
+	/**
+	 * Register a callback provider for module functions.
+	 *
+	 * @param callbackProvider
+	 *            callback provider instance
+	 */
+	void addModuleCallback(IModuleCallbackProvider callbackProvider);
 }

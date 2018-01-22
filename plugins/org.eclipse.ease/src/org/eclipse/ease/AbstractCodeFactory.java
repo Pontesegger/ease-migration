@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.modules.IEnvironment;
-import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
@@ -182,28 +181,6 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		}
 
 		return methodAliases;
-	}
-
-	public static String getPreExecutionCode(final IEnvironment environment, final Method method) {
-		final StringBuffer code = new StringBuffer();
-
-		for (final Object module : environment.getModules()) {
-			if (module instanceof IScriptFunctionModifier)
-				code.append(((IScriptFunctionModifier) module).getPreExecutionCode(method));
-		}
-
-		return code.toString();
-	}
-
-	public static String getPostExecutionCode(final IEnvironment environment, final Method method) {
-		final StringBuffer code = new StringBuffer();
-
-		for (final Object module : environment.getModules()) {
-			if (module instanceof IScriptFunctionModifier)
-				code.append(((IScriptFunctionModifier) module).getPostExecutionCode(method));
-		}
-
-		return code.toString();
 	}
 
 	/**
@@ -425,3 +402,4 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	 */
 	protected abstract String createFunctionWrapper(IEnvironment environment, String identifier, Method method);
 }
+

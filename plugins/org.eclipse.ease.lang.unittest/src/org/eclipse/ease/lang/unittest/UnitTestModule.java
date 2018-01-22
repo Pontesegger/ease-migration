@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.IDebugEngine;
+import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.lang.unittest.definition.Flag;
@@ -41,7 +42,8 @@ import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.runtime.TestStatus;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.EnvironmentModule;
-import org.eclipse.ease.modules.IScriptFunctionModifier;
+import org.eclipse.ease.modules.IEnvironment;
+import org.eclipse.ease.modules.IModuleCallbackProvider;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.service.ScriptType;
@@ -50,7 +52,7 @@ import org.eclipse.ease.tools.ResourceTools;
 /**
  * Support methods for scripted unit tests. Provides several assertion methods and utility functions to manipulate the current test instances and states.
  */
-public class UnitTestModule extends AbstractScriptModule implements IScriptFunctionModifier {
+public class UnitTestModule extends AbstractScriptModule {
 
 	private static final String ASSERTION_FUNCION_NAME = "assertion";
 
@@ -61,6 +63,34 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	private ITestFile fInjectedTestFile;
 
 	private ITestSuite fInjectedTestSuite;
+
+	@Override
+	public void initialize(IScriptEngine engine, IEnvironment environment) {
+		super.initialize(engine, environment);
+
+		environment.addModuleCallback(new IModuleCallbackProvider() {
+
+			@Override
+			public void preExecutionCallback(Method method, Object[] parameters) {
+			}
+
+			@Override
+			public void postExecutionCallback(Method method, Object result) {
+				if (result instanceof IAssertion)
+					assertion((IAssertion) result);
+			}
+
+			@Override
+			public boolean hasPreExecutionCallback(Method method) {
+				return false;
+			}
+
+			@Override
+			public boolean hasPostExecutionCallback(Method method) {
+				return IAssertion.class.isAssignableFrom(method.getReturnType());
+			}
+		});
+	}
 
 	/**
 	 * Start a specific unit test. Started tests should be terminated by an {@link #endTest()}.
@@ -328,25 +358,6 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	public void setThrowOnFailure(boolean throwOnFailure) {
 		fThrowOnFailure = throwOnFailure;
-	}
-
-	@Override
-	public String getPreExecutionCode(Method method) {
-		return "";
-	}
-
-	@Override
-	public String getPostExecutionCode(final Method method) {
-		if ("JavaScript".equals(getScriptEngine().getDescription().getSupportedScriptTypes().get(0).getName())) {
-			if (IAssertion.class.isAssignableFrom(method.getReturnType()))
-				return EnvironmentModule.getWrappedVariableName(this) + "." + ASSERTION_FUNCION_NAME + "(" + IScriptFunctionModifier.RESULT_NAME + ");\n";
-
-		} else if ("Python".equals(getScriptEngine().getDescription().getSupportedScriptTypes().get(0).getName())) {
-			if (IAssertion.class.isAssignableFrom(method.getReturnType()))
-				return EnvironmentModule.getWrappedVariableName(this) + "." + ASSERTION_FUNCION_NAME + "(" + IScriptFunctionModifier.RESULT_NAME + ")\n";
-		}
-
-		return "";
 	}
 
 	/**

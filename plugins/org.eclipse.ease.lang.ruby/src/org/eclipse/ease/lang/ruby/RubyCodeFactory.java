@@ -16,9 +16,10 @@ import java.util.List;
 
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
-import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ModuleHelper;
+import org.eclipse.ease.tools.StringTools;
 
 public class RubyCodeFactory extends AbstractCodeFactory {
 
@@ -36,6 +37,8 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 
 	@Override
 	public String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
+
+		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
 
 		final StringBuilder rubyScriptCode = new StringBuilder();
 
@@ -55,19 +58,20 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 		body.append(verifyParameters(parameters));
 
 		// insert hooked pre execution code
-		body.append(getPreExecutionCode(environment, method));
+		body.append("\t$").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback('").append(methodId).append("'")
+				.append(parameters.isEmpty() ? "" : ", ").append(parameterList).append(");").append(StringTools.LINE_DELIMITER);
 
 		// insert method call
-		body.append("\t").append(IScriptFunctionModifier.RESULT_NAME).append(" = ").append('$').append(moduleVariable).append('.').append(method.getName())
-				.append('(');
+		body.append("\t").append(RESULT_NAME).append(" = ").append('$').append(moduleVariable).append('.').append(method.getName()).append('(');
 		body.append(parameterList);
 		body.append(");\n");
 
 		// insert hooked post execution code
-		body.append(getPostExecutionCode(environment, method));
+		body.append("\t$").append(EnvironmentModule.getWrappedVariableName(environment)).append(".postMethodCallback('").append(methodId).append("', ")
+				.append(RESULT_NAME).append(");").append(StringTools.LINE_DELIMITER);
 
 		// insert return statement
-		body.append("\treturn ").append(IScriptFunctionModifier.RESULT_NAME).append(";\n");
+		body.append("\treturn ").append(RESULT_NAME).append(";\n");
 
 		// build function declarations
 		for (final String name : getMethodNames(method)) {

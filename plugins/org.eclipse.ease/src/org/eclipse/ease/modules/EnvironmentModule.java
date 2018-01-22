@@ -63,6 +63,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	private final ListenerList fModuleListeners = new ListenerList();
 
+	/** Stores short method IDs to method relations used for script callbacks. */
+	private final Map<String, Method> fRegisteredMethods = new HashMap<>();
+
 	@Override
 	@WrapToScript
 	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
@@ -112,28 +115,24 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 				fModuleNames.put(moduleName, module);
 
-				// we need to track this module already as we need it in case we want to manipulate functions of already loaded modules
-				fModules.add(module);
-
-				// scripts changing functions force reloading of the whole module stack
-				if (module instanceof IScriptFunctionModifier) {
-					final List<Object> reverseList = new ArrayList<>(fModules);
-					Collections.reverse(reverseList);
-
-					for (final Object loadedModule : reverseList)
-						wrap(loadedModule, useCustomNamespace);
-				}
 			} else
 				throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
 		}
 
 		// first take care that module is tracked as it might modify itself implementing IScriptFunctionModifier
 		// move module up to first position
-		fModules.remove(module);
+		fModules.remove(module); // just in case it was already loaded
 		fModules.add(0, module);
 
 		// create function wrappers
 		return wrap(module, useCustomNamespace);
+	}
+
+	private final ListenerList<IModuleCallbackProvider> fModuleCallbacks = new ListenerList<>();
+
+	@Override
+	public void addModuleCallback(IModuleCallbackProvider callbackProvider) {
+		fModuleCallbacks.add(callbackProvider);
 	}
 
 	@Override
@@ -552,5 +551,48 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		}
 
 		return false;
+	}
+
+	// needed by dynamic script code
+	public boolean hasMethodCallback(String methodToken) {
+		final Method method = fRegisteredMethods.get(methodToken);
+
+		for (final IModuleCallbackProvider callbackProvider : fModuleCallbacks) {
+			if ((callbackProvider.hasPreExecutionCallback(method)) || (callbackProvider.hasPostExecutionCallback(method)))
+				return true;
+		}
+
+		return false;
+	}
+
+	// needed by dynamic script code, do not change synopsis
+	public void preMethodCallback(String methodToken, Object... parameters) {
+		final Method method = fRegisteredMethods.get(methodToken);
+		if (method != null) {
+			for (final IModuleCallbackProvider callbackProvider : fModuleCallbacks) {
+				if (callbackProvider.hasPreExecutionCallback(method)) {
+					callbackProvider.preExecutionCallback(method, parameters);
+				}
+			}
+		}
+	}
+
+	// needed by dynamic script code, do not change synopsis
+	public void postMethodCallback(String methodToken, Object result) {
+		final Method method = fRegisteredMethods.get(methodToken);
+		if (method != null) {
+			for (final IModuleCallbackProvider callbackProvider : fModuleCallbacks) {
+				if (callbackProvider.hasPostExecutionCallback(method)) {
+					callbackProvider.postExecutionCallback(method, result);
+				}
+			}
+		}
+	}
+
+	public String registerMethod(Method method) {
+		final String key = Integer.toString(method.toString().hashCode());
+		fRegisteredMethods.put(key, method);
+
+		return key;
 	}
 }

@@ -22,6 +22,9 @@ import org.eclipse.ease.modules.ScriptParameter;
  */
 public interface ICodeFactory {
 
+	/** intermediate name of original method call return value. */
+	String RESULT_NAME = "__result";
+
 	/** Trace enablement for module wrappers. */
 	boolean TRACE_MODULE_WRAPPER = org.eclipse.ease.Activator.getDefault().isDebugging()
 			&& "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.ease/debug/moduleWrapper"));

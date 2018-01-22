@@ -17,9 +17,10 @@ import java.util.List;
 
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
-import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ModuleHelper;
+import org.eclipse.ease.tools.StringTools;
 
 public class PythonCodeFactory extends AbstractCodeFactory {
 
@@ -130,7 +131,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	}
 
 	@Override
-	public String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
+	public String createFunctionWrapper(IEnvironment environment, final String moduleVariable, final Method method) {
 
 		final StringBuilder pythonCode = new StringBuilder();
 
@@ -153,21 +154,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 			methodCall.delete(0, 2);
 		}
 
-		final StringBuilder body = new StringBuilder();
-
-		// insert hooked pre execution code
-		body.append(getPreExecutionCode(environment, method));
-
-		// insert method call
-		body.append('\t').append(IScriptFunctionModifier.RESULT_NAME).append(" = ").append(moduleVariable).append('.').append(method.getName()).append('(');
-		body.append(methodCall);
-		body.append(")\n");
-
-		// insert hooked post execution code
-		body.append(indent(getPostExecutionCode(environment, method), "\t"));
-
-		// insert return statement
-		body.append("\treturn ").append(IScriptFunctionModifier.RESULT_NAME).append('\n');
+		final String body = buildMethodBody(parameters, method, moduleVariable, environment);
 
 		// build function declarations
 		for (final String name : getMethodNames(method)) {
@@ -177,7 +164,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 			} else if (!name.isEmpty()) {
 				pythonCode.append("def ").append(name).append('(').append(methodSignature).append("):\n");
-				pythonCode.append(body);
+				pythonCode.append(indent(body, "    "));
 				pythonCode.append('\n');
 			}
 		}
@@ -185,11 +172,37 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		return pythonCode.toString();
 	}
 
-	/**
-	 * @param postExecutionCode
-	 * @param string
-	 * @return
-	 */
+	private String buildMethodBody(List<Parameter> parameters, Method method, String classIdentifier, IEnvironment environment) {
+		final StringBuilder body = new StringBuilder();
+
+		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
+
+		// insert deprecation warnings
+		if (ModuleHelper.isDeprecated(method))
+			body.append("printError(\"" + method.getName() + "() is deprecated. Consider updating your code.\")").append(StringTools.LINE_DELIMITER);
+
+		// check for callbacks
+		body.append("if not ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\"):")
+				.append(StringTools.LINE_DELIMITER);
+
+		// simple execution
+		body.append("    return ").append(classIdentifier).append(".").append(method.getName()).append("(").append(buildParameterList(parameters)).append(")")
+				.append(StringTools.LINE_DELIMITER);
+		body.append(StringTools.LINE_DELIMITER);
+
+		// execution with callbacks
+		body.append("else:").append(StringTools.LINE_DELIMITER);
+		body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback(\"").append(methodId).append("\"")
+				.append(parameters.isEmpty() ? "" : ", ").append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
+		body.append("    ").append(RESULT_NAME).append(" = ").append(classIdentifier).append(".").append(method.getName()).append("(")
+				.append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
+		body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".postMethodCallback(\"").append(methodId).append("\"")
+				.append(", ").append(RESULT_NAME).append(")").append(StringTools.LINE_DELIMITER);
+		body.append("    return ").append(RESULT_NAME).append(StringTools.LINE_DELIMITER);
+
+		return body.toString();
+	}
+
 	private static String indent(String code, String indentation) {
 		if (code.isEmpty())
 			return code;

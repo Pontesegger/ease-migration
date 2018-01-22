@@ -21,7 +21,6 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
-import org.eclipse.ease.modules.IScriptFunctionModifier;
 import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.tools.StringTools;
 
@@ -168,13 +167,13 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		if (customNamespace)
 			// create object wrapper
-			return createObjectWrapper(environment, instance, identifier);
+			return createObjectWrapper(instance, identifier);
 
 		else
 			return super.createWrapper(environment, instance, identifier, customNamespace, engine);
 	}
 
-	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
+	private String createObjectWrapper(Object instance, String identifier) {
 		final StringBuilder scriptCode = new StringBuilder();
 
 		scriptCode.append(EnvironmentModule.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
@@ -195,7 +194,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 				// parse parameters
 				final List<Parameter> parameters = ModuleHelper.getParameters(method);
 
-				final String body = "\t\t" + buildMethodBody(parameters, environment, method, identifier).replaceAll("\n", "\n\t\t");
+				final String body = "\t\t" + buildMethodBody(parameters, method, identifier).replaceAll("\n", "\n\t\t");
 
 				// method header
 				scriptCode.append('\t').append(method.getName()).append(": function(");
@@ -230,7 +229,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	}
 
 	@Override
-	protected String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
+	protected String createFunctionWrapper(IEnvironment environment, final String moduleVariable, final Method method) {
 
 		final StringBuilder javaScriptCode = new StringBuilder();
 
@@ -240,7 +239,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		// build parameter string
 		final String parameterList = buildParameterList(parameters);
 
-		final String body = "\t" + buildMethodBody(parameters, environment, method, moduleVariable).replaceAll("\n", "\n\t");
+		final String body = "\t" + buildMethodBody(parameters, method, moduleVariable).replaceAll("\n", "\n\t");
 
 		// build function declarations
 		for (final String name : getMethodNames(method)) {
@@ -258,31 +257,46 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		return javaScriptCode.toString();
 	}
 
-	private String buildMethodBody(List<Parameter> parameters, IEnvironment environment, Method method, String classIdentifier) {
+	private String buildMethodBody(List<Parameter> parameters, Method method, String classIdentifier) {
 		final StringBuilder body = new StringBuilder();
 		// insert parameter checks
 		body.append("// verify mandatory and optional parameters").append(StringTools.LINE_DELIMITER);
 		body.append(verifyParameters(parameters, "")).append(StringTools.LINE_DELIMITER);
 
-		// insert hooked pre execution code
-		body.append(getPreExecutionCode(environment, method));
-
 		// insert deprecation warnings
-
 		if (ModuleHelper.isDeprecated(method))
 			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.');").append(StringTools.LINE_DELIMITER);
 
-		// insert method call
-		body.append("// delegate call to java layer").append(StringTools.LINE_DELIMITER);
-		body.append("var ").append(IScriptFunctionModifier.RESULT_NAME).append(" = ").append(classIdentifier).append('.').append(method.getName()).append('(');
+		final IEnvironment environment = IEnvironment.getEnvironment();
+		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
+
+		// body.append("var hasCallback = false;").append(StringTools.LINE_DELIMITER);
+		body.append("if (!").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\")) {")
+				.append(StringTools.LINE_DELIMITER);
+
+		// plain method call
+		body.append("\t// delegate call to java layer").append(StringTools.LINE_DELIMITER);
+		body.append("\treturn ").append(classIdentifier).append('.').append(method.getName()).append('(');
+		body.append(buildParameterList(parameters));
+		body.append(");").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+
+		body.append("} else {").append(StringTools.LINE_DELIMITER);
+
+		// method call with callbacks
+		body.append("\t").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback('").append(methodId).append("'")
+				.append(parameters.isEmpty() ? "" : ", ").append(buildParameterList(parameters)).append(");").append(StringTools.LINE_DELIMITER);
+		body.append(StringTools.LINE_DELIMITER);
+		body.append("\t// delegate call to java layer").append(StringTools.LINE_DELIMITER);
+		body.append("\tvar ").append(RESULT_NAME).append(" = ").append(classIdentifier).append('.').append(method.getName()).append('(');
 		body.append(buildParameterList(parameters));
 		body.append(");").append(StringTools.LINE_DELIMITER);
-
-		// insert hooked post execution code
-		body.append(getPostExecutionCode(environment, method));
-
-		// insert return statement
-		body.append("return ").append(IScriptFunctionModifier.RESULT_NAME).append(';');
+		body.append(StringTools.LINE_DELIMITER);
+		body.append("\t").append(EnvironmentModule.getWrappedVariableName(environment)).append(".postMethodCallback('").append(methodId).append("', ")
+				.append(RESULT_NAME).append(");").append(StringTools.LINE_DELIMITER);
+		body.append(StringTools.LINE_DELIMITER);
+		body.append("\treturn __result;").append(StringTools.LINE_DELIMITER);
+		body.append(StringTools.LINE_DELIMITER);
+		body.append("}").append(StringTools.LINE_DELIMITER);
 
 		return body.toString();
 	}
