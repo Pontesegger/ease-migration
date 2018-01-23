@@ -462,7 +462,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	public void help(@ScriptParameter(defaultValue = ScriptParameter.NULL) final String topic) {
 
 		// sanity check to avoid blue screens for invalid calls, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=479762
-		if (!VALID_TOPICS_PATTERN.matcher(topic).matches()) {
+		if ((topic != null) && !VALID_TOPICS_PATTERN.matcher(topic).matches()) {
 			printError("Invalid help topic to look for: \"" + topic + "\"");
 			return;
 		}
