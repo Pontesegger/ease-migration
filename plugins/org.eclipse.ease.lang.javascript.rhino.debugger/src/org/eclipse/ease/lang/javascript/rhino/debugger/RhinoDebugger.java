@@ -204,7 +204,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 		final Script script = fFrameToSource.get(getParentScript(fnOrScript).hashCode());
 
-		final RhinoDebugFrame debugFrame = new RhinoDebugFrame(fnOrScript, script);
+		final RhinoDebugFrame debugFrame = new RhinoDebugFrame(fnOrScript, (script != null) ? script : fLastScript);
 		getStacktrace().add(0, debugFrame);
 
 		return debugFrame;
