@@ -149,7 +149,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	}
 
 	/**
-	 * Create a new workspace project. Will create a new project if it now already exists. If creation fails, <code>null</code> is returned.
+	 * Create a new workspace project. Will create a new project if it not already exists. If creation fails, <code>null</code> is returned.
 	 *
 	 * @param name
 	 *            name or project to create
