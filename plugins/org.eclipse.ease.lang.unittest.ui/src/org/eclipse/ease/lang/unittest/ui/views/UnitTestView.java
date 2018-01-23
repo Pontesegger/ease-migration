@@ -200,14 +200,16 @@ public class UnitTestView extends ViewPart {
 	private static boolean openEditor(ScriptStackTrace stackTrace) {
 		if (stackTrace != null) {
 			for (final IScriptDebugFrame trace : stackTrace) {
-				if (trace.getScript().getCommand() instanceof IFile) {
-					openEditor(trace.getScript().getCommand(), trace.getLineNumber());
-					return true;
-				}
+				if (trace.getScript() != null) {
+					if (trace.getScript().getCommand() instanceof IFile) {
+						openEditor(trace.getScript().getCommand(), trace.getLineNumber());
+						return true;
+					}
 
-				if (trace.getScript().getCommand() instanceof File) {
-					openEditor(trace.getScript().getCommand(), trace.getLineNumber());
-					return true;
+					if (trace.getScript().getCommand() instanceof File) {
+						openEditor(trace.getScript().getCommand(), trace.getLineNumber());
+						return true;
+					}
 				}
 			}
 		}
