@@ -12,7 +12,7 @@ package org.eclipse.ease.ui.scripts.repository.impl;
 
 import java.io.File;
 
-import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.scripts.repository.IScriptLocation;
 import org.eclipse.ui.PlatformUI;
@@ -29,7 +29,7 @@ public class FileSystemParser extends WorkspaceParser {
 
 		} else {
 			// try to locate registered script
-			final String location = URIUtil.toUnencodedString(file.toURI()).toString();
+			final String location = ResourceTools.toAbsoluteLocation(file, null);
 
 			final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
 			repositoryService.updateLocation(entry, location, file.lastModified());
