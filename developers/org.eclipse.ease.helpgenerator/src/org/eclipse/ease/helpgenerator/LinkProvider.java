@@ -42,7 +42,7 @@ public class LinkProvider {
 		return (foundCandidate != null) ? foundCandidate : candidate;
 	}
 
-	public String createClassText(final String qualifiedName) {
+	public String createClassText(String qualifiedName) {
 		if (qualifiedName.contains(".")) {
 
 			final String urlLocation = findClassURL(qualifiedName);
@@ -65,8 +65,12 @@ public class LinkProvider {
 									+ HTMLWriter.escapeText(qualifiedName.substring(packageName.length() + 1)) + "</a>";
 					}
 				}
-			}
-		}
+
+			} else
+				qualifiedName = HTMLWriter.escapeText(qualifiedName);
+
+		} else
+			qualifiedName = HTMLWriter.escapeText(qualifiedName);
 
 		return qualifiedName;
 	}
