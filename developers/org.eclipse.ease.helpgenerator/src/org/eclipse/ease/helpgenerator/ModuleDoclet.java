@@ -58,6 +58,10 @@ public class ModuleDoclet extends Doclet {
 				"-root", projectDir,
 				"-doclet", ModuleDoclet.class.getName(),
 				"-docletpath",  docletProjectRootDir + "/bin",
+
+				"-failOnHTMLError", "true",
+				"-failOnMissingDocs", "false",
+
 				"-link", "https://docs.oracle.com/javase/8/docs/api/",
 
 				projectDir.substring(projectDir.lastIndexOf('/') + 1),
