@@ -12,7 +12,7 @@ var __EASE_UnitTest_TestRunner = {
 			while (iterator.hasNext()) {
 				var candidateEntry = iterator.next();
 				var candidate = candidateEntry.getValue();
-				if (this.isUnitTest(candidate)) {
+				if (this.isUnitTest(candidateEntry.getKey(), candidate)) {
 					// this is a unit test class
 					var testClass = this.easeModule.javaInstance.addTestClass(candidateEntry.getKey());
 					if (candidate.hasOwnProperty("__description"))
@@ -194,11 +194,13 @@ var __EASE_UnitTest_TestRunner = {
 		 * @param {object}
 		 *            candidate - object to test
 		 */
-		isUnitTest : function(candidate) {
-			try {
-				return candidate.hasOwnProperty("__unittest");
-			} catch (e) {
-				return false;
+		isUnitTest : function(name, candidate) {
+			if (name != '_') {
+				try {
+					return candidate.hasOwnProperty("__unittest");
+				} catch (e) {
+					return false;
+				}
 			}
 		},
 
