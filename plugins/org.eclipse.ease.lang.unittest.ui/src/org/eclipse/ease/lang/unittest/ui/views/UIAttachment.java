@@ -23,11 +23,14 @@ import org.eclipse.ui.PlatformUI;
 
 public class UIAttachment implements IScriptEngineLaunchExtension {
 
+	public static boolean isHeadless() {
+		return !PlatformUI.isWorkbenchRunning();
+	}
+
 	@Override
 	public void createEngine(IScriptEngine engine) {
 
-		if (engine instanceof TestSuiteScriptEngine) {
-
+		if ((engine instanceof TestSuiteScriptEngine) && (!isHeadless())) {
 			try {
 				Display.getDefault().syncExec(() -> {
 					// try to open script unittest view
