@@ -44,80 +44,28 @@ public class ModuleDoclet extends Doclet {
 	 * Method to locally test this doclet. Not needed for productive use.
 	 */
 	public static void main(final String[] args) {
+		String docletProjectRootDir = new File(System.getProperty("user.dir")).getAbsolutePath();
+		docletProjectRootDir = docletProjectRootDir.replaceAll("\\\\", "/");
 
-		final String repositoryRoot = new File(System.getProperty("user.dir")).getParentFile().getParent();
+		String repositoryRootDir = new File(System.getProperty("user.dir")).getParentFile().getParent();
+		repositoryRootDir = repositoryRootDir.replaceAll("\\\\", "/");
 
-		final String[] javadocargs = { "-sourcepath", "/data/develop/workspaces/EASE/org.eclipse.ease.modules/plugins/org.eclipse.ease.modules.platform/src",
-				"-root", "/data/develop/workspaces/EASE/org.eclipse.ease.modules/plugins/org.eclipse.ease.modules.platform", "-doclet",
-				ModuleDoclet.class.getName(), "-docletpath",
-				"/data/develop/workspaces/EASE/org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/bin",
+		final String projectDir = repositoryRootDir + "/../org.eclipse.ease.modules/plugins/org.eclipse.ease.modules.platform";
 
-				"org.eclipse.ease.modules.platform"
+		// @formatter:off
+		final String[] javadocargs = {
+				"-sourcepath", projectDir + "/src",
+				"-root", projectDir,
+				"-doclet", ModuleDoclet.class.getName(),
+				"-docletpath",  docletProjectRootDir + "/bin",
+				"-link", "https://docs.oracle.com/javase/8/docs/api/",
 
+				projectDir.substring(projectDir.lastIndexOf('/') + 1),
+				"org.eclipse.ease"
 		};
-		// com.sun.tools.javadoc.Main.execute(javadocargs);
+		// @formatter:on
 
-		final String[] javadocargs2 = { "-sourcepath", repositoryRoot + "/plugins/org.eclipse.ease/src",
-
-				"-root", repositoryRoot + "/plugins/org.eclipse.ease",
-
-				"-doclet", ModuleDoclet.class.getName(),
-
-				"-docletpath", repositoryRoot + "/developers/org.eclipse.ease.helpgenerator/bin",
-
-				"-link", "http://docs.oracle.com/javase/8/docs/api",
-				// "-linkOffline", "http://localhost",
-				// "http://docs.oracle.com/javase/8/docs/api",
-
-				"org.eclipse.ease.modules", "org.eclipse.ease" };
-
-		final String[] javadocargs3 = { "-sourcepath", "C:/userdata/workspaces/EASE/org.eclipse.ease.core/plugins/org.eclipse.ease/src",
-
-				"-root", "C:/userdata/workspaces/EASE/org.eclipse.ease.core/plugins/org.eclipse.ease",
-
-				"-doclet", ModuleDoclet.class.getName(),
-
-				"-docletpath", "C:/userdata/workspaces/EASE/org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/bin",
-
-				// "-link", "http://docs.oracle.com/javase/8/docs/api",
-				// "-linkOffline", "http://localhost",
-				// "http://docs.oracle.com/javase/8/docs/api",
-
-				"org.eclipse.ease.modules", "org.eclipse.ease" };
-
-		final String[] javadocargs4 = {
-				// folder containing source code
-				"-sourcepath", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.modules/plugins/org.eclipse.ease.modules.platform/src",
-				// project root folder
-				"-root", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.modules/plugins/org.eclipse.ease.modules.platform/",
-				// doclet class name
-				"-doclet", ModuleDoclet.class.getName(),
-				// doclet bin folder
-				"-docletpath", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/bin",
-
-				// "-link", "http://docs.oracle.com/javase/8/docs/api",
-				// "-linkOffline", "http://localhost",
-				// "http://docs.oracle.com/javase/8/docs/api",
-
-				"org.eclipse.ease.modules.platform", "org.eclipse.ease" };
-
-		final String[] javadocargs5 = {
-				// folder containing source code
-				"-sourcepath", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.core/tests/org.eclipse.ease.ui.test/src",
-				// project root folder
-				"-root", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.core/tests/org.eclipse.ease.ui.test/",
-				// doclet class name
-				"-doclet", ModuleDoclet.class.getName(),
-				// doclet bin folder
-				"-docletpath", "/usr/local/eclipse/ease-helphovers/ws/org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/bin",
-
-				// "-link", "http://docs.oracle.com/javase/8/docs/api",
-				// "-linkOffline", "http://localhost",
-				// "http://docs.oracle.com/javase/8/docs/api",
-
-				"org.eclipse.ease.ui.help.hovers", "org.eclipse.ease" };
-
-		com.sun.tools.javadoc.Main.execute(javadocargs5);
+		com.sun.tools.javadoc.Main.execute(javadocargs);
 	}
 
 	private static final String OPTION_PROJECT_ROOT = "-root";

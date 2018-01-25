@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Christian Pontesegger and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Christian Pontesegger - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ease.helpgenerator;
 
 import java.util.ArrayList;
@@ -348,7 +358,7 @@ public class HTMLWriter {
 		final StringBuffer buffer = new StringBuffer();
 
 		addText(buffer, "		<p class=\"synopsis\">");
-		addText(buffer, escapeText(fLinkProvider.createClassText(LinkProvider.resolveClassName(method.returnType().qualifiedTypeName(), fClazz))));
+		addText(buffer, fLinkProvider.createClassText(LinkProvider.resolveClassName(method.returnType().qualifiedTypeName(), fClazz)));
 		addText(buffer, " ");
 		addText(buffer, method.name());
 		addText(buffer, "(");
@@ -357,7 +367,7 @@ public class HTMLWriter {
 			if (parameterAnnotation != null)
 				addText(buffer, "[");
 
-			addText(buffer, escapeText(fLinkProvider.createClassText(LinkProvider.resolveClassName(parameter.type().qualifiedTypeName(), fClazz))));
+			addText(buffer, fLinkProvider.createClassText(LinkProvider.resolveClassName(parameter.type().qualifiedTypeName(), fClazz)));
 			addText(buffer, " ");
 			addText(buffer, parameter.name());
 			if (parameterAnnotation != null)
@@ -653,7 +663,7 @@ public class HTMLWriter {
 				|| (WRAP_TO_SCRIPT.equals(annotation.annotationType().qualifiedName()));
 	}
 
-	private static String escapeText(String text) {
+	public static String escapeText(String text) {
 		return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 

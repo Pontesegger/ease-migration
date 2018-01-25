@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Christian Pontesegger and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Christian Pontesegger - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.ease.helpgenerator;
 
 import java.util.Collection;
@@ -42,7 +52,8 @@ public class LinkProvider {
 				// first run, look for exact package match
 				for (final Entry<String, Collection<String>> entry : fExternalDocs.entrySet()) {
 					if (entry.getValue().contains(packageName))
-						return "<a href=\"" + urlLocation + "\" title=\"" + qualifiedName + "\">" + qualifiedName.substring(packageName.length() + 1) + "</a>";
+						return "<a href=\"" + urlLocation + "\" title=\"" + HTMLWriter.escapeText(qualifiedName) + "\">"
+								+ HTMLWriter.escapeText(qualifiedName.substring(packageName.length() + 1)) + "</a>";
 				}
 
 				// not found; try to locate matching parent package and hope for
@@ -50,8 +61,8 @@ public class LinkProvider {
 				for (final Entry<String, Collection<String>> entry : fExternalDocs.entrySet()) {
 					for (final String entryPackage : entry.getValue()) {
 						if (packageName.startsWith(entryPackage))
-							return "<a href=\"" + urlLocation + "\" title=\"" + qualifiedName + "\">" + qualifiedName.substring(packageName.length() + 1)
-									+ "</a>";
+							return "<a href=\"" + urlLocation + "\" title=\"" + HTMLWriter.escapeText(qualifiedName) + "\">"
+									+ HTMLWriter.escapeText(qualifiedName.substring(packageName.length() + 1)) + "</a>";
 					}
 				}
 			}
@@ -74,7 +85,10 @@ public class LinkProvider {
 		return (target != null) ? target.toString() : null;
 	}
 
-	private String findClassURL(final String qualifiedName) {
+	private String findClassURL(String qualifiedName) {
+		if (qualifiedName.contains("<"))
+			qualifiedName = qualifiedName.substring(0, qualifiedName.indexOf("<"));
+
 		if (qualifiedName.contains(".")) {
 			final String packageName = qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));
 
@@ -184,7 +198,6 @@ public class LinkProvider {
 						else
 							output.append("<a href=\"../../" + plugin + "/help/" + ModuleDoclet.createHTMLFileName(linkMatcher.group(1)) + "\">"
 									+ capitalizeFirst(linkMatcher.group(1).substring(linkMatcher.group(1).lastIndexOf('.') + 1)) + " module</a>");
-
 					}
 				}
 			}
