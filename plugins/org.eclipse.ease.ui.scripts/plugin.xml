@@ -25,7 +25,7 @@
             class="org.eclipse.ease.ui.scripts.view.ScriptExplorerView"
             icon="icons/eview16/script_explorer.png"
             id="org.eclipse.ease.ui.views.scriptExplorerView"
-            name="Script Explorer">
+            name="%scriptExplorer">
       </view>
    </extension>
    <extension
@@ -48,13 +48,13 @@
          point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.ease.commands.category.script"
-            name="Script">
+            name="%script">
       </category>
       <command
             categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.RunScript"
             id="org.eclipse.ease.commands.script.run"
-            name="Run Script">
+            name="%runScript">
          <commandParameter
                id="org.eclipse.ease.commands.script.run.name"
                name="Script Name"
@@ -65,7 +65,7 @@
             categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.ToggleScriptRecording"
             id="org.eclipse.ease.commands.script.toggleScriptRecording"
-            name="Toggle Script Recording">
+            name="%toggleScriptRec">
          <state
                class="org.eclipse.jface.commands.ToggleState"
                id="STYLE">
@@ -75,7 +75,7 @@
             categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.EditScript"
             id="org.eclipse.ease.commands.script.edit"
-            name="Edit Script">
+            name="%editScript">
          <commandParameter
                id="org.eclipse.ease.commands.script.edit.name"
                name="Script Name"
@@ -86,14 +86,14 @@
             categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.RefreshRepository"
             id="org.eclipse.ease.commands.script.refreshRepository"
-            name="Refresh Repository">
+            name="%refreshRepository">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.CreateUserKeyword"
-            description="Create a new user keyword"
+            description="%addKeywordDesc"
             id="org.eclipse.ease.commands.script.addKeyword"
-            name="Add Keyword">
+            name="%addKeyword">
       </command>
    </extension>
    <extension
@@ -107,19 +107,19 @@
          <command
                commandId="org.eclipse.ease.commands.script.run"
                icon="icons/elcl16/run_script.png"
-               label="Run"
+               label="%run"
                style="push">
          </command>
          <command
                commandId="org.eclipse.ease.commands.script.edit"
                icon="icons/elcl16/edit_script.png"
-               label="Edit"
+               label="%edit"
                style="push">
          </command>
          <command
                commandId="org.eclipse.ease.commands.script.refreshRepository"
                icon="platform:/plugin/org.eclipse.ease.ui/icons/elcl16/refresh.png"
-               label="Refresh"
+               label="%refresh"
                style="push">
          </command>
          <separator
@@ -132,7 +132,7 @@
          <command
                commandId="org.eclipse.ease.commands.script.toggleScriptRecording"
                icon="icons/elcl16/start_script_recording.png"
-               label="Toggle Script Recording"
+               label="%toggleScriptRec"
                style="toggle">
          </command>
       </menuContribution>
@@ -142,7 +142,7 @@
          <command
                commandId="org.eclipse.ease.commands.script.addKeyword"
                icon="icons/elcl16/new_keyword.png"
-               label="Add Keyword..."
+               label="%addKeywordDot"
                style="push">
          </command>
       </menuContribution>
@@ -175,13 +175,13 @@
             category="org.eclipse.ease.preferences.root"
             class="org.eclipse.ease.ui.scripts.preferences.LocationsPage"
             id="org.eclipse.ease.preferences.scriptLocations"
-            name="Script Locations">
+            name="%scriptLocations">
       </page>
       <page
             category="org.eclipse.ease.preferences.root"
             class="org.eclipse.ease.ui.scripts.preferences.SignaturePreferencePage"
             id="org.eclipse.ease.preferences.signature"
-            name="Signature Properties">
+            name="%signatureProperties">
       </page>
    </extension>
    <extension
@@ -207,63 +207,63 @@
             description="Adds scripts to view toolbars. Keyword syntax: viewID;viewID|name;viewTitle;viewTitle|name"
             id="org.eclipse.ease.ui.scripts.handler.toolbar"
             keywords="toolbar"
-            name="Toolbar Additions">
+            name="%toolbarAdditions">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.MenuHandler"
             description="Adds scripts to view menus. Keyword syntax: viewID;viewID|name;viewTitle;viewTitle|name"
             id="org.eclipse.ease.ui.scripts.handler.menu"
             keywords="menu"
-            name="Menu Additions">
+            name="%menuAdditions">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.PopupHandler"
             description="Adds scripts to popup menus. Keyword syntax: viewID;viewID|name;viewTitle;viewTitle|name"
             id="org.eclipse.ease.ui.scripts.handler.popup"
             keywords="popup"
-            name="Popup Additions">
+            name="%popupAdditions">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.StartupHandler"
             description="Run scripts on Eclipse startup. Provide an integer parameter to denote an execution delay in seconds."
             id="org.eclipse.ease.ui.scripts.handler.startup"
             keywords="onStartup"
-            name="Eclipse Startup">
+            name="%eclipseStartup">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.ShutdownHandler"
             description="Runs scripts on Eclipse shutdown. Provide an integer parameter to denote maximum execution time in secods (defaults to 10s). Do not run UI code in shutdown scripts, it would lock up your application!"
             id="org.eclipse.ease.ui.scripts.handler.shutdown"
             keywords="onShutdown"
-            name="Eclipse Shutdown">
+            name="%eclipseShutdown">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.SaveEditorHandler"
             description="Run scripts when an editor is saved. Accepts a file pattern for files to listen to. either use simple * wildcards or use a regular expression by starting your pattern with ^."
             id="org.eclipse.ease.ui.scripts.handler.editorSave"
             keywords="onSave"
-            name="Save Editor">
+            name="%saveEditor">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.EventBusHandler"
             description="Run scripts when a specific event is posted on the OSGI message bus. Accepts a channel identifier for broker subscription (* wildcards may be used). The event will be passed to the script as variable &apos;event&apos;."
             id="org.eclipse.ease.ui.scripts.handler.brokerEvent"
             keywords="onEventBus"
-            name="Event Bus">
+            name="%eventBus">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.ResourceChangeHandler"
             description="Run scripts when a workspace resource changes. Accepts a file pattern for files to listen to. Either use simple * wildcards or use a regular expression by starting your pattern with ^. The first parameter passed to the script is the affected file, the 2nd parameter denotes the type of change."
             id="org.eclipse.ease.ui.scripts.handler.resourceChange"
             keywords="onResourceChange"
-            name="Resource Change">
+            name="%resourceChange">
       </handler>
       <handler
             class="org.eclipse.ease.ui.scripts.keywordhandler.KeyHandler"
             description="Binds a script to a keyboard shortcut. Syntax for keyboard mappings is the same as in the &apos;Keys&apos; preferences page."
             id="org.eclipse.ease.ui.scripts.handler.keyboard"
             keywords="keyboard"
-            name="Key Shortcut">
+            name="%keyShortcut">
       </handler>
    </extension>
    <extension
@@ -281,7 +281,7 @@
       <decorator
             class="org.eclipse.ease.ui.scripts.ui.Decorator"
             id="org.eclipse.ease.ui.scripts.decorator.signatureState"
-            label="Signature State"
+            label="%signatureState"
             lightweight="true"
             location="TOP_LEFT"
             state="true">
@@ -308,14 +308,14 @@
                category="org.eclipse.ease.properties.scripts"
                id="org.eclipse.ease.ui.scripts.propertyTab.uiintegration"
                image="icons/eobj16/script_ui_integration.png"
-               label="UI Integration">
+               label="%uiIntegration">
          </propertyTab>
          <propertyTab
                afterTab="org.eclipse.ease.ui.scripts.propertyTab.uiintegration"
                category="org.eclipse.ease.properties.scripts"
                id="org.eclipse.ease.ui.scripts.propertyTab.allkeywords"
                image="icons/eobj16/script_keywords.png"
-               label="All Keywords">
+               label="%allKeywords">
          </propertyTab>
       </propertyTabs>
    </extension>
@@ -525,13 +525,13 @@
          point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.ease.commands.category.expressions"
-            name="Expressions Context">
+            name="%expressionContext">
       </category>
       <command
             categoryId="org.eclipse.ease.commands.category.expressions"
             defaultHandler="org.eclipse.ease.ui.scripts.expressions.handler.CreateExpressionHandler"
             id="org.eclipse.ease.commands.expressions.createExpression"
-            name="Create expression">
+            name="%createExpression">
          <commandParameter
                id="org.eclipse.ease.commands.expressions.createExpression.type"
                name="type"
@@ -542,7 +542,7 @@
             categoryId="org.eclipse.ease.commands.category.expressions"
             defaultHandler="org.eclipse.ease.ui.scripts.expressions.handler.DeleteExpressionHandler"
             id="org.eclipse.ease.commands.expressions.deleteExpression"
-            name="Delete expression">
+            name="%deleteExpression">
       </command>
    </extension>
 </plugin>

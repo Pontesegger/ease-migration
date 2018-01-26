@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -92,13 +93,13 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 		final Label lblUseDragAnd = new Label(composite, SWT.NONE);
 		lblUseDragAnd.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		lblUseDragAnd.setText("Use drag and drop to organize module visibility.");
+		lblUseDragAnd.setText(Messages.ModulesPage_dragDrop);
 
 		final Label lblVisibleModules = new Label(composite, SWT.NONE);
-		lblVisibleModules.setText("Visible Modules");
+		lblVisibleModules.setText(Messages.ModulesPage_visibleModules);
 
 		final Label lblHiddenModules = new Label(composite, SWT.NONE);
-		lblHiddenModules.setText("Hidden Modules");
+		lblHiddenModules.setText(Messages.ModulesPage_hiddenModules);
 
 		visibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
 		final Tree tree = visibleTreeViewer.getTree();

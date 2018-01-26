@@ -28,6 +28,7 @@ import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.StringTools;
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.ScriptEditorInput;
 import org.eclipse.ease.ui.scripts.ScriptStorage;
 import org.eclipse.ease.ui.scripts.dialogs.SelectScriptStorageDialog;
@@ -37,6 +38,7 @@ import org.eclipse.ease.ui.tools.ToggleHandler;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
@@ -74,10 +76,10 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 
 	private static String askForScriptName(ExecutionEvent event, ScriptStorage storage) {
 		// ask for script name
-		final InputDialog dialog = new InputDialog(HandlerUtil.getActiveShell(event), "Save Script",
-				"Enter a unique name for your script (use '/' as path delimiter)", "", name -> {
+		final InputDialog dialog = new InputDialog(HandlerUtil.getActiveShell(event), Messages.ToggleScriptRecording_saveScript,
+				Messages.ToggleScriptRecording_enterUniqueName, "", name -> {
 					if ((storage != null) && (storage.exists(new Path(name).makeAbsolute().toString())))
-						return "Script name <" + name + "> is already in use. Choose a different one.";
+						return NLS.bind(Messages.ToggleScriptRecording_nameAlreadyInUse, name);
 
 					return null;
 				});
@@ -141,7 +143,8 @@ public class ToggleScriptRecording extends ToggleHandler implements IHandler, IE
 							final String fileName = scriptName + "." + scriptType.getDefaultExtension();
 							if (!storage.store(fileName, buffer.toString()))
 								// could not store script
-								MessageDialog.openError(HandlerUtil.getActiveShell(event), "Save error", "Could not store script data");
+								MessageDialog.openError(HandlerUtil.getActiveShell(event), Messages.ToggleScriptRecording_saveError,
+										Messages.ToggleScriptRecording_couldNotStore);
 
 						} else {
 							// we do not have a storage, open script in editor

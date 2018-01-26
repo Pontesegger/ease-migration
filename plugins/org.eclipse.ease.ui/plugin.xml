@@ -11,12 +11,12 @@
             class="org.eclipse.ease.ui.view.ScriptShell"
             icon="icons/eview16/script_shell.png"
             id="org.eclipse.ease.ui.views.scriptShell"
-            name="Script Shell"
+            name="%scriptShell"
             restorable="true">
       </view>
       <category
             id="org.eclipse.ease.ui.views.category.scripting"
-            name="Scripting">
+            name="%scripting">
       </category>
       <view
             allowMultiple="false"
@@ -24,7 +24,7 @@
             class="org.eclipse.ease.ui.view.ModuleExplorerView"
             icon="icons/eview16/modules_explorer.png"
             id="org.eclipse.ease.ui.views.modulesExplorer"
-            name="Modules Explorer"
+            name="%moduleExplorer"
             restorable="true">
       </view>
    </extension>
@@ -32,31 +32,31 @@
          point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.ease.commands.category.scriptShell"
-            name="Script Shell">
+            name="%scriptShell">
       </category>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.ClearDisplay"
             id="org.eclipse.ease.commands.scriptShell.clearDisplay"
-            name="Clear Display">
+            name="%clearDisplay">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
-            description="Terminate Current Script"
+            description="%abortScriptDesc"
             id="org.eclipse.ease.commands.scriptShell.stop"
-            name="Abort script execution">
+            name="%abortScript">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.Reset"
             id="org.eclipse.ease.commands.scriptShell.reset"
-            name="Reset Engine">
+            name="%resetEngine">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.SwitchEngine"
             id="org.eclipse.ease.commands.scriptShell.switchEngine"
-            name="Switch Script Engine">
+            name="%switchScriptEngine">
          <commandParameter
                id="org.eclipse.ease.commands.scriptShell.switchEngine.id"
                name="Script engine ID"
@@ -67,13 +67,13 @@
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.SpawnShell"
             id="org.eclipse.ease.commands.scriptShell.newShell"
-            name="Spawn new shell">
+            name="%spawnShell">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.LoadModule"
             id="org.eclipse.ease.commands.scriptShell.loadModule"
-            name="Load Module">
+            name="%loadModule">
          <commandParameter
                id="org.eclipse.ease.commands.scriptShell.loadModule.moduleID"
                name="Module ID"
@@ -84,24 +84,24 @@
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.ToggleDropinsSection"
             id="org.eclipse.ease.commands.script.toggleDropinsSection"
-            name="Toggle Dropins Section">
+            name="%toggleDropins">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.OpenScriptHelp"
             id="org.eclipse.ease.commands.scriptShell.openScriptHelp"
-            name="Open Script Help">
+            name="%openScriptHelp">
       </command>
       <command
             defaultHandler="org.eclipse.ease.ui.handler.PerformSignature"
             id="org.eclipse.ease.commands.sign.contextMenu"
-            name="Perform Signature...">
+            name="%performSign">
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
             defaultHandler="org.eclipse.ease.ui.handler.PasteTextToScriptShell"
             id="org.eclipse.ease.commands.scriptShell.pasteToShell"
-            name="Paste Text to Script Shell">
+            name="%pasteText">
       </command>
    </extension>
    <extension
@@ -110,17 +110,17 @@
             categoryId="org.eclipse.ease.commands.category.ModulesExplorer"
             defaultHandler="org.eclipse.ease.ui.handler.OpenHelp"
             id="org.eclipse.ease.commands.ModulesExplorer.openHelp"
-            name="Open Help">
+            name="%openHelp">
       </command>
       <category
             id="org.eclipse.ease.commands.category.ModulesExplorer"
-            name="Modules Explorer">
+            name="%moduleExplorer">
       </category>
       <command
             categoryId="org.eclipse.ease.commands.category.ModulesExplorer"
             defaultHandler="org.eclipse.ease.ui.handler.OpenModulesPreferences"
             id="org.eclipse.ease.commands.ModulesExplorer.openPreferences"
-            name="Show Module Preferences">
+            name="%showPreferences">
       </command>
    </extension>
    <extension
@@ -142,20 +142,20 @@
                commandId="org.eclipse.ease.commands.scriptShell.loadModule"
                icon="icons/elcl16/modules.png"
                id="org.eclipse.ease.commands.scriptShell.loadModule.popup"
-               label="Load Module"
+               label="%loadModule"
                style="pulldown"
                tooltip="Load an external module">
          </command>
          <command
                commandId="org.eclipse.ease.commands.scriptShell.clearDisplay"
                icon="icons/elcl16/erase.png"
-               label="Clear Display"
+               label="%clearDisplay"
                style="push">
          </command>
          <command
                commandId="org.eclipse.ease.commands.script.toggleDropinsSection"
                icon="icons/elcl16/dropins_pane.png"
-               label="Toggle Dropins Section"
+               label="%toggleDropins"
                style="push">
          </command>
          <separator
@@ -166,13 +166,13 @@
                commandId="org.eclipse.ease.commands.scriptShell.switchEngine"
                icon="icons/elcl16/engines.png"
                id="org.eclipse.ease.commands.scriptShell.switchEngine.popup"
-               label="Switch engine"
+               label="%switchEngine"
                style="pulldown">
          </command>
          <command
                commandId="org.eclipse.ease.commands.scriptShell.reset"
                icon="icons/elcl16/reset.png"
-               label="Reset"
+               label="%reset"
                style="push"
                tooltip="Reset Script Engine">
          </command>
@@ -180,7 +180,7 @@
                commandId="org.eclipse.ease.commands.scriptShell.newShell"
                icon="icons/elcl16/new_shell.png"
                id="org.eclipse.ease.commands.scriptShell.newShell.popup"
-               label="New shell"
+               label="%newShell"
                style="push">
          </command>
          <separator
@@ -190,7 +190,7 @@
          <command
                commandId="org.eclipse.ease.commands.scriptShell.openScriptHelp"
                icon="icons/eobj16/help.png"
-               label="Open Script Help"
+               label="%openHelp"
                style="push">
          </command>
       </menuContribution>
@@ -219,7 +219,7 @@
          <command
                commandId="org.eclipse.ease.commands.ModulesExplorer.openHelp"
                icon="icons/eobj16/help.png"
-               label="open help"
+               label="%openHelp"
                style="push">
          </command>
          <separator
@@ -231,7 +231,7 @@
             locationURI="popup:org.eclipse.ui.popup.any">
          <command
                commandId="org.eclipse.ease.commands.sign.contextMenu"
-               label="Perform Signature..."
+               label="%performSign"
                mnemonic="P"
                style="push">
             <visibleWhen
@@ -280,7 +280,7 @@
          <command
                commandId="org.eclipse.ease.commands.ModulesExplorer.openPreferences"
                icon="icons/elcl16/preferences.png"
-               label="Show Module Preferences"
+               label="%showPreferences"
                style="push">
          </command>
          <separator
@@ -318,18 +318,18 @@
             category="org.eclipse.ease.preferences.root"
             class="org.eclipse.ease.ui.preferences.ModulesPage"
             id="org.eclipse.ease.preferences.modules"
-            name="Modules">
+            name="%modules">
       </page>
       <page
             class="org.eclipse.ease.ui.preferences.ScriptingPage"
             id="org.eclipse.ease.preferences.root"
-            name="Scripting">
+            name="%scripting">
       </page>
       <page
             category="org.eclipse.ease.preferences.root"
             class="org.eclipse.ease.ui.preferences.ShellPreferencePage"
             id="org.eclipse.ease.preferences.scriptShell"
-            name="Shell">
+            name="%shell">
       </page>
    </extension>
    <extension
@@ -344,10 +344,10 @@
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="org.eclipse.ease.ui.launching.EaseLaunchDelegate"
-            description="Run a script file"
+            description="%runScriptDesc"
             icon="icons/eobj16/script.png"
             id="org.eclipse.ease.launchShortcut"
-            label="EASE Script"
+            label="%easeScript"
             modes="run">
          <contextualLaunch>
             <enablement>
@@ -365,10 +365,10 @@
       </shortcut>
       <shortcut
             class="org.eclipse.ease.ui.launching.EaseLaunchDelegate"
-            description="Run a script file"
+            description="%runScriptDesc"
             icon="icons/eobj16/script.png"
             id="org.eclipse.ease.launchShortcut"
-            label="EASE Script"
+            label="%easeScript"
             modes="debug">
          <contextualLaunch>
             <enablement>
@@ -391,7 +391,7 @@
             delegate="org.eclipse.ease.ui.launching.EaseLaunchDelegate"
             id="org.eclipse.ease.launchConfigurationType"
             modes="run,debug"
-            name="EASE Script"
+            name="%easeScript"
             sourceLocatorId="org.eclipse.ease.sourceLocator.generic">
       </launchConfigurationType>
    </extension>
@@ -432,7 +432,7 @@
             class="org.eclipse.ease.ui.perspectives.ScriptingPerspective"
             icon="icons/eobj16/script.png"
             id="org.eclipse.ease.ui.perspectives.ScriptingPerspective"
-            name="Scripting">
+            name="%scripting">
       </perspective>
    </extension>
    <extension
@@ -448,7 +448,7 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="org.eclipse.ease.newWizard.category"
-            name="Scripting">
+            name="%scripting">
       </category>
    </extension>
    <extension
@@ -490,7 +490,7 @@
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="CONSOLE_INPUT_COLOR"
-            label="Console input text color"
+            label="%consoleTextColor"
             value="50,200,50">
          <description>
             %Color.errorTextDesc
@@ -499,7 +499,7 @@
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="CONSOLE_INPUT_COLOR"
-            label="Console input text color"
+            label="%consoleTextColor"
             value="COLOR_RED">
          <description>
             %Color.errorTextDesc
@@ -529,7 +529,7 @@
          point="org.eclipse.ui.exportWizards">
       <category
             id="org.eclipse.ease.export"
-            name="Scripting">
+            name="%scripting">
       </category>
    </extension>
    <extension

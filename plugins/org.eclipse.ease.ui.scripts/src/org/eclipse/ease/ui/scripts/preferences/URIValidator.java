@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.scripts.preferences;
 
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.dialogs.IInputValidator;
 
@@ -19,9 +20,9 @@ public class URIValidator implements IInputValidator {
 	public String isValid(String text) {
 		try {
 			if (URI.createURI(text).isRelative())
-				return "relative URI detected";
+				return Messages.URIValidator_relativeUri;
 		} catch (Exception e) {
-			return "Invalid URI detected";
+			return Messages.URIValidator_invalidUri;
 		}
 
 		return null;

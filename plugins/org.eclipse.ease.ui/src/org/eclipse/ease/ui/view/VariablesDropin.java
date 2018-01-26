@@ -22,6 +22,7 @@ import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
 import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.modules.EnvironmentModule;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.debugging.model.AbstractEaseDebugModelPresentation;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -158,7 +159,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		final TreeViewerColumn treeViewerColumn = new TreeViewerColumn(fVariablesTree, SWT.NONE);
 		final TreeColumn column = treeViewerColumn.getColumn();
 		treeColumnLayout.setColumnData(column, new ColumnWeightData(1));
-		column.setText("Name");
+		column.setText(Messages.VariablesDropin_name);
 		treeViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			private final AbstractEaseDebugModelPresentation fDebugModelPresentation = new AbstractEaseDebugModelPresentation() {
 			};
@@ -180,7 +181,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		final TreeViewerColumn treeViewerColumn2 = new TreeViewerColumn(fVariablesTree, SWT.NONE);
 		final TreeColumn column2 = treeViewerColumn2.getColumn();
 		treeColumnLayout.setColumnData(column2, new ColumnWeightData(1));
-		column2.setText("Value");
+		column2.setText(Messages.VariablesDropin_value);
 		treeViewerColumn2.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(final Object element) {
@@ -198,7 +199,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 
 	@Override
 	public String getTitle() {
-		return "Variables";
+		return Messages.VariablesDropin_variables;
 	}
 
 	@Override

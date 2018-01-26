@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.preferences.PreferencesHelper;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -54,7 +55,7 @@ public class SelectScriptStorageDialog extends Dialog {
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 
-		newShell.setText("Script Storage Location");
+		newShell.setText(Messages.SelectScriptStorageDialog_storageLocation);
 	}
 
 	/**
@@ -69,7 +70,7 @@ public class SelectScriptStorageDialog extends Dialog {
 
 		final Label lblWhereDoYou = new Label(container, SWT.NONE);
 		lblWhereDoYou.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		lblWhereDoYou.setText("Where do you want to store your recorded scripts to?");
+		lblWhereDoYou.setText(Messages.SelectScriptStorageDialog_storageDescription);
 
 		btnStoreInSettings = new Button(container, SWT.RADIO);
 		btnStoreInSettings.setSelection(true);
@@ -81,11 +82,11 @@ public class SelectScriptStorageDialog extends Dialog {
 		final GridData gd_btnStoreInSettings = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_btnStoreInSettings.verticalIndent = 20;
 		btnStoreInSettings.setLayoutData(gd_btnStoreInSettings);
-		btnStoreInSettings.setText("Store in my workspace settings");
+		btnStoreInSettings.setText(Messages.SelectScriptStorageDialog_storeInSettings);
 		new Label(container, SWT.NONE);
 
 		btnStoreInWorkspace = new Button(container, SWT.RADIO);
-		btnStoreInWorkspace.setText("Use a workspace project");
+		btnStoreInWorkspace.setText(Messages.SelectScriptStorageDialog_storeInWorkspace);
 		new Label(container, SWT.NONE);
 
 		txtWorkspace = new Text(container, SWT.BORDER);
@@ -94,12 +95,12 @@ public class SelectScriptStorageDialog extends Dialog {
 		txtWorkspace.setLayoutData(gd_txtWorkspace);
 
 		final Button btnNewButton = new Button(container, SWT.NONE);
-		btnNewButton.setText("Browse...");
+		btnNewButton.setText(Messages.SelectScriptStorageDialog_browse);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				final ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), true,
-						"Select script storage folder");
+						Messages.SelectScriptStorageDialog_selectFolder);
 				if (dialog.open() == Window.OK) {
 					final Object[] result = dialog.getResult();
 					if ((result.length > 0) && (result[0] instanceof IPath))
@@ -109,7 +110,7 @@ public class SelectScriptStorageDialog extends Dialog {
 		});
 
 		btnStoreOnFileSystem = new Button(container, SWT.RADIO);
-		btnStoreOnFileSystem.setText("On the file system");
+		btnStoreOnFileSystem.setText(Messages.SelectScriptStorageDialog_fileSystem);
 		new Label(container, SWT.NONE);
 
 		txtFileSystem = new Text(container, SWT.BORDER);
@@ -118,7 +119,7 @@ public class SelectScriptStorageDialog extends Dialog {
 		txtFileSystem.setLayoutData(gd_txtFileSystem);
 
 		final Button btnNewButton_1 = new Button(container, SWT.NONE);
-		btnNewButton_1.setText("Browse...");
+		btnNewButton_1.setText(Messages.SelectScriptStorageDialog_browse);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {

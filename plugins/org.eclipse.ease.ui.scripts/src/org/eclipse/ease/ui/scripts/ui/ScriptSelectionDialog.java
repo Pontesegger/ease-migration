@@ -12,6 +12,7 @@ package org.eclipse.ease.ui.scripts.ui;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -67,7 +68,7 @@ public class ScriptSelectionDialog extends Dialog {
 	@Override
 	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Script Browser");
+		newShell.setText(Messages.ScriptSelectionDialog_scriptBrowser);
 	}
 
 	@Override
@@ -75,11 +76,11 @@ public class ScriptSelectionDialog extends Dialog {
 		super.createButtonsForButtonBar(parent);
 
 		final Button ok = getButton(IDialogConstants.OK_ID);
-		ok.setText("Open");
+		ok.setText(Messages.ScriptSelectionDialog_open);
 		setButtonLayoutData(ok);
 
 		final Button cancel = getButton(IDialogConstants.CANCEL_ID);
-		cancel.setText("Cancel");
+		cancel.setText(Messages.ScriptSelectionDialog_cancel);
 		setButtonLayoutData(cancel);
 	}
 

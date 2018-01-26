@@ -12,6 +12,7 @@ package org.eclipse.ease.ui.scripts.view;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.ui.ScriptComposite;
 import org.eclipse.ease.ui.view.IShellDropin;
 import org.eclipse.swt.SWT;
@@ -43,7 +44,7 @@ public class ScriptDropin implements IShellDropin, IScriptEngineProvider {
 
 	@Override
 	public String getTitle() {
-		return "Scripts";
+		return Messages.ScriptDropin_scripts;
 	}
 
 	@Override

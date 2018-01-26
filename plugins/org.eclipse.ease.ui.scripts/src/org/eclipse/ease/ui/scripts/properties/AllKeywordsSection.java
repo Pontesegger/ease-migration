@@ -13,6 +13,7 @@ package org.eclipse.ease.ui.scripts.properties;
 import java.util.Map.Entry;
 
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.TableColumnLayout;
@@ -70,7 +71,7 @@ public class AllKeywordsSection extends AbstractPropertySection {
 		final TableViewerColumn tableViewerColumn = new TableViewerColumn(fTableViewer, SWT.NONE);
 		final TableColumn tblclmnKeyword = tableViewerColumn.getColumn();
 		tcl_composite.setColumnData(tblclmnKeyword, new ColumnWeightData(2, ColumnWeightData.MINIMUM_WIDTH, true));
-		tblclmnKeyword.setText("Keyword");
+		tblclmnKeyword.setText(Messages.AllKeywordsSection_keyword);
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 
 			@SuppressWarnings("unchecked")
@@ -94,7 +95,7 @@ public class AllKeywordsSection extends AbstractPropertySection {
 		final TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(fTableViewer, SWT.NONE);
 		final TableColumn tblclmnValue = tableViewerColumn_1.getColumn();
 		tcl_composite.setColumnData(tblclmnValue, new ColumnWeightData(5, ColumnWeightData.MINIMUM_WIDTH, true));
-		tblclmnValue.setText("Value");
+		tblclmnValue.setText(Messages.AllKeywordsSection_value);
 
 		fTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		tableViewerColumn_1.setLabelProvider(new ColumnLabelProvider() {

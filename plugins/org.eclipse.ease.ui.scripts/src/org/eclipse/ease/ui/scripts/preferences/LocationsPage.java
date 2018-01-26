@@ -19,6 +19,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.repository.IRawLocation;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryFactory;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
@@ -78,7 +79,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 		{
 			final Label lblProvideLocationsTo = new Label(container, SWT.NONE);
 			lblProvideLocationsTo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-			lblProvideLocationsTo.setText("Provide locations to look for scripts. The default location will be used to store your recorded scripts.");
+			lblProvideLocationsTo.setText(Messages.LocationsPage_provideLocation);
 		}
 		{
 			final Composite composite = new Composite(container, SWT.NONE);
@@ -121,13 +122,13 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 					});
 					final TableColumn tblclmnLocation = tableViewerColumn.getColumn();
 					tcl_composite.setColumnData(tblclmnLocation, new ColumnWeightData(5, ColumnWeightData.MINIMUM_WIDTH, true));
-					tblclmnLocation.setText("Location");
+					tblclmnLocation.setText(Messages.LocationsPage_location);
 					tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 						@Override
 						public String getText(final Object element) {
 							if (element instanceof IScriptLocation) {
 								if (((IScriptLocation) element).isDefault())
-									return ((IScriptLocation) element).getLocation() + " (default)";
+									return ((IScriptLocation) element).getLocation() + Messages.LocationsPage_default;
 								else
 									return ((IScriptLocation) element).getLocation();
 							}
@@ -177,7 +178,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 					});
 					final TableColumn tblclmnRecursive = tableViewerColumn.getColumn();
 					tcl_composite.setColumnData(tblclmnRecursive, new ColumnWeightData(1, ColumnWeightData.MINIMUM_WIDTH, true));
-					tblclmnRecursive.setText("Recursive");
+					tblclmnRecursive.setText(Messages.LocationsPage_recursive);
 					tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 						@Override
 						public String getText(final Object element) {
@@ -209,7 +210,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					final ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(), true,
-							"Select script folder");
+							Messages.LocationsPage_selectFolder);
 					if (dialog.open() == Window.OK) {
 						final Object[] result = dialog.getResult();
 						if ((result.length > 0) && (result[0] instanceof IPath))
@@ -218,7 +219,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				}
 			});
 			btnAddWorkspace.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-			btnAddWorkspace.setText("Add Workspace...");
+			btnAddWorkspace.setText(Messages.LocationsPage_workspace);
 		}
 		{
 			final Button btnAddFileSystem = new Button(container, SWT.NONE);
@@ -232,20 +233,20 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				}
 			});
 			btnAddFileSystem.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-			btnAddFileSystem.setText("Add File System...");
+			btnAddFileSystem.setText(Messages.LocationsPage_filesystem);
 		}
 		{
 			final Button btnAddUri = new Button(container, SWT.NONE);
 			btnAddUri.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					final InputDialog dialog = new InputDialog(getShell(), "Enter location URI", "Enter the URI of a location to add", "", new URIValidator());
+					final InputDialog dialog = new InputDialog(getShell(), Messages.LocationsPage_enterURI, Messages.LocationsPage_enterURIToAdd, "", new URIValidator());
 					if (dialog.open() == Window.OK)
 						addEntry(dialog.getValue());
 				}
 			});
 			btnAddUri.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-			btnAddUri.setText("Add URI...");
+			btnAddUri.setText(Messages.LocationsPage_addURI);
 		}
 		;
 		new Label(container, SWT.NONE);
@@ -266,7 +267,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				}
 			});
 			btnSetAsDefault.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, true, 1, 1));
-			btnSetAsDefault.setText("Default");
+			btnSetAsDefault.setText(Messages.LocationsPage_defaultUpperCase);
 		}
 		{
 			final Button btnDelete = new Button(container, SWT.NONE);
@@ -292,7 +293,7 @@ public class LocationsPage extends PreferencePage implements IWorkbenchPreferenc
 				}
 			});
 			btnDelete.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
-			btnDelete.setText("Delete");
+			btnDelete.setText(Messages.LocationsPage_delete);
 		}
 
 		performDefaults();

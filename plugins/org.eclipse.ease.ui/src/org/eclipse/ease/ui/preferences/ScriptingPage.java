@@ -12,6 +12,7 @@ package org.eclipse.ease.ui.preferences;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -46,13 +47,13 @@ public class ScriptingPage extends PreferencePage implements IWorkbenchPreferenc
 		Group grpSecurisecurty = new Group(container, SWT.NONE);
 		grpSecurisecurty.setLayout(new FillLayout(SWT.VERTICAL));
 		grpSecurisecurty.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		grpSecurisecurty.setText("Security");
+		grpSecurisecurty.setText(Messages.ScriptingPage_security);
 
 		btnAllowUIAccess = new Button(grpSecurisecurty, SWT.CHECK);
-		btnAllowUIAccess.setText("Allow scripts to run code in UI thread");
+		btnAllowUIAccess.setText(Messages.ScriptingPage_allowUIThread);
 
 		btnAllowRemoteAccess = new Button(grpSecurisecurty, SWT.CHECK);
-		btnAllowRemoteAccess.setText("Allow to run remote scripts");
+		btnAllowRemoteAccess.setText(Messages.ScriptingPage_allowRemoteScripts);
 
 		performDefaults();
 

@@ -17,6 +17,7 @@ import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -65,43 +66,43 @@ public class ShellPreferencePage extends PreferencePage implements IWorkbenchPre
 
 		final Label lblNewLabel = new Label(container, SWT.WRAP);
 		lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		lblNewLabel.setText("Defines look and feel as well as behavior of the script shells.");
+		lblNewLabel.setText(Messages.ShellPreferencePage_lookAndFeel);
 
 		final Group grpAppearance = new Group(container, SWT.NONE);
 		grpAppearance.setLayout(new GridLayout(3, false));
 		final GridData gd_grpAppearance = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		gd_grpAppearance.verticalIndent = 15;
 		grpAppearance.setLayoutData(gd_grpAppearance);
-		grpAppearance.setText("Appearance");
+		grpAppearance.setText(Messages.ShellPreferencePage_appearance);
 
 		final Label lblSeeColorsAnd = new Label(grpAppearance, SWT.NONE);
 		lblSeeColorsAnd.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		lblSeeColorsAnd.setText("See Colors and fonts to change the font settings for shell output.");
+		lblSeeColorsAnd.setText(Messages.ShellPreferencePage_colorAndFonts);
 
 		final Label lblHistoryLength = new Label(grpAppearance, SWT.NONE);
 		lblHistoryLength.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblHistoryLength.setText("History Length:");
+		lblHistoryLength.setText(Messages.ShellPreferencePage_historyLength);
 
 		fTxtHistoryLength = new Text(grpAppearance, SWT.BORDER);
 
 		final Label lblEntries = new Label(grpAppearance, SWT.NONE);
-		lblEntries.setText("entries");
+		lblEntries.setText(Messages.ShellPreferencePage_entries);
 
 		fChkModulesAsFlatList = new Button(grpAppearance, SWT.CHECK);
 		fChkModulesAsFlatList.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		fChkModulesAsFlatList.setText("Show modules as flat list");
+		fChkModulesAsFlatList.setText(Messages.ShellPreferencePage_flatModuleList);
 
 		fChkAutoFocusText = new Button(grpAppearance, SWT.CHECK);
 		fChkAutoFocusText.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		fChkAutoFocusText.setText("Auto focus text input field");
+		fChkAutoFocusText.setText(Messages.ShellPreferencePage_autoFocus);
 
 		fChkKeepLastCommand = new Button(grpAppearance, SWT.CHECK);
 		fChkKeepLastCommand.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		fChkKeepLastCommand.setText("Keep last command in input field");
+		fChkKeepLastCommand.setText(Messages.ShellPreferencePage_keepLastCmd);
 
 		final Label lblPreferredEngine = new Label(container, SWT.NONE);
 		lblPreferredEngine.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblPreferredEngine.setText("Preferred Engine:");
+		lblPreferredEngine.setText(Messages.ShellPreferencePage_preferredEngine);
 
 		comboViewer = new ComboViewer(container, SWT.NONE);
 		final Combo combo = comboViewer.getCombo();
@@ -116,7 +117,7 @@ public class ShellPreferencePage extends PreferencePage implements IWorkbenchPre
 
 		final Label lblShellStartupCommands = new Label(container, SWT.NONE);
 		lblShellStartupCommands.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		lblShellStartupCommands.setText("Shell startup commands");
+		lblShellStartupCommands.setText(Messages.ShellPreferencePage_shellStartupCmds);
 
 		fTabFolder = new TabFolder(container, SWT.NONE);
 		fTabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));

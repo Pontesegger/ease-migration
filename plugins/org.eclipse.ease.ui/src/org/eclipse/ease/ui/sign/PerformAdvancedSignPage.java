@@ -11,6 +11,7 @@
 
 package org.eclipse.ease.ui.sign;
 
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -31,8 +32,8 @@ public class PerformAdvancedSignPage extends WizardPage {
 	 * @param pageName
 	 */
 	protected PerformAdvancedSignPage() {
-		super("Advanced Settings");
-		setTitle("Enter Keystore Info");
+		super(Messages.PerformAdvancedSignPage_advancedSettings);
+		setTitle(Messages.PerformAdvancedSignPage_enterKeystoreInfo);
 	}
 
 	/*
@@ -55,13 +56,13 @@ public class PerformAdvancedSignPage extends WizardPage {
 		GridData gridData;
 
 		Label aliasProviderLabel = new Label(container, SWT.NONE);
-		aliasProviderLabel.setText("Provider to perform Signature:");
+		aliasProviderLabel.setText(Messages.PerformAdvancedSignPage_providePerformSignature);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
 		aliasProviderLabel.setLayoutData(gridData);
 
 		fAliasProviderCombo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
-		fAliasProviderCombo.add("Preferred");
+		fAliasProviderCombo.add(Messages.PerformAdvancedSignPage_preffered);
 		for (String provider : GetInfo.getProvider()) {
 			fAliasProviderCombo.add(provider);
 		}
@@ -69,7 +70,7 @@ public class PerformAdvancedSignPage extends WizardPage {
 		fAliasProviderCombo.select(0);
 
 		Label digestLabel = new Label(container, SWT.NONE);
-		digestLabel.setText("Provide Message Digest Algorithm to use:");
+		digestLabel.setText(Messages.PerformAdvancedSignPage_provideDigestAlgo);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
 		digestLabel.setLayoutData(gridData);
 

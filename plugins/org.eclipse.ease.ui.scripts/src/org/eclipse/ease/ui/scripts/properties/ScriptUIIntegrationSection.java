@@ -30,6 +30,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.expressions.IExpressionDefinition;
 import org.eclipse.ease.ui.scripts.expressions.ui.ExpressionDialog;
 import org.eclipse.ease.ui.scripts.repository.IScript;
@@ -116,7 +117,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		fSctnLookFeel = getWidgetFactory().createSection(parent, ExpandableComposite.FOCUS_TITLE | ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 		fSctnLookFeel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		getWidgetFactory().paintBordersFor(fSctnLookFeel);
-		fSctnLookFeel.setText("Look & Feel");
+		fSctnLookFeel.setText(Messages.ScriptUIIntegrationSection_lockAndFeel);
 		fSctnLookFeel.setExpanded(true);
 
 		final Composite composite = getWidgetFactory().createComposite(fSctnLookFeel, SWT.NONE);
@@ -124,11 +125,11 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		fSctnLookFeel.setClient(composite);
 		composite.setLayout(new GridLayout(4, false));
 
-		final Label lblName = getWidgetFactory().createLabel(composite, "Name:", SWT.NONE);
+		final Label lblName = getWidgetFactory().createLabel(composite, Messages.ScriptUIIntegrationSection_name, SWT.NONE);
 		lblName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		fTxtName = getWidgetFactory().createText(composite, "", SWT.NONE);
-		fTxtName.setToolTipText("The entry name displayed in the Script Explorer view. Use / to create folder structures.");
+		fTxtName.setToolTipText(Messages.ScriptUIIntegrationSection_enterDisplayName);
 		fTxtName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
 		// fTxtName.addModifyListener(new KeywordModifyListener("name"));
 
@@ -147,11 +148,11 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		gd_lblImagePic.heightHint = 20;
 		fLblImagePic.setLayoutData(gd_lblImagePic);
 
-		final Label lblImage = getWidgetFactory().createLabel(composite_2, "Image:", SWT.NONE);
+		final Label lblImage = getWidgetFactory().createLabel(composite_2, Messages.ScriptUIIntegrationSection_image, SWT.NONE);
 		lblImage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		fTxtImage = getWidgetFactory().createText(composite, "", SWT.NONE);
-		fTxtImage.setToolTipText("Provide an image URI. You may use file:// platform:// or web URIs.");
+		fTxtImage.setToolTipText(Messages.ScriptUIIntegrationSection_imageUri);
 		fTxtImage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		fTxtImage.addModifyListener(new ModifyListener() {
 
@@ -163,7 +164,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 
 		final Button btnBrowseWorkspace = getWidgetFactory().createButton(composite, "", SWT.NONE);
 		btnBrowseWorkspace.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT));
-		btnBrowseWorkspace.setToolTipText("Browse the workspace");
+		btnBrowseWorkspace.setToolTipText(Messages.ScriptUIIntegrationSection_browseWorkspace);
 		btnBrowseWorkspace.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -210,8 +211,8 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 							}
 
 						});
-				dialog.setTitle("Select Image");
-				dialog.setMessage("Select the image to use for the script:");
+				dialog.setTitle(Messages.ScriptUIIntegrationSection_selectImage);
+				dialog.setMessage(Messages.ScriptUIIntegrationSection_selectImageForScript);
 				dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
 				if (dialog.open() == Window.OK) {
 					final Object result = dialog.getFirstResult();
@@ -226,7 +227,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);
-				fileDialog.setFilterNames(new String[] { "Images", "All Files (*.*)" });
+				fileDialog.setFilterNames(new String[] { Messages.ScriptUIIntegrationSection_images, Messages.ScriptUIIntegrationSection_allFiles });
 				fileDialog.setFilterExtensions(new String[] { "*.png;*.gif;*.ico", "*.*" });
 
 				final String location = fileDialog.open();
@@ -235,13 +236,13 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 			}
 		});
 		btnBrowseFileSystem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER));
-		btnBrowseFileSystem.setToolTipText("Browse the local file system");
+		btnBrowseFileSystem.setToolTipText(Messages.ScriptUIIntegrationSection_browseLocal);
 
-		final Label label_2 = getWidgetFactory().createLabel(composite, "Description:", SWT.NONE);
+		final Label label_2 = getWidgetFactory().createLabel(composite, Messages.ScriptUIIntegrationSection_description, SWT.NONE);
 		label_2.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1));
 
 		fTxtDescription = getWidgetFactory().createText(composite, "", SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-		fTxtDescription.setToolTipText("The description will be visible as a tooltip when hovering over a script.");
+		fTxtDescription.setToolTipText(Messages.ScriptUIIntegrationSection_descriptionTooltip);
 		final GridData gd_text_2 = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
 		gd_text_2.heightHint = 62;
 		fTxtDescription.setLayoutData(gd_text_2);
@@ -250,7 +251,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 				ExpandableComposite.FOCUS_TITLE | ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 		fSctnMenusToolbars.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		getWidgetFactory().paintBordersFor(fSctnMenusToolbars);
-		fSctnMenusToolbars.setText("Menus & Toolbars");
+		fSctnMenusToolbars.setText(Messages.ScriptUIIntegrationSection_menuAndToolbars);
 		fSctnMenusToolbars.setExpanded(true);
 
 		final Composite composite_1 = getWidgetFactory().createComposite(fSctnMenusToolbars, SWT.NONE);
@@ -258,31 +259,31 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		fSctnMenusToolbars.setClient(composite_1);
 		composite_1.setLayout(new GridLayout(4, false));
 
-		final Label lblToolbar = getWidgetFactory().createLabel(composite_1, "Toolbar:", SWT.NONE);
+		final Label lblToolbar = getWidgetFactory().createLabel(composite_1, Messages.ScriptUIIntegrationSection_toolbar, SWT.NONE);
 		lblToolbar.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		fTxtToolbar = getWidgetFactory().createText(composite_1, "", SWT.NONE);
-		fTxtToolbar.setToolTipText("View ID or view title to add script to.");
+		fTxtToolbar.setToolTipText(Messages.ScriptUIIntegrationSection_toolbarToolTip);
 		fTxtToolbar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		addBrowseButton(composite_1, fTxtToolbar);
 		addBuildExpressionButton(composite_1, fTxtToolbar);
 
-		final Label lblMenu = getWidgetFactory().createLabel(composite_1, "Menu:", SWT.NONE);
+		final Label lblMenu = getWidgetFactory().createLabel(composite_1, Messages.ScriptUIIntegrationSection_menu, SWT.NONE);
 		lblMenu.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		fTxtMenu = getWidgetFactory().createText(composite_1, "", SWT.NONE);
-		fTxtMenu.setToolTipText("View ID or view title to add script to.");
+		fTxtMenu.setToolTipText(Messages.ScriptUIIntegrationSection_menuToolTip);
 		fTxtMenu.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		addBrowseButton(composite_1, fTxtMenu);
 		addBuildExpressionButton(composite_1, fTxtMenu);
 
-		final Label lblPopup = getWidgetFactory().createLabel(composite_1, "Popup:", SWT.NONE);
+		final Label lblPopup = getWidgetFactory().createLabel(composite_1, Messages.ScriptUIIntegrationSection_popup, SWT.NONE);
 		lblPopup.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 		fTxtPopup = getWidgetFactory().createText(composite_1, "", SWT.NONE);
-		fTxtPopup.setToolTipText("View ID or view title to add script to.");
+		fTxtPopup.setToolTipText(Messages.ScriptUIIntegrationSection_popupToolTip);
 		fTxtPopup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		addBrowseButton(composite_1, fTxtPopup);
@@ -351,7 +352,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		btnBuildExpression.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				final ExpressionDialog dialog = new ExpressionDialog(null, "Provide an expression to control the enablement of the entry.", "enabledWhen");
+				final ExpressionDialog dialog = new ExpressionDialog(null, Messages.ScriptUIIntegrationSection_expressionDialogTitle, "enabledWhen");
 				if (Window.OK == dialog.open()) {
 					final IExpressionDefinition expression = dialog.getExpression();
 					text.setText(text.getText() + " enabledWhen(" + expression.serialize() + ")");

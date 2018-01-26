@@ -12,6 +12,7 @@ package org.eclipse.ease.ui.scripts.ui;
 
 import java.util.HashMap;
 
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.handler.EditScript;
 import org.eclipse.ease.ui.scripts.handler.RunScript;
 import org.eclipse.ease.ui.scripts.repository.IScript;
@@ -61,7 +62,7 @@ public class ScriptContextMenuEntries extends AbstractContributionFactory implem
 				parameters.put(RunScript.PARAMETER_NAME, names.toString());
 				final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(serviceLocator, null, RunScript.COMMAND_ID,
 						CommandContributionItem.STYLE_PUSH);
-				contributionParameter.label = "Run";
+				contributionParameter.label = Messages.ScriptContextMenuEntries_run;
 				contributionParameter.visibleEnabled = true;
 				contributionParameter.parameters = parameters;
 				CommandContributionItem contribution = new CommandContributionItem(contributionParameter);
@@ -74,7 +75,7 @@ public class ScriptContextMenuEntries extends AbstractContributionFactory implem
 				parameters.clear();
 				parameters.put(EditScript.PARAMETER_NAME, names.toString());
 				contributionParameter.commandId = EditScript.COMMAND_ID;
-				contributionParameter.label = "Edit";
+				contributionParameter.label = Messages.ScriptContextMenuEntries_edit;
 				contribution = new CommandContributionItem(contributionParameter);
 				additions.addContributionItem(contribution, null);
 			}

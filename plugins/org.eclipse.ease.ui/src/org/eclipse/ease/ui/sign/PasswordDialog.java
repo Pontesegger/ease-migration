@@ -13,6 +13,7 @@ package org.eclipse.ease.ui.sign;
 
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -61,7 +62,7 @@ public class PasswordDialog extends Dialog {
 
 		Label aliasLabel = new Label(container, SWT.NONE);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
-		aliasLabel.setText("Enter Password");
+		aliasLabel.setText(Messages.PasswordDialog_enterPwd);
 		aliasLabel.setLayoutData(gridData);
 
 		fPasswordText = new Text(container, SWT.PASSWORD | SWT.BORDER);
@@ -74,7 +75,7 @@ public class PasswordDialog extends Dialog {
 		fSavePassCheckButton = new Button(group, SWT.CHECK);
 
 		Label checkBoxLabel = new Label(group, SWT.NONE);
-		checkBoxLabel.setText("Save Password");
+		checkBoxLabel.setText(Messages.PasswordDialog_savePwd);
 
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
 		group.setLayoutData(gridData);

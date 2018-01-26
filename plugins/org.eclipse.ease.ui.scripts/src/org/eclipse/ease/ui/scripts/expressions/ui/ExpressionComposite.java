@@ -22,6 +22,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.expressions.ExpressionTools;
 import org.eclipse.ease.ui.scripts.expressions.ExpressionTools.ExpressionDescription;
 import org.eclipse.ease.ui.scripts.expressions.ICompositeExpressionDefinition;
@@ -161,7 +162,7 @@ public class ExpressionComposite extends Composite {
 			}
 		});
 
-		setExpression(null, "Root");
+		setExpression(null, Messages.ExpressionComposite_3);
 
 		// create context menu
 		createContextMenu();
@@ -209,7 +210,7 @@ public class ExpressionComposite extends Composite {
 		prepareDynamicContributionItems();
 
 		final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(fSite, null, DeleteExpressionHandler.COMMAND_ID,
-				null, null, null, null, "Delete", null, "Delete", SWT.PUSH, null, true);
+				null, null, null, null, Messages.ExpressionComposite_delete, null, Messages.ExpressionComposite_delete, SWT.PUSH, null, true);
 		final CommandContributionItem deleteContributionItem = new CommandContributionItem(contributionParameters);
 
 		final Menu menu = menuManager.createContextMenu(fTreeViewer.getControl());
@@ -253,7 +254,7 @@ public class ExpressionComposite extends Composite {
 
 			final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(fSite, null,
 					CreateExpressionHandler.COMMAND_ID, parameters, description.getImageDescriptor(), null, null, description.getName(), null,
-					"Add " + description.getName() + " Expression", SWT.PUSH, null, true);
+					Messages.ExpressionComposite_add + description.getName() + Messages.ExpressionComposite_expression, SWT.PUSH, null, true);
 			fContributionItems.add(new CommandContributionItem(contributionParameters));
 		}
 	}

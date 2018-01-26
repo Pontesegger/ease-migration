@@ -27,6 +27,7 @@ import org.eclipse.ease.sign.PerformSignature;
 import org.eclipse.ease.sign.ScriptSignatureException;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -60,8 +61,8 @@ public class PerformBasicSignPage extends WizardPage {
 	 *            provide instance of {@link GetInfo}
 	 */
 	protected PerformBasicSignPage(GetInfo getInfo) {
-		super("Enter Properties");
-		setTitle("Enter Properties");
+		super(Messages.PerformBasicSignPage_enterProperties);
+		setTitle(Messages.PerformBasicSignPage_enterProperties);
 		setPageComplete(false);
 
 		fGetInfo = getInfo;
@@ -85,8 +86,8 @@ public class PerformBasicSignPage extends WizardPage {
 		GridData gridData;
 
 		final Label keyStoreLabel = new Label(container, SWT.NONE);
-		keyStoreLabel.setText("KeyStore Location");
-		keyStoreLabel.setToolTipText("Enter location of keystore. Location can be URL or a file or even location on workspace.");
+		keyStoreLabel.setText(Messages.PerformBasicSignPage_keyStoreLoc);
+		keyStoreLabel.setToolTipText(Messages.PerformBasicSignPage_enterKeyStoreLoc);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
 		keyStoreLabel.setLayoutData(gridData);
 
@@ -96,11 +97,11 @@ public class PerformBasicSignPage extends WizardPage {
 
 		final Button browseButton = new Button(container, SWT.NONE);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
-		browseButton.setText("Browse...");
+		browseButton.setText(Messages.PerformBasicSignPage_browse);
 		browseButton.setLayoutData(gridData);
 
 		final Label aliasLabel = new Label(container, SWT.NONE);
-		aliasLabel.setText("Choose Alias");
+		aliasLabel.setText(Messages.PerformBasicSignPage_chooseAlias);
 		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true, 4, 1);
 		aliasLabel.setLayoutData(gridData);
 
@@ -114,7 +115,7 @@ public class PerformBasicSignPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final FileDialog fd = new FileDialog(getShell(), SWT.OPEN);
-				fd.setText("Chose Keystore");
+				fd.setText(Messages.PerformBasicSignPage_chooseKeystore);
 				final String selectedFile = fd.open();
 				if (selectedFile != null)
 					fKeyStoreFileCombo.setText(selectedFile);
@@ -201,7 +202,7 @@ public class PerformBasicSignPage extends WizardPage {
 				if (inputStream != null) {
 					pass = node.get(selectedFile, null);
 					if (pass == null) {
-						final PasswordDialog passwordDialog = new PasswordDialog(getShell(), selectedFile, "Keystore Password");
+						final PasswordDialog passwordDialog = new PasswordDialog(getShell(), selectedFile, Messages.PerformBasicSignPage_keystorePwd);
 						if (passwordDialog.open() == Window.CANCEL) {
 							reset();
 							throw new ScriptSignatureException("Cannot load Keystore");
@@ -228,7 +229,7 @@ public class PerformBasicSignPage extends WizardPage {
 						fGetInfo.setKeyStorePassword(pass);
 
 						setErrorMessage(null);
-						setMessage("KeyStore Loaded", SWT.OK);
+						setMessage(Messages.PerformBasicSignPage_keystoreLoaded, SWT.OK);
 
 						if (fKeyStoreFileList.contains(selectedFile))
 							fKeyStoreFileList.remove(selectedFile);
@@ -251,7 +252,7 @@ public class PerformBasicSignPage extends WizardPage {
 						// password is incorrect. Remove key from node and try again
 						pass = null;
 						node.remove(selectedFile);
-						setErrorMessage("Invalid Keystore Password");
+						setErrorMessage(Messages.PerformBasicSignPage_invalidPwd);
 					}
 				} else
 					throw new ScriptSignatureException("Cannot open Keystore from provided file");

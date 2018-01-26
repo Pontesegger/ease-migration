@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.help.hovers.HoverManager;
 import org.eclipse.ease.ui.help.hovers.IHoverContentProvider;
 import org.eclipse.ease.ui.help.hovers.ModuleHelp;
@@ -58,7 +59,7 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 
 	public static final String VIEW_ID = "org.eclipse.ease.ui.views.modulesExplorer"; //$NON-NLS-1$
 
-	private static final String SEARCH_DEFAULT_TEXT = "<search modules>";
+	private static final String SEARCH_DEFAULT_TEXT = Messages.ModuleExplorerView_serachModules;
 
 	/**
 	 * Job to update the tree filter settings. Decoupled to trigger after some delay.
@@ -71,7 +72,7 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 		private String fFilterText;
 
 		public UpdateTreeJob() {
-			super("Update Modules Explorer");
+			super(Messages.ModuleExplorerView_updateModulesExplorer);
 		}
 
 		@Override

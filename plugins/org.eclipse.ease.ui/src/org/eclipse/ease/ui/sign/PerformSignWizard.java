@@ -26,6 +26,7 @@ import org.eclipse.ease.sign.ScriptSignatureException;
 import org.eclipse.ease.sign.SignatureInfo;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.window.Window;
@@ -61,7 +62,7 @@ public class PerformSignWizard extends Wizard {
 
 	@Override
 	public String getWindowTitle() {
-		return "Perform Signature";
+		return Messages.PerformSignWizard_performSignature;
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class PerformSignWizard extends Wizard {
 				try {
 					pass = node.get(aliasNodeKey, null);
 					if (pass == null) {
-						final PasswordDialog passwordDialog = new PasswordDialog(getShell(), aliasNodeKey, "Alias Password");
+						final PasswordDialog passwordDialog = new PasswordDialog(getShell(), aliasNodeKey, Messages.PerformSignWizard_aliasPwd);
 						if (passwordDialog.open() == Window.CANCEL) {
 							return false;
 						}
@@ -123,8 +124,8 @@ public class PerformSignWizard extends Wizard {
 				} catch (final UnrecoverableKeyException e) {
 					pass = null;
 					node.remove(aliasNodeKey);
-					fPerformBasicSignPage.setErrorMessage("Invalid Private Key Password");
-					fPerformAdvancedSignPage.setErrorMessage("Invalid Private Key Password");
+					fPerformBasicSignPage.setErrorMessage(Messages.PerformSignWizard_invalidPrivateKey);
+					fPerformAdvancedSignPage.setErrorMessage(Messages.PerformSignWizard_invalidPrivateKey);
 
 				} catch (final Exception e) {
 					// StorageException CoreException
@@ -135,8 +136,8 @@ public class PerformSignWizard extends Wizard {
 
 			if (signature == null) {
 				fPerformBasicSignPage.reset();
-				fPerformBasicSignPage.setErrorMessage("Unable to access keystore. Try again");
-				fPerformAdvancedSignPage.setErrorMessage("Unable to access keystore. Try again");
+				fPerformBasicSignPage.setErrorMessage(Messages.PerformSignWizard_unableToAccessKeystore);
+				fPerformAdvancedSignPage.setErrorMessage(Messages.PerformSignWizard_unableToAccessKeystore);
 				return false;
 			}
 

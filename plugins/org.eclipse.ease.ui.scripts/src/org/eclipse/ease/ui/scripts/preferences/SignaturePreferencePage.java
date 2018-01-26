@@ -13,6 +13,7 @@ package org.eclipse.ease.ui.scripts.preferences;
 
 import org.eclipse.ease.sign.IPreferenceConstants;
 import org.eclipse.ease.ui.scripts.Activator;
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
@@ -33,16 +34,16 @@ public class SignaturePreferencePage extends FieldEditorPreferencePage implement
 	@Override
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
-		setDescription("EASE Security");
+		setDescription(Messages.SignaturePreferencePage_easeSecurity);
 	}
 
 	@Override
 	protected void createFieldEditors() {
 
-		addField(new BooleanFieldEditor(IPreferenceConstants.RUN_WITHOUT_SIGN_LOCAL, "Allow executing &LOCAL scripts that are not signed",
+		addField(new BooleanFieldEditor(IPreferenceConstants.RUN_WITHOUT_SIGN_LOCAL, Messages.SignaturePreferencePage_allowLocalScript,
 				getFieldEditorParent()));
 
-		addField(new BooleanFieldEditor(IPreferenceConstants.RUN_WITHOUT_SIGN_REMOTE, "Allow executing &REMOTE scripts that are not signed(Not Recommended)",
+		addField(new BooleanFieldEditor(IPreferenceConstants.RUN_WITHOUT_SIGN_REMOTE, Messages.SignaturePreferencePage_allowRemoteScript,
 				getFieldEditorParent()));
 	}
 }

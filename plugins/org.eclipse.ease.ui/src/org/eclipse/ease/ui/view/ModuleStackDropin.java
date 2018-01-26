@@ -20,6 +20,7 @@ import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.ui.Activator;
+import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.modules.ui.ModulesDragListener;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -95,7 +96,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 		final TableViewerColumn tableViewerColumn = new TableViewerColumn(fModulesTable, SWT.NONE);
 		final TableColumn column = tableViewerColumn.getColumn();
 		tableColumnLayout.setColumnData(column, new ColumnWeightData(1));
-		column.setText("Module");
+		column.setText(Messages.ModuleStackDropin_module);
 		tableViewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(final Object element) {
@@ -149,7 +150,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 
 	@Override
 	public String getTitle() {
-		return "Module Stack";
+		return Messages.ModuleStackDropin_moduleStack;
 	}
 
 	@Override

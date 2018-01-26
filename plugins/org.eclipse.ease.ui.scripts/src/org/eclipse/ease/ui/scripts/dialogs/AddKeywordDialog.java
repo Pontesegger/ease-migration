@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.scripts.dialogs;
 
+import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.ease.ui.scripts.repository.impl.RepositoryService;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -33,8 +34,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class AddKeywordDialog extends TitleAreaDialog {
 
-	private static final String MESSAGE_TEXT = "Create a new keyword by either selecting one of the officially supported ones or use your own keyword.";
-
 	private class Validator implements ModifyListener {
 
 		@Override
@@ -44,18 +43,18 @@ public class AddKeywordDialog extends TitleAreaDialog {
 
 			// check that keyword is not empty
 			if (fComboViewer.getCombo().getText().trim().isEmpty())
-				setMessage("Keyword cannot be empty", IMessageProvider.ERROR);
+				setMessage(Messages.AddKeywordDialog_emptyKey, IMessageProvider.ERROR);
 
 			else if (fTxtValue.getText().trim().isEmpty())
-				setMessage("Value cannot be empty", IMessageProvider.ERROR);
+				setMessage(Messages.AddKeywordDialog_emptyValue, IMessageProvider.ERROR);
 
 			else if ((fScript != null) && (fScript.getKeywords().containsKey(fComboViewer.getCombo().getText().trim()))) {
 				getButton(IDialogConstants.OK_ID).setEnabled(true);
-				setMessage("This keyword already exists and would be replaced.", IMessageProvider.WARNING);
+				setMessage(Messages.AddKeywordDialog_keyAlreadyExists, IMessageProvider.WARNING);
 
 			} else {
 				getButton(IDialogConstants.OK_ID).setEnabled(true);
-				setMessage(MESSAGE_TEXT, IMessageProvider.INFORMATION);
+				setMessage(Messages.AddKeywordDialog_text, IMessageProvider.INFORMATION);
 			}
 		}
 	}
@@ -80,8 +79,8 @@ public class AddKeywordDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Create new script keyword");
-		setMessage(MESSAGE_TEXT, IMessageProvider.INFORMATION);
+		setTitle(Messages.AddKeywordDialog_createNew);
+		setMessage(Messages.AddKeywordDialog_text, IMessageProvider.INFORMATION);
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public class AddKeywordDialog extends TitleAreaDialog {
 
 		final Label lblKeyword = new Label(composite, SWT.NONE);
 		lblKeyword.setSize(47, 13);
-		lblKeyword.setText("Keyword");
+		lblKeyword.setText(Messages.AddKeywordDialog_keyword);
 
 		final Validator validator = new Validator();
 
@@ -110,7 +109,7 @@ public class AddKeywordDialog extends TitleAreaDialog {
 
 		final Label lblValue = new Label(composite, SWT.NONE);
 		lblValue.setSize(30, 13);
-		lblValue.setText("Value");
+		lblValue.setText(Messages.AddKeywordDialog_value);
 
 		fTxtValue = new Text(composite, SWT.BORDER);
 		fTxtValue.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
