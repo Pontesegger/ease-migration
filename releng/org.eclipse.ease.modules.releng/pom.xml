@@ -180,22 +180,26 @@
 							<doclet>org.eclipse.ease.helpgenerator.ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
 							<additionalparam>-root ${basedir}</additionalparam>
-							<useStandardDocletOptions>false</useStandardDocletOptions>
+
+							<useStandardDocletOptions>true</useStandardDocletOptions>
 							<links>
+								<link>https://osgi.org/javadoc/r6/cmpn</link>
+								<!-- 
 								<link>http://docs.oracle.com/javase/8/docs/api/</link>
+								 -->
 							</links>
 							<offlineLinks>
 								<offlineLink>
-									<url>http://help.eclipse.org/mars/topic/org.eclipse.platform.doc.isv/reference/api/</url>
-									<location>../../${platform.api}</location>
+									<url>../../org.eclipse.platform.doc.isv/reference/api/</url>
+									<location>http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api</location>
 								</offlineLink>
 								<offlineLink>
-									<url>https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/</url>
-									<location>../../${ease.api}</location>
+									<url>../../org.eclipse.ease.help/reference/api/</url>
+									<location>https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/</location>
 								</offlineLink>
 								<offlineLink>
-									<url>https://hudson.eclipse.org/ease/job/ease-build-modules/javadoc/</url>
-									<location>../../${ease.modules.api}</location>
+									<url>../../org.eclipse.ease.modules.help/reference/api/</url>
+									<location>https://hudson.eclipse.org/ease/job/ease-build-modules/javadoc/</location>
 								</offlineLink>
 							</offlineLinks>
 						</configuration>
