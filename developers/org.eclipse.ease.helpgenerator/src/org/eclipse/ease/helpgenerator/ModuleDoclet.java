@@ -74,7 +74,7 @@ public class ModuleDoclet extends Doclet {
 
 	private static final String OPTION_PROJECT_ROOT = "-root";
 	private static final Object OPTION_LINK = "-link";
-	private static final Object OPTION_LINK_OFFLINE = "-linkOffline";
+	private static final Object OPTION_LINK_OFFLINE = "-linkoffline";
 	private static final Object OPTION_FAIL_ON_HTML_ERRORS = "-failOnHTMLError";
 	private static final Object OPTION_FAIL_ON_MISSING_DOCS = "-failOnMissingDocs";
 
@@ -125,6 +125,9 @@ public class ModuleDoclet extends Doclet {
 			return 2;
 
 		if ("-windowtitle".equals(option))
+			return 2;
+
+		if ("-d".equals(option))
 			return 2;
 
 		if ("-use".equals(option))
