@@ -103,6 +103,36 @@ public class ModuleDoclet extends Doclet {
 		if (OPTION_FAIL_ON_MISSING_DOCS.equals(option))
 			return 2;
 
+		if ("-encoding".equals(option))
+			return 2;
+
+		if ("-protected".equals(option))
+			return 1;
+
+		if ("-author".equals(option))
+			return 1;
+
+		if ("-bottom".equals(option))
+			return 2;
+
+		if ("-charset".equals(option))
+			return 2;
+
+		if ("-docencoding".equals(option))
+			return 2;
+
+		if ("-doctitle".equals(option))
+			return 2;
+
+		if ("-windowtitle".equals(option))
+			return 2;
+
+		if ("-use".equals(option))
+			return 1;
+
+		if ("-version".equals(option))
+			return 1;
+
 		return Doclet.optionLength(option);
 	}
 
