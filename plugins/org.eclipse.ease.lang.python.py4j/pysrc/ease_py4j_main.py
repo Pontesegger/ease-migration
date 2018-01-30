@@ -293,6 +293,7 @@ class ScriptEngineExecute(object):
 
     def internalSetVariable(self, name, content):
         self.locals[name] = content
+        __builtins__.__dict__[name] = content 
 
     def teardownEngine(self):
         self.shutdown_event.set()

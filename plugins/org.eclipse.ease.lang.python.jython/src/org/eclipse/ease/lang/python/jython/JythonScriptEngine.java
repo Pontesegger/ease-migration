@@ -299,6 +299,6 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 			throw new RuntimeException("\"" + name + "\" is not a valid Python variable name");
 
 		getEngine().set(name, content);
-
+		getEngine().getSystemState().builtins.__setitem__(name, Py.java2py(content));
 	}
 }

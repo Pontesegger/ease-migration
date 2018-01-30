@@ -294,7 +294,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "wrapping object: " + toBeWrapped.toString());
 
 		// create function wrappers
-		final Object result = createWrappers(toBeWrapped, identifier, reloaded, useCustomNamespace);
+		final Object result = createWrappers(toBeWrapped, identifier, useCustomNamespace);
 
 		boolean isTrackedModule = false;
 		for (final ModuleState state : fModuleTracker.getAvailableModules()) {
@@ -333,7 +333,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to the return value only
 	 * @return java instance or wrapper object
 	 */
-	private Object createWrappers(final Object instance, final String identifier, final boolean reload, boolean useCustomNamespace) {
+	private Object createWrappers(final Object instance, final String identifier, boolean useCustomNamespace) {
 		final ICodeFactory codeFactory = getCodeFactory();
 		if (null == codeFactory)
 			return null;

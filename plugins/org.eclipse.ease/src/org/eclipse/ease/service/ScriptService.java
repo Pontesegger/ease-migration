@@ -112,6 +112,7 @@ public class ScriptService implements IScriptService, BundleListener {
 				}
 			}
 		}
+
 		return fAvailableModules;
 	}
 

@@ -11,6 +11,8 @@
 package org.eclipse.ease.modules;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.service.ScriptService;
 
 public class ModuleCategoryDefinition {
 
@@ -34,5 +36,28 @@ public class ModuleCategoryDefinition {
 
 	public String getName() {
 		return fConfig.getAttribute(NAME);
+	}
+
+	public ModuleCategoryDefinition getParentDefinition() {
+		if (getParentId() != null) {
+			final IScriptService scriptService = ScriptService.getService();
+			;
+			return scriptService.getAvailableModuleCategories().get(getParentId());
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get full name including parent category names. Categories are separated by slashes.
+	 *
+	 * @return full name, eg /parentCategory/CategoryName
+	 */
+	public String getFullName() {
+		final ModuleCategoryDefinition parentDefinition = getParentDefinition();
+		if (parentDefinition != null)
+			return parentDefinition.getFullName() + "/" + getName();
+
+		return "/" + getName();
 	}
 }
