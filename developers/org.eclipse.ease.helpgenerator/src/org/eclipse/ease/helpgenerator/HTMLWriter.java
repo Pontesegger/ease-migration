@@ -562,7 +562,7 @@ public class HTMLWriter {
 		for (final ClassDoc iface : method.containingClass().interfaces()) {
 			for (final MethodDoc ifaceMethod : iface.methods()) {
 				if (method.overrides(ifaceMethod)) {
-					comment = ifaceMethod.commentText();
+					comment = extractComment(ifaceMethod, extractor);
 					if ((comment != null) && (!comment.isEmpty()))
 						return comment;
 				}
