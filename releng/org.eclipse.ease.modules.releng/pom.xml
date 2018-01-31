@@ -194,11 +194,11 @@
 									<location>http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api</location>
 								</offlineLink>
 								<offlineLink>
-									<url>../../org.eclipse.ease.help/reference/api/</url>
+									<url>../../org.eclipse.ease.help/help/api-docs/javadoc/</url>
 									<location>https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/</location>
 								</offlineLink>
 								<offlineLink>
-									<url>../../org.eclipse.ease.modules.help/reference/api/</url>
+									<url>../../org.eclipse.ease.modules.help/help/api-docs/javadoc/</url>
 									<location>https://hudson.eclipse.org/ease/job/ease-build-modules/javadoc/</location>
 								</offlineLink>
 							</offlineLinks>
