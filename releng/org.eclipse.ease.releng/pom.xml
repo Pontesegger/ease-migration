@@ -218,18 +218,16 @@
 							<doclet>org.eclipse.ease.helpgenerator.ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
 							<additionalparam>-root ${basedir}</additionalparam>
-							<useStandardDocletOptions>false</useStandardDocletOptions>
-							<links>
-								<link>http://docs.oracle.com/javase/8/docs/api/</link>
-							</links>
+
+							<useStandardDocletOptions>true</useStandardDocletOptions>
 							<offlineLinks>
 								<offlineLink>
-									<url>http://help.eclipse.org/mars/topic/org.eclipse.platform.doc.isv/reference/api/</url>
-									<location>../../${platform.api}</location>
+									<url>../../org.eclipse.platform.doc.isv/reference/api/</url>
+									<location>http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api</location>
 								</offlineLink>
 								<offlineLink>
-									<url>https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/</url>
-									<location>../../${ease.api}</location>
+									<url>../../org.eclipse.ease.help/help/api-docs/javadoc/</url>
+									<location>https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/</location>
 								</offlineLink>
 							</offlineLinks>
 						</configuration>
