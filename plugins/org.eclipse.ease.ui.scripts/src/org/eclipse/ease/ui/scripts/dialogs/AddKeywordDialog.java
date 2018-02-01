@@ -117,9 +117,14 @@ public class AddKeywordDialog extends TitleAreaDialog {
 		fTxtValue.setSize(380, 19);
 		fTxtValue.addModifyListener(validator);
 
-		getButton(IDialogConstants.OK_ID).setEnabled(false);
-
 		return area;
+	}
+
+	@Override
+	protected Control createButtonBar(Composite parent) {
+		final Control control = super.createButtonBar(parent);
+		getButton(IDialogConstants.OK_ID).setEnabled(false);
+		return control;
 	}
 
 	@Override
