@@ -85,6 +85,11 @@ public class VerifySignature {
 			throw new ScriptSignatureException("One or more parameters are not provided");
 
 		ICodeParser iCodeParser = scriptType.getCodeParser();
+		
+		if (iCodeParser == null) {
+			return null;
+		}
+		
 		if (signatureInputStream == null) {
 			SignatureInfo signatureInfo = iCodeParser.getSignatureInfo(inputStream);
 			if (signatureInfo != null) {
