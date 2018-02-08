@@ -46,6 +46,7 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeFunction;
+import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
@@ -434,6 +435,14 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			for (final Entry<String, Object> entry : getNativeChildObjects((NativeObject) scope).entrySet()) {
 				final EaseDebugVariable variable = createVariable(entry.getKey(), entry.getValue());
 				result.add(variable);
+			}
+
+		} else if (scope instanceof NativeJavaArray) {
+			for (final Object id : ((NativeJavaArray) scope).getIds()) {
+				if (id instanceof Integer) {
+					final EaseDebugVariable variable = createVariable("[" + id + "]", ((NativeJavaArray) scope).get((Integer) id, (Scriptable) scope));
+					result.add(variable);
+				}
 			}
 
 		} else if (scope instanceof Scriptable) {
