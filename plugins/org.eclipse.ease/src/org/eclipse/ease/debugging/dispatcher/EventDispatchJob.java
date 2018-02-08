@@ -18,10 +18,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.ease.Activator;
 import org.eclipse.ease.debugging.DebugTracer;
 import org.eclipse.ease.debugging.events.IDebugEvent;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
 import org.eclipse.ease.debugging.events.model.IModelRequest;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.swt.widgets.Display;
 
 public class EventDispatchJob extends Job {
 
@@ -89,8 +92,19 @@ public class EventDispatchJob extends Job {
 			if ((monitor.isCanceled()) || (!platformRunning))
 				terminate();
 
-			if (event != null)
-				handleEvent(event);
+			if (event != null) {
+				try {
+					handleEvent(event);
+				} catch (final Throwable e) {
+					// do not terminate the dispatcher in case of an error during event handling
+					DebugTracer.debug("Dispatcher", "Error detected: " + e.getClass().getName() + ": " + e.getMessage());
+
+					final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+							"The debug session encountered an error. We try to gracefully continue the session.", e);
+					ErrorDialog.openError(Display.getDefault().getActiveShell(), "Debug session error",
+							"The debug session encountered an error. We try to gracefully continue the session.", status);
+				}
+			}
 		}
 
 		return Status.OK_STATUS;
