@@ -258,7 +258,9 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 *            handle to be closed
 	 */
 	@WrapToScript
-	public static void closeFile(final IFileHandle handle) {
+	public void closeFile(final IFileHandle handle) {
+		fOpenHandles.remove(handle);
+
 		handle.close();
 	}
 
