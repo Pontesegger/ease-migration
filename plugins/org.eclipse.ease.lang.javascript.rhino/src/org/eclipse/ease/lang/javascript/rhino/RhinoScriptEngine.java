@@ -305,16 +305,17 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	public Map<String, Object> getVariables(final Scriptable scope) {
 		final Map<String, Object> result = new TreeMap<>();
 
+		// first handle parent scope
+		final Scriptable parent = scope.getParentScope();
+		if (parent != null)
+			result.putAll(getVariables(parent));
+
+		// local scope variables may hide parent scope variables
 		for (final Object key : scope.getIds()) {
 			final Object value = getVariable(scope, key.toString());
 			if ((value == null) || (!value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
 				result.put(key.toString(), value);
 		}
-
-		// add parent scope
-		final Scriptable parent = scope.getParentScope();
-		if (parent != null)
-			result.putAll(getVariables(parent));
 
 		return result;
 	}

@@ -898,6 +898,31 @@ public class RhinoDebugTest extends WorkspaceTest {
 		assertEquals(1, suspendedEvents);
 	}
 
+	@Test(timeout = 5000)
+	public void innerScopeVariableBeforeOuterScopeVariable() throws CoreException {
+		setBreakpoint(fFile, getLineNumber("	return a + b;"));
+		assertEquals(1, getBreakpoints().length);
+
+		final RhinoDebuggerEngine engine = createEngine();
+
+		engine.executeAsync(fFile);
+		final int suspendedEvents = runUntilTerminated(engine, () -> {
+			try {
+				final IStackFrame stackFrame = getTopmostStackFrame();
+				assertNotNull(stackFrame);
+
+				final IVariable variable = getVariable("primitiveInteger");
+				assertEquals("-42.0", variable.getValue().getValueString());
+
+				getDebugTarget().terminate();
+
+			} catch (final DebugException e) {
+				fail(e.getMessage());
+			}
+		});
+
+		assertEquals(1, suspendedEvents);
+	}
 	// ---------- helper methods ----------------------------------------------------------------------------------------------------
 
 	private EaseDebugVariable[] getVariables() {

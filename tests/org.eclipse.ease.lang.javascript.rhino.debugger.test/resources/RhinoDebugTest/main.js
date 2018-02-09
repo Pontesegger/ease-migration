@@ -8,6 +8,7 @@ var nativeObject = {firstname: "John", lastname: "Doe"};
 var file = org.eclipse.ease.tools.ResourceTools.resolve("workspace://Rhino Debug Test/RhinoDebugTest.js")
 
 function testMethod(a, b) {
+	var primitiveInteger = -42;
 	return a + b;
 }
 
