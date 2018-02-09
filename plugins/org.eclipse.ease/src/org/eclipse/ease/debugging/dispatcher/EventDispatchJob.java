@@ -101,8 +101,9 @@ public class EventDispatchJob extends Job {
 
 					final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
 							"The debug session encountered an error. We try to gracefully continue the session.", e);
-					ErrorDialog.openError(Display.getDefault().getActiveShell(), "Debug session error",
-							"The debug session encountered an error. We try to gracefully continue the session.", status);
+
+					Display.getDefault().asyncExec(() -> ErrorDialog.openError(Display.getDefault().getActiveShell(), "Debug session error",
+							"The debug session encountered an error. We try to gracefully continue the session.", status));
 				}
 			}
 		}
