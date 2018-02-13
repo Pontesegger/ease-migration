@@ -108,16 +108,18 @@ public class ScriptExecutionException extends RuntimeException {
 
 		if (fScriptStackTrace != null) {
 			for (final IScriptDebugFrame traceElement : fScriptStackTrace) {
-				String fileName = "<unknown source>";
-				final Object file = traceElement.getScript().getFile();
-				if (file instanceof IFile)
-					fileName = ((IFile) file).getName();
-				else if (file instanceof File)
-					fileName = ((File) file).getName();
+				if (traceElement.getScript() != null) {
+					String fileName = "<unknown source>";
+					final Object file = traceElement.getScript().getFile();
+					if (file instanceof IFile)
+						fileName = ((IFile) file).getName();
+					else if (file instanceof File)
+						fileName = ((File) file).getName();
 
-				final String name = ((traceElement.getName() != null) && (!traceElement.getName().isEmpty())) ? ("," + traceElement.getName()) : "";
-				final String lineInfo = (traceElement.getLineNumber() > 0) ? ":" + traceElement.getLineNumber() : "";
-				s.println("\tat " + fileName + name + lineInfo);
+					final String name = ((traceElement.getName() != null) && (!traceElement.getName().isEmpty())) ? ("," + traceElement.getName()) : "";
+					final String lineInfo = (traceElement.getLineNumber() > 0) ? ":" + traceElement.getLineNumber() : "";
+					s.println("\tat " + fileName + name + lineInfo);
+				}
 			}
 		}
 

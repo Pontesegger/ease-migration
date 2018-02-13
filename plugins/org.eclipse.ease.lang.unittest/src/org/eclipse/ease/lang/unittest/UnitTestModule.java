@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.ScriptStackTrace;
@@ -473,9 +472,7 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 */
 	@WrapToScript
 	public void error(String message) throws Exception {
-		error(message, null);
-
-		throw new ExitException();
+		throw new AssertionException(message);
 	}
 
 	/**
