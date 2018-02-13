@@ -24,16 +24,18 @@ public abstract class AbstractFileDropHandler extends AbstractModuleDropHandler 
 
 	@Override
 	public boolean accepts(final IScriptEngine scriptEngine, final Object element) {
-		String extension = null;
-		if (element instanceof IFile)
-			extension = ((IFile) element).getFileExtension();
+		for (String extension : getAcceptedFileExtensions()) {
+			if (!extension.startsWith("."))
+				extension = "." + extension;
 
-		else if (element instanceof File) {
-			String name = ((File) element).getName();
-			extension = (name.contains(".")) ? name.substring(name.lastIndexOf('.') + 1) : null;
+			if (element instanceof IFile)
+				return ((IFile) element).getName().toLowerCase().endsWith(extension.toLowerCase());
+
+			else if (element instanceof File)
+				return ((File) element).getName().toLowerCase().endsWith(extension.toLowerCase());
 		}
 
-		return (extension != null) ? getAcceptedFileExtensions().contains(extension) : false;
+		return false;
 	}
 
 	/**
@@ -48,7 +50,8 @@ public abstract class AbstractFileDropHandler extends AbstractModuleDropHandler 
 	}
 
 	/**
-	 * Get accepted file extensions. The file extension portion is defined as the string following the last period (".") character in the name.
+	 * Get accepted file extensions. File extensions are considered to be the text after a '.'. Even files with multiple extensions in the file name can be
+	 * considered (eg 'ascii.txt'). File extensions are compared case insensitive.
 	 *
 	 * @return accepted file extensions
 	 */
