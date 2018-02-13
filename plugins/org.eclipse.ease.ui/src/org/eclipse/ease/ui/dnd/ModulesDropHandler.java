@@ -18,12 +18,11 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.ModuleDefinition;
-import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.modules.ui.ModulesTools.ModuleEntry;
 
-public class ModulesDropHandler implements IShellDropHandler {
+public class ModulesDropHandler extends AbstractModuleDropHandler implements IShellDropHandler {
 
 	@Override
 	public boolean accepts(final IScriptEngine scriptEngine, final Object element) {
@@ -34,47 +33,31 @@ public class ModulesDropHandler implements IShellDropHandler {
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
 		try {
 			final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
-			final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
 
 			if (element instanceof ModuleDefinition) {
+				final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
 				final String call = codeFactory.createFunctionCall(loadModuleMethod, ((ModuleDefinition) element).getPath().toString(), false);
 				scriptEngine.executeAsync(call);
 
 			} else if (element instanceof ModuleEntry) {
-				if (((ModuleEntry) element).getEntry() instanceof Method) {
-					final ModuleDefinition declaringModule = ((ModuleEntry) element).getModuleDefinition();
-					if (!ModuleHelper.getLoadedModules(scriptEngine).contains(declaringModule)) {
-						// module not loaded yet
+				final ModuleDefinition declaringModule = ((ModuleEntry) element).getModuleDefinition();
+				loadModule(scriptEngine, declaringModule.getPath().toString(), false);
 
-						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString(), false);
-						scriptEngine.executeAsync(call);
-					}
+				if (((ModuleEntry) element).getEntry() instanceof Method) {
 
 					// FIXME we need to find reasonable default values for mandatory parameters
 					final String call = codeFactory.createFunctionCall((Method) ((ModuleEntry) element).getEntry());
 					scriptEngine.executeAsync(call);
 
-				} else if (((ModuleEntry) element).getEntry() instanceof Field) {
-					final ModuleDefinition declaringModule = ((ModuleEntry) element).getModuleDefinition();
-					if (!ModuleHelper.getLoadedModules(scriptEngine).contains(declaringModule)) {
-						// module not loaded yet
-
-						final String call = codeFactory.createFunctionCall(loadModuleMethod, declaringModule.getPath().toString(), false);
-						scriptEngine.executeAsync(call);
-					}
-
+				} else if (((ModuleEntry) element).getEntry() instanceof Field)
 					scriptEngine.executeAsync(((Field) ((ModuleEntry) element).getEntry()).getName());
-				}
 
 			} else
 				// fallback solution
 				scriptEngine.executeAsync(element);
 
-		} catch (final Exception e) {
+		} catch (final NoSuchMethodException | SecurityException e) {
 			Logger.error(Activator.PLUGIN_ID, "loadModule() method not found in Environment module", e);
-
-			// fallback solution
-			scriptEngine.executeAsync(element);
 		}
 	}
 }
