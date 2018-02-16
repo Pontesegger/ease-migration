@@ -245,7 +245,7 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 		if (fShowDynamicCode)
 			return frames;
 
-		return frames.stream().filter(frame -> !frame.getScript().isDynamic()).collect(Collectors.toList());
+		return frames.stream().filter(frame -> (frame.getScript() != null) && (!frame.getScript().isDynamic())).collect(Collectors.toList());
 	}
 
 	private EaseDebugThread findDebugThread(final Thread thread) {

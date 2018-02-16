@@ -112,7 +112,7 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 		if ((value != null) && ("org.mozilla.javascript.InterpretedFunction".equals(value.getClass().getName())))
 			return false;
 
-		return true;
+		return super.acceptVariable(value);
 	}
 
 	@Override

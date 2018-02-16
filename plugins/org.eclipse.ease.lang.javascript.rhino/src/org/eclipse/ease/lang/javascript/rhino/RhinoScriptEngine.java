@@ -447,17 +447,9 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			}
 
 		} else if (scope instanceof Scriptable) {
-			if ("org.mozilla.javascript.Arguments".equals(scope.getClass().getName())) {
-				for (int id = 0; id < ((Scriptable) scope).getIds().length; id++) {
-					final EaseDebugVariable variable = createVariable("[" + id + "]", ((Scriptable) scope).get(id, (Scriptable) scope));
-					result.add(variable);
-				}
-
-			} else {
-				for (final Object id : ((Scriptable) scope).getIds()) {
-					final EaseDebugVariable variable = createVariable(id.toString(), ((Scriptable) scope).get(id.toString(), (Scriptable) scope));
-					result.add(variable);
-				}
+			for (final Object id : ((Scriptable) scope).getIds()) {
+				final EaseDebugVariable variable = createVariable(id.toString(), ((Scriptable) scope).get(id.toString(), (Scriptable) scope));
+				result.add(variable);
 			}
 
 		} else if (hasNoChildElements(scope))
@@ -522,7 +514,8 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	protected boolean acceptVariable(Object value) {
-		if ((value != null) && (value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
+		if ((value != null) && ((value.getClass().getName().startsWith("org.mozilla.javascript.gen"))
+				|| (value.getClass().getName().startsWith("org.mozilla.javascript.Arguments"))))
 			return false;
 
 		return true;
