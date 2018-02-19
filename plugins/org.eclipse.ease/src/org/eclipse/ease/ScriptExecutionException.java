@@ -83,7 +83,10 @@ public class ScriptExecutionException extends RuntimeException {
 			buffer.append(": ");
 		}
 
-		buffer.append(super.getMessage());
+		if (super.getMessage() != null)
+			buffer.append(super.getMessage());
+		else if (getCause() != null)
+			buffer.append(getCause().getClass().getName());
 
 		if (fLineSource != null) {
 			// add source causing the error
