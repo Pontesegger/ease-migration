@@ -26,8 +26,6 @@ public @interface ScriptParameter {
 
 	public static final String UNDEFINED = "org.eclipse.ease.modules.ScriptParameter.undefined";
 
-	String name() default "";
-
 	String defaultValue() default UNDEFINED;
 
 	public static class OptionalParameterHelper {
@@ -36,14 +34,14 @@ public @interface ScriptParameter {
 			String defaultValue = in.defaultValue();
 			if (defaultValue == null) {
 				try {
-					Method method = ScriptParameter.class.getMethod("defaultValue", null);
-					Object defaultV = method.getDefaultValue();
+					final Method method = ScriptParameter.class.getMethod("defaultValue", null);
+					final Object defaultV = method.getDefaultValue();
 					if (defaultV instanceof String) {
 						defaultValue = (String) defaultV;
 					}
-				} catch (NoSuchMethodException e) {
+				} catch (final NoSuchMethodException e) {
 					e.printStackTrace();
-				} catch (SecurityException e) {
+				} catch (final SecurityException e) {
 					e.printStackTrace();
 				}
 			}
@@ -51,7 +49,7 @@ public @interface ScriptParameter {
 		}
 
 		public static Object getDefaultValue(final ScriptParameter in, final Class<?> type) {
-			String defaultValue = getDefaultValue(in);
+			final String defaultValue = getDefaultValue(in);
 			if ((defaultValue == null) || UNDEFINED.equals(defaultValue)) {
 				return null;
 			}

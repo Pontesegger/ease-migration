@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -94,22 +93,6 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		}
 
 		return header.toString();
-	}
-
-	/**
-	 * Get the parameter name from a annotation. Use for engine which can have named variable
-	 *
-	 * @param parameterAnnotations
-	 * @return
-	 */
-	protected String getParameterName(final Annotation[] parameterAnnotations) {
-		for (final Annotation annot : parameterAnnotations) {
-			if (annot instanceof ScriptParameter) {
-				final ScriptParameter namedParameter = (ScriptParameter) annot;
-				return namedParameter.name();
-			}
-		}
-		return null;
 	}
 
 	@Override
