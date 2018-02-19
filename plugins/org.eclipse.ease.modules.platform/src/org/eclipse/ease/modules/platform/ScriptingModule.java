@@ -219,7 +219,7 @@ public class ScriptingModule extends AbstractScriptModule {
 	 *            monitor to synchronize on
 	 * @param code
 	 *            code to run.
-	 * @return
+	 * @return execution result of executed code
 	 */
 	@WrapToScript
 	public Object executeSync(final Object monitor, final Object code) {

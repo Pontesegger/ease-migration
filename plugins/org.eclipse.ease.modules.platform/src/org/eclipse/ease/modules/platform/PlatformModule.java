@@ -84,9 +84,13 @@ public class PlatformModule {
 	 * @param parameters
 	 *            command parameters
 	 * @throws ExecutionException
+	 *             If the handler has problems executing this command.
 	 * @throws NotDefinedException
+	 *             If the command you are trying to execute is not defined.
 	 * @throws NotEnabledException
+	 *             If the command you are trying to execute is not enabled.
 	 * @throws NotHandledException
+	 *             If there is no handler.
 	 */
 	@WrapToScript
 	public static void executeCommand(final String commandId, @ScriptParameter(defaultValue = ScriptParameter.NULL) final Map<String, String> parameters)
@@ -119,8 +123,7 @@ public class PlatformModule {
 	 *            program to run (with full path if necessary)
 	 * @param args
 	 *            program arguments
-	 * @return
-	 * @return {@link FutureX} object tracking the program
+	 * @return process object to track proces execution
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
@@ -147,7 +150,7 @@ public class PlatformModule {
 	 *            key name to read from
 	 * @param defaultValue
 	 *            default value to use, if value is not set
-	 * @return
+	 * @return preference value or <code>null</code>
 	 */
 	@WrapToScript
 	public static Object readPreferences(final String node, final String key, @ScriptParameter(defaultValue = "") final Object defaultValue) {

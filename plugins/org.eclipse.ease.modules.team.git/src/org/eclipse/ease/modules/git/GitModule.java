@@ -24,6 +24,7 @@ import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -55,6 +56,7 @@ public class GitModule extends AbstractScriptModule {
 	 * @throws TransportException
 	 *             when transport operation failed
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
 	public Git clone(final String remoteLocation, final Object localLocation, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String user,
@@ -90,6 +92,7 @@ public class GitModule extends AbstractScriptModule {
 	 *            local repository root folder
 	 * @return GIT API instance
 	 * @throws IOException
+	 *             when resource cannot be accessed
 	 */
 	@WrapToScript
 	public Git openRepository(final Object location) throws IOException {
@@ -115,12 +118,11 @@ public class GitModule extends AbstractScriptModule {
 	 * @param bare
 	 *            <code>true</code> for bare repositories
 	 * @return GIT API instance
-	 * @throws IllegalStateException
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
-	public Git initRepository(final Object location, @ScriptParameter(defaultValue = "false") final boolean bare)
-			throws IllegalStateException, GitAPIException {
+	public Git initRepository(final Object location, @ScriptParameter(defaultValue = "false") final boolean bare) throws GitAPIException {
 		final Object resource = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 		final File folder = ResourceTools.toFile(resource);
 
@@ -166,6 +168,7 @@ public class GitModule extends AbstractScriptModule {
 	 * @throws IOException
 	 *             the repository could not be accessed
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
 	public RevCommit commit(final Object repository, final String message, @ScriptParameter(defaultValue = ScriptParameter.NULL) String author,
@@ -184,12 +187,18 @@ public class GitModule extends AbstractScriptModule {
 	 *
 	 * @param repository
 	 *            repository instance or location (local) to get status from
+	 * @param filepattern
+	 *            repository-relative path of file/directory to add (with <code>/</code> as separator)
 	 * @return add result
 	 * @throws IOException
+	 *             when resource cannot be accessed
+	 * @throws NoFilepatternException
+	 *             when <i>filepattern</i> is empty
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
-	public DirCache add(final Object repository, final String filepattern) throws IOException, GitAPIException {
+	public DirCache add(final Object repository, final String filepattern) throws IOException, NoFilepatternException, GitAPIException {
 		final Git repo = openRepository(repository);
 		if (repo != null) {
 			return repo.add().addFilepattern(filepattern).call();
@@ -205,7 +214,9 @@ public class GitModule extends AbstractScriptModule {
 	 *            repository instance or location (local) to get status from
 	 * @return repository status
 	 * @throws IOException
+	 *             when resource cannot be accessed
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
 	public Status getStatus(final Object repository) throws IOException, GitAPIException {
@@ -224,7 +235,9 @@ public class GitModule extends AbstractScriptModule {
 	 *            repository instance or location (local) to pull
 	 * @return push result
 	 * @throws IOException
+	 *             when resource cannot be accessed
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
 	public Iterable<PushResult> push(final Object repository) throws IOException, GitAPIException {
@@ -243,7 +256,9 @@ public class GitModule extends AbstractScriptModule {
 	 *            repository instance or location (local) to pull
 	 * @return pull result
 	 * @throws IOException
+	 *             when resource cannot be accessed
 	 * @throws GitAPIException
+	 *             on a general error during git execution
 	 */
 	@WrapToScript
 	public PullResult pull(final Object repository) throws IOException, GitAPIException {

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.modules.modeling;
 
-import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -20,20 +19,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 /**
- * Module to display dialogs
- * 
- * @author adaussy
- * 
+ * Helper class to display dialogs.
  */
-public class DialogModule extends AbstractScriptModule {
-
-	public DialogModule() {
-		super();
-	}
+public class DialogHelper {
 
 	/**
 	 * Return the active {@link Shell}
-	 * 
+	 *
 	 * @return
 	 */
 	@WrapToScript
@@ -43,14 +35,14 @@ public class DialogModule extends AbstractScriptModule {
 
 	/**
 	 * Open a dialog
-	 * 
+	 *
 	 * @param window
 	 *            A Window to open
 	 * @return window.open().
 	 */
 	@WrapToScript
 	public static int openDialog(final Window window) {
-		RunnableWithResult<Integer> run = new RunnableWithResult<Integer>() {
+		final RunnableWithResult<Integer> run = new RunnableWithResult<Integer>() {
 
 			@Override
 			public void run() {
@@ -63,7 +55,7 @@ public class DialogModule extends AbstractScriptModule {
 
 	/**
 	 * Open a dialog and ask to the user to select from a list of element
-	 * 
+	 *
 	 * @param selectionOption
 	 *            The list element from which the user shall choose
 	 * @param labelProvider
@@ -72,11 +64,11 @@ public class DialogModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public static Object[] selectFromList(final Object[] selectionOption, final ILabelProvider labelProvider) {
-		RunnableWithResult<Object[]> runnable = new RunnableWithResult<Object[]>() {
+		final RunnableWithResult<Object[]> runnable = new RunnableWithResult<Object[]>() {
 
 			@Override
 			public void run() {
-				ElementListSelectionDialog dialog = new ElementListSelectionDialog(Display.getDefault().getActiveShell(), labelProvider);
+				final ElementListSelectionDialog dialog = new ElementListSelectionDialog(Display.getDefault().getActiveShell(), labelProvider);
 				dialog.setElements(selectionOption);
 				if (dialog.open() == Window.OK)
 					setResult(dialog.getResult());
@@ -88,13 +80,7 @@ public class DialogModule extends AbstractScriptModule {
 	}
 
 	public static void openWindow(final Window window) {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				window.open();
-			}
-		};
+		final Runnable runnable = () -> window.open();
 		Display.getDefault().syncExec(runnable);
 	}
 

@@ -28,7 +28,6 @@ import org.eclipse.nebula.visualization.xygraph.figures.Trace;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 
 /**
  * Provide functions to display and populate line charts.
@@ -314,6 +313,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 * @param y
 	 *            y coordinate of this point
 	 * @return series as Trace type to set different properties for this series
+	 * @throws Throwable
+	 *             when the view could not be initialized
 	 */
 	@WrapToScript
 	public Trace plotPoint(final double x, final double y) throws Throwable {
@@ -330,6 +331,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 * @param y
 	 *            array of y coordinates
 	 * @return series as Trace type to set different properties for this series
+	 * @throws Throwable
+	 *             when the view could not be initialized
 	 */
 	@WrapToScript
 	public Trace plot(final double[] x, final double[] y) throws Throwable {
@@ -345,7 +348,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 * @return {@link XYGraph} object or <code>null</code> if there is no active graph
 	 */
 	@WrapToScript(alias = "title")
-	public XYGraph setPlotTitle(final String chartTitle) throws PartInitException {
+	public XYGraph setPlotTitle(final String chartTitle) {
 		if (fChart != null)
 			return fChart.setPlotTitle(chartTitle);
 
@@ -360,7 +363,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 * @return {@link Axis} object or <code>null</code> if there is no active graph
 	 */
 	@WrapToScript(alias = "xlabel")
-	public Axis setXLabel(final String label) throws PartInitException {
+	public Axis setXLabel(final String label) {
 		if (fChart != null)
 			return fChart.setXLabel(label);
 
@@ -375,7 +378,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 * @return {@link Axis} object or <code>null</code> if there is no active graph
 	 */
 	@WrapToScript(alias = "ylabel")
-	public Axis setYLabel(final String label) throws PartInitException {
+	public Axis setYLabel(final String label) {
 		if (fChart != null)
 			return fChart.setYLabel(label);
 
@@ -391,7 +394,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 *            Range from Y Axis to be set, format is [ymin, ymax]
 	 */
 	@WrapToScript(alias = "axis")
-	public void setAxisRange(final double[] xRange, final double[] yRange) throws Exception {
+	public void setAxisRange(final double[] xRange, final double[] yRange) {
 		if (fChart != null)
 			fChart.setAxisRange(xRange, yRange);
 	}
@@ -403,7 +406,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 *            if <code>true</code> a grid will be displayed
 	 */
 	@WrapToScript
-	public void showGrid(final boolean showGrid) throws PartInitException {
+	public void showGrid(final boolean showGrid) {
 		if (fChart != null)
 			fChart.showGrid(showGrid);
 	}
@@ -415,7 +418,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 *            if <code>true</code> auto scaling will be enabled
 	 */
 	@WrapToScript
-	public void setAutoScale(final boolean performAutoScale) throws PartInitException {
+	public void setAutoScale(final boolean performAutoScale) {
 		if (fChart != null)
 			fChart.setAutoScale(performAutoScale);
 	}
@@ -424,7 +427,7 @@ public class ChartingModule extends AbstractScriptModule {
 	 * Clears the active chart.
 	 */
 	@WrapToScript
-	public void clear() throws PartInitException {
+	public void clear() {
 		if (fChart != null)
 			fChart.clear();
 
@@ -443,7 +446,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 *            where to store image to. Accepts strings, {@link IFile} and {@link File} instances
 	 * @param overwrite
 	 *            Overwrite flag, if <code>true</code> file will be overwritten without question
-	 * @throws Exception
+	 * @throws Throwable
+	 *             when the view could not be initialized
 	 */
 	@WrapToScript
 	public void exportGraph(@ScriptParameter(defaultValue = ScriptParameter.NULL) final Object location,
@@ -460,6 +464,8 @@ public class ChartingModule extends AbstractScriptModule {
 	 *
 	 * @param seriesName
 	 *            name of series to be deleted
+	 * @throws Throwable
+	 *             when the view could not be initialized
 	 */
 	@WrapToScript
 	public void removeSeries(final String seriesName) throws Throwable {

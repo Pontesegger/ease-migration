@@ -58,6 +58,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 *
 	 * @return array of launch configuration names.
 	 * @throws CoreException
+	 *             if an exception occurs retrieving configurations
 	 */
 	@WrapToScript
 	public static String[] getLaunchConfigurationNames() throws CoreException {
@@ -75,6 +76,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 *
 	 * @return array of launch configurations
 	 * @throws CoreException
+	 *             if an exception occurs retrieving configurations
 	 */
 	@WrapToScript
 	public static ILaunchConfiguration[] getLaunchConfigurations() throws CoreException {
@@ -90,6 +92,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 * @throws IllegalArgumentException
 	 *             if the name is not known to the launch manager
 	 * @throws CoreException
+	 *             if an exception occurs retrieving configurations
 	 * @see {@link ILaunchConfiguration#getWorkingCopy()}.
 	 */
 	@WrapToScript
@@ -119,6 +122,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 * @throws IllegalArgumentException
 	 *             if the name is not known to the launch manager
 	 * @throws CoreException
+	 *             if an exception occurs retrieving configurations
 	 */
 	@WrapToScript
 	public static ILaunch launch(Object launchConfiguration, @ScriptParameter(defaultValue = "run") String mode) throws CoreException {
@@ -144,6 +148,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 * @param mode
 	 *            the launch mode, normally "debug" or "run" but can be any of the launch modes available on the platform. The default value is "run".
 	 * @throws CoreException
+	 *             if an exception occurs retrieving configurations
 	 */
 	@WrapToScript
 	public static void launchUI(Object launchConfiguration, @ScriptParameter(defaultValue = "run") final String mode) throws CoreException {

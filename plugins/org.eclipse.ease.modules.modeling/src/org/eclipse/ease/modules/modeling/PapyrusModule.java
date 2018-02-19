@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
@@ -50,27 +51,34 @@ import org.eclipse.uml2.uml.Element;
 
 /**
  * Module used to interact with Papyrus Editor.
- *
- * @author adaussy
- *
  */
-public class PapyrusModule extends UMLModule {
+public class PapyrusModule extends AbstractScriptModule {
 
-	private final NotationModule notationModule = new NotationModule();
+	private EcoreModule getEcoreModule() {
+		return getEnvironment().getModule(EcoreModule.class);
+	}
+
+	private UMLModule getUMLModule() {
+		return getEnvironment().getModule(UMLModule.class);
+	}
+
+	private NotationModule getNotationModule() {
+		return getEnvironment().getModule(NotationModule.class);
+	}
 
 	/**
-	 * Return the model set (ResourceSet) of the current model open in Papyrus
+	 * Return the model set (ResourceSet) of the current model open in Papyrus.
 	 *
-	 * @return
+	 * @return current model set
 	 */
 	@WrapToScript
 	public ModelSet getModelSet() {
-		EditingDomain editingDomain = TransactionUtil.getEditingDomain(getModel());
+		final EditingDomain editingDomain = TransactionUtil.getEditingDomain(getUMLModule().getModel());
 		if (editingDomain == null) {
 			Logger.error(Activator.PLUGIN_ID, "Unable to get the editing domain");
 			return null;
 		}
-		ResourceSet resourceSet = editingDomain.getResourceSet();
+		final ResourceSet resourceSet = editingDomain.getResourceSet();
 		if (resourceSet instanceof ModelSet) {
 			return (ModelSet) resourceSet;
 
@@ -82,52 +90,56 @@ public class PapyrusModule extends UMLModule {
 	@Override
 	public void initialize(final IScriptEngine engine, final IEnvironment environment) {
 		super.initialize(engine, environment);
-		notationModule.initialize(engine, environment);
+		getNotationModule().initialize(engine, environment);
 	}
 
 	/**
-	 * Return the select view element (Notation metamodel)
+	 * Return the select view element (Notation metamodel).
 	 *
-	 * @return
+	 * @return selection view or <code>null</code>
 	 */
 	@WrapToScript
 	public View getSelectionView() {
-		EObject v = notationModule.getSelection();
+		final EObject v = getNotationModule().getSelection();
 		if (v instanceof View) {
 			return (View) v;
 		}
+
 		return null;
 	}
 
 	/**
-	 * Return the UML element from the selection
+	 * Return the UML element from the selection.
 	 *
-	 * @return
+	 * @return UML element or <code>null</code>
 	 */
 	@WrapToScript
 	public Element getSelectionElement() {
-		EObject elem = getSelection();
+		final EObject elem = getEcoreModule().getSelection();
 		if (elem instanceof Element) {
 			return (Element) elem;
 		}
+
 		return null;
 	}
 
 	/**
-	 * Create a new empty diagram WARNING: For now only Package and class diagram are implemented.
+	 * Create a new empty diagram. WARNING: For now only Class diagrams are implemented.
 	 *
 	 * @param semanticElement
 	 *            UML or Sysml element of the diagram
-	 * @param newDiagram
+	 * @param diagramType
+	 *            currently only <i>Class</i> is supported
+	 * @param diagramName
 	 *            The name of the diagram (Optional set the name to newDiagram)
 	 * @param open
-	 *            True if the diagram shall be open (Optional default = false)
+	 *            <code>true</code> if the diagram shall be opened
 	 */
 	@WrapToScript
-	public void createDiagram(final EObject semanticElement, @ScriptParameter(name = "diagramType") final String diagramType,
-			@ScriptParameter(name = "diagramName", defaultValue = "NewDiagram") final String newDiagram, @ScriptParameter(name = "open") final boolean open) {
+	public void createDiagram(final EObject semanticElement, @ScriptParameter(defaultValue = "Class") final String diagramType,
+			@ScriptParameter(defaultValue = "NewDiagram") final String diagramName, @ScriptParameter(defaultValue = "false") final boolean open) {
 		if ("Class".equals(diagramType)) {
-			createDiagram(getModelSet(), new CreateClassDiagramCommand(), new ClassDiagramCreationCondition(), semanticElement, newDiagram, open);
+			createDiagram(getModelSet(), new CreateClassDiagramCommand(), new ClassDiagramCreationCondition(), semanticElement, diagramName, open);
 		}
 	}
 
@@ -140,28 +152,28 @@ public class PapyrusModule extends UMLModule {
 	 *            The name of the new file
 	 */
 	@WrapToScript
-	public void control(final EObject semanticElement, @ScriptParameter(name = "fileName") String fileName) {
+	public void control(final EObject semanticElement, String fileName) {
 		if (fileName == null) {
 			fileName = semanticElement.eResource().getURIFragment(semanticElement);
 		}
-		URI baseURI = semanticElement.eResource().getURI();
-		URI createURI = baseURI.trimSegments(1).appendSegment(fileName + ".uml");
-		ControlModeRequest controlRequest = ControlModeRequest.createUIControlModelRequest(getEditingDomain(), semanticElement, createURI);
+		final URI baseURI = semanticElement.eResource().getURI();
+		final URI createURI = baseURI.trimSegments(1).appendSegment(fileName + ".uml");
+		final ControlModeRequest controlRequest = ControlModeRequest.createUIControlModelRequest(getEditingDomain(), semanticElement, createURI);
 		controlRequest.setIsUIAction(false);
-		IControlModeManager controlMng = ControlModeManager.getInstance();
-		ICommand controlCommand = controlMng.getControlCommand(controlRequest);
+		final IControlModeManager controlMng = ControlModeManager.getInstance();
+		final ICommand controlCommand = controlMng.getControlCommand(controlRequest);
 		getEditingDomain().getCommandStack().execute(new GMFtoEMFCommandWrapper(controlCommand));
 	}
 
 	private void createDiagram(final ModelSet modelSet, final ICreationCommand creationCommand, final ClassDiagramCreationCondition creationCondition,
 			final EObject target, final String diagramName, final boolean openDiagram) {
-		NavigableElement navElement = getNavigableElementWhereToCreateDiagram(creationCondition, target);
+		final NavigableElement navElement = getNavigableElementWhereToCreateDiagram(creationCondition, target);
 		if ((navElement != null) && (modelSet != null)) {
-			CompositeCommand command = getLinkCreateAndOpenNavigableDiagramCommand(navElement, creationCommand, diagramName, modelSet, openDiagram);
+			final CompositeCommand command = getLinkCreateAndOpenNavigableDiagramCommand(navElement, creationCommand, diagramName, modelSet, openDiagram);
 			// modelSet.getTransactionalEditingDomain().getCommandStack().execute(new GMFtoEMFCommandWrapper(command));
 			try {
 				command.execute(new NullProgressMonitor(), null);
-			} catch (ExecutionException e) {
+			} catch (final ExecutionException e) {
 				e.printStackTrace();
 			}
 
@@ -175,11 +187,11 @@ public class PapyrusModule extends UMLModule {
 			if (creationCondition.create(selectedElement)) {
 				return new ExistingNavigableElement(selectedElement, null);
 			} else {
-				List<NavigableElement> navElements = NavigationHelper.getInstance().getAllNavigableElements(selectedElement);
+				final List<NavigableElement> navElements = NavigationHelper.getInstance().getAllNavigableElements(selectedElement);
 				// this will sort elements by navigation depth
 				Collections.sort(navElements);
 
-				for (NavigableElement navElement : navElements) {
+				for (final NavigableElement navElement : navElements) {
 					// ignore existing elements because we want a hierarchy to
 					// be created if it is not on the current element
 					if ((navElement instanceof CreatedNavigableElement) && creationCondition.create(navElement.getElement())) {
@@ -191,14 +203,13 @@ public class PapyrusModule extends UMLModule {
 		return null;
 	}
 
-	@Override
 	protected TransactionalEditingDomain getEditingDomain() {
-		return (TransactionalEditingDomain) super.getEditingDomain();
+		return (TransactionalEditingDomain) getEcoreModule().getEditingDomain();
 	}
 
 	public static CompositeCommand getLinkCreateAndOpenNavigableDiagramCommand(final NavigableElement navElement,
 			final ICreationCommand creationCommandInterface, final String diagramName, final ModelSet modelSet, final boolean openDiagram) {
-		CompositeCommand compositeCommand = new CompositeCommand("Create diagram");
+		final CompositeCommand compositeCommand = new CompositeCommand("Create diagram");
 
 		if (navElement instanceof CreatedNavigableElement) {
 			compositeCommand.add(new AbstractTransactionalCommand(modelSet.getTransactionalEditingDomain(), "Create hierarchy", null) {
@@ -212,7 +223,7 @@ public class PapyrusModule extends UMLModule {
 			});
 		}
 
-		ICommand createDiagCommand = creationCommandInterface.getCreateDiagramCommand(modelSet, navElement.getElement(), diagramName);
+		final ICommand createDiagCommand = creationCommandInterface.getCreateDiagramCommand(modelSet, navElement.getElement(), diagramName);
 		compositeCommand.add(createDiagCommand);
 		if (openDiagram) {
 			compositeCommand.add(new OpenDiagramCommand(modelSet.getTransactionalEditingDomain(), createDiagCommand));
@@ -222,24 +233,20 @@ public class PapyrusModule extends UMLModule {
 	}
 
 	/**
-	 * The same as eInstanceOf of the Ecore model. However it will look into UML and Notation metamodel
+	 * Return if the current instance is a instance of an EClass define by its name. Will look into UML and Notation metamodel.
+	 *
+	 * @param eObject
+	 *            The {@link EObject} you want to test.
+	 * @param type
+	 *            The name of the EClass defined in the metamodel
+	 * @return <code>true</code> if the {@link EObject} is instance of typeName
 	 */
 	@WrapToScript
-	@Override
-	public boolean eInstanceOf(@ScriptParameter(name = "eObject") final EObject eObject, @ScriptParameter(name = "type") final String type) {
-		EClassifier classifier = getEPackage().getEClassifier(type);
+	public boolean eInstanceOf(final EObject eObject, final String type) {
+		EClassifier classifier = getEcoreModule().getEPackage().getEClassifier(type);
 		if (classifier == null) {
-			classifier = notationModule.getEPackage().getEClassifier(type);
+			classifier = getEcoreModule().getEPackage().getEClassifier(type);
 		}
 		return classifier.isInstance(eObject);
-	}
-
-	/**
-	 * The the current Papyrus editor. The object parameter is useless
-	 */
-	@Override
-	@WrapToScript
-	public void save(@ScriptParameter(name = "object", defaultValue = ScriptParameter.NULL) final Object object) {
-		save();
 	}
 }

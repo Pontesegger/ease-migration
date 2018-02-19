@@ -26,22 +26,15 @@ import org.eclipse.ui.services.IEvaluationService;
 import com.google.common.collect.Lists;
 
 /**
- * Module to interact with selection
- *
- * @author adaussy
- *
+ * Module to interact with selections.
  */
 public class SelectionModule extends AbstractScriptModule {
-
-	public SelectionModule() {
-		super();
-	}
 
 	/**
 	 * Return the current selection using the selection service. The selection service return transformed selection using some rules define in the platform.
 	 * This method use the selector with the Highest priority
 	 *
-	 * @return
+	 * @return custom selection
 	 */
 	@WrapToScript
 	public Object getCustomSelection() {
@@ -61,7 +54,7 @@ public class SelectionModule extends AbstractScriptModule {
 	 *
 	 * @param selectorID
 	 *            The if of the selector to use
-	 * @return
+	 * @return custom selecton from selector
 	 */
 	@WrapToScript
 	public Object getCustomSelectionFromSelector(final String selectorID) {
@@ -73,13 +66,16 @@ public class SelectionModule extends AbstractScriptModule {
 	/**
 	 * Return the selection after being adapter to {@link IIterable}
 	 *
-	 * @return
+	 * @param name
+	 *            name or ID of part to get selection from
+	 *
+	 * @return iterable selection or <code>null</code>
 	 */
 	@WrapToScript
 	public Iterable<Object> getIterableSelection(@ScriptParameter(defaultValue = ScriptParameter.NULL) final String name) {
 		final ISelection selection = UIModule.getSelection(name);
 
-		final IIterable result = getAdapter(IIterable.class, selection);
+		final IIterable<?> result = getAdapter(IIterable.class, selection);
 		if (result != null) {
 			return Lists.newArrayList(result.iterator());
 		}

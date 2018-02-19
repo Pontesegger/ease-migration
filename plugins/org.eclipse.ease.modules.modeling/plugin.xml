@@ -56,6 +56,10 @@
          <dependency
                module="org.eclipse.ease.modules.modeling.selection">
          </dependency>
+         <dependency
+               module="org.eclipse.ease.modules.modeling.ecore"
+               reload="false">
+         </dependency>
       </module>
       <module
             category="org.eclipse.ease.modules.category.modeling"
@@ -67,7 +71,8 @@
                module="org.eclipse.ease.modules.platform.ui">
          </dependency>
          <dependency
-               module="org.eclipse.ease.modules.modeling.selection">
+               module="org.eclipse.ease.modules.modeling.ecore"
+               reload="false">
          </dependency>
       </module>
       <module
@@ -76,6 +81,13 @@
             id="org.eclipse.ease.modules.modeling.papyrus"
             name="Papyrus"
             visible="true">
+         <dependency
+               module="org.eclipse.ease.modules.modeling.uml">
+         </dependency>
+         <dependency
+               module="org.eclipse.ease.modules.modeling.notation"
+               reload="false">
+         </dependency>
       </module>
       <module
             category="org.eclipse.ease.modules.category.modeling"
@@ -87,7 +99,7 @@
                module="org.eclipse.ease.modules.platform.ui">
          </dependency>
          <dependency
-               module="org.eclipse.ease.modules.modeling.selection">
+               module="org.eclipse.ease.modules.modeling.uml">
          </dependency>
       </module>
    </extension>

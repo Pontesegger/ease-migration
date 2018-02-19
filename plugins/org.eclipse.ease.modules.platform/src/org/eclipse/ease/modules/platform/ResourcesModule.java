@@ -177,6 +177,20 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 *            folder location
 	 * @return {@link IFolder}, {@link File} or <code>null</code> in case of error
 	 * @throws CoreException
+	 *             if this method fails. Reasons include:
+	 *             <ul>
+	 *             <li>This resource already exists in the workspace.</li>
+	 *             <li>The workspace contains a resource of a different type at the same path as this resource.</li>
+	 *             <li>The parent of this resource does not exist.</li>
+	 *             <li>The parent of this resource is a project that is not open.</li>
+	 *             <li>The parent contains a resource of a different type at the same path as this resource.</li>
+	 *             <li>The parent of this resource is virtual, but this resource is not.</li>
+	 *             <li>The name of this resource is not valid (according to <code>IWorkspace.validateName</code>).</li>
+	 *             <li>The corresponding location in the local file system is occupied by a file (as opposed to a directory).</li>
+	 *             <li>The corresponding location in the local file system is occupied by a folder and <code>force </code> is <code>false</code>.</li>
+	 *             <li>Resource changes are disallowed during certain types of resource change event notification. See <code>IResourceChangeEvent</code> for
+	 *             more details.</li>
+	 *             </ul>
 	 */
 	@WrapToScript
 	public Object createFolder(final Object location) throws CoreException {
@@ -294,10 +308,10 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	/**
 	 * Copies a file from location to targetLocation.
 	 *
-	 * @param location
-	 *            file location, file handle or file instance
+	 * @param sourceLocation
+	 *            file location, file handle or file instance for the source object
 	 * @param targetLocation
-	 *            file location, file handle or file instance
+	 *            file location, file handle or file instance for the target object
 	 * @throws Exception
 	 *             problems on file access
 	 */

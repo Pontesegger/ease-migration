@@ -13,7 +13,6 @@ package org.eclipse.ease.modules.svn;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
@@ -41,7 +40,7 @@ public class SVNModule extends AbstractScriptModule {
 	/**
 	 * Creates repository location.
 	 *
-	 * Creates repository location with rooturl, if location already exists: return existing location
+	 * Creates repository location with <i>rootUrl</i>, if location already exists: return existing location
 	 *
 	 * @param rootUrl
 	 *            defines the root URL of the repository
@@ -91,15 +90,13 @@ public class SVNModule extends AbstractScriptModule {
 	/**
 	 * Imports project from repository location.
 	 *
-	 * Imports project (given with projectLocation) from repository location.
-	 *
 	 * @param rootLocation
-	 *            can be a string (-> generate RepositoryLocation automatically) or already a RepositoryLocation
+	 *            can be a string (to generate RepositoryLocation automatically) or already a RepositoryLocation
 	 * @param projectLocations
 	 *            array from relative paths to project locations
 	 */
 	@WrapToScript
-	public void importProjectFromSVN(Object rootLocation, final String[] projectLocations) throws Exception {
+	public void importProjectFromSVN(Object rootLocation, final String[] projectLocations) {
 		if (rootLocation instanceof IRepositoryResource) {
 		} else {
 			rootLocation = createRepositoryLocation(rootLocation.toString(), null, null);

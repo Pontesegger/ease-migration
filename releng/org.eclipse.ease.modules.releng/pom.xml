@@ -179,7 +179,7 @@
 							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
 							<doclet>org.eclipse.ease.helpgenerator.ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
-							<additionalparam>-root ${basedir}</additionalparam>
+							<additionalparam>-root ${basedir} -failOnHTMLError true -failOnMissingDocs true</additionalparam>
 
 							<useStandardDocletOptions>true</useStandardDocletOptions>
 							<links>
