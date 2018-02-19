@@ -229,7 +229,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *            <code>true</code> to add a line feed after the text
 	 */
 	@Override
-	@WrapToScript
+	@WrapToScript(supportedLanguages = "!Python")
 	public final void print(final @ScriptParameter(defaultValue = "") Object text, final @ScriptParameter(defaultValue = "true") boolean lineFeed) {
 		if (lineFeed)
 			getScriptEngine().getOutputStream().println(text);
@@ -458,7 +458,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 * @param topic
 	 *            help topic to open (typically a function name)
 	 */
-	@WrapToScript
+	@WrapToScript(supportedLanguages = "!Python")
 	public void help(@ScriptParameter(defaultValue = ScriptParameter.NULL) final String topic) {
 
 		// sanity check to avoid blue screens for invalid calls, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=479762
