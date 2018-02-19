@@ -30,4 +30,11 @@ public @interface WrapToScript {
 	 * Defines alias names for the same command. Names are delimited by ";"
 	 */
 	String alias() default "";
+
+	/**
+	 * Provide a list of supported script languages. Language names shall match the <i>name</i> field of the <i>scriptType</i> extension point. Multiple
+	 * languages may be provided via a comma separated list. Explicitly excluding a language is supported via <i>!scriptType</i>. Mixing include and exclude
+	 * patterns is not supported. By default all languages will be supported.
+	 */
+	String supportedLanguages() default "";
 }

@@ -255,4 +255,9 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	protected String getMultiLineCommentEndToken() {
 		return getMultiLineCommentStartToken();
 	}
+
+	@Override
+	protected Object getLanguageIdentifier() {
+		return "Python";
+	}
 }

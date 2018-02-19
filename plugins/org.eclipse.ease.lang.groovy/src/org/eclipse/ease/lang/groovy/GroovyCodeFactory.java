@@ -194,4 +194,8 @@ public class GroovyCodeFactory extends org.eclipse.ease.AbstractCodeFactory {
 		return groovyCode.toString();
 	}
 
+	@Override
+	protected Object getLanguageIdentifier() {
+		return "Groovy";
+	}
 }

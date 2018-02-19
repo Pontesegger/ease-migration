@@ -128,4 +128,9 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 	protected String getSingleLineCommentToken() {
 		return "#";
 	}
+
+	@Override
+	protected Object getLanguageIdentifier() {
+		return "Ruby";
+	}
 }

@@ -307,34 +307,39 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 
 			// create wrappers for methods
 			for (final Method method : ModuleHelper.getMethods(instance.getClass())) {
-				final String code = createFunctionWrapper(environment, identifier, method);
+				if (isSupportedByLanguage(method)) {
 
-				if ((code != null) && !code.isEmpty()) {
-					scriptCode.append(code);
-					scriptCode.append('\n');
+					final String code = createFunctionWrapper(environment, identifier, method);
+
+					if ((code != null) && !code.isEmpty()) {
+						scriptCode.append(code);
+						scriptCode.append('\n');
+					}
 				}
 			}
 
 			// create wrappers for final fields
 			for (final Field field : ModuleHelper.getFields(instance.getClass())) {
-				try {
-					final Object toBeInjected = field.get(instance);
+				if (isSupportedByLanguage(field)) {
+					try {
+						final Object toBeInjected = field.get(instance);
 
-					// only wrap if field is not already declared
-					if (!engine.hasVariable(getSaveVariableName(field.getName()))) {
-						engine.setVariable(getSaveVariableName(field.getName()), toBeInjected);
+						// only wrap if field is not already declared
+						if (!engine.hasVariable(getSaveVariableName(field.getName()))) {
+							engine.setVariable(getSaveVariableName(field.getName()), toBeInjected);
 
-					} else {
-						// see if the defined variable equals the one we want to set
-						final Object existing = engine.getVariable(getSaveVariableName(field.getName()));
-						if (((existing != null) && (!existing.equals(toBeInjected))) || ((existing == null) && (toBeInjected != null))) {
-							Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "Skipped wrapping of field \"" + field.getName()
-									+ "\" (module \"" + instance.getClass().getName() + "\") as variable is already declared.");
+						} else {
+							// see if the defined variable equals the one we want to set
+							final Object existing = engine.getVariable(getSaveVariableName(field.getName()));
+							if (((existing != null) && (!existing.equals(toBeInjected))) || ((existing == null) && (toBeInjected != null))) {
+								Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "Skipped wrapping of field \"" + field.getName()
+										+ "\" (module \"" + instance.getClass().getName() + "\") as variable is already declared.");
+							}
 						}
-					}
 
-				} catch (final IllegalArgumentException | IllegalAccessException e) {
-					Logger.error(Activator.PLUGIN_ID, "Could not wrap field \"" + field.getName() + " \" of module \"" + instance.getClass() + "\".", e);
+					} catch (final IllegalArgumentException | IllegalAccessException e) {
+						Logger.error(Activator.PLUGIN_ID, "Could not wrap field \"" + field.getName() + " \" of module \"" + instance.getClass() + "\".", e);
+					}
 				}
 			}
 
@@ -343,6 +348,69 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		} else
 			throw new RuntimeException("Object wrappers not supported by default wrapper");
 	}
+
+	/**
+	 * Verify that a method can be wrapped for the current target language.
+	 *
+	 * @param method
+	 *            method to be queried
+	 * @return <code>true</code> when method can be wrapped
+	 */
+	protected boolean isSupportedByLanguage(Method method) {
+		return isSupportedByLanguage(method.getAnnotation(WrapToScript.class));
+	}
+
+	/**
+	 * Verify that a field can be wrapped for the current target language.
+	 *
+	 * @param field
+	 *            method to be queried
+	 * @return <code>true</code> when field can be wrapped
+	 */
+	protected boolean isSupportedByLanguage(Field field) {
+		return isSupportedByLanguage(field.getAnnotation(WrapToScript.class));
+	}
+
+	/**
+	 * Verify that an annotation indicates wrapping support for the current target language.
+	 *
+	 * @param annotation
+	 *            annotation to be queried
+	 * @return <code>true</code> when annotation indicated wrapping support
+	 */
+	private boolean isSupportedByLanguage(WrapToScript annotation) {
+		if (annotation != null) {
+			final String languages = annotation.supportedLanguages().trim();
+			if (!languages.isEmpty()) {
+				final String[] supportedLanguages = languages.split(",");
+				if (supportedLanguages[0].startsWith("!")) {
+					// exclude pattern
+					for (final String language : supportedLanguages) {
+						if (language.substring(1).equals(getLanguageIdentifier()))
+							return false;
+					}
+
+				} else {
+					// include pattern
+					for (final String language : supportedLanguages) {
+						if (language.equals(getLanguageIdentifier()))
+							return true;
+					}
+
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the language identifier for this code factory
+	 *
+	 * @return language identifier as defined in extension point scriptType.name
+	 */
+	protected abstract Object getLanguageIdentifier();
 
 	/**
 	 * Create code for a wrapper function in the global namespace of the script engine.

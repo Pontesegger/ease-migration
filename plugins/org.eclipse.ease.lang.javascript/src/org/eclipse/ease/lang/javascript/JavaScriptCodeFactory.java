@@ -182,39 +182,44 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// field definitions").append(StringTools.LINE_DELIMITER);
 		for (final Field field : ModuleHelper.getFields(instance.getClass())) {
-			scriptCode.append('\t').append(field.getName()).append(": ").append(identifier).append('.').append(field.getName()).append(',')
-					.append(StringTools.LINE_DELIMITER);
+			if (isSupportedByLanguage(field)) {
+				scriptCode.append('\t').append(field.getName()).append(": ").append(identifier).append('.').append(field.getName()).append(',')
+						.append(StringTools.LINE_DELIMITER);
+			}
 		}
 
 		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// method definitions").append(StringTools.LINE_DELIMITER);
 		for (final Method method : ModuleHelper.getMethods(instance.getClass())) {
-			// parse parameters
-			final List<Parameter> parameters = ModuleHelper.getParameters(method);
+			if (isSupportedByLanguage(method)) {
 
-			final String body = "\t\t" + buildMethodBody(parameters, environment, method, identifier).replaceAll("\n", "\n\t\t");
+				// parse parameters
+				final List<Parameter> parameters = ModuleHelper.getParameters(method);
 
-			// method header
-			scriptCode.append('\t').append(method.getName()).append(": function(");
-			// method parameters
-			scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
-			// method body
-			scriptCode.append(body).append(StringTools.LINE_DELIMITER);
-			// method footer
-			scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+				final String body = "\t\t" + buildMethodBody(parameters, environment, method, identifier).replaceAll("\n", "\n\t\t");
 
-			// append method aliases
-			for (final String alias : getMethodAliases(method)) {
-				if (!isValidMethodName(alias)) {
-					Logger.error(PluginConstants.PLUGIN_ID,
-							"The method name \"" + alias + "\" from the module \"" + identifier + "\" can not be wrapped because it's name is reserved");
+				// method header
+				scriptCode.append('\t').append(method.getName()).append(": function(");
+				// method parameters
+				scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
+				// method body
+				scriptCode.append(body).append(StringTools.LINE_DELIMITER);
+				// method footer
+				scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
 
-				} else if (!alias.isEmpty()) {
-					scriptCode.append('\t').append(alias).append(": function(");
-					scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
-					scriptCode.append("\t\t// method alias").append(StringTools.LINE_DELIMITER);
-					scriptCode.append("\t\treturn this.").append(method.getName()).append('(').append(buildParameterList(parameters)).append(");")
-							.append(StringTools.LINE_DELIMITER);
-					scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+				// append method aliases
+				for (final String alias : getMethodAliases(method)) {
+					if (!isValidMethodName(alias)) {
+						Logger.error(PluginConstants.PLUGIN_ID,
+								"The method name \"" + alias + "\" from the module \"" + identifier + "\" can not be wrapped because it's name is reserved");
+
+					} else if (!alias.isEmpty()) {
+						scriptCode.append('\t').append(alias).append(": function(");
+						scriptCode.append(buildParameterList(parameters)).append(") {").append(StringTools.LINE_DELIMITER);
+						scriptCode.append("\t\t// method alias").append(StringTools.LINE_DELIMITER);
+						scriptCode.append("\t\treturn this.").append(method.getName()).append('(').append(buildParameterList(parameters)).append(");")
+								.append(StringTools.LINE_DELIMITER);
+						scriptCode.append("\t},").append(StringTools.LINE_DELIMITER).append(StringTools.LINE_DELIMITER);
+					}
 				}
 			}
 		}
@@ -280,5 +285,10 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		body.append("return ").append(IScriptFunctionModifier.RESULT_NAME).append(';');
 
 		return body.toString();
+	}
+
+	@Override
+	protected Object getLanguageIdentifier() {
+		return "JavaScript";
 	}
 }
