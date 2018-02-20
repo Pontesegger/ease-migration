@@ -125,9 +125,6 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		@Override
 		public void onExceptionThrown(final Context cx, final Throwable ex) {
 			setExceptionStacktrace(getStacktrace().clone());
-
-			// we do not need the scope any longer
-			fScope = null;
 		}
 
 		@Override
