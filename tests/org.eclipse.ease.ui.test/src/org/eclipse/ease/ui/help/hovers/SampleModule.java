@@ -25,10 +25,10 @@ public class SampleModule {
 	 * Provide sum of 2 variables.
 	 *
 	 * @param a
-	 *            summand 1
+	 *            param1
 	 * @param b
-	 *            summand 2
-	 * @return sum
+	 *            param2
+	 * @return result
 	 */
 	@WrapToScript
 	public double sum(double a, double b) {
@@ -37,6 +37,12 @@ public class SampleModule {
 
 	/**
 	 * Subtract b from a.
+	 *
+	 * @param a
+	 *            param1
+	 * @param b
+	 *            param2
+	 * @return result
 	 */
 	@WrapToScript
 	public double sub(double a, double b) {
@@ -45,6 +51,12 @@ public class SampleModule {
 
 	/**
 	 * Multiply 2 values.
+	 *
+	 * @param a
+	 *            param1
+	 * @param b
+	 *            param2
+	 * @return result
 	 */
 	@WrapToScript
 	public double mul(double a, double b) {
@@ -53,6 +65,12 @@ public class SampleModule {
 
 	/**
 	 * Divide a by b.
+	 *
+	 * @param a
+	 *            param1
+	 * @param b
+	 *            param2
+	 * @return result
 	 */
 	@WrapToScript
 	public double div(double a, double b) {

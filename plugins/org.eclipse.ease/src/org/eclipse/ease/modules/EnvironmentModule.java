@@ -65,9 +65,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	@Override
 	@WrapToScript
-	public final Object loadModule(final String identifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
+	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
 		// resolve identifier
-		final String moduleName = ModuleHelper.resolveName(identifier);
+		final String moduleName = ModuleHelper.resolveName(moduleIdentifier);
 
 		Object module = getModule(moduleName);
 		if (module == null) {
@@ -124,7 +124,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 						wrap(loadedModule, useCustomNamespace);
 				}
 			} else
-				throw new RuntimeException("Could not find module \"" + identifier + "\"");
+				throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
 		}
 
 		// first take care that module is tracked as it might modify itself implementing IScriptFunctionModifier

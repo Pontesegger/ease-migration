@@ -62,13 +62,13 @@ public interface IEnvironment {
 	 * namespace is not changed. The namespace behavior is also used for loading dependencies.
 	 * </p>
 	 *
-	 * @param name
+	 * @param moduleIdentifier
 	 *            name of module to load
 	 * @param useCustomNamespace
 	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to a custom object
 	 * @return loaded module instance
 	 */
-	Object loadModule(final String moduleIdentifier, boolean useCustomNamespace);
+	Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace);
 
 	/**
 	 * Wrap a java instance. Will create accessors in the target language for methods and constants defined by the java instance <i>toBeWrapped</i>. If the

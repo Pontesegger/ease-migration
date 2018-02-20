@@ -469,9 +469,11 @@ public class UnitTestModule extends AbstractScriptModule implements IScriptFunct
 	 *
 	 * @param message
 	 *            error message
+	 * @throws AssertionException
+	 *             containing the provided message
 	 */
 	@WrapToScript
-	public void error(String message) throws Exception {
+	public void error(String message) throws AssertionException {
 		throw new AssertionException(message);
 	}
 
