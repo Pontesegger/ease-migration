@@ -42,7 +42,7 @@ public class VariablesCompletionProvider extends AbstractCompletionProvider {
 					styledString.append(" - " + "Variable", StyledString.QUALIFIER_STYLER);
 
 					addProposal(styledString, variable.getKey(),
-							new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/field_public_obj.png")),
+							new DescriptorImageResolver(Activator.getLocalImageDescriptor("/icons/eobj16/debug_local_variable.png")),
 							ScriptCompletionProposal.ORDER_FIELD, null);
 				}
 			}
