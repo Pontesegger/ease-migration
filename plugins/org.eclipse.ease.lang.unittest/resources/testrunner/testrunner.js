@@ -221,7 +221,11 @@ var __EASE_UnitTest_TestRunner = {
 			do {
 				match = expression.exec(data);
 				if (match) {
-					annotations[match[1].toLowerCase()] = match[2];
+					annotationContent = match[2];
+					if (typeof(annotationContent) != 'undefined')
+						annotationContent = annotationContent.replace(/\\\"/g, "\"");
+						
+					annotations[match[1].toLowerCase()] = annotationContent
 				}
 			} while (match);
 
