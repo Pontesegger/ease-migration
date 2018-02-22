@@ -159,7 +159,7 @@ public class ScriptService implements IScriptService, BundleListener {
 		for (final IConfigurationElement e : config) {
 			try {
 				if (LAUNCH_EXTENSION.equals(e.getName())) {
-					if (e.getAttribute(ENGINE_ID).equals(engineID)) {
+					if ((e.getAttribute(ENGINE_ID).equals(engineID)) || (e.getAttribute(ENGINE_ID).equals("*"))) {
 						final Object extension = e.createExecutableExtension("class");
 						if (extension instanceof IScriptEngineLaunchExtension)
 							extensions.add((IScriptEngineLaunchExtension) extension);

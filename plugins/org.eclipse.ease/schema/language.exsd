@@ -103,7 +103,7 @@
          <attribute name="engineID" type="string" use="required">
             <annotation>
                <documentation>
-                  Script engine to bind this extension to.
+                  Script engine to bind this extension to. To bind to any engine use * as a wildcard qualifier.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ease.language/engine/@id"/>
