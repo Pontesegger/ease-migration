@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.team.svn.core.connector.SVNDepth;
 import org.eclipse.team.svn.core.operation.CompositeOperation;
 import org.eclipse.team.svn.core.operation.IActionOperation;
+import org.eclipse.team.svn.core.operation.remote.LocateProjectsOperation;
 import org.eclipse.team.svn.core.operation.remote.management.AddRepositoryLocationOperation;
 import org.eclipse.team.svn.core.operation.remote.management.SaveRepositoryLocationsOperation;
 import org.eclipse.team.svn.core.resource.ILocalResource;
@@ -117,6 +118,36 @@ public class SVNModule extends AbstractScriptModule {
 					SVNDepth.INFINITY, false);
 			UIMonitorUtility.doTaskNowDefault(op, true);
 		});
+	}
+
+	/**
+	 * Import all projects from a repository location. It scans the location and all projects found are imported.
+	 *
+	 * @param rootLocation
+	 *            can be a string (to generate RepositoryLocation automatically) or already a RepositoryLocation
+	 */
+	@WrapToScript
+	public void importProjectsFromSVN(Object rootLocation) {
+		IRepositoryResource repositoryResource = null;
+		if (rootLocation instanceof IRepositoryResource) {
+			repositoryResource = (IRepositoryResource) rootLocation;
+		} else {
+			final IRepositoryLocation repositoryLocation = createRepositoryLocation(rootLocation.toString(), null, null);
+			repositoryResource = SVNRemoteStorage.instance().asRepositoryResource(repositoryLocation, repositoryLocation.getUrl(), false);
+		}
+		final IRepositoryResource res = repositoryResource;
+		final IRepositoryResource[] doCeckout = new IRepositoryResource[] { res };
+		final LocateProjectsOperation locateProjectsOp = new LocateProjectsOperation(doCeckout,
+				ExtensionsManager.getInstance().getCurrentCheckoutFactory().getLocateFilter(), 5);
+		Display.getDefault().syncExec(() -> {
+			final Shell sh = Display.getDefault().getActiveShell();
+			// Execute the locate project operation first, to get a list of all repository projects
+			UIMonitorUtility.doTaskNowDefault(locateProjectsOp, true);
+			final IActionOperation op = ExtensionsManager.getInstance().getCurrentCheckoutFactory().getCheckoutOperation(sh,
+					locateProjectsOp.getRepositoryResources(), null, true, null, SVNDepth.INFINITY, false);
+			UIMonitorUtility.doTaskNowDefault(op, true);
+		});
+
 	}
 
 	/**
