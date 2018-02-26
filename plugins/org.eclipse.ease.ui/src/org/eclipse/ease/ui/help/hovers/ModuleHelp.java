@@ -92,24 +92,32 @@ public class ModuleHelp {
 	/**
 	 * Retrieve help page for a given module definition.
 	 *
+	 * @param url
+	 *            url to read help from
+	 * @return help content (HTML body node)
+	 */
+	private static IMemento getHtmlContent(final URL url) {
+
+		try {
+			final IMemento rootNode = XMLMemento.createReadRoot(new InputStreamReader(url.openStream(), "UTF-8"));
+			return rootNode.getChild("body");
+		} catch (final Exception e) {
+			Logger.error(Activator.PLUGIN_ID, "Cannot find the module help content ", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Retrieve help page for a given module definition.
+	 *
 	 * @param definition
 	 *            module definition to fetch help for
 	 * @return help content (HTML body node)
 	 */
-	private static IMemento getHelpContent(final ModuleDefinition definition) {
-
-		if (definition != null) {
-			final String helpLocation = definition.getHelpLocation(null);
-			final URL url = PlatformUI.getWorkbench().getHelpSystem().resolve(helpLocation, true);
-			try {
-				final IMemento rootNode = XMLMemento.createReadRoot(new InputStreamReader(url.openStream(), "UTF-8"));
-				return rootNode.getChild("body");
-			} catch (final Exception e) {
-				Logger.error(Activator.PLUGIN_ID, "Cannot find the module help content ", e);
-			}
-		}
-
-		return null;
+	private static URL getModuleHelpLocation(final ModuleDefinition definition) {
+		final String helpLocation = definition.getHelpLocation(null);
+		return PlatformUI.getWorkbench().getHelpSystem().resolve(helpLocation, true);
 	}
 
 	/**
@@ -121,7 +129,8 @@ public class ModuleHelp {
 	 */
 	public static String getModuleHelpTip(final ModuleDefinition definition) {
 
-		final IMemento bodyNode = getHelpContent(definition);
+		final URL helpLocation = getModuleHelpLocation(definition);
+		final IMemento bodyNode = getHtmlContent(helpLocation);
 		if (bodyNode != null) {
 
 			final StringBuffer helpContent = new StringBuffer();
@@ -129,6 +138,8 @@ public class ModuleHelp {
 				if ("module".equals(node.getString("class"))) {
 					for (final IMemento contentNode : node.getChildren()) {
 						if ("description".equals(contentNode.getString("class"))) {
+							updateRelativeLinks(contentNode, helpLocation);
+
 							final String content = getNodeContent(contentNode);
 							if ((content != null) && (!content.isEmpty()))
 								helpContent.append(content);
@@ -148,6 +159,46 @@ public class ModuleHelp {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Replace relative links in HTML content with absolute links.
+	 *
+	 * @param contentNode
+	 *            original content
+	 * @param helpLocation
+	 *            original source location
+	 */
+	private static void updateRelativeLinks(IMemento node, URL helpLocation) {
+		if ((node.getType().equals("a")) && (node.getString("href") != null))
+			node.putString("href", resolveUrl(helpLocation, node.getString("href")));
+
+		if ((node.getType().equals("img")) && (node.getString("src") != null))
+			node.putString("src", resolveUrl(helpLocation, node.getString("src")));
+
+		for (final IMemento child : node.getChildren())
+			updateRelativeLinks(child, helpLocation);
+	}
+
+	private static String resolveUrl(URL base, String relativeLocation) {
+		if (relativeLocation.contains("://"))
+			return relativeLocation;
+
+		final String baseLocation = base.toString();
+
+		if (relativeLocation.startsWith("#"))
+			return baseLocation + relativeLocation;
+
+		if (relativeLocation.startsWith("/")) {
+			final int hostPosition = baseLocation.indexOf(base.getHost());
+			return baseLocation.substring(0, hostPosition + base.getHost().length()) + relativeLocation;
+		}
+
+		final int lastPathDelimiter = baseLocation.lastIndexOf('/');
+		if (lastPathDelimiter > 0)
+			return baseLocation.substring(0, lastPathDelimiter + 1) + relativeLocation;
+
+		return "";
 	}
 
 	public static String getImageAndLabel(String imageSrcPath, String label) {
@@ -216,12 +267,16 @@ public class ModuleHelp {
 	public static String getMethodHelpTip(final Method method) {
 
 		// FIXME do not use getDeclaringMethod, see bug 502854
-		final IMemento bodyNode = getHelpContent(ModulesTools.getDeclaringModule(method));
+		final URL helpLocation = getModuleHelpLocation(ModulesTools.getDeclaringModule(method));
+		final IMemento bodyNode = getHtmlContent(helpLocation);
+
 		if (bodyNode != null) {
 
 			for (final IMemento node : bodyNode.getChildren("div")) {
 				if ((method.getName().equals(node.getString("data-method"))) && ("command".equals(node.getString("class")))) {
 					// method found
+
+					updateRelativeLinks(node, helpLocation);
 
 					final StringBuffer helpContent = new StringBuffer();
 
@@ -447,7 +502,9 @@ public class ModuleHelp {
 	 */
 	public static String getConstantHelpTip(final Field field) {
 
-		final IMemento bodyNode = getHelpContent(ModulesTools.getDeclaringModule(field));
+		final URL helpLocation = getModuleHelpLocation(ModulesTools.getDeclaringModule(field));
+		final IMemento bodyNode = getHtmlContent(helpLocation);
+
 		if (bodyNode != null) {
 			for (final IMemento node : bodyNode.getChildren("table")) {
 				if ("constants".equals(node.getString("class"))) {
@@ -458,6 +515,8 @@ public class ModuleHelp {
 						final IMemento candidate = candidates.remove(0);
 						if (field.getName().equals(candidate.getString("data-field"))) {
 							// constant found
+
+							updateRelativeLinks(candidate, helpLocation);
 
 							final StringBuffer helpContent = new StringBuffer();
 
