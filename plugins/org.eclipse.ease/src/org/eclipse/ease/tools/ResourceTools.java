@@ -361,7 +361,7 @@ public final class ResourceTools {
 					throw new RuntimeException(e1);
 				}
 
-			} else if (locationStr.contains("://")) {
+			} else if (locationStr.contains(":/")) {
 				// simple check for URI schemes
 				try {
 					return createURI(locationStr);
@@ -425,7 +425,7 @@ public final class ResourceTools {
 			return false;
 
 		// simple check for URI style
-		if (location.contains("://"))
+		if (location.contains(":/"))
 			return true;
 
 		// check for windows files

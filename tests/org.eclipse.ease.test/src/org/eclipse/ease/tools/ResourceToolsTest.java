@@ -166,6 +166,7 @@ public class ResourceToolsTest {
 		assertTrue(ResourceTools.isAbsolute("http://eclipse.org/file.txt"));
 		assertTrue(ResourceTools.isAbsolute("https://eclipse.org/file.txt"));
 		assertTrue(ResourceTools.isAbsolute("svn://eclipse.org/file.txt"));
+		assertTrue(ResourceTools.isAbsolute("platform:/plugin/org.eclipse.ease/some/location.png"));
 	}
 
 	// --------------------------------------------------------------------------------
@@ -376,6 +377,15 @@ public class ResourceToolsTest {
 		assertEquals(URI.create("http://eclipse.org/"), ResourceTools.resolve(".", "http://eclipse.org/file.js"));
 		assertEquals(URI.create("http://eclipse.org/"), ResourceTools.resolve("..", "http://eclipse.org/folder/file.js"));
 		assertEquals(URI.create("http://eclipse.org/anotherFile.js"), ResourceTools.resolve("anotherFile.js", "http://eclipse.org/file.js"));
+	}
+
+	@Test
+	public void resolvePlatformURI() {
+		// needed to locate platform images
+		assertEquals(URI.create("platform:/plugin/org.eclipse.ease/icons/myImage.png"),
+				ResourceTools.resolve("platform:/plugin/org.eclipse.ease/icons/myImage.png"));
+		assertEquals(URI.create("platform:/plugin/org.eclipse.ease/icons/myImage.png"),
+				ResourceTools.resolve("platform:/plugin/org.eclipse.ease/icons/myImage.png", null));
 	}
 
 	@Test
