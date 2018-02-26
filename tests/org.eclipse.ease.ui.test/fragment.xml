@@ -6,7 +6,7 @@
       <module
             class="org.eclipse.ease.ui.help.hovers.SampleModule"
             id="org.eclipse.ease.ui.help.hovers.sample"
-            name="SampleModule"
+            name="Sample"
             visible="true">
       </module>
    </extension>

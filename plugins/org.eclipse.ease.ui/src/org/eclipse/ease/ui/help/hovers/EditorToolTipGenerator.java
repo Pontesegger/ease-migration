@@ -13,16 +13,14 @@ package org.eclipse.ease.ui.help.hovers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.eclipse.ease.modules.ModuleDefinition;
+import org.eclipse.ease.ui.modules.ui.ModulesTools;
 import org.eclipse.swt.widgets.Combo;
 
-/**
- * @author VIDURA
- *
- */
 public class EditorToolTipGenerator {
 
 	/*
@@ -43,7 +41,7 @@ public class EditorToolTipGenerator {
 			}
 		}
 		for (int j = caretPosition; j < inputLength; j++) {
-			if (input.charAt(j) == ' ' || input.charAt(j) == '(') {
+			if ((input.charAt(j) == ' ') || (input.charAt(j) == '(')) {
 				textEndPosition = j;
 				break;
 			}
@@ -69,7 +67,12 @@ public class EditorToolTipGenerator {
 			for (final Field field : definition.getFields()) {
 				if (field.getName().equals(text)) {
 
-					toolTipText = ModuleHelp.getConstantHelpTip(field);
+					try {
+						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule(field));
+						toolTipText = new ModuleHelp(helpLocation).getConstantHelp(field).getHoverContent();
+					} catch (final Exception e) {
+						// silently fail if we cannot retrieve module help
+					}
 
 					if (toolTipText == null) {
 						return String.format("Public member of module %s with type %s.", definition.getName(), field.getType().getName());
@@ -82,7 +85,12 @@ public class EditorToolTipGenerator {
 			for (final Method method : definition.getMethods()) {
 				if (method.getName().equals(text)) {
 
-					toolTipText = ModuleHelp.getMethodHelpTip(method);
+					try {
+						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule(method));
+						toolTipText = new ModuleHelp(helpLocation).getMethodHelp(method).getHoverContent();
+					} catch (final Exception e) {
+						// silently fail if we cannot retrieve module help
+					}
 
 					if (toolTipText == null) {
 						final StringBuilder sb = new StringBuilder();

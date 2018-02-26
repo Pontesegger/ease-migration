@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.help.hovers;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.junit.Before;
@@ -30,22 +33,54 @@ public class ModuleHelpTest {
 	public void setUp() throws Exception {
 		fSampleModule = new org.eclipse.ease.ui.help.hovers.SampleModule();
 		fSampleModuleDefinition = ModuleDefinition.getDefinition(fSampleModule);
-		fSampleMethod = fSampleModuleDefinition.getMethods().get(0);
-		fSampleField = fSampleModuleDefinition.getFields().get(0);
+
+		fSampleMethod = fSampleModule.getClass().getMethod("sum", double.class, double.class);
+		fSampleField = fSampleModule.getClass().getField("PI");
 	}
 
 	@Test
-	public void getModuleHelpTip() {
-		assertFalse(ModuleHelp.getModuleHelpTip(fSampleModuleDefinition).equals(""));
+	public void getModuleHelpLocation() {
+		assertNotNull(ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition));
 	}
 
 	@Test
-	public void getMethodHelpTip() {
-		assertFalse(ModuleHelp.getMethodHelpTip(fSampleMethod).equals(""));
+	public void getModuleHelp() throws Exception {
+		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
+
+		final ModuleHelp moduleHelp = new ModuleHelp(helpLocation);
+		assertNotNull(moduleHelp);
+
+		assertEquals("Sample Module", moduleHelp.getName());
+		assertEquals("Module only used for unit testing.", moduleHelp.getDescription());
+
+		assertTrue(moduleHelp.getHoverContent().length() > moduleHelp.getDescription().length());
 	}
 
 	@Test
-	public void getConstantHelpTip() {
-		assertFalse(ModuleHelp.getConstantHelpTip(fSampleField).equals(""));
+	public void getMethodHelp() throws Exception {
+		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
+
+		final ModuleHelp moduleHelp = new ModuleHelp(helpLocation);
+
+		final IHoverHelp methodHelp = moduleHelp.getMethodHelp(fSampleMethod);
+
+		assertEquals("sum", methodHelp.getName());
+		assertEquals("Provide sum of 2 variables.", methodHelp.getDescription());
+
+		assertTrue(moduleHelp.getHoverContent().length() > methodHelp.getDescription().length());
+	}
+
+	@Test
+	public void getConstantHelp() throws Exception {
+		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
+
+		final ModuleHelp moduleHelp = new ModuleHelp(helpLocation);
+
+		final IHoverHelp constantHelp = moduleHelp.getConstantHelp(fSampleField);
+
+		assertEquals("PI", constantHelp.getName());
+		assertEquals("PI constant.", constantHelp.getDescription());
+
+		assertTrue(moduleHelp.getHoverContent().length() > constantHelp.getDescription().length());
 	}
 }

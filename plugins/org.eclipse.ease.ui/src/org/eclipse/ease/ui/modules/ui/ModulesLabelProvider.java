@@ -22,19 +22,17 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.ui.Activator;
-import org.eclipse.ease.ui.help.hovers.ModuleHelp;
 import org.eclipse.ease.ui.modules.ui.ModulesTools.ModuleEntry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IToolTipProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
-public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLabelProvider, IToolTipProvider, ILabelProvider {
+public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLabelProvider, ILabelProvider {
 
 	private static final Styler STRIKE_THROUGH_STYLE = new Styler() {
 
@@ -50,7 +48,7 @@ public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLa
 
 		// unpack field/method
 		if (element instanceof ModuleEntry)
-			element = ((ModuleEntry) element).getEntry();
+			element = ((ModuleEntry<?>) element).getEntry();
 
 		if (element instanceof ModuleDefinition) {
 			text.append(((ModuleDefinition) element).getName());
@@ -88,31 +86,13 @@ public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLa
 
 		// unpack field/method
 		if (element instanceof ModuleEntry)
-			element = ((ModuleEntry) element).getEntry();
+			element = ((ModuleEntry<?>) element).getEntry();
 
 		if (element instanceof Method)
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/function.png", true);
 
 		if (element instanceof Field)
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/field.png", true);
-
-		return null;
-	}
-
-	@Override
-	public String getToolTipText(final Object element) {
-
-		if (element instanceof IPath)
-			return null;
-
-		if (element instanceof ModuleDefinition)
-			return ModuleHelp.getModuleHelpTip((ModuleDefinition) element);
-
-		if (element instanceof Method)
-			return ModuleHelp.getMethodHelpTip((Method) element);
-
-		if (element instanceof Field)
-			return ModuleHelp.getConstantHelpTip((Field) element);
 
 		return null;
 	}

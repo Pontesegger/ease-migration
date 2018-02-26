@@ -13,6 +13,7 @@ package org.eclipse.ease.ui.view;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +31,7 @@ import org.eclipse.ease.ui.help.hovers.ModuleHelp;
 import org.eclipse.ease.ui.modules.ui.ModulesComposite;
 import org.eclipse.ease.ui.modules.ui.ModulesContentProvider;
 import org.eclipse.ease.ui.modules.ui.ModulesFilter;
+import org.eclipse.ease.ui.modules.ui.ModulesTools;
 import org.eclipse.ease.ui.modules.ui.ModulesTools.ModuleEntry;
 import org.eclipse.ease.ui.tools.TextWithImage;
 import org.eclipse.jface.action.MenuManager;
@@ -244,14 +246,24 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 				if (detail instanceof ModuleEntry<?>)
 					detail = ((ModuleEntry<?>) detail).getEntry();
 
-				if (detail instanceof ModuleDefinition)
-					return ModuleHelp.getModuleHelpTip((ModuleDefinition) detail);
+				try {
+					if (detail instanceof ModuleDefinition) {
+						final URL helpLocation = ModuleHelp.getModuleHelpLocation((ModuleDefinition) detail);
+						return new ModuleHelp(helpLocation).getHoverContent();
+					}
 
-				if (detail instanceof Method)
-					return ModuleHelp.getMethodHelpTip((Method) detail);
+					if (detail instanceof Field) {
+						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule((Field) detail));
+						return new ModuleHelp(helpLocation).getConstantHelp((Field) detail).getHoverContent();
+					}
 
-				if (detail instanceof Field)
-					return ModuleHelp.getConstantHelpTip((Field) detail);
+					if (detail instanceof Method) {
+						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule((Method) detail));
+						return new ModuleHelp(helpLocation).getMethodHelp((Method) detail).getHoverContent();
+					}
+				} catch (final Exception e) {
+					// no help available, fail silently
+				}
 
 				return null;
 			}
