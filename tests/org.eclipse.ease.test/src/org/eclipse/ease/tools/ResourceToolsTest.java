@@ -209,22 +209,22 @@ public class ResourceToolsTest {
 	@Test
 	public void resolveAbsoluteInFileSystemOnWindows() {
 		if (isWindows()) {
-			assertEquals(new File("C:/home/user/file.txt"), ResourceTools.resolve("C:\\home\\user\\file.txt"));
+			assertEquals(new File("C:/home/user/file with spaces.txt"), ResourceTools.resolve("C:\\home\\user\\file with spaces.txt"));
 			assertEquals(new File("C:/rootFile.txt"), ResourceTools.resolve("C:\\rootFile.txt"));
 
-			assertEquals(new File("C:/home/user/file.txt"), ResourceTools.resolve("C:/home/user/file.txt"));
+			assertEquals(new File("C:/home/user/file with spaces.txt"), ResourceTools.resolve("C:/home/user/file with spaces.txt"));
 			assertEquals(new File("C:/rootFile.txt"), ResourceTools.resolve("C:/rootFile.txt"));
 
-			assertEquals(new File("C:/home/user/file.txt"), ResourceTools.resolve("file://C:/home/user/file.txt"));
+			assertEquals(new File("C:/home/user/file with spaces.txt"), ResourceTools.resolve("file://C:/home/user/file with spaces.txt"));
 			assertEquals(new File("C:/rootFile.txt"), ResourceTools.resolve("file://C:/rootFile.txt"));
 
-			assertEquals(new File("C:/home/user/file.txt"), ResourceTools.resolve("file:///C:/home/user/file.txt"));
+			assertEquals(new File("C:/home/user/file with spaces.txt"), ResourceTools.resolve("file:///C:/home/user/file with spaces.txt"));
 			assertEquals(new File("C:/rootFile.txt"), ResourceTools.resolve("file:///C:/rootFile.txt"));
 
-			assertEquals(new File("//someServer/home/user/file.txt"), ResourceTools.resolve("file://someServer/home/user/file.txt"));
+			assertEquals(new File("//someServer/home/user/file with spaces.txt"), ResourceTools.resolve("file://someServer/home/user/file with spaces.txt"));
 			assertEquals(new File("//someServer/rootFile.txt"), ResourceTools.resolve("file://someServer/rootFile.txt"));
 
-			assertEquals(new File("//someServer/home/user/file.txt"), ResourceTools.resolve("\\\\someServer\\home\\user\\file.txt"));
+			assertEquals(new File("//someServer/home/user/file with spaces.txt"), ResourceTools.resolve("\\\\someServer\\home\\user\\file with spaces.txt"));
 			assertEquals(new File("//someServer/rootFile.txt"), ResourceTools.resolve("\\\\someServer\\rootFile.txt"));
 
 			assertEquals(ResourceTools.VIRTUAL_WINDOWS_ROOT, ResourceTools.resolve("file://"));

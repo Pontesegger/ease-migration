@@ -361,7 +361,8 @@ public final class ResourceTools {
 					throw new RuntimeException(e1);
 				}
 
-			} else if (locationStr.contains(":/")) {
+			} else if ((locationStr.contains(":/")) && (locationStr.indexOf(":/") != 1)) {
+				// the check: (locationStr.indexOf(":/") != 1) eliminates windows file 'URIs' like C:/mydata/...
 				// simple check for URI schemes
 				try {
 					return createURI(locationStr);
