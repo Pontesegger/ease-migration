@@ -41,10 +41,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-/**
- * @author christian
- *
- */
 public class VirtualProject implements IProject {
 
 	@Override
@@ -667,9 +663,8 @@ public class VirtualProject implements IProject {
 		throw new RuntimeException("setDescription not implemented");
 	}
 
-	// Bug 517300: No @Override because this is a new method on IProject in Eclipse 4.7
-	// Note that Auto-cleanup will re-add the @Override
+	@Override
 	public void clearCachedDynamicReferences() {
-		throw new RuntimeException("clearCachedDynamicReferences not implemented");
+		// nothing to do
 	}
 }
