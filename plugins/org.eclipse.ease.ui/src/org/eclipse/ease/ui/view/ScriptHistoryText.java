@@ -286,10 +286,11 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 * @return text string
 	 */
 	private String getResultMesage(ScriptResult result) {
-		if (result.hasException())
-			return result.getException().getLocalizedMessage();
+		if (result.hasException()) {
+			final String message = result.getException().getLocalizedMessage();
+			return (message != null) ? message : result.getException().getClass().getName();
 
-		else {
+		} else {
 			final Object executionResult = result.getResult();
 			if (fCurrentEngine != null)
 				return fCurrentEngine.toString(executionResult);
