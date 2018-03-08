@@ -12,6 +12,8 @@
 package org.eclipse.ease.modules.charting;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.modules.AbstractScriptModule;
@@ -35,13 +37,15 @@ import org.eclipse.ui.IWorkbenchPage;
 public class ChartingModule extends AbstractScriptModule {
 	public static final String MODULE_NAME = "Charting";
 
+	private static int fFigureIterator = 1;
+
 	private Chart fChart = null;
 
 	private XYGraph fXYGraph = null;
 
 	private Trace fCurrentPlot = null;
 
-	private static int fFigureIterator = 1;
+	private final Collection<Annotation> fUserMarkers = new HashSet<>();
 
 	/**
 	 * Opens a new view with an empty figure. <i>figureId</i> is used as a view and chart title. If a view with the same <i>figureId</i> already exists, it will
@@ -428,13 +432,16 @@ public class ChartingModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public void clear() {
+		Display.getDefault().syncExec(() -> {
+			if (fXYGraph != null) {
+				for (final Annotation marker : fUserMarkers)
+					fXYGraph.removeAnnotation(marker);
+				// fXYGraph.removeAll();
+			}
+		});
+
 		if (fChart != null)
 			fChart.clear();
-
-		Display.getDefault().asyncExec(() -> {
-			if (fXYGraph != null)
-				fXYGraph.removeAll();
-		});
 
 		fCurrentPlot = null;
 	}
@@ -503,6 +510,8 @@ public class ChartingModule extends AbstractScriptModule {
 						annotation.setValues(xPosition, yPosition);
 				});
 			});
+
+			fUserMarkers.add(annotation);
 
 			return annotation;
 		}
