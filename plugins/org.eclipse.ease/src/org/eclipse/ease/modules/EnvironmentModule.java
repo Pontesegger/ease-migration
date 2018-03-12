@@ -110,7 +110,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 				if (module == null)
 					throw new RuntimeException("Could not create module instance, see workspace log for more details");
 
-				if (module instanceof IScriptModule)
+				if (module instanceof IEnvironment)
+					((IScriptModule) module).initialize(getScriptEngine(), (IEnvironment) module);
+				else if (module instanceof IScriptModule)
 					((IScriptModule) module).initialize(getScriptEngine(), this);
 
 				fModuleNames.put(moduleName, module);
@@ -334,7 +336,11 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		if (null == codeFactory)
 			return null;
 
-		final String wrapperCode = codeFactory.createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
+		String wrapperCode;
+		if (instance instanceof IEnvironment)
+			wrapperCode = codeFactory.createWrapper((IEnvironment) instance, instance, identifier, useCustomNamespace, getScriptEngine());
+		else
+			wrapperCode = codeFactory.createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
 
 		if (useCustomNamespace)
 			return getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode));
