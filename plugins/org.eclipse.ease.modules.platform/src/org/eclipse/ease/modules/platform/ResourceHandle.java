@@ -12,6 +12,7 @@ package org.eclipse.ease.modules.platform;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.eclipse.core.resources.IContainer;
@@ -36,12 +37,12 @@ public class ResourceHandle extends FilesystemHandle {
 	}
 
 	@Override
-	public boolean write(final String data) {
-		return write(data.getBytes());
+	public void write(final String data) throws IOException {
+		write(data.getBytes());
 	}
 
 	@Override
-	public boolean write(final byte[] data) {
+	public void write(final byte[] data) throws IOException {
 		try {
 			// replace file content or append content
 			if ((getMode() & APPEND) == APPEND) {
@@ -54,12 +55,9 @@ public class ResourceHandle extends FilesystemHandle {
 				setMode(getMode() | APPEND);
 			}
 
-			return true;
-
-		} catch (final Exception e) {
+		} catch (final CoreException e) {
+			throw new IOException(e.getMessage(), e);
 		}
-
-		return false;
 	}
 
 	@Override

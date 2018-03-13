@@ -54,18 +54,20 @@ public interface IFileHandle {
 	 *
 	 * @param data
 	 *            data to write
-	 * @return <code>true</code> on success
+	 * @throws IOException
+	 *             on write errors
 	 */
-	boolean write(String data);
+	void write(String data) throws IOException;
 
 	/**
 	 * Write data to a file.
 	 *
 	 * @param data
 	 *            data to write
-	 * @return <code>true</code> on success
+	 * @throws IOException
+	 *             on write errors
 	 */
-	boolean write(byte[] data);
+	void write(byte[] data) throws IOException;
 
 	/**
 	 * Check if a physical file exists.

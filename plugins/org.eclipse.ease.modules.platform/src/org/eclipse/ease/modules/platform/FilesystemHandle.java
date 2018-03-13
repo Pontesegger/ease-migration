@@ -83,41 +83,27 @@ public class FilesystemHandle implements IFileHandle {
 	}
 
 	@Override
-	public boolean write(final String data) {
-		try {
-			// replace file content or append content
-			if (fWriter == null) {
-				if (fOutput == null)
-					fOutput = new BufferedOutputStream(new FileOutputStream(fFile, (fMode & APPEND) == APPEND));
-
-				fWriter = new PrintWriter(new OutputStreamWriter(fOutput));
-			}
-
-			fWriter.print(data);
-			fWriter.flush();
-			return true;
-
-		} catch (final Exception e) {
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean write(final byte[] data) {
-		try {
-			// replace file content or append content
+	public void write(final String data) throws IOException {
+		// replace file content or append content
+		if (fWriter == null) {
 			if (fOutput == null)
 				fOutput = new BufferedOutputStream(new FileOutputStream(fFile, (fMode & APPEND) == APPEND));
 
-			fOutput.write(data);
-			fOutput.flush();
-			return true;
-
-		} catch (final Exception e) {
+			fWriter = new PrintWriter(new OutputStreamWriter(fOutput));
 		}
 
-		return false;
+		fWriter.print(data);
+		fWriter.flush();
+	}
+
+	@Override
+	public void write(final byte[] data) throws IOException {
+		// replace file content or append content
+		if (fOutput == null)
+			fOutput = new BufferedOutputStream(new FileOutputStream(fFile, (fMode & APPEND) == APPEND));
+
+		fOutput.write(data);
+		fOutput.flush();
 	}
 
 	protected static StringBuilder read(final Reader reader) throws IOException {
