@@ -272,7 +272,7 @@ public class Test extends TestEntity implements ITest {
 			result.setMessage("Test timeout: lasted " + getDuration() + " ms, limit was set to " + getDurationLimit() + " ms");
 			result.setStackTrace(getStackTrace());
 
-			final ITestSuiteDefinition definition = getTestSuite().getDefinition();
+			final ITestSuiteDefinition definition = (getTestSuite() != null) ? getTestSuite().getDefinition() : null;
 			if ((definition != null) && (definition.getFlag(Flag.PROMOTE_FAILURE_TO_ERROR, false)))
 				result.setStatus(TestStatus.ERROR);
 			else
