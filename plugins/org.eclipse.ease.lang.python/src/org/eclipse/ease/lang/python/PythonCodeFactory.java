@@ -192,8 +192,27 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 		// execution with callbacks
 		body.append("else:").append(StringTools.LINE_DELIMITER);
-		body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback(\"").append(methodId).append("\"")
-				.append(parameters.isEmpty() ? "" : ", ").append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
+		if (environment.getScriptEngine().getDescription().getID().startsWith("org.eclipse.ease.lang.python.py4j")) {
+			// special handling for Py4J as it cannot use java varargs parameters directly
+			body.append("    ").append("parameters_array = gateway.new_array(gateway.jvm.Object, ").append(parameters.size()).append(")")
+					.append(StringTools.LINE_DELIMITER);
+			for (int index = 0; index < parameters.size(); index++) {
+				// Py4J cannot execute
+				// gateway.new_array(gateway.jvm.Object, 1)[0] = None
+				// as the default value for array elements is null anyway, we simply do not set those
+				body.append("    if ").append(parameters.get(index).getName()).append(" != None:").append(StringTools.LINE_DELIMITER);
+				body.append("        ").append("parameters_array[").append(index).append("] = ").append(parameters.get(index).getName())
+						.append(StringTools.LINE_DELIMITER);
+			}
+
+			body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback(\"").append(methodId)
+					.append("\", parameters_array)").append(StringTools.LINE_DELIMITER);
+
+		} else {
+			body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".preMethodCallback(\"").append(methodId).append("\"")
+					.append(parameters.isEmpty() ? "" : ", ").append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
+		}
+
 		body.append("    ").append(RESULT_NAME).append(" = ").append(classIdentifier).append(".").append(method.getName()).append("(")
 				.append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
 		body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".postMethodCallback(\"").append(methodId).append("\"")

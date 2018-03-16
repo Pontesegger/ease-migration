@@ -41,12 +41,10 @@ import org.eclipse.ease.lang.unittest.runtime.ITestResult;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.runtime.TestStatus;
 import org.eclipse.ease.modules.AbstractScriptModule;
-import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.IModuleCallbackProvider;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
-import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 
 /**
@@ -54,15 +52,9 @@ import org.eclipse.ease.tools.ResourceTools;
  */
 public class UnitTestModule extends AbstractScriptModule {
 
-	private static final String ASSERTION_FUNCION_NAME = "assertion";
-
 	private ITestClass fCurrentTestClass = null;
 	private ITest fCurrentTest = null;
 	private boolean fThrowOnFailure = false;
-
-	private ITestFile fInjectedTestFile;
-
-	private ITestSuite fInjectedTestSuite;
 
 	@Override
 	public void initialize(IScriptEngine engine, IEnvironment environment) {
@@ -145,25 +137,8 @@ public class UnitTestModule extends AbstractScriptModule {
 		if (getTestFile() != null)
 			return getTestFile().getTestSuite();
 
-		Object testSuite = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE);
-
-		if ((!(testSuite instanceof ITestSuite)) && (isPythonEngine())) {
-			getScriptEngine().inject(EnvironmentModule.getWrappedVariableName(this) + ".setTestSuite(__EASE_UnitTest_Suite)");
-			testSuite = fInjectedTestSuite;
-			fInjectedTestSuite = null;
-		}
-
+		final Object testSuite = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE);
 		return (testSuite instanceof ITestSuite) ? (ITestSuite) testSuite : null;
-	}
-
-	/**
-	 * Only to be called from Py4J engine to link this module to the current testsuite.
-	 *
-	 * @param testSuite
-	 *            testsuite to be set
-	 */
-	public void setTestSuite(ITestSuite testSuite) {
-		fInjectedTestSuite = testSuite;
 	}
 
 	/**
@@ -173,34 +148,8 @@ public class UnitTestModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public ITestFile getTestFile() {
-		Object testFile = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
-
-		if ((!(testFile instanceof ITestFile)) && (isPythonEngine())) {
-			getScriptEngine().inject(EnvironmentModule.getWrappedVariableName(this) + ".setTestFile(__EASE_UnitTest_File)");
-			testFile = fInjectedTestFile;
-			fInjectedTestFile = null;
-		}
-
+		final Object testFile = getScriptEngine().getVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE);
 		return (testFile instanceof ITestFile) ? (ITestFile) testFile : null;
-	}
-
-	/**
-	 * Only to be called from Py4J engine to link this module to the current testfile.
-	 *
-	 * @param testFile
-	 *            testfile to be set
-	 */
-	public void setTestFile(ITestFile testFile) {
-		fInjectedTestFile = testFile;
-	}
-
-	private boolean isPythonEngine() {
-		for (final ScriptType scriptType : getScriptEngine().getDescription().getSupportedScriptTypes()) {
-			if ("Python".equals(scriptType.getName()))
-				return true;
-		}
-
-		return false;
 	}
 
 	/**
