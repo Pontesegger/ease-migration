@@ -40,7 +40,7 @@ public abstract class AbstractModuleDropHandler implements IShellDropHandler {
 		final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
 		if (environment != null) {
 			if ((force) || (environment.getModule(moduleID) == null)) {
-				if (ModuleHelper.resolveName(moduleID) != null) {
+				if (ModuleHelper.resolveModuleName(moduleID) != null) {
 
 					final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
 

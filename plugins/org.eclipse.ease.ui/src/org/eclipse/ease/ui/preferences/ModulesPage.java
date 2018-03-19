@@ -59,7 +59,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 			if (element instanceof IPath) {
 				final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-				for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+				for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
 					if ((((IPath) element).isPrefixOf(definition.getPath())) && (definition.isVisible() == fShowVisible))
 						return true;
 				}
@@ -130,7 +130,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		addDNDSupport(invisibleTreeViewer, false);
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final Collection<ModuleDefinition> modules = scriptService.getAvailableModules().values();
+		final Collection<ModuleDefinition> modules = scriptService.getAvailableModules();
 		visibleTreeViewer.setInput(modules);
 		invisibleTreeViewer.setInput(modules);
 
@@ -160,7 +160,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 					else if (element instanceof IPath) {
 						final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-						for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+						for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
 							if (((IPath) element).isPrefixOf(definition.getPath()))
 								definition.setVisible(dropVisible);
 						}
@@ -176,7 +176,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 	@Override
 	protected void performDefaults() {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		for (final ModuleDefinition definition : scriptService.getAvailableModules().values())
+		for (final ModuleDefinition definition : scriptService.getAvailableModules())
 			definition.resetVisible();
 
 		visibleTreeViewer.refresh();

@@ -12,8 +12,6 @@ package org.eclipse.ease.ui.completion.provider;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -53,23 +51,23 @@ public class LoadModuleCompletionProvider extends AbstractCompletionProvider {
 		final Collection<String> pathProposals = new HashSet<>();
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final Map<String, ModuleDefinition> availableModules = scriptService.getAvailableModules();
+		final Collection<ModuleDefinition> availableModules = scriptService.getAvailableModules();
 
-		for (final Entry<String, ModuleDefinition> moduleEntry : availableModules.entrySet()) {
-			final Path modulePath = new Path(moduleEntry.getKey());
+		for (final ModuleDefinition definition : availableModules) {
+			final IPath modulePath = definition.getPath();
 			if (searchPath.isPrefixOf(modulePath)) {
 				// this is a valid candidate
 
 				if ((searchPath.segmentCount() + 1) == modulePath.segmentCount()) {
 
-					if (matchesFilterIgnoreCase(moduleEntry.getKey())) {
+					if (matchesFilterIgnoreCase(definition.getName())) {
 
 						// add module proposal
 						final StyledString displayString = new StyledString(modulePath.lastSegment());
-						if (!moduleEntry.getValue().isVisible())
+						if (!definition.isVisible())
 							displayString.append(" (hidden)", StyledString.DECORATIONS_STYLER);
 
-						addProposal(displayString, moduleEntry.getKey(),
+						addProposal(displayString, definition.getName(),
 								new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/module.png")), 0, null);
 					}
 

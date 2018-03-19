@@ -20,10 +20,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.ICodeFactory.Parameter;
 import org.eclipse.ease.IScriptEngine;
@@ -112,44 +110,38 @@ public final class ModuleHelper {
 	}
 
 	/**
-	 * Resolve a relative module name to its absolute name. When only the last part of a module name is provided (without path), this method tries to locate the
-	 * module and returns its absolute path. If 2 modules with the same name are detected, a {@link RuntimeException} is thrown.
+	 * Resolve a relative module name to its definition. When only the last part of a module name is provided (without path), this method tries to locate the
+	 * module and returns its definition. If 2 modules with the same name are detected, a {@link RuntimeException} is thrown.
 	 *
 	 * @param identifier
 	 *            module identifier
-	 * @return absolute module name
+	 * @return module definition or <code>null</code> in case no matching definition is found
 	 */
-	public static String resolveName(final String identifier) {
+	public static ModuleDefinition resolveModuleName(final String identifier) {
+
+		final Path searchPath = new Path(identifier);
+
 		final IScriptService scriptService = ScriptService.getService();
-		final Map<String, ModuleDefinition> availableModules = scriptService.getAvailableModules();
+		final Collection<ModuleDefinition> availableModules = scriptService.getAvailableModules();
 
-		// check for absolute path
-		if (identifier.startsWith("/")) {
+		// check for valid, absolute path
+		ModuleDefinition candidate = null;
+		for (final ModuleDefinition definition : availableModules) {
+			if (definition.getPath().equals(searchPath))
+				return definition;
 
-			// check for valid, absolute path
-			if (availableModules.containsKey(identifier))
-				return identifier;
-
-			// path is already absolute, module does not exist
-			return null;
-		}
-
-		IPath searchPath = new Path(identifier);
-		if ((searchPath.segmentCount() == 1) && (!searchPath.isAbsolute())) {
-			// only module name given
-			for (final Entry<String, ModuleDefinition> module : availableModules.entrySet()) {
-				if (new Path(module.getKey()).lastSegment().equals(identifier)) {
-					// candidate detected
-					if (searchPath.isAbsolute())
+			if ((searchPath.segmentCount() == 1) && (!searchPath.isAbsolute())) {
+				if (definition.getPath().lastSegment().equals(searchPath.lastSegment())) {
+					if (candidate != null)
 						// we already had one candidate, name is ambiguous
 						throw new RuntimeException("Module identifier \"" + identifier + "\" is ambiguous. Use full path name to load.");
 
-					searchPath = module.getValue().getPath();
+					candidate = definition;
 				}
 			}
 		}
 
-		return searchPath.toString();
+		return candidate;
 	}
 
 	/**
@@ -160,6 +152,8 @@ public final class ModuleHelper {
 	 * @return module definitions for all loaded modules
 	 */
 	public static Collection<ModuleDefinition> getLoadedModules(final IScriptEngine engine) {
+		// FIXME should be recoded as we should better query the environment module directly
+
 		final Collection<ModuleDefinition> modules = new HashSet<>();
 
 		// statically access service as workbench is not available in headless mode
@@ -169,7 +163,7 @@ public final class ModuleHelper {
 			if (entry.getKey().startsWith(EnvironmentModule.MODULE_PREFIX)) {
 				final Class<? extends Object> moduleClass = entry.getValue().getClass();
 
-				for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+				for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
 					if (definition.getModuleClass().equals(moduleClass)) {
 						modules.add(definition);
 						break;

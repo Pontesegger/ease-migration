@@ -12,9 +12,8 @@ package org.eclipse.ease.modules;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,6 +35,22 @@ import org.osgi.service.prefs.Preferences;
 
 public class ModuleDefinition {
 
+	public static class ModuleDependency {
+
+		/** Module dependency parameter name. */
+		private static final String CONFIG_DEPENDENCY_ID = "module";
+
+		private final IConfigurationElement fElement;
+
+		public ModuleDependency(IConfigurationElement element) {
+			fElement = element;
+		}
+
+		public String getId() {
+			return fElement.getAttribute(CONFIG_DEPENDENCY_ID);
+		}
+	}
+
 	/** Module name parameter. */
 	private static final String NAME = "name";
 
@@ -50,12 +65,6 @@ public class ModuleDefinition {
 
 	/** Module dependency node. */
 	private static final String DEPENDENCY = "dependency";
-
-	/** Module dependency parameter name. */
-	private static final String CONFIG_DEPENDENCY_ID = "module";
-
-	/** Module dependency reload parameter name. */
-	private static final String CONFIG_DEPENDENCY_RELOAD = "reload";
 
 	/** Module id parameter name. */
 	private static final String ID = "id";
@@ -72,7 +81,7 @@ public class ModuleDefinition {
 	 */
 	public static ModuleDefinition getDefinition(final Object module) {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		for (final ModuleDefinition definition : scriptService.getAvailableModules().values()) {
+		for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
 			if (definition.getModuleClass().equals(module.getClass()))
 				return definition;
 		}
@@ -94,16 +103,15 @@ public class ModuleDefinition {
 	}
 
 	/**
-	 * Get a map of module dependencies. Map contains ids of required modules and their 'reload' status.
+	 * Get module dependencies.
 	 *
-	 * @return map of required module ids
+	 * @return required dependencies
 	 */
-	public Map<String, Boolean> getDependencies() {
-		final Map<String, Boolean> dependencies = new HashMap<>();
+	public List<ModuleDependency> getDependencies() {
+		final List<ModuleDependency> dependencies = new ArrayList<>();
 
-		for (final IConfigurationElement element : fConfig.getChildren(DEPENDENCY)) {
-			dependencies.put(element.getAttribute(CONFIG_DEPENDENCY_ID), Boolean.parseBoolean(element.getAttribute(CONFIG_DEPENDENCY_RELOAD)));
-		}
+		for (final IConfigurationElement element : fConfig.getChildren(DEPENDENCY))
+			dependencies.add(new ModuleDependency(element));
 
 		return dependencies;
 	}
@@ -251,5 +259,30 @@ public class ModuleDefinition {
 	 */
 	public boolean isDeprecated() {
 		return getModuleClass().getAnnotation(Deprecated.class) != null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((getId() == null) ? 0 : getId().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ModuleDefinition other = (ModuleDefinition) obj;
+		if (getId() == null) {
+			if (other.getId() != null)
+				return false;
+		} else if (!getId().equals(other.getId()))
+			return false;
+		return true;
 	}
 }

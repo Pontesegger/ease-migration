@@ -137,7 +137,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 	 */
 	private ModuleDefinition getDefinition(Object element) {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final List<ModuleDefinition> modules = new ArrayList<>(scriptService.getAvailableModules().values());
+		final List<ModuleDefinition> modules = new ArrayList<>(scriptService.getAvailableModules());
 
 		for (final ModuleDefinition definition : modules) {
 			if (definition.getModuleClass().equals(element.getClass())) {

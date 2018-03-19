@@ -77,7 +77,7 @@ public class ScriptService implements IScriptService, BundleListener {
 		return fInstance;
 	}
 
-	private Map<String, ModuleDefinition> fAvailableModules = null;
+	private Collection<ModuleDefinition> fAvailableModules = null;
 
 	private Map<String, EngineDescription> fEngineDescriptions = null;
 
@@ -95,16 +95,16 @@ public class ScriptService implements IScriptService, BundleListener {
 	}
 
 	@Override
-	public synchronized Map<String, ModuleDefinition> getAvailableModules() {
+	public synchronized Collection<ModuleDefinition> getAvailableModules() {
 		if (fAvailableModules == null) {
-			fAvailableModules = new HashMap<>();
+			fAvailableModules = new HashSet<>();
 			final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_MODULES_ID);
 			for (final IConfigurationElement e : config) {
 				if (e.getName().equals(EXTENSION_MODULE)) {
 					// module extension detected
 					final ModuleDefinition definition = new ModuleDefinition(e);
 					if (definition.getModuleClass() != null)
-						fAvailableModules.put(definition.getPath().toString(), definition);
+						fAvailableModules.add(definition);
 
 					else
 						Logger.warning(Activator.PLUGIN_ID,
@@ -271,7 +271,7 @@ public class ScriptService implements IScriptService, BundleListener {
 
 	@Override
 	public ModuleDefinition getModuleDefinition(final String moduleId) {
-		for (final ModuleDefinition definition : getAvailableModules().values()) {
+		for (final ModuleDefinition definition : getAvailableModules()) {
 			if (definition.getId().equals(moduleId))
 				return definition;
 		}

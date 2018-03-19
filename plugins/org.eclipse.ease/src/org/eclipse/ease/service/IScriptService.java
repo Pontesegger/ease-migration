@@ -72,7 +72,7 @@ public interface IScriptService {
 	 *
 	 * @return available modules or empty map
 	 */
-	Map<String, ModuleDefinition> getAvailableModules();
+	Collection<ModuleDefinition> getAvailableModules();
 
 	/**
 	 * Get a map of available module categories. Keys contain the category id, values contain its descriptor.

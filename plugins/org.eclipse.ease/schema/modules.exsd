@@ -50,21 +50,14 @@
 
    <element name="dependency">
       <complexType>
-         <attribute name="module" type="string">
+         <attribute name="module" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Module to be loaded as dependency.
                </documentation>
                <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ease.modules/module/@id"/>
                </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="reload" type="boolean" use="default" value="false">
-            <annotation>
-               <documentation>
-                  Set to true if this dependency should be reloaded when already available. When reloaded it will be moved to the top of the loaded modules stack. If unsure leave &apos;false&apos;.
-               </documentation>
             </annotation>
          </attribute>
       </complexType>

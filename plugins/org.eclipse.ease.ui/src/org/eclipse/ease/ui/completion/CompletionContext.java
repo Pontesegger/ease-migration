@@ -29,8 +29,6 @@ import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.modules.ModuleHelper;
-import org.eclipse.ease.service.IScriptService;
-import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.jface.text.Position;
@@ -552,33 +550,12 @@ public abstract class CompletionContext implements ICompletionContext {
 					// TODO add string literal characters lookup method
 					if ((candidate.charAt(0) == '"') || (candidate.charAt(0) == '\'')) {
 						// found loadModule, try to resolve
-						final String moduleName = ModuleHelper.resolveName(candidate.substring(1, candidate.length() - 1));
-
-						final IScriptService scriptService = ScriptService.getInstance();
-						final ModuleDefinition moduleDefinition = scriptService.getAvailableModules().get(moduleName);
+						final ModuleDefinition moduleDefinition = ModuleHelper.resolveModuleName(candidate.substring(1, candidate.length() - 1));
 						if (moduleDefinition != null)
-							addLoadedModule(moduleDefinition);
+							fLoadedModules.add(moduleDefinition);
 					}
 				}
 			}
-		}
-	}
-
-	/**
-	 * Add a module definition to the list of loaded modules. Will also add module dependencies to the list.
-	 *
-	 * @param definition
-	 *            module definition to add
-	 */
-	private void addLoadedModule(final ModuleDefinition definition) {
-		fLoadedModules.add(definition);
-
-		// recursively load dependencies
-		final IScriptService scriptService = ScriptService.getInstance();
-		for (final String dependency : definition.getDependencies().keySet()) {
-			final ModuleDefinition dependencyDefinition = scriptService.getAvailableModules().get(dependency);
-			if (dependencyDefinition != null)
-				addLoadedModule(dependencyDefinition);
 		}
 	}
 
@@ -650,9 +627,7 @@ public abstract class CompletionContext implements ICompletionContext {
 			fLoadedModules = new HashSet<>();
 
 			// add default environment module
-			// use static service instance to enable unit tests in headless mode
-			final IScriptService scriptService = ScriptService.getInstance();
-			addLoadedModule(scriptService.getAvailableModules().get(EnvironmentModule.MODULE_NAME));
+			fLoadedModules.add(ModuleHelper.resolveModuleName(EnvironmentModule.MODULE_NAME));
 
 			// process loadModule() calls
 			addLoadedModules(getOriginalCode());
@@ -666,7 +641,7 @@ public abstract class CompletionContext implements ICompletionContext {
 			// add loaded modules from script engine
 			if (getScriptEngine() != null) {
 				for (final ModuleDefinition definition : ModuleHelper.getLoadedModules(getScriptEngine()))
-					addLoadedModule(definition);
+					fLoadedModules.add(definition);
 			}
 		}
 

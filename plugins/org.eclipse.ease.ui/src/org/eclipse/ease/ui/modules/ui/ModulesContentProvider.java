@@ -56,7 +56,7 @@ public class ModulesContentProvider extends AbstractVirtualTreeProvider {
 	@Override
 	protected void populateElements(final Object inputElement) {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final List<ModuleDefinition> modules = new ArrayList<>(scriptService.getAvailableModules().values());
+		final List<ModuleDefinition> modules = new ArrayList<>(scriptService.getAvailableModules());
 
 		for (final ModuleDefinition module : modules)
 			registerElement(module.getPath().removeLastSegments(1), module);

@@ -11,6 +11,7 @@
 package org.eclipse.ease.ui.modules.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,25 +43,25 @@ public final class ModuleContributionFactory extends CompoundContributionItem im
 	@Override
 	protected IContributionItem[] getContributionItems() {
 
-		List<IContributionItem> contributions = new ArrayList<IContributionItem>();
+		final List<IContributionItem> contributions = new ArrayList<>();
 
-		IScriptService scriptService = (IScriptService) PlatformUI.getWorkbench().getService(IScriptService.class);
-		Map<String, ModuleDefinition> modules = scriptService.getAvailableModules();
+		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final Collection<ModuleDefinition> modules = scriptService.getAvailableModules();
 
 		// read preferences for tree/list layout
-		Preferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).node(IPreferenceConstants.NODE_SHELL);
-		boolean flatMode = prefs.getBoolean(IPreferenceConstants.SHELL_MODULES_AS_LIST, IPreferenceConstants.DEFAULT_SHELL_MODULES_AS_LIST);
+		final Preferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).node(IPreferenceConstants.NODE_SHELL);
+		final boolean flatMode = prefs.getBoolean(IPreferenceConstants.SHELL_MODULES_AS_LIST, IPreferenceConstants.DEFAULT_SHELL_MODULES_AS_LIST);
 
 		// create root menu (only used as a container while populating)
-		HashMap<IPath, ModulePopupMenu> moduleTree = new HashMap<IPath, ModulePopupMenu>();
+		final HashMap<IPath, ModulePopupMenu> moduleTree = new HashMap<>();
 		ModulePopupMenu menu = new ModulePopupMenu("");
 		moduleTree.put(new Path("/"), menu);
 
-		for (final ModuleDefinition definition : modules.values()) {
+		for (final ModuleDefinition definition : modules) {
 			if (definition.isVisible()) {
 				if (!flatMode) {
 					// find correct menu for tree layout
-					IPath path = definition.getPath();
+					final IPath path = definition.getPath();
 					if (!moduleTree.containsKey(path.removeLastSegments(1)))
 						createPath(moduleTree, path.removeLastSegments(1));
 
@@ -72,12 +73,12 @@ public final class ModuleContributionFactory extends CompoundContributionItem im
 		}
 
 		// sort all menus
-		for (ModulePopupMenu popupMenu : moduleTree.values())
+		for (final ModulePopupMenu popupMenu : moduleTree.values())
 			popupMenu.sortEntries();
 
 		// populate root contributions
-		ModulePopupMenu root = moduleTree.get(new Path("/"));
-		for (AbstractPopupItem item : root.getEntries())
+		final ModulePopupMenu root = moduleTree.get(new Path("/"));
+		for (final AbstractPopupItem item : root.getEntries())
 			contributions.add(item.getContribution(fServiceLocator));
 
 		return contributions.toArray(new IContributionItem[contributions.size()]);
@@ -90,8 +91,8 @@ public final class ModuleContributionFactory extends CompoundContributionItem im
 
 	private static ModulePopupMenu createPath(final Map<IPath, ModulePopupMenu> moduleTree, final IPath path) {
 		if (!moduleTree.containsKey(path)) {
-			ModulePopupMenu parentMenu = createPath(moduleTree, path.removeLastSegments(1));
-			ModulePopupMenu menu = new ModulePopupMenu(path.lastSegment());
+			final ModulePopupMenu parentMenu = createPath(moduleTree, path.removeLastSegments(1));
+			final ModulePopupMenu menu = new ModulePopupMenu(path.lastSegment());
 
 			parentMenu.addEntry(menu);
 			moduleTree.put(path, menu);

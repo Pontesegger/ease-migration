@@ -22,6 +22,6 @@ public class GroovyEnvironementBootStrapper implements IScriptEngineLaunchExtens
 	public void createEngine(final IScriptEngine engine) {
 		// load environment module
 		engine.executeAsync("import org.eclipse.ease.modules.EnvironmentModule");
-		engine.executeAsync("new org.eclipse.ease.modules.EnvironmentModule().loadModule(\"/System/Environment\", false)");
+		engine.executeAsync("new org.eclipse.ease.modules.EnvironmentModule().bootstrap()");
 	}
 }
