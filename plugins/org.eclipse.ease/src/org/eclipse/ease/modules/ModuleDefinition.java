@@ -49,6 +49,11 @@ public class ModuleDefinition {
 		public String getId() {
 			return fElement.getAttribute(CONFIG_DEPENDENCY_ID);
 		}
+
+		public ModuleDefinition getDefinition() {
+			final IScriptService scriptService = ScriptService.getInstance();
+			return scriptService.getModuleDefinition(getId());
+		}
 	}
 
 	/** Module name parameter. */

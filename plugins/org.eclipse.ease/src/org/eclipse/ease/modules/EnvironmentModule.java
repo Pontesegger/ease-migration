@@ -138,8 +138,28 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 			module = createModuleInstance(definition);
 		}
 
+		if (!useCustomNamespace)
+			wrapModuleDependencies(definition);
+
 		// create function wrappers
 		return wrap(module, useCustomNamespace);
+	}
+
+	/**
+	 * Find and wrap instances of module dependencies. All found dependencies (and dependencies of dependencies) are wrapped into the root scope.
+	 *
+	 * @param definition
+	 *            parent definition to find dependencies for
+	 */
+	private void wrapModuleDependencies(ModuleDefinition definition) {
+		for (final ModuleDependency dependency : definition.getDependencies()) {
+			final ModuleDefinition dependencyDefinition = dependency.getDefinition();
+			wrapModuleDependencies(dependencyDefinition);
+
+			final Object instance = fLoadedModuleInstances.get(dependencyDefinition);
+			if (instance != null)
+				wrap(instance, false);
+		}
 	}
 
 	/**
