@@ -189,7 +189,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object, U extends Class<T>> T getModule(final U clazz) {
-		for (final Object module : getModules()) {
+		for (final Object module : fLoadedModuleInstances.values()) {
 			if (clazz.isAssignableFrom(module.getClass()))
 				return (T) module;
 		}
