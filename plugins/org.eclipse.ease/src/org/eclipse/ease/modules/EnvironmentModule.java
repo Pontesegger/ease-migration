@@ -92,6 +92,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 			if (definition.isDeprecated())
 				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.");
 
+			loadModuleDependencies(definition);
 			final Object instance = definition.createModuleInstance();
 
 			// check that module class got initialized correctly
@@ -134,7 +135,6 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		Object module = fLoadedModuleInstances.get(definition);
 		if (module == null) {
 			// not loaded yet
-			loadModuleDependencies(definition);
 			module = createModuleInstance(definition);
 		}
 
