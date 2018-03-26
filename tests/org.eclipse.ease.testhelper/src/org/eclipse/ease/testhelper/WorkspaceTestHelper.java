@@ -9,7 +9,7 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.lang.javascript.rhino;
+package org.eclipse.ease.testhelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.tools.StringTools;
 
-public class WorkspaceTest {
+public class WorkspaceTestHelper {
 
 	public static final IWorkspaceRoot getWorkspace() {
 		return ResourcesPlugin.getWorkspace().getRoot();
