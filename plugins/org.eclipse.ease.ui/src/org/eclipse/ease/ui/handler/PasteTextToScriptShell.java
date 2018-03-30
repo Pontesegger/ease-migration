@@ -15,14 +15,21 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.ui.view.ScriptShell;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 public class PasteTextToScriptShell extends AbstractHandler {
 
@@ -33,9 +40,29 @@ public class PasteTextToScriptShell extends AbstractHandler {
 			final IViewReference viewReference = findViewReference(ScriptShell.VIEW_ID);
 			if (viewReference != null) {
 				final IViewPart view = viewReference.getView(true);
-				if (view instanceof IScriptEngineProvider) {
-					((IScriptEngineProvider) view).getScriptEngine().executeAsync(((ITextSelection) selection).getText());
+
+				String selectedText = ((ITextSelection) selection).getText();
+				if (((ITextSelection) selection).getLength() == 0) {
+					final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+
+					final Control editorControl = editor.getAdapter(Control.class);
+					if (editorControl instanceof StyledText) {
+						if (editor instanceof ITextEditor) {
+							final IDocument document = ((ITextEditor) editor).getDocumentProvider().getDocument(editor.getEditorInput());
+							if (document != null) {
+								try {
+									final IRegion lineInformation = document.getLineInformationOfOffset(((StyledText) editorControl).getCaretOffset());
+									selectedText = document.get(lineInformation.getOffset(), lineInformation.getLength()).trim();
+								} catch (final BadLocationException e) {
+									// ignore gracefully;
+								}
+							}
+						}
+					}
 				}
+
+				if (view instanceof IScriptEngineProvider)
+					((IScriptEngineProvider) view).getScriptEngine().executeAsync(selectedText);
 			}
 		}
 
