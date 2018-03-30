@@ -28,11 +28,17 @@ public abstract class AbstractFileDropHandler extends AbstractModuleDropHandler 
 			if (!extension.startsWith("."))
 				extension = "." + extension;
 
-			if (element instanceof IFile)
-				return ((IFile) element).getName().toLowerCase().endsWith(extension.toLowerCase());
+			if (element instanceof IFile) {
+				final boolean accept = ((IFile) element).getName().toLowerCase().endsWith(extension.toLowerCase());
+				if (accept)
+					return true;
+			}
 
-			else if (element instanceof File)
-				return ((File) element).getName().toLowerCase().endsWith(extension.toLowerCase());
+			else if (element instanceof File) {
+				final boolean accept = ((File) element).getName().toLowerCase().endsWith(extension.toLowerCase());
+				if (accept)
+					return true;
+			}
 		}
 
 		return false;
