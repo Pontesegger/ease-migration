@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2017 Kloesch and others.
+ * Copyright (c) 2017 Martin Kloesch and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Kloesch - initial API and implementation
+ *     Martin Kloesch - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.ease.lang.python.jython.debugger;
@@ -37,14 +37,10 @@ public class JythonCodeTracer implements ICodeTracer {
 		fPyTracer = tracer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.lang.python.debugger.ICodeTracer#run(org.eclipse.ease.Script, java.lang.String)
-	 */
 	@Override
-	public void run(Script script, String filename) {
-		fPyTracer.invoke("run", Py.java2py(script), Py.java2py(filename));
-	}
+	public Object run(Script script, String filename) {
+		final PyObject result = fPyTracer.invoke("run", Py.java2py(script), Py.java2py(filename));
 
+		return Py.tojava(result, Object.class);
+	}
 }

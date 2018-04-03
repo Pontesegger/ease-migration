@@ -74,6 +74,10 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 		super("Jython");
 	}
 
+	protected JythonScriptEngine(String name) {
+		super(name);
+	}
+
 	@Override
 	public void terminateCurrent() {
 		final Job terminationJob = new Job("Termination Jython script") {

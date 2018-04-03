@@ -19,8 +19,10 @@ public class EaseWatchExpressionDelegate implements IWatchExpressionDelegate {
 
 	@Override
 	public void evaluateExpression(String expression, IDebugElement context, IWatchExpressionListener listener) {
-		if (context instanceof EaseDebugStackFrame)
+		if (context instanceof EaseDebugStackFrame) {
+			final Object thread = ((EaseDebugStackFrame) context).getThread().getThread();
 			((EaseDebugStackFrame) context).getDebugTarget()
-					.fireDispatchEvent(new EvaluateExpressionRequest(expression, (EaseDebugStackFrame) context, listener));
+					.fireDispatchEvent(new EvaluateExpressionRequest(expression, (EaseDebugStackFrame) context, thread, listener));
+		}
 	}
 }

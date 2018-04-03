@@ -28,5 +28,5 @@ public interface ICodeTracer {
 	 * @param filename
 	 *            Filename for script.
 	 */
-	void run(Script script, String filename);
+	Object run(Script script, String filename);
 }

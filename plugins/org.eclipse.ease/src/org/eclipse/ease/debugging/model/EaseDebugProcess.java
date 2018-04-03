@@ -25,7 +25,6 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.debugging.events.IDebugEvent;
-import org.eclipse.ease.debugging.events.debugger.AbstractThreadEvent;
 import org.eclipse.ease.debugging.events.debugger.ScriptReadyEvent;
 import org.eclipse.ease.debugging.events.debugger.ThreadCreatedEvent;
 import org.eclipse.ease.debugging.events.debugger.ThreadTerminatedEvent;
@@ -106,15 +105,15 @@ public class EaseDebugProcess extends EaseDebugElement implements IProcess, IEve
 			debugThread.resume();
 
 		} else if (event instanceof ThreadCreatedEvent) {
-			EaseDebugThread debugThread = findDebugThread(((AbstractThreadEvent) event).getThread());
+			EaseDebugThread debugThread = findDebugThread(((ThreadCreatedEvent) event).getThread());
 
 			if (debugThread == null) {
 				// thread does not exist, create new one
-				debugThread = createDebugThread(((AbstractThreadEvent) event).getThread());
+				debugThread = createDebugThread(((ThreadCreatedEvent) event).getThread());
 			}
 
 		} else if (event instanceof ThreadTerminatedEvent) {
-			final EaseDebugThread debugThread = findDebugThread(((AbstractThreadEvent) event).getThread());
+			final EaseDebugThread debugThread = findDebugThread(((ThreadTerminatedEvent) event).getThread());
 
 			if (debugThread != null)
 				debugThread.handleEvent(event);

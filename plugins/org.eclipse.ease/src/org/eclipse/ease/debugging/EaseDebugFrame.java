@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.eclipse.ease.Script;
 
 /**
@@ -70,5 +73,9 @@ public class EaseDebugFrame implements IScriptDebugFrame {
 	@Override
 	public Object inject(String expression) throws Throwable {
 		throw new UnsupportedOperationException("Executing code on a stackframe is not supported");
+	}
+
+	public Map<String, Object> getVariables() {
+		return Collections.emptyMap();
 	}
 }

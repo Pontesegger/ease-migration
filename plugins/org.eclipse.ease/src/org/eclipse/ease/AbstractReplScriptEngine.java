@@ -118,6 +118,18 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 
 	protected String getTypeName(Object object) {
 		switch (getType(object)) {
+		case NATIVE_ARRAY:
+			String languageName = getDescription().getSupportedScriptTypes().get(0).getName();
+			return languageName + " Array";
+
+		case NATIVE_OBJECT:
+			languageName = getDescription().getSupportedScriptTypes().get(0).getName();
+			return languageName + " Object";
+
+		case NATIVE:
+			languageName = getDescription().getSupportedScriptTypes().get(0).getName();
+			return "Generic " + languageName;
+
 		case JAVA_OBJECT:
 			return "Java Object";
 
@@ -147,6 +159,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 				return "float";
 
 			// fall through
+
 		default:
 			return "";
 		}

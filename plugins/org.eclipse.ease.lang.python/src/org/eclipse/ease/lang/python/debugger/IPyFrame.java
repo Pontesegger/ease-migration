@@ -11,6 +11,8 @@
 
 package org.eclipse.ease.lang.python.debugger;
 
+import java.util.Map;
+
 /**
  * Abstraction interface for frame information in Python.
  */
@@ -39,4 +41,20 @@ public interface IPyFrame {
 	 * @return Parent in the call stack or <code>null</code>
 	 */
 	public IPyFrame getParent();
+
+	/**
+	 * Get a variable from the current frame.
+	 *
+	 * @param name
+	 *            variable name to look up
+	 * @return variable or <code>null</code>
+	 */
+	public Object getVariable(String name);
+
+	/**
+	 * Get variables visible from current frame.
+	 *
+	 * @return variableName -> variableContent
+	 */
+	public Map<String, Object> getVariables();
 }

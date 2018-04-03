@@ -13,6 +13,7 @@ package org.eclipse.ease.debugging;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
+import org.eclipse.ease.debugging.events.AbstractEvent;
 import org.eclipse.ease.debugging.events.IDebugEvent;
 import org.eclipse.ease.debugging.events.debugger.EngineStartedEvent;
 import org.eclipse.ease.debugging.events.debugger.EngineTerminatedEvent;
@@ -60,11 +62,11 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 
 		public int fResumeType;
 
-		public int fResumeStackSize = 0;
-
 		public int fResumeLineNumber = 0;
 
 		public boolean fSuspended = false;
+
+		public ScriptStackTrace fResumeStack = new ScriptStackTrace();
 	}
 
 	private EventDispatchJob fDispatcher;
@@ -78,6 +80,9 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	private boolean fTerminated = false;
 
 	private final Map<Object, ThreadState> fThreadStates = new HashMap<>();
+
+	/** Requests to evaluate expressions. */
+	private final List<AbstractEvent> fEvaluationRequests = Collections.synchronizedList(new ArrayList<>());
 
 	public AbstractEaseDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		fEngine = engine;
@@ -108,6 +113,45 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			fDispatcher.addEvent(event);
 	}
 
+	@Override
+	public void handleEvent(final IDebugEvent event) {
+		if (!fTerminated) {
+			DebugTracer.debug("Debugger", "process " + event);
+
+			if (event instanceof ResumeRequest) {
+				resume(((ResumeRequest) event).getType(), ((ResumeRequest) event).getThread());
+
+			} else if (event instanceof BreakpointRequest) {
+				if (((BreakpointRequest) event).isRemoveAllBreakpointsRequest())
+					fBreakpoints.clear();
+
+				else {
+					final Script script = ((BreakpointRequest) event).getScript();
+					if (!fBreakpoints.containsKey(script))
+						fBreakpoints.put(script, new ArrayList<IBreakpoint>());
+
+					if (((BreakpointRequest) event).getMode() == BreakpointRequest.Mode.ADD)
+						fBreakpoints.get(script).add(((BreakpointRequest) event).getBreakpoint());
+					else
+						fBreakpoints.get(script).remove(((BreakpointRequest) event).getBreakpoint());
+				}
+
+			} else if (event instanceof TerminateRequest) {
+				fBreakpoints.clear();
+				getEngine().terminate();
+				fireDispatchEvent(new EngineTerminatedEvent());
+				setDispatcher(null);
+
+			} else if (event instanceof AbstractEvent) {
+				fEvaluationRequests.add((AbstractEvent) event);
+				final ThreadState threadState = getThreadState(((AbstractEvent) event).getThread());
+				synchronized (threadState) {
+					threadState.notify();
+				}
+			}
+		}
+	}
+
 	protected void suspend(final IDebuggerEvent event) {
 
 		// only suspend if there possibly exists someone to wake us up again
@@ -118,11 +162,65 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 				threadState.fSuspended = true;
 				fireDispatchEvent(event);
 
-				DebugTracer.debug("Debugger", "\t engine suspended");
+				DebugTracer.debug("Debugger", "\t engine suspended on state: " + threadState);
 
 				try {
-					while (threadState.fSuspended)
+					while (threadState.fSuspended) {
+
+						synchronized (fEvaluationRequests) {
+							for (final AbstractEvent request : fEvaluationRequests) {
+								final ThreadState threadStateForRequest = getThreadState(request.getThread());
+								if (threadState.equals(threadStateForRequest)) {
+
+									if (request instanceof EvaluateExpressionRequest) {
+										try {
+											final EaseDebugStackFrame scope = ((EvaluateExpressionRequest) request).getContext();
+											final Object result = scope.getDebugFrame().inject(((EvaluateExpressionRequest) request).getExpression());
+											fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), result, null,
+													((EvaluateExpressionRequest) request).getListener()));
+										} catch (final Throwable e) {
+											fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), null, e,
+													((EvaluateExpressionRequest) request).getListener()));
+										}
+
+									} else if (request instanceof GetStackFramesRequest) {
+										fireDispatchEvent(new StackFramesEvent(getStacktrace(), getThread()));
+
+									} else if (request instanceof GetVariablesRequest) {
+										final EaseDebugStackFrame requestor = ((GetVariablesRequest) request).getRequestor();
+										final Collection<EaseDebugVariable> variables = getEngine().getVariables(requestor.getDebugFrame());
+										fireDispatchEvent(new VariablesEvent(requestor, variables));
+
+									} else if (request instanceof SetVariablesRequest) {
+										final IDebugElement requestor = ((SetVariablesRequest) request).getRequestor();
+										try {
+											if (requestor instanceof EaseDebugStackFrame) {
+
+												// evaluate expression
+												final Object result = getEngine().inject(((SetVariablesRequest) request).getExpression());
+												// set variable
+												((EaseDebugStackFrame) requestor).getDebugFrame()
+														.setVariable(((SetVariablesRequest) request).getVariable().getName(), result);
+
+												// re-fetch variables for current stackframe
+												final Collection<EaseDebugVariable> variables = getEngine()
+														.getVariables(((EaseDebugStackFrame) requestor).getDebugFrame());
+												fireDispatchEvent(new VariablesEvent((EaseDebugStackFrame) requestor, variables));
+											}
+
+										} catch (final Throwable e) {
+											Logger.error(Activator.PLUGIN_ID,
+													"Could not change variable <" + ((SetVariablesRequest) event).getVariable().getName() + "> to \""
+															+ ((SetVariablesRequest) event).getExpression() + "\"",
+													e);
+										}
+									}
+								}
+							}
+						}
+
 						threadState.wait();
+					}
 
 				} catch (final InterruptedException e) {
 					threadState.fSuspended = false;
@@ -143,8 +241,8 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		// UNSPECIFIED is sent by the debug target if execution is resumed automatically, so stay with last user resume request
 		if (resumeType != DebugEvent.UNSPECIFIED) {
 			threadState.fResumeType = resumeType;
-			threadState.fResumeStackSize = threadState.fStacktrace.size();
-			threadState.fResumeLineNumber = (threadState.fResumeStackSize > 0) ? threadState.fStacktrace.get(0).getLineNumber() : 0;
+			threadState.fResumeStack = threadState.fStacktrace.clone();
+			threadState.fResumeLineNumber = (threadState.fResumeStack.size() > 0) ? threadState.fStacktrace.get(0).getLineNumber() : 0;
 		}
 
 		synchronized (threadState) {
@@ -199,77 +297,6 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		default:
 			// unknown event
 			break;
-		}
-	}
-
-	@Override
-	public void handleEvent(final IDebugEvent event) {
-		if (!fTerminated) {
-			DebugTracer.debug("Debugger", "process " + event);
-
-			if (event instanceof ResumeRequest) {
-				resume(((ResumeRequest) event).getType(), ((ResumeRequest) event).getThread());
-
-			} else if (event instanceof BreakpointRequest) {
-				if (((BreakpointRequest) event).isRemoveAllBreakpointsRequest())
-					fBreakpoints.clear();
-
-				else {
-					final Script script = ((BreakpointRequest) event).getScript();
-					if (!fBreakpoints.containsKey(script))
-						fBreakpoints.put(script, new ArrayList<IBreakpoint>());
-
-					if (((BreakpointRequest) event).getMode() == BreakpointRequest.Mode.ADD)
-						fBreakpoints.get(script).add(((BreakpointRequest) event).getBreakpoint());
-					else
-						fBreakpoints.get(script).remove(((BreakpointRequest) event).getBreakpoint());
-				}
-
-			} else if (event instanceof GetStackFramesRequest) {
-				fireDispatchEvent(new StackFramesEvent(getStacktrace(), getThread()));
-
-			} else if (event instanceof GetVariablesRequest) {
-				final EaseDebugStackFrame requestor = ((GetVariablesRequest) event).getRequestor();
-				final Collection<EaseDebugVariable> variables = getEngine().getVariables(requestor.getDebugFrame());
-				fireDispatchEvent(new VariablesEvent(requestor, variables));
-
-			} else if (event instanceof EvaluateExpressionRequest) {
-				try {
-					final EaseDebugStackFrame scope = ((EvaluateExpressionRequest) event).getContext();
-					final Object result = scope.getDebugFrame().inject(((EvaluateExpressionRequest) event).getExpression());
-					fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) event).getExpression(), result, null,
-							((EvaluateExpressionRequest) event).getListener()));
-				} catch (final Throwable e) {
-					fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) event).getExpression(), null, e,
-							((EvaluateExpressionRequest) event).getListener()));
-				}
-
-			} else if (event instanceof SetVariablesRequest) {
-				final IDebugElement requestor = ((SetVariablesRequest) event).getRequestor();
-				try {
-					if (requestor instanceof EaseDebugStackFrame) {
-
-						// evaluate expression
-						final Object result = getEngine().inject(((SetVariablesRequest) event).getExpression());
-						// set variable
-						((EaseDebugStackFrame) requestor).getDebugFrame().setVariable(((SetVariablesRequest) event).getVariable().getName(), result);
-
-						// re-fetch variables for current stackframe
-						final Collection<EaseDebugVariable> variables = getEngine().getVariables(((EaseDebugStackFrame) requestor).getDebugFrame());
-						fireDispatchEvent(new VariablesEvent((EaseDebugStackFrame) requestor, variables));
-					}
-
-				} catch (final Throwable e) {
-					Logger.error(Activator.PLUGIN_ID, "Could not change variable <" + ((SetVariablesRequest) event).getVariable().getName() + "> to \""
-							+ ((SetVariablesRequest) event).getExpression() + "\"", e);
-				}
-
-			} else if (event instanceof TerminateRequest) {
-				fBreakpoints.clear();
-				getEngine().terminate();
-				fireDispatchEvent(new EngineTerminatedEvent());
-				setDispatcher(null);
-			}
 		}
 	}
 
@@ -357,8 +384,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		final Object thread = getThread();
 
 		// check breakpoints
-		final IBreakpoint breakpoint = getBreakpoint(script, lineNumber);
-		if (breakpoint != null) {
+		if (isActiveBreakpoint(script, lineNumber)) {
 			suspend(new SuspendedEvent(DebugEvent.BREAKPOINT, thread, getStacktrace()));
 			return;
 		}
@@ -370,12 +396,12 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			break;
 
 		case DebugEvent.STEP_OVER:
-			if (getThreadState(thread).fResumeStackSize > getStacktrace().size()) {
+			if (getThreadState(thread).fResumeStack.size() > getStacktrace().size()) {
 				// stacktrace got smaller, we stepped out of a function or file
 				if (!getStacktrace().isEmpty())
 					suspend(new SuspendedEvent(DebugEvent.STEP_END, thread, getStacktrace()));
 
-			} else if (getThreadState(thread).fResumeStackSize == getStacktrace().size()) {
+			} else if (getThreadState(thread).fResumeStack.size() == getStacktrace().size()) {
 				// same stacktrace, check if line number changed
 				if (getThreadState(thread).fResumeLineNumber != getStacktrace().get(0).getLineNumber())
 					suspend(new SuspendedEvent(DebugEvent.STEP_END, thread, getStacktrace()));
@@ -384,7 +410,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			break;
 
 		case DebugEvent.STEP_RETURN:
-			if (getThreadState(thread).fResumeStackSize > getStacktrace().size())
+			if (getThreadState(thread).fResumeStack.size() > getStacktrace().size())
 				suspend(new SuspendedEvent(DebugEvent.STEP_END, thread, getStacktrace()));
 
 			break;
@@ -392,6 +418,11 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		default:
 			// either user did not request anything yet or "RESUME" was triggered
 		}
+	}
+
+	protected boolean isActiveBreakpoint(Script script, int lineNumber) {
+		final IBreakpoint breakpoint = getBreakpoint(script, lineNumber);
+		return breakpoint != null;
 	}
 
 	protected ThreadState getThreadState(Object thread) {

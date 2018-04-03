@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging.events.debugger;
 
+import org.eclipse.ease.debugging.events.AbstractEvent;
 import org.eclipse.ease.debugging.events.model.ResumeRequest;
 
-public class ResumedEvent extends AbstractThreadEvent implements IDebuggerEvent {
+public class ResumedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	private final int fType;
 

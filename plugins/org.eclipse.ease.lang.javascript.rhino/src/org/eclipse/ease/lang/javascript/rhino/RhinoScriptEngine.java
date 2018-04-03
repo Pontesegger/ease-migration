@@ -522,23 +522,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected String getTypeName(Object object) {
-		switch (getType(object)) {
-		case NATIVE_ARRAY:
-			return "JavaScript Array";
-
-		case NATIVE_OBJECT:
-			return "JavaScript Object";
-
-		case NATIVE:
-			return "Generic JavaScript";
-
-		default:
-			return super.getTypeName(object);
-		}
-	}
-
-	@Override
 	public ScriptObjectType getType(Object object) {
 		if (object != null) {
 			if (object instanceof NativeArray)

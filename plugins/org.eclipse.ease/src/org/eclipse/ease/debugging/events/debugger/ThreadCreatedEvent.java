@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging.events.debugger;
 
-public class ThreadCreatedEvent extends AbstractThreadEvent {
+import org.eclipse.ease.debugging.events.AbstractEvent;
+
+public class ThreadCreatedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	public ThreadCreatedEvent() {
 		super();

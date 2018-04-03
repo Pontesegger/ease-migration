@@ -18,6 +18,8 @@ public class GetVariablesRequest extends AbstractEvent implements IModelRequest 
 	private final EaseDebugStackFrame fRequestor;
 
 	public GetVariablesRequest(EaseDebugStackFrame requestor) {
+		super(requestor.getThread().getThread());
+
 		fRequestor = requestor;
 	}
 

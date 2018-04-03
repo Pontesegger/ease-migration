@@ -29,8 +29,6 @@ import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
-import org.eclipse.ease.debugging.events.IDebugEvent;
-import org.eclipse.ease.debugging.events.model.TerminateRequest;
 
 /**
  * Debugger class handling communication between Python and Eclipse.
@@ -45,6 +43,8 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 * Custom {@link EaseDebugFrame} parsing the data from {@link IPyFrame} to more usable format.
 	 */
 	public class PythonDebugFrame extends EaseDebugFrame implements IScriptDebugFrame {
+		private final IPyFrame fFrame;
+
 		/**
 		 * Constructor parses information from {@link IPyFrame} to correct parameters for {@link EaseDebugFrame#ScriptDebugFrame(Script, int, int)}.
 		 *
@@ -53,6 +53,8 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 		 */
 		public PythonDebugFrame(final IPyFrame frame) {
 			super(fScriptRegistry.get(frame.getFilename()), frame.getLineNumber(), TYPE_FILE);
+			fFrame = frame;
+
 		}
 
 		@Override
@@ -78,12 +80,23 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 
 			return "(unknown source)";
 		}
+
+		@Override
+		public Map<String, Object> getVariables() {
+			return fFrame.getVariables();
+		}
+
+		@Override
+		public Object inject(String expression) throws Throwable {
+			return getEngine().inject(expression);
+		}
 	}
 
 	/**
 	 * {@link ICodeTracer} for communicating with Python implementation.
 	 */
 	private ICodeTracer fCodeTracer;
+	private boolean fBreakpointsDisabled = false;
 
 	/**
 	 * @see AbstractEaseDebugger#AbstractScriptDebugger(IScriptEngine, boolean)
@@ -105,31 +118,6 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	}
 
 	/**
-	 * Function called to handle incoming event.
-	 *
-	 * Depending on type corresponding handler will be called
-	 */
-	@Override
-	public void handleEvent(final IDebugEvent event) {
-		if (event instanceof TerminateRequest) {
-			resume(DebugEvent.STEP_END, getThread());
-
-		} else
-			super.handleEvent(event);
-	}
-
-	/**
-	 * Utility to check if a frame is part of user code or external library.
-	 *
-	 * @param frame
-	 *            {@link IPyFrame} to check if we are currently in user code.
-	 * @return <code>true</code> if we are in user code.
-	 */
-	private static boolean isUserCode(final IPyFrame frame) {
-		return frame.getFilename().startsWith("__ref_");
-	}
-
-	/**
 	 * Parses given frame for its call stack.
 	 *
 	 * @param origin
@@ -141,7 +129,8 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 
 		IPyFrame frame = origin;
 		while (frame != null) {
-			if (isUserCode(frame)) {
+			final Script script = fScriptRegistry.get(frame.getFilename());
+			if (script != null) {
 				if (isTrackedScript(fScriptRegistry.get(frame.getFilename())))
 					trace.add(new PythonDebugFrame(frame));
 			}
@@ -153,32 +142,38 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	}
 
 	/**
-	 * Function called from {@link ICodeTracer} whenever a new frame in Python is hit.
-	 * <p>
-	 * Effectively checks if debugger should supsend or continue.
+	 * Function called from {@link ICodeTracer} whenever a new frame in Python is hit. Effectively checks if debugger should suspend or continue.
 	 *
 	 * @param frame
 	 *            {@link IPyFrame} for current execution point.
 	 * @param type
-	 *            Type of trace step that occured (ignored).
+	 *            Type of trace step that occurred (ignored).
 	 */
 	public void traceDispatch(final IPyFrame frame, final String type) {
-		if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END)
-			throw new ExitException("Debug aborted by user");
-
-		if (isUserCode(frame)) {
-			final Script script = fScriptRegistry.get(frame.getFilename());
-
+		final Script script = fScriptRegistry.get(frame.getFilename());
+		if (script != null) {
 			if (isTrackedScript(script)) {
 
 				// update stacktrace
 				setStacktrace(getStacktrace(frame));
 
 				// do not process script load event (line == 0)
-				if (frame.getLineNumber() != 0)
+				if (frame.getLineNumber() != 0) {
+					// do not evaluate breakpoints when returning from a function call
+					fBreakpointsDisabled = "return".equals(type);
+
 					processLine(script, frame.getLineNumber());
+				}
 			}
 		}
+	}
+
+	@Override
+	protected boolean isActiveBreakpoint(Script script, int lineNumber) {
+		if (!fBreakpointsDisabled)
+			return super.isActiveBreakpoint(script, lineNumber);
+
+		return false;
 	}
 
 	/**
@@ -192,7 +187,8 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 */
 	public Object execute(final Script script) {
 		try {
-			fCodeTracer.run(script, registerScript(script));
+			return fCodeTracer.run(script, registerScript(script));
+
 		} catch (final Exception e) {
 			/*
 			 * When terminating, #handleEvent sets resume type to STEP_END, which causes #traceDispatch to raise an ExitException. The ExitException is
@@ -206,7 +202,6 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 			}
 			throw e;
 		}
-		return null;
 	}
 
 	/**
@@ -219,6 +214,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	private String registerScript(final Script script) {
 		final String reference = getHash(script, fScriptRegistry.keySet());
 		fScriptRegistry.put(reference, script);
+
 		return reference;
 	}
 

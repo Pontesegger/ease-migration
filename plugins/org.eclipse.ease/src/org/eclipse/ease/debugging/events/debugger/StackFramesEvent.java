@@ -13,8 +13,9 @@ package org.eclipse.ease.debugging.events.debugger;
 import java.util.List;
 
 import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.events.AbstractEvent;
 
-public class StackFramesEvent extends AbstractThreadEvent implements IDebuggerEvent {
+public class StackFramesEvent extends AbstractEvent implements IDebuggerEvent {
 
 	private final List<IScriptDebugFrame> fDebugFrames;
 

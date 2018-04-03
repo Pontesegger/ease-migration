@@ -13,9 +13,10 @@ package org.eclipse.ease.debugging.events.debugger;
 import java.util.List;
 
 import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.events.AbstractEvent;
 import org.eclipse.ease.debugging.events.model.ResumeRequest;
 
-public class SuspendedEvent extends AbstractThreadEvent implements IDebuggerEvent {
+public class SuspendedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	private final int fType;
 

@@ -23,14 +23,6 @@ import org.eclipse.ease.debugging.model.EaseDebugTarget;
 public class PythonDebugTarget extends EaseDebugTarget {
 	private static final String pyBreakpointType = PythonDebugModelPresentation.ID;
 
-	/**
-	 * Constructor for now only calls super constructor.
-	 *
-	 * @param launch
-	 * @param suspendOnStartup
-	 * @param suspendOnScriptLoad
-	 * @param showDynamicCode
-	 */
 	public PythonDebugTarget(final ILaunch launch, final boolean suspendOnStartup, final boolean suspendOnScriptLoad, boolean showDynamicCode) {
 		super(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);
 	}
@@ -39,10 +31,6 @@ public class PythonDebugTarget extends EaseDebugTarget {
 	public String getName() {
 		return "EASE Python Debugger";
 	}
-
-	// ************************************************************
-	// IEventProcessor
-	// ************************************************************
 
 	/**
 	 * Getter methods for all matching breakpoints in given script.
@@ -57,6 +45,11 @@ public class PythonDebugTarget extends EaseDebugTarget {
 	@Override
 	public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
 		return true;
+	}
+
+	@Override
+	public boolean canSuspend() {
+		return false;
 	}
 
 	@Override

@@ -35,6 +35,7 @@ public class ResourceHelper {
 	 *             on access errors on the resource
 	 */
 	public static InputStream getResourceStream(final String bundle, final String path) throws IOException {
+		// FIXME see if we can reuse methods from ResourceTools and get rid of this helper class
 		String location = Platform.getBundle(bundle).getLocation();
 
 		if (location.toLowerCase().endsWith(".jar")) {

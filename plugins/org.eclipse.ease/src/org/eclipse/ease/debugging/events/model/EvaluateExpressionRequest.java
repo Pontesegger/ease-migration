@@ -20,7 +20,8 @@ public class EvaluateExpressionRequest extends AbstractEvent implements IModelRe
 	private final EaseDebugStackFrame fContext;
 	private final IWatchExpressionListener fListener;
 
-	public EvaluateExpressionRequest(String expression, EaseDebugStackFrame context, IWatchExpressionListener listener) {
+	public EvaluateExpressionRequest(String expression, EaseDebugStackFrame context, Object thread, IWatchExpressionListener listener) {
+		super(thread);
 		fExpression = expression;
 		fContext = context;
 		fListener = listener;

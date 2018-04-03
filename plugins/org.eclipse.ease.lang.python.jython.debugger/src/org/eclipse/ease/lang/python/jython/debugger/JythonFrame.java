@@ -11,9 +11,18 @@
 
 package org.eclipse.ease.lang.python.jython.debugger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.ease.lang.python.debugger.IPyFrame;
 import org.python.core.Py;
+import org.python.core.PyDictionary;
+import org.python.core.PyFunction;
+import org.python.core.PyJavaPackage;
+import org.python.core.PyJavaType;
+import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyObjectDerived;
 
 /**
  * Wrapper class for calling {@link IPyFrame} functionality on {@link PyObject}.
@@ -47,11 +56,6 @@ public class JythonFrame implements IPyFrame {
 		return (object != null) && !Py.None.equals(object);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.lang.python.debugger.IPyFrame#getFilename()
-	 */
 	@Override
 	public String getFilename() {
 		if (isNull(fJythonFrame)) {
@@ -61,11 +65,6 @@ public class JythonFrame implements IPyFrame {
 		return "<No Filename>";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.lang.python.debugger.IPyFrame#getLineNumber()
-	 */
 	@Override
 	public int getLineNumber() {
 		if (isNull(fJythonFrame)) {
@@ -75,11 +74,6 @@ public class JythonFrame implements IPyFrame {
 		return -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.lang.python.debugger.IPyFrame#getParent()
-	 */
 	@Override
 	public IPyFrame getParent() {
 		if (isNull(fJythonFrame)) {
@@ -88,4 +82,41 @@ public class JythonFrame implements IPyFrame {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return getFilename() + ": #" + getLineNumber();
+	}
+
+	@Override
+	public Object getVariable(String name) {
+		// FIXME implement
+		return null;
+	}
+
+	@Override
+	public Map<String, Object> getVariables() {
+		final Map<String, Object> variables = new HashMap<>();
+
+		final PyObject pyVariables = fJythonFrame.invoke("getVariables");
+
+		if (pyVariables instanceof PyDictionary) {
+			// TODO some overlap with JythonScriptEngine.internalGetVariables()
+			final PyList keys = ((PyDictionary) pyVariables).keys();
+			for (final Object key : keys) {
+				Object value = ((PyDictionary) pyVariables).get(key);
+
+				if (value instanceof PyObjectDerived)
+					// unpack wrapped java objects
+					value = ((PyObjectDerived) value).__tojava__(Object.class);
+
+				if (value instanceof PyList)
+					value = ((PyList) value).toArray();
+
+				if ((!(value instanceof PyFunction)) && (!(value instanceof PyJavaPackage)) && (!(value instanceof PyJavaType)))
+					variables.put(key.toString(), value);
+			}
+		}
+
+		return variables;
+	}
 }

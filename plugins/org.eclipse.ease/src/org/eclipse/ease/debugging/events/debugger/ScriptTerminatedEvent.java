@@ -11,8 +11,9 @@
 package org.eclipse.ease.debugging.events.debugger;
 
 import org.eclipse.ease.Script;
+import org.eclipse.ease.debugging.events.AbstractEvent;
 
-public class ScriptTerminatedEvent extends AbstractThreadEvent implements IDebuggerEvent {
+public class ScriptTerminatedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	private final Script fScript;
 

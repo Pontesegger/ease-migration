@@ -12,6 +12,7 @@ package org.eclipse.ease.lang.python.jython;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
+import org.eclipse.ease.Script;
 
 /**
  * Python loader. Loads initial environment module.
@@ -30,6 +31,6 @@ public class PythonEnvironementBootStrapper implements IScriptEngineLaunchExtens
 
 		code.append("EnvironmentModule().bootstrap()\n");
 
-		engine.executeAsync(code);
+		engine.executeAsync(new Script("Python Bootstrapper", code));
 	}
 }

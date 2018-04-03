@@ -9,48 +9,16 @@ Contributors:
  * Martin Kloesch - initial API and implementation
  * Christian Pontesegger - stripped most parts to simply trace and relay to java
 '''
+
 # Python std library imports
 import sys
 import __main__
 import re
+import ast
+from pygments.lexers._scilab_builtins import variables_kw
 
 # : Regular expression if we are dealing with internal module.
 _pyease_INTERNAL_CHECKER = re.compile(r"^<.+>$")
-
-def _pyease_ignore_frame(frame, first=True):
-    '''
-    Utility method to check if a frame should be ignored.
-    
-    Current reasons to ignore a frame:
-        * It is the top entry of the stack and it is a standard module.
-          e.g. <string>
-        * It is part of the py4j library or has py4j in its call chain.
-        
-    Recursively checks trace until at bottom of stack. 
-
-    :param frame:    Frame to check if it should be ignored.
-    :param first:    Flag to signalize if it is the first call.
-    :returns:        `True` if the frame should be ignored.
-    '''
-    # End of frame
-    if not frame:
-        return False
-    
-    # Check if we are in the standard modules
-    if _pyease_INTERNAL_CHECKER.match(frame.f_code.co_filename):
-        # Only ignore standard module if its the top of the stack
-        if first:
-            return True
-        else:
-            return False
-        
-    # TODO: Think of better way to identify py4j library
-    if 'py4j' in frame.f_code.co_filename.lower():
-        return True
-    
-    # Check parent in stack
-    return _pyease_ignore_frame(frame.f_back, False)
-
 
 class _pyease_PyFrame:
     '''
@@ -58,6 +26,9 @@ class _pyease_PyFrame:
     with eclipse.
     
     Simply wraps standard python frame to more easily usable format.
+    
+    Python frame documentation is available here:
+    https://docs.python.org/3/reference/datamodel.html#types
     '''
     def __init__(self, frame):
         '''
@@ -106,6 +77,38 @@ class _pyease_PyFrame:
             return _pyease_PyFrame(self._frame.f_back)
         else:
             return None
+    
+    def getVariable(self, name):
+        '''
+        Get a variable from the current frame.
+         
+        :param: name:   variable name to look up
+        :return:        variable or <code>null</code>
+        '''
+        if (self._frame):
+            if name in self._frame.f_locals:
+                return self._frame.f_locals[name]
+            
+            if name in self._frame.f_globals:
+                return self._frame.f_globals[name]
+            
+        return None
+    
+    def getVariables(self):
+        '''
+        Get variables visible from current frame.
+         
+        :return:        variableName -> variableContent
+        '''
+        variables = {}
+        if (self._frame):
+            variables.update(self._frame.f_globals)
+            variables.update(self._frame.f_locals)
+            
+        return variables
+    
+    def toString(self):
+        return str(self.getFilename()) + ": #" + str(self.getLineNumber())
         
     class Java:
         implements = ['org.eclipse.ease.lang.python.debugger.IPyFrame']
@@ -118,6 +121,9 @@ class _pyease_CodeTracer:
     _debugger = None
     _framework_variables = {}
 
+    def __init__(self):
+        sys.settrace(self.trace_dispatch)         
+
     def set_debugger(self, debugger):
         '''
         Setter method for self._debugger.
@@ -126,7 +132,6 @@ class _pyease_CodeTracer:
             PythonDebugger object to handling communication with Eclipse.
         '''
         self._debugger = debugger
-        sys.settrace(self.trace_dispatch)         
     
     def trace_dispatch(self, frame, event, arg):
         '''
@@ -139,9 +144,14 @@ class _pyease_CodeTracer:
         :param arg:      ignored.
         :see:            sys.settrace
         '''
-        if not _pyease_ignore_frame(frame):
+        
+        if not self.ignore_frame(frame):
             if self._debugger:
-                self._debugger.traceDispatch(_pyease_PyFrame(frame), event)
+                if event == "return":
+                    self._debugger.traceDispatch(_pyease_PyFrame(frame.f_back), event)
+                else:
+                    self._debugger.traceDispatch(_pyease_PyFrame(frame), event)
+                
         return self.trace_dispatch
                 
     def run(self, script, filename):
@@ -149,11 +159,64 @@ class _pyease_CodeTracer:
         Executes the file given using the bdb.Bdb.run method.
         '''
         code = "{}\n".format(script.getCode())
-        compiledCode = compile(code, filename, "exec")
 
-        g = globals()
+        ast_ = ast.parse(code, filename, 'exec')
+        final_expr = None
+        for field_ in ast.iter_fields(ast_):
+            if 'body' != field_[0]:
+                continue
+            
+            if len(field_[1]) > 0:
+                if isinstance(field_[1][-1], ast.Expr):
+                    final_expr = ast.Expression()
+                    popped = field_[1].pop(len(field_[1]) - 1); # Jython pop() will not accept -1 as parameter
+                    final_expr.body = popped.value
+        
+        return_value = None
+        exec(compile(ast_, filename, 'exec'), globals())
+        if final_expr:
+            return_value = eval(compile(final_expr, '<code>', 'eval'), None)
+            
+        return return_value
        
-        exec(compiledCode, g)
+#        exec(compiledCode, g)
+
+    def ignore_frame(self, frame, first=True):
+        '''
+        Utility method to check if a frame should be ignored.
+    
+        Current reasons to ignore a frame:
+            * It is the top entry of the stack and it is a standard module.
+              e.g. <string>
+            * It is part of the py4j library or has py4j in its call chain.
+        
+        Recursively checks trace until at bottom of stack. 
+
+        :param frame:    Frame to check if it should be ignored.
+        :param first:    Flag to signalize if it is the first call.
+        :returns:        `True` if the frame should be ignored.
+        '''
+        # End of frame
+        if not frame:
+            return False
+
+        # ignore frames that originate from the self.run() method 
+        if first:
+            if frame.f_code.co_filename == "(none)":
+                return True
+
+        # Check if we are in the standard modules
+        if _pyease_INTERNAL_CHECKER.match(frame.f_code.co_filename):
+            # Only ignore standard module if its the top of the stack
+            return first
+        
+        # TODO: Think of better way to identify py4j library
+        if 'py4j' in frame.f_code.co_filename.lower():
+            return True
+    
+        # Check parent in stack
+        return self.ignore_frame(frame.f_back, False)
+
         
     class Java:
         implements = ['org.eclipse.ease.lang.python.debugger.ICodeTracer']

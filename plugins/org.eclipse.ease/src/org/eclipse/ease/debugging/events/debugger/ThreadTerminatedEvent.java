@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging.events.debugger;
 
-public class ThreadTerminatedEvent extends AbstractThreadEvent {
+import org.eclipse.ease.debugging.events.AbstractEvent;
+
+public class ThreadTerminatedEvent extends AbstractEvent implements IDebuggerEvent {
 
 	public ThreadTerminatedEvent() {
 		super();
