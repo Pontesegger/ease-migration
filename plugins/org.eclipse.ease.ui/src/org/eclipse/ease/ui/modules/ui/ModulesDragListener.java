@@ -75,7 +75,7 @@ public class ModulesDragListener implements DragSourceListener {
 		}
 	}
 
-	private IStructuredSelection getSelection() {
+	protected IStructuredSelection getSelection() {
 		if (fTreeViewer != null)
 			return fTreeViewer.getStructuredSelection();
 

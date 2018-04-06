@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.modules.ModuleDefinition.ModuleDependency;
-import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.modules.ModuleTracker.ModuleState;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.swt.widgets.Display;
@@ -65,11 +64,13 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		instance.wrap(instance, false);
 	}
 
+	private final ModuleTracker fModuleTracker = new ModuleTracker();
+
 	/** Loaded module instances. Used as cache so that each module instance gets created only once. Maps moduleID -> instance. */
-	private final Map<ModuleDefinition, Object> fLoadedModuleInstances = new HashMap<>();
+	// private final Map<ModuleDefinition, Object> fLoadedModuleInstances = new HashMap<>();
 
 	/** Stores ordering of wrapped elements. Index 0 contains the newest element */
-	private final List<Object> fWrappedElements = new ArrayList<>();
+	// private final List<Object> fWrappedElements = new ArrayList<>();
 
 	/** Stores beautified names of loaded modules. */
 	// private final Map<String, Object> fModuleNames = new HashMap<>();
@@ -83,45 +84,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	private final ListenerList<IModuleCallbackProvider> fModuleCallbacks = new ListenerList<>();
 
 	public EnvironmentModule() {
-		fLoadedModuleInstances.put(ModuleHelper.resolveModuleName(MODULE_NAME), this);
-	}
-
-	private Object createModuleInstance(final ModuleDefinition definition) {
-
-		if (!fLoadedModuleInstances.containsKey(definition)) {
-			if (definition.isDeprecated())
-				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.");
-
-			loadModuleDependencies(definition);
-			final Object instance = definition.createModuleInstance();
-
-			// check that module class got initialized correctly
-			if (instance == null)
-				throw new RuntimeException("Could not create module instance, see workspace log for more details");
-
-			if (instance instanceof IScriptModule)
-				((IScriptModule) instance).initialize(getScriptEngine(), this);
-
-			fLoadedModuleInstances.put(definition, instance);
-		}
-
-		return fLoadedModuleInstances.get(definition);
-	}
-
-	private void loadModuleDependencies(ModuleDefinition parentModuleDefinition) {
-
-		final IScriptService scriptService = ScriptService.getService();
-
-		for (final ModuleDependency dependency : parentModuleDefinition.getDependencies()) {
-			final ModuleDefinition requiredModule = scriptService.getModuleDefinition(dependency.getId());
-
-			if (requiredModule == null)
-				throw new RuntimeException("Could not resolve module dependency \"" + dependency.getId() + "\"");
-
-			Object instance = fLoadedModuleInstances.get(requiredModule);
-			if (instance == null)
-				instance = createModuleInstance(requiredModule);
-		}
+		final ModuleDefinition moduleDefinition = ModuleHelper.resolveModuleName(MODULE_NAME);
+		final ModuleState state = fModuleTracker.addModule(moduleDefinition);
+		state.setInstance(this);
 	}
 
 	@Override
@@ -132,33 +97,72 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		if (definition == null)
 			throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
 
-		Object module = fLoadedModuleInstances.get(definition);
-		if (module == null) {
-			// not loaded yet
-			module = createModuleInstance(definition);
-		}
+		final ModuleState moduleState = fModuleTracker.getOrCreateModuleState(definition);
+
+		if (!moduleState.isLoaded())
+			createModuleInstance(moduleState);
 
 		if (!useCustomNamespace)
 			wrapModuleDependencies(definition);
 
 		// create function wrappers
-		return wrap(module, useCustomNamespace);
+		return wrap(moduleState.getInstance(), useCustomNamespace);
+	}
+
+	private Object createModuleInstance(final ModuleState state) {
+
+		final ModuleDefinition definition = state.getModuleDefinition();
+		if (definition != null) {
+			if (definition.isDeprecated())
+				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.");
+
+			createModuleDependencies(definition);
+			final Object instance = definition.createModuleInstance();
+			state.setInstance(instance);
+
+			// check that module class got initialized correctly
+			if (instance == null)
+				throw new RuntimeException("Could not create module instance, see workspace log for more details");
+
+			if (instance instanceof IScriptModule)
+				((IScriptModule) instance).initialize(getScriptEngine(), this);
+		}
+
+		return state.getInstance();
+	}
+
+	private void createModuleDependencies(ModuleDefinition parentModuleDefinition) {
+
+		for (final ModuleDependency dependency : parentModuleDefinition.getDependencies()) {
+			final ModuleDefinition dependencyDefinition = dependency.getDefinition();
+
+			if (dependencyDefinition == null)
+				throw new RuntimeException("Could not resolve module dependency \"" + dependency.getId() + "\"");
+
+			createModuleDependencies(dependencyDefinition);
+
+			final ModuleState dependencyState = fModuleTracker.getOrCreateModuleState(dependencyDefinition);
+			if (!dependencyState.isLoaded())
+				createModuleInstance(dependencyState);
+		}
 	}
 
 	/**
-	 * Find and wrap instances of module dependencies. All found dependencies (and dependencies of dependencies) are wrapped into the root scope.
+	 * Find and wrap instances of module dependencies. All found dependencies (and dependencies of dependencies) are wrapped into the root scope if they were
+	 * not wrapped before.
 	 *
-	 * @param definition
+	 * @param parentModuleDefinition
 	 *            parent definition to find dependencies for
 	 */
-	private void wrapModuleDependencies(ModuleDefinition definition) {
-		for (final ModuleDependency dependency : definition.getDependencies()) {
+	private void wrapModuleDependencies(ModuleDefinition parentModuleDefinition) {
+		for (final ModuleDependency dependency : parentModuleDefinition.getDependencies()) {
 			final ModuleDefinition dependencyDefinition = dependency.getDefinition();
+
 			wrapModuleDependencies(dependencyDefinition);
 
-			final Object instance = fLoadedModuleInstances.get(dependencyDefinition);
-			if (instance != null)
-				wrap(instance, false);
+			final ModuleState dependencyState = fModuleTracker.getOrCreateModuleState(dependencyDefinition);
+			if (!dependencyState.isWrapped())
+				wrap(dependencyState.getInstance(), false);
 		}
 	}
 
@@ -176,7 +180,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		if (definition == null)
 			return null;
 
-		return fLoadedModuleInstances.get(definition);
+		final ModuleState moduleState = fModuleTracker.getModuleState(definition);
+		return (moduleState != null) ? moduleState.getInstance() : null;
 	}
 
 	/**
@@ -189,9 +194,11 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object, U extends Class<T>> T getModule(final U clazz) {
-		for (final Object module : fLoadedModuleInstances.values()) {
-			if (clazz.isAssignableFrom(module.getClass()))
-				return (T) module;
+		for (final ModuleState state : fModuleTracker.getAvailableModules()) {
+			if (state.getInstance() != null) {
+				if (clazz.isAssignableFrom(state.getInstance().getClass()))
+					return (T) state.getInstance();
+			}
 		}
 
 		return null;
@@ -199,47 +206,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	@Override
 	public List<Object> getModules() {
-		return fWrappedElements.stream().filter(instance -> fLoadedModuleInstances.values().contains(instance)).collect(Collectors.toList());
-	}
-
-	/**
-	 * List all available (visible) modules. Returns a list of visible modules. Loaded modules are indicated.
-	 *
-	 * @return string containing module information
-	 */
-	@WrapToScript
-	public final String listModules() {
-
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		final List<ModuleDefinition> moduleDefinitions = new ArrayList<>(scriptService.getAvailableModules());
-
-		moduleDefinitions.sort((m1, m2) -> {
-			return m1.getPath().toString().compareTo(m2.getPath().toString());
-		});
-
-		final StringBuilder output = new StringBuilder();
-
-		// add header
-		output.append("available modules\n=================\n\n");
-
-		// add modules
-		for (final ModuleDefinition definition : moduleDefinitions) {
-
-			if (definition.isVisible()) {
-				output.append('\t');
-
-				output.append(definition.getPath().toString());
-				if (fLoadedModuleInstances.containsKey(definition))
-					output.append(" [LOADED]");
-
-				output.append('\n');
-			}
-		}
-
-		// write to default output
-		print(output, true);
-
-		return output.toString();
+		return fModuleTracker.getAvailableModules().stream().filter(state -> state.isLoaded()).map(state -> state.getInstance()).collect(Collectors.toList());
 	}
 
 	/**
@@ -329,8 +296,19 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		// create function wrappers
 		final Object result = createWrappers(toBeWrapped, identifier, reloaded, useCustomNamespace);
 
-		fWrappedElements.remove(toBeWrapped);
-		fWrappedElements.add(0, toBeWrapped);
+		boolean isTrackedModule = false;
+		for (final ModuleState state : fModuleTracker.getAvailableModules()) {
+			if (toBeWrapped.equals(state.getInstance())) {
+				state.setWrapped(true);
+				isTrackedModule = true;
+				break;
+			}
+		}
+
+		if (!isTrackedModule) {
+			final ModuleState state = fModuleTracker.addInstance(toBeWrapped);
+			state.setWrapped(true);
+		}
 
 		// notify listeners
 		fireModuleEvent(toBeWrapped, reloaded ? IModuleListener.RELOADED : IModuleListener.LOADED);

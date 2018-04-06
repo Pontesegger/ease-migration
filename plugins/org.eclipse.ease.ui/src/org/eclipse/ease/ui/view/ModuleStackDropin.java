@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
@@ -79,14 +80,14 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 			if (inputElement instanceof IScriptEngine) {
 				final IEnvironment environment = IEnvironment.getEnvironment((IScriptEngine) inputElement);
 				if (environment != null) {
-					final List<ModuleDefinition> loadedModules = new ArrayList<>();
-					for (final Object element : new ArrayList<>(environment.getModules())) {
-						final ModuleDefinition module = getDefinition(element);
-						if (module != null)
-							loadedModules.add(module);
+					final List<Object> loadedModules = new ArrayList<>();
+
+					for (final Object instance : new ArrayList<>(environment.getModules())) {
+						final ModuleDefinition definition = getDefinition(instance);
+						loadedModules.add((definition != null) ? definition : instance);
 					}
 
-					return loadedModules.toArray(new ModuleDefinition[loadedModules.size()]);
+					return loadedModules.toArray();
 				}
 			}
 
@@ -103,6 +104,9 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 				if (element instanceof ModuleDefinition)
 					return ((ModuleDefinition) element).getName();
 
+				if (element != null)
+					return element.getClass().getCanonicalName();
+
 				return super.getText(element);
 			}
 
@@ -116,6 +120,9 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 					return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/module.png", true);
 				}
 
+				if (element != null)
+					return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/debug_java_class.png", true);
+
 				return super.getImage(element);
 			}
 		});
@@ -123,7 +130,15 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 		fModulesTable.setInput(fEngine);
 
 		fModulesTable.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY, new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() },
-				new ModulesDragListener(fModulesTable));
+				new ModulesDragListener(fModulesTable) {
+					@Override
+					public void dragStart(DragSourceEvent event) {
+						super.dragStart(event);
+
+						final Object firstElement = getSelection().getFirstElement();
+						event.doit = (firstElement instanceof ModuleDefinition);
+					}
+				});
 
 		return composite;
 	}
