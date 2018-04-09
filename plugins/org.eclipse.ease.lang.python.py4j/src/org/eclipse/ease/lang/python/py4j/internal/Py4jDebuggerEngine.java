@@ -86,6 +86,12 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	}
 
 	@Override
+	public ScriptStackTrace getExceptionStackTrace(Object thread) {
+		// FIXME to be implemented
+		return null;
+	}
+
+	@Override
 	public Object removeVariable(final String name) {
 		throw new UnsupportedOperationException();
 	}

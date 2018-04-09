@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Christian Pontesegger and others.
+ * Copyright (c) 2018 Christian Pontesegger and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,29 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.debugging.events.model;
+
+package org.eclipse.ease.debugging.events.debugger;
 
 import org.eclipse.ease.debugging.events.AbstractEvent;
 
-public class GetStackFramesRequest extends AbstractEvent implements IModelRequest {
+public class AbstractThreadEvent extends AbstractEvent implements IDebuggerEvent {
 
 	private final Object fThread;
 
-	public GetStackFramesRequest(final Object thread) {
+	protected AbstractThreadEvent(Object thread) {
 		fThread = thread;
+	}
+
+	protected AbstractThreadEvent() {
+		this(Thread.currentThread());
 	}
 
 	public Object getThread() {
 		return fThread;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "(" + getThread() + ")";
 	}
 }

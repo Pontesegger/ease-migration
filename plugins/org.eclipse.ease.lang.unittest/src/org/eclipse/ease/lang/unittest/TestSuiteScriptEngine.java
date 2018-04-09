@@ -227,6 +227,11 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 	}
 
 	@Override
+	public ScriptStackTrace getExceptionStackTrace(Object thread) {
+		return null;
+	}
+
+	@Override
 	public void terminate() {
 		if (!fTerminated) {
 			fTerminated = true;

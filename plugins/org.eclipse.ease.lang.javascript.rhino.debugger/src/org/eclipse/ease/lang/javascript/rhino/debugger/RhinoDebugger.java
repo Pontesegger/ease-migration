@@ -107,7 +107,6 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 		@Override
 		public void onEnter(final Context cx, final Scriptable activation, final Scriptable thisObj, final Object[] args) {
-			// nothing to do
 			fScope = activation;
 
 			if (getScript() != null)
@@ -166,7 +165,10 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 		public Object inject(String expression) throws Throwable {
 			try {
 				final StringReader reader = new StringReader(expression);
-				return RhinoScriptEngine.getContext().evaluateReader(fScope, reader, null, 1, null);
+				final Context context = RhinoScriptEngine.getContext();
+				context.setDebugger(null, null);
+				return context.evaluateReader(fScope, reader, null, 1, null);
+
 			} catch (final Throwable e) {
 				// FIXME: move to script engine to get correct error handling
 				throw e;

@@ -31,12 +31,22 @@ public interface IDebugEngine extends IScriptEngine {
 	ScriptStackTrace getStackTrace();
 
 	/**
-	 * Get the stack trace of the last thrown exception. Will be populated when an exception is thrown by the script engine. Can be evaluated in a try/catch
-	 * statement within the script. Only available during script runtime.
+	 * Get the stack trace of the last thrown exception of the current thread. Will be populated when an exception is thrown by the script engine. Can be
+	 * evaluated in a try/catch statement within the script. Only available during script runtime.
 	 *
 	 * @return last exception stack trace or <code>null</code>
 	 */
 	ScriptStackTrace getExceptionStackTrace();
+
+	/**
+	 * Get the stack trace of the last thrown exception of the given thread. Will be populated when an exception is thrown by the script engine. Can be
+	 * evaluated in a try/catch statement within the script. Only available during script runtime.
+	 *
+	 * @param thread
+	 *            thread to get last exception stacktrace from
+	 * @return last exception stack trace or <code>null</code>
+	 */
+	ScriptStackTrace getExceptionStackTrace(Object thread);
 
 	void setupDebugger(ILaunch launch, boolean suspendOnStartup, boolean suspendOnScriptLoad, boolean showDynamicCode);
 

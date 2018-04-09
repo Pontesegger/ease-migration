@@ -32,6 +32,9 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 		case DebugEvent.STEP_END:
 			return "STEP_END";
 
+		case DebugEvent.BREAKPOINT:
+			return "BREAKPOINT";
+
 		default:
 			return "<unknown>";
 		}
@@ -39,6 +42,7 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 
 	/** See {@link DebugEvent}. */
 	private final int fType;
+	private final Object fThread;
 
 	/**
 	 * Constructor.
@@ -48,12 +52,17 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 	 * @param thread
 	 *            thread to resume
 	 */
-	public ResumeRequest(final int type, final Thread thread) {
+	public ResumeRequest(final int type, final Object thread) {
 		fType = type;
+		fThread = thread;
 	}
 
 	public int getType() {
 		return fType;
+	}
+
+	public Object getThread() {
+		return fThread;
 	}
 
 	@Override

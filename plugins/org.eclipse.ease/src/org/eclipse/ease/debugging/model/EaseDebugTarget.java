@@ -13,24 +13,21 @@ package org.eclipse.ease.debugging.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IMemoryBlock;
-import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.ease.Activator;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.DebugTracer;
-import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.debugging.events.IDebugEvent;
@@ -41,29 +38,20 @@ import org.eclipse.ease.debugging.events.debugger.ResumedEvent;
 import org.eclipse.ease.debugging.events.debugger.ScriptReadyEvent;
 import org.eclipse.ease.debugging.events.debugger.StackFramesEvent;
 import org.eclipse.ease.debugging.events.debugger.SuspendedEvent;
+import org.eclipse.ease.debugging.events.debugger.ThreadCreatedEvent;
+import org.eclipse.ease.debugging.events.debugger.ThreadTerminatedEvent;
 import org.eclipse.ease.debugging.events.debugger.VariablesEvent;
 import org.eclipse.ease.debugging.events.model.BreakpointRequest;
 import org.eclipse.ease.debugging.events.model.BreakpointRequest.Mode;
 import org.eclipse.ease.debugging.events.model.IModelRequest;
-import org.eclipse.ease.debugging.events.model.ResumeRequest;
-import org.eclipse.ease.debugging.events.model.SuspendRequest;
-import org.eclipse.ease.debugging.events.model.TerminateRequest;
 
 public abstract class EaseDebugTarget extends EaseDebugElement implements IDebugTarget, IEventProcessor {
-
-	private enum State {
-		NOT_STARTED, SUSPENDED, RESUMED, STEPPING, TERMINATED, DISCONNECTED
-	}
 
 	private EventDispatchJob fDispatcher;
 
 	private EaseDebugProcess fProcess = null;
 
-	private final List<EaseDebugThread> fThreads = new ArrayList<>();
-
 	private final ILaunch fLaunch;
-
-	private State fState = State.NOT_STARTED;
 
 	private final boolean fSuspendOnStartup;
 
@@ -87,6 +75,18 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 		fireCreationEvent();
 	}
 
+	public boolean isSuspendOnStartup() {
+		return fSuspendOnStartup;
+	}
+
+	public boolean isSuspendOnScriptLoad() {
+		return fSuspendOnScriptLoad;
+	}
+
+	public boolean isShowDynamicCode() {
+		return fShowDynamicCode;
+	}
+
 	@Override
 	public String getName() {
 		return "EASE Debugger";
@@ -103,18 +103,21 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	}
 
 	@Override
-	public IProcess getProcess() {
+	public EaseDebugProcess getProcess() {
 		return fProcess;
 	}
 
 	@Override
 	public EaseDebugThread[] getThreads() {
-		return fThreads.toArray(new EaseDebugThread[fThreads.size()]);
+		if (getProcess() != null)
+			return getProcess().getThreads();
+
+		return new EaseDebugThread[0];
 	}
 
 	@Override
 	public boolean hasThreads() {
-		return !fThreads.isEmpty();
+		return getThreads().length > 0;
 	}
 
 	public void fireDispatchEvent(final IModelRequest event) {
@@ -148,55 +151,26 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 				fProcess.fireCreationEvent();
 
 			} else if (event instanceof ScriptReadyEvent) {
-				// find existing DebugThread
-				EaseDebugThread debugThread = findDebugThread(((ScriptReadyEvent) event).getThread());
-
-				if (debugThread == null) {
-					// thread does not exist, create new one
-					debugThread = new EaseDebugThread(getDebugTarget(), ((ScriptReadyEvent) event).getThread());
-					fThreads.add(debugThread);
-
-					debugThread.fireCreationEvent();
-
-				} else {
-					// stack frames changed
-					debugThread.fireChangeEvent(DebugEvent.CONTENT);
-				}
-
-				// set deferred breakpoints
-				setDeferredBreakpoints(((ScriptReadyEvent) event).getScript());
-
-				// tell framework we are suspended
-				fState = State.SUSPENDED;
-				debugThread.fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
-
-				// by default resume execution
-				int stepType = DebugEvent.UNSPECIFIED;
-				if (fSuspendOnScriptLoad)
-					// suspend on any script load event
-					stepType = DebugEvent.STEP_INTO;
-
-				else if ((((ScriptReadyEvent) event).isRoot()) && (fSuspendOnStartup))
-					// suspend on script startup event
-					stepType = DebugEvent.STEP_INTO;
-
-				// send resume request
-				fireDispatchEvent(new ResumeRequest(stepType, debugThread.getThread()));
+				fProcess.handleEvent(event);
 
 			} else if (event instanceof SuspendedEvent) {
-				final EaseDebugThread debugThread = findDebugThread(((SuspendedEvent) event).getThread());
-				debugThread.setStackFrames(filterFrames(((SuspendedEvent) event).getDebugFrames()));
+				EaseDebugThread debugThread = getProcess().findDebugThread(((SuspendedEvent) event).getThread());
+				if (debugThread == null) {
+					// new debug thread detected
+					debugThread = getProcess().createDebugThread(((SuspendedEvent) event).getThread());
+				}
 
-				fState = State.SUSPENDED;
-				debugThread.fireSuspendEvent(((SuspendedEvent) event).getType());
+				debugThread.handleEvent(event);
+
+			} else if (event instanceof ResumedEvent) {
+				final EaseDebugThread debugThread = getProcess().findDebugThread(((ResumedEvent) event).getThread());
+				if (debugThread != null)
+					debugThread.handleEvent(event);
 
 			} else if (event instanceof StackFramesEvent) {
-				// stackframe refresh
-				final EaseDebugThread debugThread = findDebugThread(((StackFramesEvent) event).getThread());
-				debugThread.setStackFrames(filterFrames(((StackFramesEvent) event).getDebugFrames()));
-
-				// stack frames changed
-				debugThread.fireChangeEvent(DebugEvent.CONTENT);
+				final EaseDebugThread debugThread = getProcess().findDebugThread(((StackFramesEvent) event).getThread());
+				if (debugThread != null)
+					debugThread.handleEvent(event);
 
 			} else if (event instanceof VariablesEvent) {
 				// variables refresh
@@ -208,10 +182,11 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 					((EvaluateExpressionEvent) event).getListener().watchEvaluationFinished(((EvaluateExpressionEvent) event).getWatchExpressionResult(this));
 				}
 
-			} else if (event instanceof ResumedEvent) {
-				fState = State.RESUMED;
-				final EaseDebugThread debugThread = findDebugThread(((ResumedEvent) event).getThread());
-				debugThread.fireResumeEvent(((ResumedEvent) event).getType());
+			} else if (event instanceof ThreadCreatedEvent) {
+				getProcess().handleEvent(event);
+
+			} else if (event instanceof ThreadTerminatedEvent) {
+				getProcess().handleEvent(event);
 
 			} else if (event instanceof EngineTerminatedEvent) {
 				cleanupOnTermination();
@@ -219,7 +194,7 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 		}
 	}
 
-	private void cleanupOnTermination() {
+	public void cleanupOnTermination() {
 		// allow for garbage collection
 		fDispatcher = null;
 
@@ -228,33 +203,14 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 		if (debugPlugin != null)
 			debugPlugin.getBreakpointManager().removeBreakpointListener(this);
 
-		fState = State.TERMINATED;
+		getProcess().setTerminated();
 
-		getThreads()[0].setStackFrames(Collections.emptyList());
-		fireTerminateEvent();
-	}
-
-	/**
-	 * Remove dynamic code fragments in case they are disabled by the debug target.
-	 *
-	 * @param frames
-	 *            frames to be filtered
-	 * @return filtered frames
-	 */
-	private List<IScriptDebugFrame> filterFrames(final List<IScriptDebugFrame> frames) {
-		if (fShowDynamicCode)
-			return frames;
-
-		return frames.stream().filter(frame -> (frame.getScript() != null) && (!frame.getScript().isDynamic())).collect(Collectors.toList());
-	}
-
-	private EaseDebugThread findDebugThread(final Thread thread) {
-		for (final EaseDebugThread debugThread : getThreads()) {
-			if (thread.equals(debugThread.getThread()))
-				return debugThread;
+		for (final EaseDebugThread thread : getThreads()) {
+			thread.setStackFrames(Collections.emptyList());
+			thread.setState(State.TERMINATED);
 		}
 
-		return null;
+		fireTerminateEvent();
 	}
 
 	public int getUniqueVariableId(Object value) {
@@ -267,19 +223,6 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 		}
 
 		return index;
-	}
-
-	private void setDeferredBreakpoints(final Script script) {
-
-		final Object file = script.getFile();
-		if (file instanceof IResource) {
-			final IBreakpoint[] breakpoints = getBreakpoints(script);
-
-			for (final IBreakpoint breakpoint : breakpoints) {
-				if (file.equals(breakpoint.getMarker().getResource()))
-					fireDispatchEvent(new BreakpointRequest(script, breakpoint, BreakpointRequest.Mode.ADD));
-			}
-		}
 	}
 
 	protected abstract IBreakpoint[] getBreakpoints(Script script);
@@ -332,129 +275,6 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 
 	@Override
 	public IMemoryBlock getMemoryBlock(final long startAddress, final long length) throws DebugException {
-		// FIXME add correct plugin id
-		throw new DebugException(new Status(IStatus.ERROR, "Activator.PLUGIN_ID", "getMemoryBlock() not supported by " + getName()));
-	}
-
-	// ************************************************************
-	// ITerminate
-	// ************************************************************
-
-	@Override
-	public boolean canTerminate() {
-		return !isTerminated();
-	}
-
-	@Override
-	public synchronized void terminate() {
-		fireDispatchEvent(new TerminateRequest());
-	}
-
-	@Override
-	public boolean isTerminated() {
-		return State.TERMINATED == fState;
-	}
-
-	// ************************************************************
-	// ISuspendResume
-	// ************************************************************
-
-	@Override
-	public boolean canResume() {
-		return isSuspended();
-	}
-
-	@Override
-	public boolean canSuspend() {
-		return !isSuspended();
-	}
-
-	@Override
-	public synchronized void resume() {
-		// FIXME do we need the thread here?
-		final EaseDebugThread[] threads = getThreads();
-		if (threads.length == 1)
-			fireDispatchEvent(new ResumeRequest(DebugEvent.CLIENT_REQUEST, threads[0].getThread()));
-	}
-
-	@Override
-	public synchronized void suspend() {
-		fireDispatchEvent(new SuspendRequest());
-	}
-
-	@Override
-	public boolean isSuspended() {
-		return State.SUSPENDED == fState;
-	}
-
-	// ************************************************************
-	// IDisconnect
-	// ************************************************************
-
-	@Override
-	public boolean canDisconnect() {
-		return canTerminate();
-	}
-
-	@Override
-	public synchronized void disconnect() {
-		// remove all breakpoints
-		fireDispatchEvent(new BreakpointRequest(Mode.REMOVE));
-
-		// resume interpreter
-		fireDispatchEvent(new ResumeRequest(DebugEvent.CLIENT_REQUEST, null));
-
-		// cleanup removes dispatcher instance. Needs to be called after all events have been sent
-		cleanupOnTermination();
-	}
-
-	@Override
-	public boolean isDisconnected() {
-		return isTerminated();
-	}
-
-	// ************************************************************
-	// IStep
-	// ************************************************************
-
-	@Override
-	public boolean canStepInto() {
-		return isSuspended();
-	}
-
-	@Override
-	public boolean canStepOver() {
-		return isSuspended();
-	}
-
-	@Override
-	public boolean canStepReturn() {
-		return isSuspended();
-	}
-
-	@Override
-	public synchronized void stepInto() {
-		final EaseDebugThread[] threads = getDebugTarget().getThreads();
-		if (threads.length == 1)
-			fireDispatchEvent(new ResumeRequest(DebugEvent.STEP_INTO, threads[0].getThread()));
-	}
-
-	@Override
-	public synchronized void stepOver() {
-		final EaseDebugThread[] threads = getDebugTarget().getThreads();
-		if (threads.length == 1)
-			fireDispatchEvent(new ResumeRequest(DebugEvent.STEP_OVER, threads[0].getThread()));
-	}
-
-	@Override
-	public synchronized void stepReturn() {
-		final EaseDebugThread[] threads = getDebugTarget().getThreads();
-		if (threads.length == 1)
-			fireDispatchEvent(new ResumeRequest(DebugEvent.STEP_RETURN, threads[0].getThread()));
-	}
-
-	@Override
-	public boolean isStepping() {
-		return State.STEPPING == fState;
+		throw new DebugException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "getMemoryBlock() not supported by " + getName()));
 	}
 }

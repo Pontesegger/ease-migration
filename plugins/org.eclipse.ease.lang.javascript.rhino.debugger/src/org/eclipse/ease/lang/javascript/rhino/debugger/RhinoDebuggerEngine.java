@@ -22,6 +22,8 @@ import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
+import org.eclipse.ease.debugging.events.debugger.ThreadCreatedEvent;
+import org.eclipse.ease.debugging.events.debugger.ThreadTerminatedEvent;
 import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.lang.javascript.JavaScriptHelper;
@@ -29,12 +31,13 @@ import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebugger.RhinoDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.debugger.model.RhinoDebugTarget;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory.Listener;
 import org.mozilla.javascript.Scriptable;
 
 /**
  * A script engine to execute/debug JavaScript code on a Rhino interpreter.
  */
-public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngine {
+public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngine, Listener {
 
 	public static final String ENGINE_ID = "org.eclipse.ease.javascript.rhinoDebugger";
 
@@ -64,6 +67,15 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 		context.setGeneratingDebug(true);
 		context.setGeneratingSource(true);
 		context.setDebugger(fDebugger, null);
+
+		context.getFactory().addListener(this);
+	}
+
+	@Override
+	protected synchronized void teardownEngine() {
+		getContext().getFactory().removeListener(this);
+
+		super.teardownEngine();
 	}
 
 	@Override
@@ -157,5 +169,25 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 			return super.getExceptionStackTrace();
 
 		return fDebugger.getExceptionStacktrace();
+	}
+
+	@Override
+	public ScriptStackTrace getExceptionStackTrace(Object thread) {
+		if ((fDebugger.getExceptionStacktrace(thread) == null) || (fDebugger.getExceptionStacktrace(thread).isEmpty()))
+			return super.getExceptionStackTrace();
+
+		return fDebugger.getExceptionStacktrace(thread);
+	}
+
+	@Override
+	public void contextCreated(Context cx) {
+		cx.setDebugger(fDebugger, null);
+		fDebugger.fireDispatchEvent(new ThreadCreatedEvent());
+	}
+
+	@Override
+	public void contextReleased(Context cx) {
+		cx.setDebugger(null, null);
+		fDebugger.fireDispatchEvent(new ThreadTerminatedEvent());
 	}
 }

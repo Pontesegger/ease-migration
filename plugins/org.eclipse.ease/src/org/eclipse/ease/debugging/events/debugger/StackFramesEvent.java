@@ -13,24 +13,18 @@ package org.eclipse.ease.debugging.events.debugger;
 import java.util.List;
 
 import org.eclipse.ease.debugging.IScriptDebugFrame;
-import org.eclipse.ease.debugging.events.AbstractEvent;
 
-public class StackFramesEvent extends AbstractEvent implements IDebuggerEvent {
+public class StackFramesEvent extends AbstractThreadEvent implements IDebuggerEvent {
 
 	private final List<IScriptDebugFrame> fDebugFrames;
 
-	private final Thread fThread;
+	public StackFramesEvent(final List<IScriptDebugFrame> debugFrames, final Object thread) {
+		super(thread);
 
-	public StackFramesEvent(final List<IScriptDebugFrame> debugFrames, final Thread thread) {
 		fDebugFrames = debugFrames;
-		fThread = thread;
 	}
 
 	public List<IScriptDebugFrame> getDebugFrames() {
 		return fDebugFrames;
-	}
-
-	public Thread getThread() {
-		return fThread;
 	}
 }

@@ -112,7 +112,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	@Override
 	public void handleEvent(final IDebugEvent event) {
 		if (event instanceof TerminateRequest) {
-			resume(DebugEvent.STEP_END);
+			resume(DebugEvent.STEP_END, getThread());
 
 		} else
 			super.handleEvent(event);
@@ -163,7 +163,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 *            Type of trace step that occured (ignored).
 	 */
 	public void traceDispatch(final IPyFrame frame, final String type) {
-		if (getResumeType() == DebugEvent.STEP_END)
+		if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END)
 			throw new ExitException("Debug aborted by user");
 
 		if (isUserCode(frame)) {
@@ -201,7 +201,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 			 *
 			 * Therefore we catch that case and re-raise the expected ExitException()
 			 */
-			if (getResumeType() == DebugEvent.STEP_END) {
+			if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END) {
 				throw new ExitException("Debug aborted by user");
 			}
 			throw e;
@@ -244,5 +244,4 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 
 		return buffer.toString();
 	}
-
 }

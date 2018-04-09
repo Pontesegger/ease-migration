@@ -10,17 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging.events.model;
 
-import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IWatchExpressionListener;
 import org.eclipse.ease.debugging.events.AbstractEvent;
+import org.eclipse.ease.debugging.model.EaseDebugStackFrame;
 
 public class EvaluateExpressionRequest extends AbstractEvent implements IModelRequest {
 
 	private final String fExpression;
-	private final IDebugElement fContext;
+	private final EaseDebugStackFrame fContext;
 	private final IWatchExpressionListener fListener;
 
-	public EvaluateExpressionRequest(String expression, IDebugElement context, IWatchExpressionListener listener) {
+	public EvaluateExpressionRequest(String expression, EaseDebugStackFrame context, IWatchExpressionListener listener) {
 		fExpression = expression;
 		fContext = context;
 		fListener = listener;
@@ -30,7 +30,7 @@ public class EvaluateExpressionRequest extends AbstractEvent implements IModelRe
 		return fExpression;
 	}
 
-	public IDebugElement getContext() {
+	public EaseDebugStackFrame getContext() {
 		return fContext;
 	}
 

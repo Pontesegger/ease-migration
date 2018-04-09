@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IThread;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.events.model.GetVariablesRequest;
@@ -50,7 +49,7 @@ public class EaseDebugStackFrame extends EaseDebugElement implements IStackFrame
 	}
 
 	@Override
-	public IThread getThread() {
+	public EaseDebugThread getThread() {
 		return fThread;
 	}
 
@@ -139,5 +138,73 @@ public class EaseDebugStackFrame extends EaseDebugElement implements IStackFrame
 	@Override
 	public String toString() {
 		return getScript().getTitle() + ":" + getDebugFrame().getName() + " line: " + getDebugFrame().getLineNumber();
+	}
+
+	// ************************************************************
+	// ISuspendResume
+	// ************************************************************
+
+	@Override
+	public boolean canSuspend() {
+		return getThread().canSuspend();
+	}
+
+	@Override
+	public boolean canResume() {
+		return getThread().canResume();
+	}
+
+	@Override
+	public boolean isSuspended() {
+		return getThread().isSuspended();
+	}
+
+	@Override
+	public void resume() {
+		getThread().resume();
+	}
+
+	@Override
+	public void suspend() {
+		getThread().suspend();
+	}
+
+	// ************************************************************
+	// IStep
+	// ************************************************************
+
+	@Override
+	public boolean canStepInto() {
+		return getThread().canStepInto();
+	}
+
+	@Override
+	public boolean canStepOver() {
+		return getThread().canStepOver();
+	}
+
+	@Override
+	public boolean canStepReturn() {
+		return getThread().canStepReturn();
+	}
+
+	@Override
+	public boolean isStepping() {
+		return getThread().isStepping();
+	}
+
+	@Override
+	public void stepInto() {
+		getThread().stepInto();
+	}
+
+	@Override
+	public void stepOver() {
+		getThread().stepOver();
+	}
+
+	@Override
+	public void stepReturn() {
+		getThread().stepReturn();
 	}
 }

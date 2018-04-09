@@ -87,6 +87,12 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 	}
 
 	@Override
+	public ScriptStackTrace getExceptionStackTrace(Object thread) {
+		// FIXME to be implemented
+		return null;
+	}
+
+	@Override
 	public Object removeVariable(String name) {
 		throw new UnsupportedOperationException();
 	}

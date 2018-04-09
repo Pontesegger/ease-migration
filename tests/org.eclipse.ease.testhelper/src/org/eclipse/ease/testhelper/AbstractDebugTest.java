@@ -49,7 +49,6 @@ import org.eclipse.ease.debugging.model.EaseWatchExpressionDelegate;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ui.PlatformUI;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -99,9 +98,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		fScriptEngine.setupDebugger(fLaunchMock, false, false, false);
 
 		final IProject project = createProject("Debug Test");
-		fFile = createFile(
-				"DebugTest." + fScriptEngine.getDescription().getSupportedScriptTypes().get(0).getDefaultExtension(),
-				getScriptSource(), project);
+		fFile = createFile("DebugTest." + fScriptEngine.getDescription().getSupportedScriptTypes().get(0).getDefaultExtension(), getScriptSource(), project);
 		clearBreakpoints();
 	}
 
@@ -142,19 +139,18 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 			@Override
 			public void run() {
 				if (fFirstSuspend) {
+					fFirstSuspend = false;
+
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("var result = testMethod(2, 3);"),
-							getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber("var result = testMethod(2, 3);"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepOver();
-					fFirstSuspend = false;
 
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("var result = testMethod(2, 3);") + 1,
-							getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber("var result = testMethod(2, 3);") + 1, getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -201,8 +197,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				if (fFirstSuspend) {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("var result = testMethod(2, 3);"),
-							getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber("var result = testMethod(2, 3);"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepInto();
 					fFirstSuspend = false;
@@ -255,18 +250,18 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 			@Override
 			public void run() {
 				if (fFirstSuspend) {
+					fFirstSuspend = false;
+
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(2, stackFrames.length);
 					assertEquals(getLineNumber("	return a + b;"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepReturn();
-					fFirstSuspend = false;
 
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("var result = testMethod(2, 3);"),
-							getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber("var result = testMethod(2, 3);"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -435,8 +430,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 
 		// extract watch result
-		final ArgumentCaptor<IWatchExpressionResult> watchExpressionResult = ArgumentCaptor
-				.forClass(IWatchExpressionResult.class);
+		final ArgumentCaptor<IWatchExpressionResult> watchExpressionResult = ArgumentCaptor.forClass(IWatchExpressionResult.class);
 		verify(expressionListener).watchEvaluationFinished(watchExpressionResult.capture());
 		final IWatchExpressionResult variable = watchExpressionResult.getValue();
 
@@ -621,7 +615,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				assertEquals("String", variable.getValue().getReferenceTypeName());
 				assertEquals("\"Hello world\" (id=0)", variable.getValue().getValueString());
 				assertTrue(variable.getValue().hasVariables());
-				assertEquals(2, variable.getValue().getVariables().length);
+				assertTrue(variable.getValue().getVariables().length >= 2); // different java versions return different member count
 
 				getDebugTarget().terminate();
 
@@ -694,7 +688,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				assertEquals("String", variable.getValue().getReferenceTypeName());
 				assertEquals("\"foo\" (id=0)", variable.getValue().getValueString());
 				assertTrue(variable.getValue().hasVariables());
-				assertEquals(2, variable.getValue().getVariables().length);
+				assertTrue(variable.getValue().getVariables().length >= 2); // different java versions return different member count
 
 				variable = childVariables[2];
 				assertEquals("[2]", variable.getName());
@@ -768,7 +762,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				assertEquals("String", variable.getValue().getReferenceTypeName());
 				assertEquals("\"John\" (id=0)", variable.getValue().getValueString());
 				assertTrue(variable.getValue().hasVariables());
-				assertEquals(2, variable.getValue().getVariables().length);
+				assertTrue(variable.getValue().getVariables().length >= 2); // different java versions return different member count
 
 				variable = childVariables[1];
 				assertEquals("lastname", variable.getName());
@@ -776,7 +770,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				assertEquals("String", variable.getValue().getReferenceTypeName());
 				assertEquals("\"Doe\" (id=1)", variable.getValue().getValueString());
 				assertTrue(variable.getValue().hasVariables());
-				assertEquals(2, variable.getValue().getVariables().length);
+				assertTrue(variable.getValue().getVariables().length >= 2); // different java versions return different member count
 
 				getDebugTarget().terminate();
 
@@ -933,7 +927,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	}
 
 	private EaseDebugProcess getProcess() {
-		return (EaseDebugProcess) getDebugTarget().getProcess();
+		return getDebugTarget().getProcess();
 	}
 
 	private EaseDebugThread getThread() {

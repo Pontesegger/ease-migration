@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.ScriptExecutionException;
@@ -248,7 +249,7 @@ public class RhinoDebuggerEngineTest {
 		engine.setTerminateOnIdle(false);
 		engine.executeSync(fMainFile);
 
-		final List<IScriptDebugFrame> stackTrace = ((IDebugEngine) engine).getExceptionStackTrace();
+		final List<IScriptDebugFrame> stackTrace = ((IDebugEngine) engine).getExceptionStackTrace(((AbstractScriptEngine) engine).getThread());
 		assertNotNull(stackTrace);
 		assertEquals(3, stackTrace.size());
 

@@ -11,28 +11,22 @@
 package org.eclipse.ease.debugging.events.debugger;
 
 import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.events.AbstractEvent;
 
-public class ScriptReadyEvent extends AbstractEvent implements IDebuggerEvent {
+public class ScriptReadyEvent extends AbstractThreadEvent implements IDebuggerEvent {
 
 	private final Script fScript;
 
-	private final Thread fThread;
-
 	private final boolean fRoot;
 
-	public ScriptReadyEvent(final Script script, final Thread thread, final boolean root) {
+	public ScriptReadyEvent(final Script script, final Object thread, final boolean root) {
+		super(thread);
+
 		fScript = script;
-		fThread = thread;
 		fRoot = root;
 	}
 
 	public Script getScript() {
 		return fScript;
-	}
-
-	public Thread getThread() {
-		return fThread;
 	}
 
 	public boolean isRoot() {

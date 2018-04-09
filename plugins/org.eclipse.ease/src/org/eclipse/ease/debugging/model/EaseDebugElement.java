@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.debugging.model;
 
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.DebugElement;
 import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IStep;
@@ -17,6 +18,12 @@ import org.eclipse.debug.core.model.ISuspendResume;
 import org.eclipse.debug.core.model.ITerminate;
 
 public abstract class EaseDebugElement extends DebugElement implements ITerminate, ISuspendResume, IDisconnect, IStep {
+
+	public enum State {
+		NOT_STARTED, SUSPENDED, RESUMED, STEPPING, TERMINATED, DISCONNECTED
+	}
+
+	private State fState = State.NOT_STARTED;
 
 	public EaseDebugElement(final EaseDebugTarget target) {
 		super(target);
@@ -32,52 +39,37 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 		return getDebugTarget().getModelIdentifier();
 	}
 
+	protected State getState() {
+		return fState;
+	}
+
+	protected void setState(State state) {
+		fState = state;
+	}
+
 	// ************************************************************
 	// ITerminate
 	// ************************************************************
 
 	@Override
 	public boolean canTerminate() {
-		return !getDebugTarget().isTerminated();
+		if (getDebugTarget().getProcess() != null)
+			return getDebugTarget().getProcess().canTerminate();
+
+		return false;
+	}
+
+	@Override
+	public synchronized void terminate() {
+		getDebugTarget().getProcess().terminate();
 	}
 
 	@Override
 	public boolean isTerminated() {
-		return getDebugTarget().isTerminated();
-	}
+		if (getDebugTarget().getProcess() != null)
+			return getDebugTarget().getProcess().isTerminated();
 
-	@Override
-	public void terminate() {
-		getDebugTarget().terminate();
-	}
-
-	// ************************************************************
-	// ISuspendResume
-	// ************************************************************
-
-	@Override
-	public boolean canResume() {
-		return getDebugTarget().canResume();
-	}
-
-	@Override
-	public boolean canSuspend() {
-		return getDebugTarget().canSuspend();
-	}
-
-	@Override
-	public boolean isSuspended() {
-		return getDebugTarget().isSuspended();
-	}
-
-	@Override
-	public void resume() {
-		getDebugTarget().resume();
-	}
-
-	@Override
-	public void suspend() {
-		getDebugTarget().suspend();
+		return false;
 	}
 
 	// ************************************************************
@@ -86,17 +78,72 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 
 	@Override
 	public boolean canDisconnect() {
-		return getDebugTarget().canDisconnect();
+		return getDebugTarget().getProcess().canDisconnect();
 	}
 
 	@Override
 	public void disconnect() {
-		getDebugTarget().disconnect();
+		getDebugTarget().getProcess().disconnect();
 	}
 
 	@Override
 	public boolean isDisconnected() {
-		return getDebugTarget().isDisconnected();
+		return getDebugTarget().getProcess().isDisconnected();
+	}
+
+	// ************************************************************
+	// ISuspendResume
+	// ************************************************************
+
+	@Override
+	public boolean canResume() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].canResume();
+
+		return false;
+	}
+
+	@Override
+	public boolean canSuspend() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].canSuspend();
+
+		return false;
+	}
+
+	@Override
+	public boolean isSuspended() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].isSuspended();
+
+		return State.SUSPENDED == getState();
+	}
+
+	@Override
+	public void resume() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			threads[0].resume();
+	}
+
+	@Override
+	public void suspend() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			threads[0].suspend();
+	}
+
+	public void setSuspended() {
+		fState = State.SUSPENDED;
+		fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
+	}
+
+	public void setResumed(int type) {
+		fState = State.RESUMED;
+		fireResumeEvent(type);
 	}
 
 	// ************************************************************
@@ -105,36 +152,58 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 
 	@Override
 	public boolean canStepInto() {
-		return getDebugTarget().canStepInto();
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].canStepInto();
+
+		return false;
 	}
 
 	@Override
 	public boolean canStepOver() {
-		return getDebugTarget().canStepOver();
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].canStepOver();
+
+		return false;
 	}
 
 	@Override
 	public boolean canStepReturn() {
-		return getDebugTarget().canStepReturn();
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].canStepReturn();
+
+		return false;
 	}
 
 	@Override
 	public boolean isStepping() {
-		return getDebugTarget().isStepping();
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			return threads[0].isStepping();
+
+		return false;
 	}
 
 	@Override
-	public void stepInto() {
-		getDebugTarget().stepInto();
+	public synchronized void stepInto() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			threads[0].stepInto();
 	}
 
 	@Override
-	public void stepOver() {
-		getDebugTarget().stepOver();
+	public synchronized void stepOver() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			threads[0].stepOver();
 	}
 
 	@Override
-	public void stepReturn() {
-		getDebugTarget().stepReturn();
+	public synchronized void stepReturn() {
+		final EaseDebugThread[] threads = getDebugTarget().getThreads();
+		if (threads.length == 1)
+			threads[0].stepReturn();
 	}
 }

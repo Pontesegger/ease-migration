@@ -13,4 +13,13 @@ package org.eclipse.ease.debugging.events.model;
 import org.eclipse.ease.debugging.events.AbstractEvent;
 
 public class SuspendRequest extends AbstractEvent implements IModelRequest {
+	private final Object fThread;
+
+	public SuspendRequest(Object thread) {
+		fThread = thread;
+	}
+
+	public Object getThread() {
+		return fThread;
+	}
 }
