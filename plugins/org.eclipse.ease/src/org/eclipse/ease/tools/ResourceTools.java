@@ -468,9 +468,15 @@ public final class ResourceTools {
 			return WorkspaceURLConnection.SCHEME + ":/" + ((IResource) file).getFullPath().toPortableString();
 
 		else if (file instanceof File) {
-			if (isWindows())
-				return "file:///" + ((File) file).toString().replaceAll("\\\\", "/");
-			else
+			if (isWindows()) {
+				// change backslashes to forward slashes
+				final String filePath = ((File) file).toString().replaceAll("\\\\", "/");
+				if (filePath.startsWith("//"))
+					return "file://" + filePath.substring(2);
+
+				return "file:///" + filePath;
+
+			} else
 				return "file://" + ((File) file).toString();
 		}
 
