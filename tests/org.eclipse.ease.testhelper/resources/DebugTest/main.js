@@ -1,5 +1,5 @@
 print("Start of script");
-var primitiveInteger = 42;
+var primitiveInteger = 42;	// primitive-integer-definition-hook
 var primitiveString = "Hello world";
 var nullValue = null;
 var nativeArray = [1, "foo", null]

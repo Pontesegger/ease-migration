@@ -175,7 +175,7 @@ class _pyease_CodeTracer:
         return_value = None
         exec(compile(ast_, filename, 'exec'), globals())
         if final_expr:
-            return_value = eval(compile(final_expr, '<code>', 'eval'), None)
+            return_value = eval(compile(final_expr, filename, 'eval'), None)
             
         return return_value
        

@@ -128,14 +128,14 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void breakpointLocation() throws CoreException {
-		setBreakpoint(fFile, 2);
+		setBreakpoint(fFile, getLineNumber("primitive-integer-definition-hook"));
 		assertEquals(1, getBreakpoints().length);
 
 		fScriptEngine.executeAsync(fFile);
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final EaseDebugStackFrame stackFrame = getTopmostStackFrame();
 			if (stackFrame != null) {
-				assertEquals(2, stackFrame.getLineNumber());
+				assertEquals(getLineNumber("primitive-integer-definition-hook"), stackFrame.getLineNumber());
 				getDebugTarget().resume();
 			}
 		});

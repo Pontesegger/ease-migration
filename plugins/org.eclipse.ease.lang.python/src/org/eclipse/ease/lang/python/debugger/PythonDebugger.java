@@ -160,7 +160,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 				// do not process script load event (line == 0)
 				if (frame.getLineNumber() != 0) {
 					// do not evaluate breakpoints when returning from a function call
-					fBreakpointsDisabled = "return".equals(type);
+					fBreakpointsDisabled = "return".equals(type) || "call".equals(type);
 
 					processLine(script, frame.getLineNumber());
 				}

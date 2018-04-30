@@ -118,10 +118,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		if (!fTerminated) {
 			DebugTracer.debug("Debugger", "process " + event);
 
-			if (event instanceof ResumeRequest) {
-				resume(((ResumeRequest) event).getType(), ((ResumeRequest) event).getThread());
-
-			} else if (event instanceof BreakpointRequest) {
+			if (event instanceof BreakpointRequest) {
 				if (((BreakpointRequest) event).isRemoveAllBreakpointsRequest())
 					fBreakpoints.clear();
 
@@ -166,60 +163,9 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 
 				try {
 					while (threadState.fSuspended) {
-
-						synchronized (fEvaluationRequests) {
-							for (final AbstractEvent request : fEvaluationRequests) {
-								final ThreadState threadStateForRequest = getThreadState(request.getThread());
-								if (threadState.equals(threadStateForRequest)) {
-
-									if (request instanceof EvaluateExpressionRequest) {
-										try {
-											final EaseDebugStackFrame scope = ((EvaluateExpressionRequest) request).getContext();
-											final Object result = scope.getDebugFrame().inject(((EvaluateExpressionRequest) request).getExpression());
-											fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), result, null,
-													((EvaluateExpressionRequest) request).getListener()));
-										} catch (final Throwable e) {
-											fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), null, e,
-													((EvaluateExpressionRequest) request).getListener()));
-										}
-
-									} else if (request instanceof GetStackFramesRequest) {
-										fireDispatchEvent(new StackFramesEvent(getStacktrace(), getThread()));
-
-									} else if (request instanceof GetVariablesRequest) {
-										final EaseDebugStackFrame requestor = ((GetVariablesRequest) request).getRequestor();
-										final Collection<EaseDebugVariable> variables = getEngine().getVariables(requestor.getDebugFrame());
-										fireDispatchEvent(new VariablesEvent(requestor, variables));
-
-									} else if (request instanceof SetVariablesRequest) {
-										final IDebugElement requestor = ((SetVariablesRequest) request).getRequestor();
-										try {
-											if (requestor instanceof EaseDebugStackFrame) {
-
-												// evaluate expression
-												final Object result = getEngine().inject(((SetVariablesRequest) request).getExpression());
-												// set variable
-												((EaseDebugStackFrame) requestor).getDebugFrame()
-														.setVariable(((SetVariablesRequest) request).getVariable().getName(), result);
-
-												// re-fetch variables for current stackframe
-												final Collection<EaseDebugVariable> variables = getEngine()
-														.getVariables(((EaseDebugStackFrame) requestor).getDebugFrame());
-												fireDispatchEvent(new VariablesEvent((EaseDebugStackFrame) requestor, variables));
-											}
-
-										} catch (final Throwable e) {
-											Logger.error(Activator.PLUGIN_ID,
-													"Could not change variable <" + ((SetVariablesRequest) event).getVariable().getName() + "> to \""
-															+ ((SetVariablesRequest) event).getExpression() + "\"",
-													e);
-										}
-									}
-								}
-							}
-						}
-
 						threadState.wait();
+						// handle events after wait() as events might alter the threadState
+						handleEventsInSuspendedState(threadState);
 					}
 
 				} catch (final InterruptedException e) {
@@ -233,8 +179,61 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		}
 	}
 
-	protected void resume(final int resumeType, Object thread) {
-		// called by dispatcher thread
+	private void handleEventsInSuspendedState(ThreadState threadState) {
+		synchronized (fEvaluationRequests) {
+			for (final AbstractEvent request : fEvaluationRequests) {
+				final ThreadState threadStateForRequest = getThreadState(request.getThread());
+				if (threadState.equals(threadStateForRequest)) {
+
+					if (request instanceof EvaluateExpressionRequest) {
+						try {
+							final EaseDebugStackFrame scope = ((EvaluateExpressionRequest) request).getContext();
+							final Object result = scope.getDebugFrame().inject(((EvaluateExpressionRequest) request).getExpression());
+							fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), result, null,
+									((EvaluateExpressionRequest) request).getListener()));
+						} catch (final Throwable e) {
+							fireDispatchEvent(new EvaluateExpressionEvent(((EvaluateExpressionRequest) request).getExpression(), null, e,
+									((EvaluateExpressionRequest) request).getListener()));
+						}
+
+					} else if (request instanceof GetStackFramesRequest) {
+						fireDispatchEvent(new StackFramesEvent(getStacktrace(), getThread()));
+
+					} else if (request instanceof GetVariablesRequest) {
+						final EaseDebugStackFrame requestor = ((GetVariablesRequest) request).getRequestor();
+						final Collection<EaseDebugVariable> variables = getEngine().getVariables(requestor.getDebugFrame());
+						fireDispatchEvent(new VariablesEvent(requestor, variables));
+
+					} else if (request instanceof SetVariablesRequest) {
+						final IDebugElement requestor = ((SetVariablesRequest) request).getRequestor();
+						try {
+							if (requestor instanceof EaseDebugStackFrame) {
+
+								// evaluate expression
+								final Object result = getEngine().inject(((SetVariablesRequest) request).getExpression());
+								// set variable
+								((EaseDebugStackFrame) requestor).getDebugFrame().setVariable(((SetVariablesRequest) request).getVariable().getName(), result);
+
+								// re-fetch variables for current stackframe
+								final Collection<EaseDebugVariable> variables = getEngine().getVariables(((EaseDebugStackFrame) requestor).getDebugFrame());
+								fireDispatchEvent(new VariablesEvent((EaseDebugStackFrame) requestor, variables));
+							}
+
+						} catch (final Throwable e) {
+							Logger.error(Activator.PLUGIN_ID, "Could not change variable <" + ((SetVariablesRequest) request).getVariable().getName()
+									+ "> to \"" + ((SetVariablesRequest) request).getExpression() + "\"", e);
+						}
+
+					} else if (request instanceof ResumeRequest) {
+						resume(((ResumeRequest) request).getType(), ((ResumeRequest) request).getThread());
+					}
+				}
+			}
+		}
+	}
+
+	private void resume(final int resumeType, Object thread) {
+		// called by engine thread
 
 		final ThreadState threadState = fThreadStates.get(thread);
 
@@ -245,10 +244,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			threadState.fResumeLineNumber = (threadState.fResumeStack.size() > 0) ? threadState.fStacktrace.get(0).getLineNumber() : 0;
 		}
 
-		synchronized (threadState) {
-			threadState.fSuspended = false;
-			threadState.notifyAll();
-		}
+		threadState.fSuspended = false;
 	}
 
 	protected IDebugEngine getEngine() {

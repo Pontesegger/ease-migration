@@ -111,7 +111,8 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 		if ("Java Object".equals(referenceType))
 			variable.setType(Type.JAVA_OBJECT);
 
-		variable.getValue().setVariables(getDefinedVariables(value));
+		else
+			variable.getValue().setVariables(getDefinedVariables(value));
 
 		return variable;
 	}

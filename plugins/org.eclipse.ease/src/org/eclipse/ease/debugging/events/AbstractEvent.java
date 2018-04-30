@@ -18,6 +18,6 @@ public abstract class AbstractEvent implements IDebugEvent {
 
 	@Override
 	public String toString() {
-		return super.toString() + "(" + getThread() + ")";
+		return getClass().getSimpleName() + " (" + getThread() + ")";
 	}
 }

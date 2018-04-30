@@ -33,6 +33,9 @@ import org.eclipse.ease.lang.python.debugger.model.PythonDebugTarget;
  */
 
 public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebugEngine {
+
+	public static final String ENGINE_ID = "org.eclipse.ease.lang.python.py4j.debugger.engine";
+
 	private PythonDebugger fDebugger = null;
 
 	@Override
@@ -103,8 +106,15 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 		final Collection<EaseDebugVariable> variables = new ArrayList<>();
 
 		for (final Entry<String, Object> entry : getVariables().entrySet())
-			variables.add(new EaseDebugVariable(entry.getKey(), entry.getValue(), "Python"));
+			variables.add(createVariable(entry.getKey(), entry.getValue()));
 
 		return variables;
+	}
+
+	@Override
+	protected EaseDebugVariable createVariable(String name, Object value) {
+		final EaseDebugVariable variable = super.createVariable(name, value);
+
+		return variable;
 	}
 }

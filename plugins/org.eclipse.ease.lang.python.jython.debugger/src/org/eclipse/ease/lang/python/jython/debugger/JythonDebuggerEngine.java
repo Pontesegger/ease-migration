@@ -33,11 +33,13 @@ import org.python.core.Py;
 import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
 import org.python.core.PyFloat;
+import org.python.core.PyInstance;
 import org.python.core.PyInteger;
 import org.python.core.PyLong;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyStringMap;
 
 /**
  * A script engine to execute/debug Python code on a Jython interpreter.
@@ -140,6 +142,9 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 		if (object instanceof PyDictionary)
 			return ScriptObjectType.NATIVE_OBJECT;
 
+		if (object instanceof PyInstance)
+			return ScriptObjectType.NATIVE_OBJECT;
+
 		if ((object != null) && (object.getClass().isArray()))
 			return ScriptObjectType.NATIVE_ARRAY;
 
@@ -173,6 +178,11 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 			variable.setType(Type.NATIVE_OBJECT);
 		}
 
+		if (value instanceof PyInstance) {
+			variable.getValue().setValueString("object{" + getDefinedVariables(value).size() + "}");
+			variable.setType(Type.NATIVE_OBJECT);
+		}
+
 		if ((value != null) && (value.getClass().isArray())) {
 			variable.getValue().setValueString("array[" + getDefinedVariables(value).size() + "]");
 			variable.setType(Type.NATIVE_ARRAY);
@@ -190,6 +200,21 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 				final Object object = ((PyDictionary) scope).get(id);
 				if (acceptVariable(object))
 					childObjects.add(createVariable(id.toString(), object));
+			}
+
+			return childObjects;
+
+		} else if (scope instanceof PyInstance) {
+			final Collection<EaseDebugVariable> childObjects = new ArrayList<>();
+
+			final PyObject fields = ((PyInstance) scope).__dict__;
+			if (fields instanceof PyStringMap) {
+				for (final Object id : ((PyStringMap) fields).keys().toArray()) {
+					final PyObject value = fields.__finditem__(id.toString());
+
+					if (acceptVariable(value))
+						childObjects.add(createVariable(id.toString(), value));
+				}
 			}
 
 			return childObjects;
