@@ -87,6 +87,11 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 		}
 
 		@Override
+		public void setVariable(String name, Object content) {
+			fFrame.setVariable(name, content);
+		}
+
+		@Override
 		public Object inject(String expression) throws Throwable {
 			return getEngine().inject(expression);
 		}

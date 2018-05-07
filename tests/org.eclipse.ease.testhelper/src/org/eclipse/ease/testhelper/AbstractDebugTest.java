@@ -885,6 +885,51 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
+	@Test
+	public void modifyVariableKeepingType() throws CoreException, IOException {
+		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
+		assertEquals(1, getBreakpoints().length);
+
+		fScriptEngine.executeAsync(fFile);
+
+		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
+
+			private boolean fFirstSuspend = true;
+
+			@Override
+			public void run() {
+				try {
+					if (fFirstSuspend) {
+						fFirstSuspend = false;
+
+						final IVariable variable = getVariable("primitiveString");
+						assertEquals("Java Object", variable.getReferenceTypeName());
+						assertEquals("String", variable.getValue().getReferenceTypeName());
+						assertEquals("\"Hello world\" (id=0)", variable.getValue().getValueString());
+
+						assertTrue(variable.supportsValueModification());
+						variable.setValue("\"Goodbye moon\"");
+
+						getDebugTarget().stepOver();
+
+					} else {
+						final IVariable variable = getVariable("primitiveString");
+						assertEquals("Java Object", variable.getReferenceTypeName());
+						assertEquals("String", variable.getValue().getReferenceTypeName());
+						assertTrue(variable.getValue().getValueString().startsWith("\"Goodbye moon\" (id="));
+
+						getDebugTarget().terminate();
+					}
+
+				} catch (final DebugException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+
+		assertEquals(2, suspendedEvents);
+	}
+
 	// ---------- helper methods
 	// ----------------------------------------------------------------------------------------------------
 

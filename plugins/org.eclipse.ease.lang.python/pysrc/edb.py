@@ -107,6 +107,14 @@ class _pyease_PyFrame:
             
         return variables
     
+    def setVariable(self, name, value):
+        if (self._frame):
+            if name in self._frame.f_locals:
+                self._frame.f_locals[name] = value
+            
+            elif name in self._frame.f_globals:
+                self._frame.f_locals[name] = value
+        
     def toString(self):
         return str(self.getFilename()) + ": #" + str(self.getLineNumber())
         

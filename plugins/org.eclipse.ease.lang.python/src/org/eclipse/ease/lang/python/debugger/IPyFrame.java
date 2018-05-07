@@ -24,14 +24,14 @@ public interface IPyFrame {
 	 *
 	 * @return filename for the current frame.
 	 */
-	public String getFilename();
+	String getFilename();
 
 	/**
 	 * Returns the linenumber of the current frame.
 	 *
 	 * @return line number of the current frame.
 	 */
-	public int getLineNumber();
+	int getLineNumber();
 
 	/**
 	 * Returns the parent frame in the call stack.
@@ -40,7 +40,7 @@ public interface IPyFrame {
 	 *
 	 * @return Parent in the call stack or <code>null</code>
 	 */
-	public IPyFrame getParent();
+	IPyFrame getParent();
 
 	/**
 	 * Get a variable from the current frame.
@@ -49,12 +49,22 @@ public interface IPyFrame {
 	 *            variable name to look up
 	 * @return variable or <code>null</code>
 	 */
-	public Object getVariable(String name);
+	Object getVariable(String name);
 
 	/**
 	 * Get variables visible from current frame.
 	 *
 	 * @return variableName -> variableContent
 	 */
-	public Map<String, Object> getVariables();
+	Map<String, Object> getVariables();
+
+	/**
+	 * Set the content of a variable to a given value.
+	 *
+	 * @param name
+	 *            name of variable to set
+	 * @param value
+	 *            value to set to
+	 */
+	void setVariable(String name, Object value);
 }

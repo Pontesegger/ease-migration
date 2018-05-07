@@ -16,4 +16,4 @@ function testMethod(a, b) {	// testMethod-def-hook
 var result = testMethod(2, 3);	// testMethod-call-hook
 print("Result of testMethod = " + result);
 
-print("End of script");
+print("End of script"); // end-of-script-hook

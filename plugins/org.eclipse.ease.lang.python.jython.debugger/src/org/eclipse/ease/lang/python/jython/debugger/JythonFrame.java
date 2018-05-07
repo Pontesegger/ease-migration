@@ -119,4 +119,9 @@ public class JythonFrame implements IPyFrame {
 
 		return variables;
 	}
+
+	@Override
+	public void setVariable(String name, Object value) {
+		fJythonFrame.invoke("setVariable", Py.java2py(name), Py.java2py(value));
+	}
 }
