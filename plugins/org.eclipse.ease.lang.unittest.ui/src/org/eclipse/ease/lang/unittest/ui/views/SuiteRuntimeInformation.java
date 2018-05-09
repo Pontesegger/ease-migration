@@ -108,11 +108,8 @@ public class SuiteRuntimeInformation {
 					}
 				}
 
-				if (candidate instanceof ITestContainer) {
-					// manually iterate to avoid ConcurrentModificationException
-					for (final ITestEntity child : ((ITestContainer) candidate).getChildren().toArray(new ITestEntity[0]))
-						entries.add(child);
-				}
+				if (candidate instanceof ITestContainer)
+					entries.addAll(((ITestContainer) candidate).getCopyOfChildren());
 			}
 
 		} catch (final Exception e) {
@@ -136,11 +133,8 @@ public class SuiteRuntimeInformation {
 				fRuntimes.get(candidate.getFullPath()).addRuntime(candidate.getDuration());
 			}
 
-			if (candidate instanceof ITestContainer) {
-				// manually iterate to avoid ConcurrentModificationException
-				for (final ITestEntity child : ((ITestContainer) candidate).getChildren().toArray(new ITestEntity[0]))
-					entries.add(child);
-			}
+			if (candidate instanceof ITestContainer)
+				entries.addAll(((ITestContainer) candidate).getCopyOfChildren());
 		}
 
 		// store to file

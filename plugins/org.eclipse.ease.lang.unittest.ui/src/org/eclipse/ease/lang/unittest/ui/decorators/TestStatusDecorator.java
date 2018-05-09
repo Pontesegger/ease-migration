@@ -52,7 +52,7 @@ public class TestStatusDecorator implements ILightweightLabelDecorator {
 			addOverlay((ITestContainer) element, decoration);
 
 			if (status != TestStatus.PASS) {
-				final Collection<ITestEntity> testEntities = new ArrayList<>(((ITestContainer) element).getChildren());
+				final Collection<ITestEntity> testEntities = new ArrayList<>(((ITestContainer) element).getCopyOfChildren());
 				int valid = 0;
 				for (final ITestEntity entity : testEntities) {
 					if (entity.getStatus() == TestStatus.PASS)

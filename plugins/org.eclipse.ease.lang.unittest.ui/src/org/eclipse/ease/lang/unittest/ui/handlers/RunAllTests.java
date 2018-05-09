@@ -28,7 +28,7 @@ public class RunAllTests extends AbstractViewToolbarHandler {
 
 			final Object input = view.getFileTreeViewer().getInput();
 			if (input instanceof ITestContainer) {
-				final ITestSuite testRoot = (ITestSuite) ((ITestContainer) input).getChildren().iterator().next();
+				final ITestSuite testRoot = (ITestSuite) ((ITestContainer) input).getCopyOfChildren().iterator().next();
 				final TestSuiteScriptEngine engine = view.getCurrentEngine();
 
 				view.notifyEngineCreation(engine);

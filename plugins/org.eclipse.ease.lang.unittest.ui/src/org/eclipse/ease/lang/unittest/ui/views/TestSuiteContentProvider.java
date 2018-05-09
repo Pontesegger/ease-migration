@@ -24,7 +24,7 @@ public class TestSuiteContentProvider extends ArrayContentProvider implements IT
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof ITestContainer)
-			return ((ITestContainer) inputElement).getChildren().toArray();
+			return ((ITestContainer) inputElement).getCopyOfChildren().toArray();
 
 		return super.getElements(inputElement);
 	}
@@ -34,7 +34,7 @@ public class TestSuiteContentProvider extends ArrayContentProvider implements IT
 		if (parentElement instanceof ITestContainer) {
 			final List<Object> children = new ArrayList<>();
 
-			for (final Object child : ((ITestContainer) parentElement).getChildren().toArray()) {
+			for (final Object child : ((ITestContainer) parentElement).getCopyOfChildren()) {
 				if (!(child instanceof ITest))
 					children.add(child);
 			}
@@ -56,7 +56,7 @@ public class TestSuiteContentProvider extends ArrayContentProvider implements IT
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof ITestContainer) {
-			for (final Object child : ((ITestContainer) element).getChildren().toArray()) {
+			for (final Object child : ((ITestContainer) element).getCopyOfChildren()) {
 				if (!(child instanceof ITest))
 					return true;
 			}

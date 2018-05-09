@@ -294,11 +294,9 @@ public class TestSuite extends TestContainer implements ITestSuite {
 
 			if (!hasSetupError()) {
 				// not calling super.run() here as we do want to have full control on the entityStatus
-				for (final Object child : getChildren().toArray()) {
-					if (!isTerminated()) {
-						if (child instanceof ITestContainer)
-							strategy.execute((ITestEntity) child);
-					}
+				for (final ITestContainer child : getChildContainers()) {
+					if (!isTerminated())
+						strategy.execute(child);
 				}
 			}
 
@@ -322,7 +320,7 @@ public class TestSuite extends TestContainer implements ITestSuite {
 	 * @generated NOT
 	 */
 	private boolean hasSetupError() {
-		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0])) {
+		for (final ITestEntity child : getCopyOfChildren()) {
 			if ((child instanceof ITest) && (child.hasError()))
 				return true;
 		}

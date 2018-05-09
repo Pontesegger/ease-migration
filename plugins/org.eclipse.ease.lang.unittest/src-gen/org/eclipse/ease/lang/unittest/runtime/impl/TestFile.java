@@ -4,6 +4,7 @@ package org.eclipse.ease.lang.unittest.runtime.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -20,7 +21,6 @@ import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.execution.ITestExecutionStrategy;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
-import org.eclipse.ease.lang.unittest.runtime.ITestClass;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestFile;
 import org.eclipse.ease.lang.unittest.runtime.ITestResult;
@@ -231,10 +231,11 @@ public class TestFile extends TestContainer implements ITestFile {
 
 					ScriptResult executionResult = fScriptEngine.executeSync(getResource());
 
+					final List<ITestEntity> children = getCopyOfChildren();
 					if (executionResult.hasException()) {
 						// we should mark the last test as invalid
-						if (!getChildren().isEmpty()) {
-							final ITestEntity test = getChildren().get(getChildren().size() - 1);
+						if (!children.isEmpty()) {
+							final ITestEntity test = children.get(children.size() - 1);
 							if (test.getStatus() == TestStatus.RUNNING) {
 								final ITestResult result = IRuntimeFactory.eINSTANCE.createTestResult();
 								result.setStatus(TestStatus.ERROR);
@@ -259,7 +260,7 @@ public class TestFile extends TestContainer implements ITestFile {
 					}
 
 					// now check if there were any tests included. If not use testrunner to launch tests
-					if (getChildren().isEmpty()) {
+					if (children.isEmpty()) {
 
 						// TODO check if we can have a smarter binding than a string constant
 						if (scriptType.getName().equals("JavaScript")) {
@@ -300,7 +301,7 @@ public class TestFile extends TestContainer implements ITestFile {
 					runSetupTeardownCode(ITestSuiteDefinition.CODE_LOCATION_TESTFILE_TEARDOWN);
 
 				// make sure all tests are marked as finished (cleanup for badly written tests from users)
-				for (final ITestEntity test : getChildren()) {
+				for (final ITestEntity test : getCopyOfChildren()) {
 					if (TestStatus.RUNNING.equals(test.getStatus()))
 						test.setEntityStatus(TestStatus.PASS);
 				}
@@ -369,12 +370,6 @@ public class TestFile extends TestContainer implements ITestFile {
 		final Object resource = getResource();
 		if (resource instanceof IFile)
 			UnitTestHelper.removeErrorMarkers((IFile) resource);
-
-		// remove single tests
-		for (final Object child : getChildren().toArray()) {
-			if (child instanceof ITestClass)
-				getChildren().remove(child);
-		}
 
 		super.reset();
 

@@ -21,40 +21,40 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * The following features are implemented:
  * </p>
  * <ul>
- * <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.Test#getStackTrace <em>Stack Trace</em>}</li>
- * <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.Test#getDurationLimit <em>Duration Limit</em>}</li>
+ *   <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.Test#getStackTrace <em>Stack Trace</em>}</li>
+ *   <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.Test#getDurationLimit <em>Duration Limit</em>}</li>
  * </ul>
  *
  * @generated
  */
 public class Test extends TestEntity implements ITest {
 	/**
-	 * The default value of the '{@link #getStackTrace() <em>Stack Trace</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * The default value of the '{@link #getStackTrace() <em>Stack Trace</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getStackTrace()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final ScriptStackTrace STACK_TRACE_EDEFAULT = null;
 	/**
-	 * The cached value of the '{@link #getStackTrace() <em>Stack Trace</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * The cached value of the '{@link #getStackTrace() <em>Stack Trace</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getStackTrace()
 	 * @generated
 	 * @ordered
 	 */
 	protected ScriptStackTrace stackTrace = STACK_TRACE_EDEFAULT;
 	/**
-	 * The default value of the '{@link #getDurationLimit() <em>Duration Limit</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * The default value of the '{@link #getDurationLimit() <em>Duration Limit</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getDurationLimit()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final long DURATION_LIMIT_EDEFAULT = -1L;
 	/**
-	 * The cached value of the '{@link #getDurationLimit() <em>Duration Limit</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
+	 * The cached value of the '{@link #getDurationLimit() <em>Duration Limit</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getDurationLimit()
 	 * @generated
 	 * @ordered
@@ -63,7 +63,6 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	protected Test() {
@@ -72,7 +71,6 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
@@ -82,7 +80,6 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
@@ -92,12 +89,11 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public void setDurationLimit(long newDurationLimit) {
-		final long oldDurationLimit = durationLimit;
+		long oldDurationLimit = durationLimit;
 		durationLimit = newDurationLimit;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRuntimePackage.TEST__DURATION_LIMIT, oldDurationLimit, durationLimit));
@@ -105,7 +101,6 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
@@ -115,11 +110,10 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	public void setStackTraceGen(ScriptStackTrace newStackTrace) {
-		final ScriptStackTrace oldStackTrace = stackTrace;
+		ScriptStackTrace oldStackTrace = stackTrace;
 		stackTrace = newStackTrace;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRuntimePackage.TEST__STACK_TRACE, oldStackTrace, stackTrace));
@@ -138,86 +132,79 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IRuntimePackage.TEST__STACK_TRACE:
-			return getStackTrace();
-		case IRuntimePackage.TEST__DURATION_LIMIT:
-			return getDurationLimit();
+			case IRuntimePackage.TEST__STACK_TRACE:
+				return getStackTrace();
+			case IRuntimePackage.TEST__DURATION_LIMIT:
+				return getDurationLimit();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IRuntimePackage.TEST__STACK_TRACE:
-			setStackTrace((ScriptStackTrace) newValue);
-			return;
-		case IRuntimePackage.TEST__DURATION_LIMIT:
-			setDurationLimit((Long) newValue);
-			return;
+			case IRuntimePackage.TEST__STACK_TRACE:
+				setStackTrace((ScriptStackTrace)newValue);
+				return;
+			case IRuntimePackage.TEST__DURATION_LIMIT:
+				setDurationLimit((Long)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IRuntimePackage.TEST__STACK_TRACE:
-			setStackTrace(STACK_TRACE_EDEFAULT);
-			return;
-		case IRuntimePackage.TEST__DURATION_LIMIT:
-			setDurationLimit(DURATION_LIMIT_EDEFAULT);
-			return;
+			case IRuntimePackage.TEST__STACK_TRACE:
+				setStackTrace(STACK_TRACE_EDEFAULT);
+				return;
+			case IRuntimePackage.TEST__DURATION_LIMIT:
+				setDurationLimit(DURATION_LIMIT_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IRuntimePackage.TEST__STACK_TRACE:
-			return STACK_TRACE_EDEFAULT == null ? stackTrace != null : !STACK_TRACE_EDEFAULT.equals(stackTrace);
-		case IRuntimePackage.TEST__DURATION_LIMIT:
-			return durationLimit != DURATION_LIMIT_EDEFAULT;
+			case IRuntimePackage.TEST__STACK_TRACE:
+				return STACK_TRACE_EDEFAULT == null ? stackTrace != null : !STACK_TRACE_EDEFAULT.equals(stackTrace);
+			case IRuntimePackage.TEST__DURATION_LIMIT:
+				return durationLimit != DURATION_LIMIT_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
 		if (baseClass == IStackTraceContainer.class) {
 			switch (derivedFeatureID) {
-			case IRuntimePackage.TEST__STACK_TRACE:
-				return IRuntimePackage.STACK_TRACE_CONTAINER__STACK_TRACE;
-			default:
-				return -1;
+				case IRuntimePackage.TEST__STACK_TRACE: return IRuntimePackage.STACK_TRACE_CONTAINER__STACK_TRACE;
+				default: return -1;
 			}
 		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
@@ -225,17 +212,14 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
 		if (baseClass == IStackTraceContainer.class) {
 			switch (baseFeatureID) {
-			case IRuntimePackage.STACK_TRACE_CONTAINER__STACK_TRACE:
-				return IRuntimePackage.TEST__STACK_TRACE;
-			default:
-				return -1;
+				case IRuntimePackage.STACK_TRACE_CONTAINER__STACK_TRACE: return IRuntimePackage.TEST__STACK_TRACE;
+				default: return -1;
 			}
 		}
 		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
@@ -243,15 +227,13 @@ public class Test extends TestEntity implements ITest {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 *
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy())
-			return super.toString();
+		if (eIsProxy()) return super.toString();
 
-		final StringBuffer result = new StringBuffer(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (stackTrace: ");
 		result.append(stackTrace);
 		result.append(", durationLimit: ");

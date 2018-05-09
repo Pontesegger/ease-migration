@@ -106,7 +106,7 @@ public class UnitTestView extends ViewPart {
 					children.addAll(((ITestEntity) parentElement).getResults());
 
 				if (parentElement instanceof ITestContainer) {
-					for (final Object child : ((ITestContainer) parentElement).getChildren().toArray()) {
+					for (final ITestEntity child : ((ITestContainer) parentElement).getCopyOfChildren()) {
 						if (child instanceof ITest)
 							children.add(child);
 					}
@@ -137,7 +137,7 @@ public class UnitTestView extends ViewPart {
 					return true;
 
 				if (element instanceof ITestContainer) {
-					for (final Object child : ((ITestContainer) element).getChildren().toArray()) {
+					for (final Object child : ((ITestContainer) element).getCopyOfChildren()) {
 						if (child instanceof ITest)
 							return true;
 					}
@@ -822,8 +822,9 @@ public class UnitTestView extends ViewPart {
 	public ITestSuite getCurrentTestSuite() {
 		final Object input = getFileTreeViewer().getInput();
 		if (input instanceof ITestContainer) {
-			if (!((ITestContainer) input).getChildren().isEmpty()) {
-				final ITestEntity testSuite = ((ITestContainer) input).getChildren().get(0);
+			final List<ITestEntity> children = ((ITestContainer) input).getCopyOfChildren();
+			if (!children.isEmpty()) {
+				final ITestEntity testSuite = children.get(0);
 				if (testSuite instanceof ITestSuite)
 					return (ITestSuite) testSuite;
 			}

@@ -37,7 +37,7 @@ public class CreateReport extends AbstractViewToolbarHandler {
 		final UnitTestView view = getView(event, UnitTestView.class);
 		if (view != null) {
 
-			final ITestEntity testEntity = ((ITestContainer) view.getFileTreeViewer().getInput()).getChildren().get(0);
+			final ITestEntity testEntity = ((ITestContainer) view.getFileTreeViewer().getInput()).getCopyOfChildren().get(0);
 
 			// we found a test suite to export
 			final CreateReportDialog dialog = new CreateReportDialog(HandlerUtil.getActiveShell(event));

@@ -3,7 +3,9 @@
 package org.eclipse.ease.lang.unittest.runtime.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.ease.lang.unittest.execution.ITestExecutionStrategy;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory;
@@ -28,16 +30,16 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.TestContainer#getChildren <em>Children</em>}</li>
- *   <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.TestContainer#getResource <em>Resource</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.TestContainer#getChildren <em>Children</em>}</li>
+ * <li>{@link org.eclipse.ease.lang.unittest.runtime.impl.TestContainer#getResource <em>Resource</em>}</li>
  * </ul>
  *
  * @generated
  */
 public abstract class TestContainer extends TestEntity implements ITestContainer {
 	/**
-	 * The cached value of the '{@link #getChildren() <em>Children</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getChildren() <em>Children</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @see #getChildren()
 	 * @generated
 	 * @ordered
@@ -45,16 +47,16 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	protected EList<ITestEntity> children;
 
 	/**
-	 * The default value of the '{@link #getResource() <em>Resource</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The default value of the '{@link #getResource() <em>Resource</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @see #getResource()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final Object RESOURCE_EDEFAULT = null;
 	/**
-	 * The cached value of the '{@link #getResource() <em>Resource</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The cached value of the '{@link #getResource() <em>Resource</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @see #getResource()
 	 * @generated
 	 * @ordered
@@ -63,6 +65,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	protected TestContainer() {
@@ -71,6 +74,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
@@ -80,18 +84,20 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
-	@Override
-	public EList<ITestEntity> getChildren() {
+	public EList<ITestEntity> getChildrenGen() {
 		if (children == null) {
-			children = new EObjectContainmentWithInverseEList<ITestEntity>(ITestEntity.class, this, IRuntimePackage.TEST_CONTAINER__CHILDREN, IRuntimePackage.TEST_ENTITY__PARENT);
+			children = new EObjectContainmentWithInverseEList<>(ITestEntity.class, this, IRuntimePackage.TEST_CONTAINER__CHILDREN,
+					IRuntimePackage.TEST_ENTITY__PARENT);
 		}
 		return children;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
@@ -101,11 +107,12 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public void setResource(Object newResource) {
-		Object oldResource = resource;
+		final Object oldResource = resource;
 		resource = newResource;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IRuntimePackage.TEST_CONTAINER__RESOURCE, oldResource, resource));
@@ -118,7 +125,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	 */
 	@Override
 	public ITest getTest(String name) {
-		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0])) {
+		for (final ITestEntity child : getCopyOfChildren()) {
 			if ((child instanceof ITest) && (name.equals(child.getName())))
 				return (ITest) child;
 		}
@@ -127,127 +134,139 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 		final ITest test = IRuntimeFactory.eINSTANCE.createTest();
 		test.setName(name);
 
-		getChildren().add(test);
+		synchronized (this) {
+			getChildren().add(test);
+		}
+
 		return test;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getChildren()).basicAdd(otherEnd, msgs);
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			return ((InternalEList<InternalEObject>) (InternalEList<?>) getChildren()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				return ((InternalEList<?>)getChildren()).basicRemove(otherEnd, msgs);
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			return ((InternalEList<?>) getChildren()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				return getChildren();
-			case IRuntimePackage.TEST_CONTAINER__RESOURCE:
-				return getResource();
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			return getChildren();
+		case IRuntimePackage.TEST_CONTAINER__RESOURCE:
+			return getResource();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				getChildren().clear();
-				getChildren().addAll((Collection<? extends ITestEntity>)newValue);
-				return;
-			case IRuntimePackage.TEST_CONTAINER__RESOURCE:
-				setResource(newValue);
-				return;
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			getChildren().clear();
+			getChildren().addAll((Collection<? extends ITestEntity>) newValue);
+			return;
+		case IRuntimePackage.TEST_CONTAINER__RESOURCE:
+			setResource(newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				getChildren().clear();
-				return;
-			case IRuntimePackage.TEST_CONTAINER__RESOURCE:
-				setResource(RESOURCE_EDEFAULT);
-				return;
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			getChildren().clear();
+			return;
+		case IRuntimePackage.TEST_CONTAINER__RESOURCE:
+			setResource(RESOURCE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IRuntimePackage.TEST_CONTAINER__CHILDREN:
-				return children != null && !children.isEmpty();
-			case IRuntimePackage.TEST_CONTAINER__RESOURCE:
-				return RESOURCE_EDEFAULT == null ? resource != null : !RESOURCE_EDEFAULT.equals(resource);
+		case IRuntimePackage.TEST_CONTAINER__CHILDREN:
+			return (children != null) && !children.isEmpty();
+		case IRuntimePackage.TEST_CONTAINER__RESOURCE:
+			return RESOURCE_EDEFAULT == null ? resource != null : !RESOURCE_EDEFAULT.equals(resource);
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
-			case IRuntimePackage.TEST_CONTAINER___GET_TEST__STRING:
-				return getTest((String)arguments.get(0));
-			case IRuntimePackage.TEST_CONTAINER___GET_CHILD_CONTAINERS:
-				return getChildContainers();
+		case IRuntimePackage.TEST_CONTAINER___GET_TEST__STRING:
+			return getTest((String) arguments.get(0));
+		case IRuntimePackage.TEST_CONTAINER___GET_CHILD_CONTAINERS:
+			return getChildContainers();
 		}
 		return super.eInvoke(operationID, arguments);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 *
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
+		if (eIsProxy())
+			return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		final StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (resource: ");
 		result.append(resource);
 		result.append(')');
@@ -261,11 +280,9 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	public void run(ITestExecutionStrategy strategy) {
 		setEntityStatus(TestStatus.RUNNING);
 
-		for (final Object child : getChildren().toArray()) {
-			if (!isTerminated()) {
-				if (child instanceof ITestContainer)
-					strategy.execute((ITestEntity) child);
-			}
+		for (final ITestContainer child : getChildContainers()) {
+			if (!isTerminated())
+				strategy.execute(child);
 		}
 
 		setEntityStatus(TestStatus.FINISHED);
@@ -279,7 +296,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	@Override
 	public EList<ITestContainer> getChildContainers() {
 		final EList<ITestContainer> result = new BasicEList<>();
-		for (final Object child : getChildren().toArray()) {
+		for (final Object child : getCopyOfChildren()) {
 			if (child instanceof ITestContainer)
 				result.add((ITestContainer) child);
 		}
@@ -294,7 +311,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	public TestStatus getStatus() {
 		int status = super.getStatus().getValue();
 
-		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0]))
+		for (final ITestEntity child : getCopyOfChildren())
 			status = Math.max(status, child.getStatus().getValue());
 
 		return TestStatus.get(status);
@@ -305,7 +322,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	 */
 	@Override
 	public boolean hasError() {
-		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0])) {
+		for (final ITestEntity child : getCopyOfChildren()) {
 			if (child.hasError())
 				return true;
 		}
@@ -321,9 +338,11 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	@Override
 	public void reset() {
 		// remove single tests
-		for (final Object child : getChildren().toArray()) {
-			if (child instanceof ITest)
-				getChildren().remove(child);
+		synchronized (this) {
+			for (final Object child : getCopyOfChildren()) {
+				if (child instanceof ITest)
+					getChildren().remove(child);
+			}
 		}
 
 		super.reset();
@@ -337,11 +356,12 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	@Override
 	public long getEstimatedDuration() {
 		long duration = super.getEstimatedDuration();
-		if ((duration < 0) && (!getChildren().isEmpty())) {
+		final List<ITestEntity> children = getCopyOfChildren();
+		if ((duration < 0) && (!children.isEmpty())) {
 			// try to fetch duration from child elements. If one of them does not have an estimation
 			duration = 0;
 
-			for (final ITestEntity child : getChildren()) {
+			for (final ITestEntity child : children) {
 				final long childDuration = child.getEstimatedDuration();
 				if (childDuration < 0)
 					return childDuration;
@@ -364,7 +384,17 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 	public void setTerminated(boolean newTerminated) {
 		super.setTerminated(newTerminated);
 
-		for (final ITestEntity child : getChildren().toArray(new ITestEntity[0]))
+		for (final ITestEntity child : getCopyOfChildren())
 			child.setTerminated(newTerminated);
+	}
+
+	@Override
+	public synchronized EList<ITestEntity> getChildren() {
+		return getChildrenGen();
+	}
+
+	@Override
+	public synchronized List<ITestEntity> getCopyOfChildren() {
+		return new ArrayList<>(getChildrenGen());
 	}
 } // TestContainer
