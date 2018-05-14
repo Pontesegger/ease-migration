@@ -21,5 +21,9 @@
             class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
             engineID="org.eclipse.ease.python.jythonDebugger">
       </launchExtension>
+      <launchExtension
+            class="org.eclipse.ease.lang.python.Pep302ModuleImporter"
+            engineID="org.eclipse.ease.python.jythonDebugger">
+      </launchExtension>
    </extension>
 </plugin>

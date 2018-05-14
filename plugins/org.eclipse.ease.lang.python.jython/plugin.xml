@@ -16,6 +16,10 @@
             class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
             engineID="org.eclipse.ease.python.jython">
       </launchExtension>
+            <launchExtension
+                  class="org.eclipse.ease.lang.python.Pep302ModuleImporter"
+                  engineID="org.eclipse.ease.python.jython">
+            </launchExtension>
    </extension>
  <extension
        point="org.eclipse.ui.preferencePages">

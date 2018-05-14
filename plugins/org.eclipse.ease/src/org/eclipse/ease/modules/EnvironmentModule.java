@@ -66,15 +66,6 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	private final ModuleTracker fModuleTracker = new ModuleTracker();
 
-	/** Loaded module instances. Used as cache so that each module instance gets created only once. Maps moduleID -> instance. */
-	// private final Map<ModuleDefinition, Object> fLoadedModuleInstances = new HashMap<>();
-
-	/** Stores ordering of wrapped elements. Index 0 contains the newest element */
-	// private final List<Object> fWrappedElements = new ArrayList<>();
-
-	/** Stores beautified names of loaded modules. */
-	// private final Map<String, Object> fModuleNames = new HashMap<>();
-
 	private final ListenerList<IModuleListener> fModuleListeners = new ListenerList<>();
 
 	/** Stores short method IDs to method relations used for script callbacks. */
@@ -89,36 +80,16 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		state.setInstance(this);
 	}
 
-	@Override
-	@WrapToScript
-	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
-		// resolve identifier
-		final ModuleDefinition definition = ModuleHelper.resolveModuleName(moduleIdentifier);
-		if (definition == null)
-			throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
-
+	public Object getModuleInstance(ModuleDefinition definition) {
 		final ModuleState moduleState = fModuleTracker.getOrCreateModuleState(definition);
 
-		if (!moduleState.isLoaded())
-			createModuleInstance(moduleState);
-
-		if (!useCustomNamespace)
-			wrapModuleDependencies(definition);
-
-		// create function wrappers
-		return wrap(moduleState.getInstance(), useCustomNamespace);
-	}
-
-	private Object createModuleInstance(final ModuleState state) {
-
-		final ModuleDefinition definition = state.getModuleDefinition();
-		if (definition != null) {
+		if (!moduleState.isLoaded()) {
 			if (definition.isDeprecated())
 				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.");
 
 			createModuleDependencies(definition);
 			final Object instance = definition.createModuleInstance();
-			state.setInstance(instance);
+			moduleState.setInstance(instance);
 
 			// check that module class got initialized correctly
 			if (instance == null)
@@ -128,7 +99,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 				((IScriptModule) instance).initialize(getScriptEngine(), this);
 		}
 
-		return state.getInstance();
+		return moduleState.getInstance();
 	}
 
 	private void createModuleDependencies(ModuleDefinition parentModuleDefinition) {
@@ -141,10 +112,28 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 			createModuleDependencies(dependencyDefinition);
 
-			final ModuleState dependencyState = fModuleTracker.getOrCreateModuleState(dependencyDefinition);
-			if (!dependencyState.isLoaded())
-				createModuleInstance(dependencyState);
+			getModuleInstance(dependencyDefinition);
 		}
+	}
+
+	@Override
+	@WrapToScript
+	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
+		// resolve identifier
+		final ModuleDefinition definition = ModuleHelper.resolveModuleName(moduleIdentifier);
+		if (definition == null)
+			throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
+
+		final ModuleState moduleState = fModuleTracker.getOrCreateModuleState(definition);
+
+		// make sure module instance gets loaded
+		getModuleInstance(definition);
+
+		if (!useCustomNamespace)
+			wrapModuleDependencies(definition);
+
+		// create function wrappers
+		return wrap(moduleState.getInstance(), useCustomNamespace);
 	}
 
 	/**

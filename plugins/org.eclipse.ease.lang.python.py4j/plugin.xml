@@ -16,6 +16,10 @@
             class="org.eclipse.ease.lang.python.py4j.internal.Py4JBootstrap"
             engineID="org.eclipse.ease.lang.python.py4j.engine">
       </launchExtension>
+      <launchExtension
+            class="org.eclipse.ease.lang.python.Pep302ModuleImporter"
+            engineID="org.eclipse.ease.lang.python.py4j.engine">
+      </launchExtension>
       <engine
             class="org.eclipse.ease.lang.python.py4j.internal.Py4jDebuggerEngine"
             id="org.eclipse.ease.lang.python.py4j.debugger.engine"
@@ -27,6 +31,10 @@
       </engine>
       <launchExtension
             class="org.eclipse.ease.lang.python.py4j.internal.Py4JBootstrap"
+            engineID="org.eclipse.ease.lang.python.py4j.debugger.engine">
+      </launchExtension>
+      <launchExtension
+            class="org.eclipse.ease.lang.python.Pep302ModuleImporter"
             engineID="org.eclipse.ease.lang.python.py4j.debugger.engine">
       </launchExtension>
    </extension>

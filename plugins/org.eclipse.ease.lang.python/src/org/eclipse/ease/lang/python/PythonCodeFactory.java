@@ -292,4 +292,21 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	protected Object getLanguageIdentifier() {
 		return "Python";
 	}
+
+	/**
+	 * Create wrapper code for Pep302 import statements.
+	 *
+	 * @param instance
+	 *            instance to wrap
+	 * @param identifier
+	 * @param instance2
+	 * @return wrapper code to be loaded by python
+	 */
+	public String createPep302WrapperCode(EnvironmentModule environment, Object instance, String identifier) {
+
+		String code = "import __main__\n" + createWrapper(environment, instance, "__main__." + identifier, false, environment.getScriptEngine());
+		code = code.replaceAll(EnvironmentModule.getWrappedVariableName(environment), "__main__." + EnvironmentModule.getWrappedVariableName(environment));
+
+		return code;
+	}
 }
