@@ -10,4 +10,5 @@ Require-Bundle: org.eclipse.ease,
  org.eclipse.debug.core,
  org.eclipse.ease.ui,
  org.eclipse.ui.ide
-Export-Package: org.eclipse.ease.testhelper
+Export-Package: org.eclipse.ease.testhelper,
+ org.eclipse.ease.testhelper.python

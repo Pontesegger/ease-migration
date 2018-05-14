@@ -17,7 +17,7 @@
       <module
             category="org.eclipse.ease.testhelper.category"
             class="org.eclipse.ease.testhelper.AdvancedModule"
-            id="org.eclipse.ease.testhelper.basicModule"
+            id="org.eclipse.ease.testhelper.advancedModule"
             name="Advanced"
             visible="true">
          <dependency

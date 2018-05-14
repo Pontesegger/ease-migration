@@ -55,6 +55,8 @@ import org.python.util.InteractiveInterpreter;
 
 public class JythonScriptEngine extends AbstractReplScriptEngine {
 
+	public static final String ENGINE_ID = "org.eclipse.ease.python.jython";
+
 	protected InteractiveInterpreter mEngine;
 
 	private PyObject mResult;

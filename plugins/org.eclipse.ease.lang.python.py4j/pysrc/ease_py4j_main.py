@@ -41,6 +41,13 @@ except ImportError:
         integer_types = (int,)
         string_types = (str,)
 
+# builtins used to set global variables
+try:
+    # Python 3.*
+    import builtins
+except ImportError:
+    # Python 2.*
+    builtins = __builtins__
 
 # To ease some debugging of the py4j engine itself it is useful to turn logging on,
 # uncomment the following lines for one way to do that
@@ -228,11 +235,19 @@ class ScriptEngineExecute(object):
         # so that code like "java.lang.String()" can work.
         # for other names, jvm.<package name> should be used
         self.locals['java'] = gateway.jvm.java
+        builtins.__dict__['java'] = gateway.jvm.java
+
         self.locals['javax'] = gateway.jvm.javax
+        builtins.__dict__['javax'] = gateway.jvm.javax  # @IndentOk
         self.locals['org'] = gateway.jvm.org
+        builtins.__dict__['org'] = gateway.jvm.org
         self.locals['com'] = gateway.jvm.com
+        builtins.__dict__['com'] = gateway.jvm.com
         self.locals['net'] = gateway.jvm.net
+        builtins.__dict__['net'] = gateway.jvm.net
         self.locals['jvm'] = gateway.jvm
+        builtins.__dict__['jvm'] = gateway.jvm.jvm
+
         self.locals['gateway'] = gateway
         self.locals['py4j'] = py4j
         sys.displayhook = self.displayhook
@@ -293,7 +308,7 @@ class ScriptEngineExecute(object):
 
     def internalSetVariable(self, name, content):
         self.locals[name] = content
-        __builtins__.__dict__[name] = content 
+        builtins.__dict__.update({name: content}) 
 
     def teardownEngine(self):
         self.shutdown_event.set()
