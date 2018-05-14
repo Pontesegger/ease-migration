@@ -9,18 +9,28 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.lang.javascript.rhino;
+package org.eclipse.ease.testhelper;
 
-import org.eclipse.ease.IReplEngine;
-import org.eclipse.ease.service.IScriptService;
-import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ease.testhelper.AbstractEnvironmentTest;
+import org.eclipse.ease.modules.AbstractScriptModule;
+import org.eclipse.ease.modules.WrapToScript;
 
-public class RhinoEnvironmentTest extends AbstractEnvironmentTest {
+/**
+ * Advanced test module. Depends on basic test module.
+ */
+public class AdvancedModule extends AbstractScriptModule {
 
-	@Override
-	protected IReplEngine createScriptEngine() {
-		final IScriptService scriptService = ScriptService.getService();
-		return (IReplEngine) scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID).createEngine();
+	/**
+	 * Calculate the area of a rectangle.
+	 *
+	 * @param a
+	 *            width
+	 * @param b
+	 *            height
+	 * @return area
+	 */
+	@WrapToScript
+	public int area(int a, int b) {
+		final BasicModule module = getEnvironment().getModule(BasicModule.class);
+		return module.mul(a, b);
 	}
 }

@@ -13,12 +13,8 @@
                scriptType="JavaScript">
          </binding>
       </engine>
-      <moduleWrapper
-            class="org.eclipse.ease.lang.javascript.JavaScriptModuleWrapper"
-            engineID="org.eclipse.ease.javascript.nashorn">
-      </moduleWrapper>
       <launchExtension
-            class="org.eclipse.ease.modules.BootStrapper"
+            class="org.eclipse.ease.lang.javascript.nashorn.NashornBootstrapper"
             engineID="org.eclipse.ease.javascript.nashorn">
       </launchExtension>
       <completionAnalyzer

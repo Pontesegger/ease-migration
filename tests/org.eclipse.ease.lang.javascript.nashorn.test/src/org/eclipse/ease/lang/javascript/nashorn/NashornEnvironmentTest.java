@@ -9,18 +9,18 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.lang.javascript.rhino;
+package org.eclipse.ease.lang.javascript.nashorn;
 
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.testhelper.AbstractEnvironmentTest;
 
-public class RhinoEnvironmentTest extends AbstractEnvironmentTest {
+public class NashornEnvironmentTest extends AbstractEnvironmentTest {
 
 	@Override
 	protected IReplEngine createScriptEngine() {
 		final IScriptService scriptService = ScriptService.getService();
-		return (IReplEngine) scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID).createEngine();
+		return (IReplEngine) scriptService.getEngineByID(NashornScriptEngine.ENGINE_ID).createEngine();
 	}
 }

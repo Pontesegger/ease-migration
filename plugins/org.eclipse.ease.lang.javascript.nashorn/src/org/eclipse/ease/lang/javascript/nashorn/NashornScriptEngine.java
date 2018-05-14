@@ -27,6 +27,8 @@ import org.eclipse.ease.lang.javascript.JavaScriptHelper;
 
 public class NashornScriptEngine extends AbstractReplScriptEngine {
 
+	public static final String ENGINE_ID = "org.eclipse.ease.javascript.nashorn";
+
 	private ScriptEngine fEngine;
 
 	public NashornScriptEngine() {

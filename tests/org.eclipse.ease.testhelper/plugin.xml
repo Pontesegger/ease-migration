@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ease.modules">
+      <category
+            id="org.eclipse.ease.testhelper.category"
+            name="Test">
+      </category>
+      <module
+            category="org.eclipse.ease.testhelper.category"
+            class="org.eclipse.ease.testhelper.BasicModule"
+            id="org.eclipse.ease.testhelper.basicModule"
+            name="Basic"
+            visible="true">
+      </module>
+      <module
+            category="org.eclipse.ease.testhelper.category"
+            class="org.eclipse.ease.testhelper.AdvancedModule"
+            id="org.eclipse.ease.testhelper.basicModule"
+            name="Advanced"
+            visible="true">
+         <dependency
+               module="org.eclipse.ease.testhelper.basicModule">
+         </dependency>
+      </module>
+   </extension>
+
+</plugin>

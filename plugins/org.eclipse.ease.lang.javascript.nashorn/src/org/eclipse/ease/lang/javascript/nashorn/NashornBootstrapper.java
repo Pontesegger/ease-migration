@@ -9,18 +9,18 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.lang.javascript.rhino;
+package org.eclipse.ease.lang.javascript.nashorn;
 
-import org.eclipse.ease.IReplEngine;
-import org.eclipse.ease.service.IScriptService;
-import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ease.testhelper.AbstractEnvironmentTest;
+import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IScriptEngineLaunchExtension;
+import org.eclipse.ease.Script;
+import org.eclipse.ease.modules.EnvironmentModule;
 
-public class RhinoEnvironmentTest extends AbstractEnvironmentTest {
+public class NashornBootstrapper implements IScriptEngineLaunchExtension {
 
 	@Override
-	protected IReplEngine createScriptEngine() {
-		final IScriptService scriptService = ScriptService.getService();
-		return (IReplEngine) scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID).createEngine();
+	public void createEngine(final IScriptEngine engine) {
+		// seems nashorn cannot call static methods on a class instance
+		engine.executeAsync(new Script("Bootloader", "Packages." + EnvironmentModule.class.getName() + ".bootstrap();"));
 	}
 }
