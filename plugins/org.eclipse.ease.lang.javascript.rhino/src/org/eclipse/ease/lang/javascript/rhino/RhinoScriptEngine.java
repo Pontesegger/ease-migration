@@ -55,6 +55,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
+import org.mozilla.javascript.debug.Debugger;
 
 /**
  * A script engine to execute JavaScript code on a Rhino interpreter.
@@ -488,9 +489,18 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			try {
 				if (hasVariable(name)) {
 					// test for java string objects
+
+					// we need to disable a debugger in case it is set as it cannot operate on the wrong context
+					final Debugger debugger = getContext().getDebugger();
+					final Object debuggerContextData = getContext().getDebuggerContextData();
+					getContext().setDebugger(null, null);
+
 					final Object inject = inject(name + ".length;");
 					if (inject instanceof Integer)
 						variable.setType(Type.NATIVE_OBJECT);
+
+					// restore debugger settings after execution
+					getContext().setDebugger(debugger, debuggerContextData);
 				}
 			} catch (final Exception e) {
 				// could not execute type check, ignore
