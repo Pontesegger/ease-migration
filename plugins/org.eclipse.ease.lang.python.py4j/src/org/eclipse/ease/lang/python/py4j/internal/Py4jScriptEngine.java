@@ -341,4 +341,11 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		return super.getAdapter(adapter);
 	}
 
+	@Override
+	public String toString(Object object) {
+		if (object == null)
+			return "None";
+
+		return super.toString(object);
+	}
 }

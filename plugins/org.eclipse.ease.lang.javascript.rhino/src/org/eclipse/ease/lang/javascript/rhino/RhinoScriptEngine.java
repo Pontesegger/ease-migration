@@ -549,9 +549,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	public String toString(Object object) {
-		if (ScriptResult.VOID.equals(object))
-			return "<undefined>";
-
 		if (object instanceof NativeArray) {
 			final ArrayList<Object> elements = new ArrayList<>();
 			for (final int indexId : ((NativeArray) object).getIndexIds())

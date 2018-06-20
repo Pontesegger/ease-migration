@@ -184,6 +184,9 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 
 	@Override
 	public String toString(Object object) {
+		if (ScriptResult.VOID.equals(object))
+			return "<undefined>";
+
 		if (object != null)
 			return object.toString();
 
