@@ -102,7 +102,12 @@ public class RunHeadlessScript implements IApplication {
 							}
 
 							final Object result = scriptResult.getResult();
+
 							if (result != null) {
+								if (ScriptResult.VOID.equals(result)) {
+									return 0;
+								}
+
 								try {
 									return Integer.parseInt(result.toString());
 								} catch (final Exception e) {
