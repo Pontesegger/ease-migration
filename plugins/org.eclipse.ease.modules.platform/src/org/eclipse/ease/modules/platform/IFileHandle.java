@@ -12,6 +12,7 @@ package org.eclipse.ease.modules.platform;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.eclipse.core.resources.IFile;
 
@@ -48,6 +49,15 @@ public interface IFileHandle {
 	 *             on access errors
 	 */
 	String readLine() throws IOException;
+
+	/**
+	 * Returns the java.io.File Path to the underlying file
+	 *
+	 * @return Path of the file
+	 * @throws IOException
+	 *             on access errors
+	 */
+	Path getPath() throws IOException;
 
 	/**
 	 * Write data to a file. Uses platform default encoding to write strings to the file.

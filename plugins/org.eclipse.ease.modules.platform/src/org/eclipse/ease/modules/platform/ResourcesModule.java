@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -317,9 +319,16 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 */
 	@WrapToScript
 	public void copyFile(final Object sourceLocation, final Object targetLocation) throws Exception {
-		final IFileHandle handle = writeFile(targetLocation, readFile(sourceLocation, -1), IFileHandle.WRITE, false);
-		if (handle != null)
-			handle.close();
+		final IFileHandle inputFile = getFileHandle(sourceLocation, -1, false);
+		final IFileHandle targetFile = getFileHandle(targetLocation, -1, false);
+
+		if (targetFile != null) {
+			Files.copy(inputFile.getPath(), targetFile.getPath(), StandardCopyOption.REPLACE_EXISTING);
+		}
+
+		if (targetFile.getFile() instanceof IResource) {
+			((IResource) targetFile.getFile()).getParent().refreshLocal(1, null);
+		}
 	}
 
 	/**

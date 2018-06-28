@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.file.Path;
 
 public class FilesystemHandle implements IFileHandle {
 
@@ -80,6 +81,11 @@ public class FilesystemHandle implements IFileHandle {
 			return reader.readLine();
 
 		return null;
+	}
+
+	@Override
+	public Path getPath() {
+		return fFile.toPath();
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -58,6 +59,11 @@ public class ResourceHandle extends FilesystemHandle {
 		} catch (final CoreException e) {
 			throw new IOException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public Path getPath() {
+		return fFile.getLocation().toFile().toPath();
 	}
 
 	@Override

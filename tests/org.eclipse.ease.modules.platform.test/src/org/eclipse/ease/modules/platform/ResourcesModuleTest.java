@@ -12,16 +12,30 @@
 package org.eclipse.ease.modules.platform;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ease.IScriptEngine;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ResourcesModuleTest extends AbstractModuleTest {
+
+	private File tempFile;
+	private ResourcesModule module;
 
 	@Override
 	protected Object getModuleClass() {
@@ -33,23 +47,90 @@ public class ResourcesModuleTest extends AbstractModuleTest {
 		return ResourcesModule.MODULE_ID;
 	}
 
-	@Test
-	public void getFile() throws IOException {
-		File tempFile = File.createTempFile("ease_unittest_", "");
+	@Before
+	public void createTempFile() throws IOException {
+		tempFile = File.createTempFile("ease_unittest_", "");
+		tempFile.deleteOnExit(); // ensure cleanup
 
 		// mocked script engine
-		IScriptEngine mockEngine = mock(IScriptEngine.class);
+		final IScriptEngine mockEngine = mock(IScriptEngine.class);
 		when(mockEngine.getExecutedFile()).thenReturn(tempFile);
 
 		// initialize module
-		ResourcesModule module = new ResourcesModule();
+		module = new ResourcesModule();
 		module.initialize(mockEngine, null);
+	}
 
-		// test
-		Object file = module.getFile(tempFile.toString(), true);
-		assertEquals(tempFile, file);
-
-		// cleanup
+	@After
+	public void cleanUp() {
 		tempFile.delete();
+	}
+
+	@Test
+	public void getFile() throws IOException {
+		final Object file = module.getFile(tempFile.toString(), true);
+		assertEquals(tempFile, file);
+	}
+
+	@Test
+	public void copyBinaryFile() throws Exception {
+		// GIVEN
+		// use bytes that are not ASCII
+		final byte[] data = new byte[] { -128, -12, 123, 52, 0, 12, 127 };
+
+		final File sourceFile = File.createTempFile("ease_unittest_copyFile_sourceFile", "");
+		sourceFile.deleteOnExit();
+
+		try (FileOutputStream out = new FileOutputStream(sourceFile)) {
+			out.write(data);
+		}
+
+		final File targetFile = File.createTempFile("ease_unittest_copyFile_target", "");
+		targetFile.delete();
+		targetFile.deleteOnExit();
+
+		// WHEN
+		module.copyFile(sourceFile, targetFile);
+
+		// THEN
+		// compare content with the written bytes
+		try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(targetFile))) {
+			final byte[] read = new byte[data.length];
+			in.read(read, 0, data.length);
+
+			assertTrue("The content of the copied file is not the same", Arrays.equals(data, read));
+		}
+
+		targetFile.delete();
+		sourceFile.delete();
+	}
+
+	@Test
+	public void copyBinaryIFile() throws Exception {
+
+		// GIVEN
+		// use bytes that are not ASCII
+		final byte[] data = new byte[] { -128, -12, 123, 52, 0, 12, 127 };
+
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("ease_test_project_copyBinaryIFile");
+		project.create(null);
+		project.open(null);
+
+		final IFile sourceIFile = project.getFile("ease_unittest_sourceIFile");
+		sourceIFile.create(new ByteArrayInputStream(data), true, null);
+
+		final IFile targetIFile = project.getFile("ease_unittest_targetIFile");
+
+		// WHEN
+		module.copyFile(sourceIFile, targetIFile);
+
+		// THEN
+		// compare content with the written bytes
+		try (final BufferedInputStream in = new BufferedInputStream(targetIFile.getContents())) {
+			final byte[] read = new byte[data.length];
+			in.read(read, 0, data.length);
+
+			assertTrue("The content of the copied file is not the same", Arrays.equals(data, read));
+		}
 	}
 }
