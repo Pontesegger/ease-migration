@@ -67,7 +67,14 @@ def patch_builtins(name, value):
 # logger = logging.getLogger("py4j")
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())
-def convert_value(value, gw):
+def convert_value(
+        value,
+        gw,
+        integer_types=integer_types, 
+        string_types=string_types,
+        dict_types=dict,
+        list_types=list,
+        set_types=set):
     '''
     Tries to convert the given value using different strategies.
 
@@ -90,16 +97,16 @@ def convert_value(value, gw):
         return value
 
     # Recursively check collections
-    if isinstance(value, dict):
+    if isinstance(value, dict_types):
         return MapConverter().convert({
             convert_value(k, gw): convert_value(v, gw)
             for k, v in value.items()
         }, gw)
-    if isinstance(value, list):
+    if isinstance(value, list_types):
         return ListConverter().convert([
             convert_value(v, gw) for v in value
         ], gw)
-    if isinstance(value, set):
+    if isinstance(value, set_types):
         return SetConverter().convert({
             convert_value(v, gw) for v in value
         }, gw)
