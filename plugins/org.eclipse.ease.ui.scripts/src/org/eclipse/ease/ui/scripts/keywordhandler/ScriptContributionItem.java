@@ -33,7 +33,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 public class ScriptContributionItem extends CommandContributionItem {
 
-	private static final Pattern ENABLE_PATTERN = Pattern.compile("enableFor\\((.*)\\)");
+	protected static final Pattern ENABLE_PATTERN = Pattern.compile("enableFor\\((.*)\\)");
 
 	private static ImageDescriptor getImageDescriptor(final IScript script) {
 		String location = script.getKeywords().get("image");
@@ -56,7 +56,7 @@ public class ScriptContributionItem extends CommandContributionItem {
 	}
 
 	private final IScript fScript;
-	private Expression fVisibleExpression = null;
+	protected Expression fVisibleExpression = null;
 
 	public ScriptContributionItem(final IScript script) {
 		super(new CommandContributionItemParameter(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), script.getLocation(), RunScript.COMMAND_ID,

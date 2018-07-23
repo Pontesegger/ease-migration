@@ -29,10 +29,10 @@ import org.eclipse.ui.services.IServiceLocator;
 public class ScriptContributionFactory extends AbstractContributionFactory {
 
 	/** List of scripts to be registered. */
-	private final List<IScript> fScripts = new ArrayList<IScript>();
+	protected final List<IScript> fScripts = new ArrayList<IScript>();
 
 	/** ContributionManager scripts should be added to. */
-	private IContributionManager fContributionManager = null;
+	protected IContributionManager fContributionManager = null;
 
 	public ScriptContributionFactory(final String location) {
 		super(location, null);
@@ -82,7 +82,7 @@ public class ScriptContributionFactory extends AbstractContributionFactory {
 		fContributionManager = manager;
 	}
 
-	private static List<IScript> sortScripts(final List<IScript> scripts) {
+	protected static List<IScript> sortScripts(final List<IScript> scripts) {
 		Collections.sort(scripts, new Comparator<IScript>() {
 
 			@Override

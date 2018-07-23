@@ -182,7 +182,7 @@ public class ToolbarHandler implements EventHandler {
 	private List<Event> fRefreshEvents = new ArrayList<Event>();
 
 	/** UI contribution factories. */
-	private final Map<String, ScriptContributionFactory> fContributionFactories = new HashMap<String, ScriptContributionFactory>();
+	protected final Map<String, ScriptContributionFactory> fContributionFactories = new HashMap<String, ScriptContributionFactory>();
 
 	public ToolbarHandler() {
 		IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
