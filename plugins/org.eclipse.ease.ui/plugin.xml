@@ -221,6 +221,22 @@
                icon="icons/eobj16/help.png"
                label="%openHelp"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate>
+                     <or>
+                        <instanceof
+                              value="org.eclipse.ease.modules.ModuleDefinition">
+                        </instanceof>
+                        <instanceof
+                              value="org.eclipse.ease.ui.modules.ui.ModulesTools$ModuleEntry">
+                        </instanceof>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
          </command>
          <separator
                name="additions"
