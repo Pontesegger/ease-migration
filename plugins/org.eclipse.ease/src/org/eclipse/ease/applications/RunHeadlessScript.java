@@ -17,8 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ScriptResult;
@@ -62,6 +65,9 @@ public class RunHeadlessScript implements IApplication {
 						System.err.println("ERROR: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
 						return -1;
 					}
+
+					if (parameters.containsKey("refreshWorkspace"))
+						ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 				}
 
 				loadEarlyStartupExtensions();
@@ -223,12 +229,13 @@ public class RunHeadlessScript implements IApplication {
 	}
 
 	private static void printUsage() {
-		System.out.println("SYNTAX: [-workspace <workspace location>] [-engine <engineID>]-script <script name> <script parameters>");
+		System.out.println("SYNTAX: [-workspace <workspace location> [-refreshWorkspace]] [-engine <engineID>]-script <script name> <script parameters>");
 		System.out.println("");
 		System.out.println("\t\t<script name> is a path like 'file://C/myfolder/myscript.js'");
 		System.out.println("\t\t<engineID> provides a dedicated script engine ID. Use org.eclipse.ease.listEngines application.");
 		System.out.println("\t\t<workspace location> is a file system path like 'C:\\somefolder\\myworkspace'");
 		System.out.println("\t\t\tif you provide a workspace you can use workspace:// identifiers in your scripts");
+		System.out.println("\t\t\tif you provide a workspace you may ask to refresh it first prior to script execution");
 		System.out.println("\t\t<script parameters> will be passed to the script as String[] in the variable 'argv'");
 	}
 

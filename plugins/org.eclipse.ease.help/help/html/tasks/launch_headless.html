@@ -31,6 +31,8 @@
 <dd>script location to execute from. Either an absolute path or a URI. Accepts <i>workspace://</i> style URIs if a workspace is provided. Needs to be the last parameter provided!</dd>
 <dt>-workspace &lt;workspace location&gt;</dt>
 <dd>OPTIONAL: workspace location to execute from. If not provided, no workspace will be loaded.</dd>
+<dt>-refreshWorkspace</dt>
+<dd>OPTIONAL: when a workspace is provided perform a refresh to sync with the local file system.</dd>
 <dt>-engine &lt;engine ID&gt;</dt>
 <dd>OPTIONAL: Script engine ID to be used for script execution. If not provided, the default engine for the given script source will be used.</dd>
 <dt>-help</dt>
@@ -39,7 +41,7 @@
 <p>Any argument after the script parameter is passed to the script within an <i>argv[]</i> variable of type <i>String[]</i>. <i>argv[0]</i> always contains the name of the script file.</p>
 
 <h3>Example</h3>
-<code>eclipsec.exe -application org.eclipse.ease.runScript -workspace "C:\my workspace location" -script "workspace://Example Project/src/script1.js" param1 param2</code>
+<code>eclipsec.exe -application org.eclipse.ease.runScript -workspace "C:\my workspace location" -refreshWorkspace -script "workspace://Example Project/src/script1.js" param1 param2</code>
 
 </body>
 </html>
