@@ -233,7 +233,7 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 	public IContentProposal[] getProposals(final String contents, final int position) {
 		final List<ICompletionProposal> proposals = getCompletionProposals(null, contents, position, 0, null);
 		Collections.sort(proposals, (o1, o2) -> {
-			if ((o1 instanceof ScriptCompletionProposal) && (o1 instanceof ScriptCompletionProposal))
+			if ((o1 instanceof ScriptCompletionProposal) && (o2 instanceof ScriptCompletionProposal))
 				return ((ScriptCompletionProposal) o1).compareTo((ScriptCompletionProposal) o2);
 
 			return o1.getDisplayString().compareTo(o2.getDisplayString());
