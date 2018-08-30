@@ -321,7 +321,7 @@ class ScriptEngineExecute(object):
         filtered = {
             k: convert_value(v, self.gateway._gateway_client)
             for k, v in self.locals.items()
-            if not k.startswith('__')
+            if k.startswith('__EASE') or (not k.startswith('__')) 
         }
 
         return MapConverter().convert(filtered, self.gateway._gateway_client)
