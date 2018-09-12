@@ -91,11 +91,11 @@ public interface IScriptService {
 	/**
 	 * Get Launch extensions for a dedicated script engine.
 	 *
-	 * @param engineID
-	 *            engine identifier
+	 * @param engineDescription
+	 *            engine description for further filtering
 	 * @return launch extensions or empty collection
 	 */
-	Collection<IScriptEngineLaunchExtension> getLaunchExtensions(final String engineID);
+	Collection<IScriptEngineLaunchExtension> getLaunchExtensions(final EngineDescription engineDescription);
 
 	/**
 	 * Get the script type for a given resource location.

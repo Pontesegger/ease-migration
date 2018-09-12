@@ -100,17 +100,18 @@
          </documentation>
       </annotation>
       <complexType>
-         <attribute name="engineID" type="string" use="required">
+         <attribute name="engineID" type="string" use="default" value="*">
             <annotation>
                <documentation>
-                  Script engine to bind this extension to. To bind to any engine use * as a wildcard qualifier.
+                  Script engine to bind this extension to.
+
+Can be filtered using a regular expression.
+
+For legacy reasons &quot;*&quot; will also match any engine.
                </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ease.language/engine/@id"/>
-               </appinfo>
             </annotation>
          </attribute>
-         <attribute name="class" type="string">
+         <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   Class to be called when script engine is launched.
@@ -123,7 +124,7 @@
          <attribute name="scriptType" type="string">
             <annotation>
                <documentation>
-                  
+                  Script Type to bind to.
                </documentation>
             </annotation>
          </attribute>

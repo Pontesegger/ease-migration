@@ -152,18 +152,35 @@ public class ScriptService implements IScriptService, BundleListener {
 	}
 
 	@Override
-	public Collection<IScriptEngineLaunchExtension> getLaunchExtensions(final String engineID) {
+	public Collection<IScriptEngineLaunchExtension> getLaunchExtensions(final EngineDescription engineDescription) {
+		final String targetEngineID = engineDescription.getID();
+
 		final Collection<IScriptEngineLaunchExtension> extensions = new HashSet<>();
-
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_LANGUAGE_ID);
-
 		for (final IConfigurationElement e : config) {
 			try {
 				if (LAUNCH_EXTENSION.equals(e.getName())) {
-					if ((e.getAttribute(ENGINE_ID).equals(engineID)) || (e.getAttribute(ENGINE_ID).equals("*"))) {
-						final Object extension = e.createExecutableExtension("class");
-						if (extension instanceof IScriptEngineLaunchExtension)
-							extensions.add((IScriptEngineLaunchExtension) extension);
+					// Parse engine ID to backwards compatible regular expression
+					String engineID = e.getAttribute(ENGINE_ID);
+					if ((engineID == null) || engineID.matches("^\\*?$")) {
+						engineID = ".*";
+					}
+					if (!targetEngineID.matches(engineID)) {
+						continue;
+					}
+
+					// Check if script type given
+					final String scriptType = e.getAttribute("scriptType");
+					if ((scriptType != null) && !scriptType.isEmpty()) {
+						if (!engineDescription.supports(scriptType)) {
+							continue;
+						}
+					}
+
+					// Create IScriptEngineLaunchExtension based on given string
+					final Object extension = e.createExecutableExtension("class");
+					if (extension instanceof IScriptEngineLaunchExtension) {
+						extensions.add((IScriptEngineLaunchExtension) extension);
 					}
 				}
 			} catch (final InvalidRegistryObjectException e1) {

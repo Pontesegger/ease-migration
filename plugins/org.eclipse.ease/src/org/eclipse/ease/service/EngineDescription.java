@@ -98,7 +98,7 @@ public class EngineDescription {
 
 				// engine loaded, now load launch extensions
 				final IScriptService scriptService = ScriptService.getService();
-				for (final IScriptEngineLaunchExtension extension : scriptService.getLaunchExtensions(getID()))
+				for (final IScriptEngineLaunchExtension extension : scriptService.getLaunchExtensions(this))
 					extension.createEngine((IScriptEngine) object);
 
 				return (IScriptEngine) object;
