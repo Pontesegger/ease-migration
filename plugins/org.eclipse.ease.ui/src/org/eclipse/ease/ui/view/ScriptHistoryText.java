@@ -227,8 +227,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 					setStyleRange(styleRange);
 
 					// scroll to end of window
-					setHorizontalPixel(0);
-					setTopPixel(getLineHeight() * getLineCount());
+					scrollToEnd();
 				}
 			});
 		}
@@ -272,10 +271,20 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 				setStyleRange(styleRange);
 
 				// scroll to end of window
-				setHorizontalPixel(0);
-				setTopPixel(getLineHeight() * getLineCount());
+				scrollToEnd();
 			}
 		});
+	}
+
+	/**
+	 * Vertically scroll to the end of the history text.
+	 */
+	private void scrollToEnd() {
+		setHorizontalPixel(0);
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=538973
+		// seems the StyledText widget has a strange bug when trying to scroll correctly. we therefore add a factor to the calculated pixel offset to make sure
+		// we correctly scroll to the end.
+		setTopPixel((int) (getLineHeight() * getLineCount() * 1.1));
 	}
 
 	/**
