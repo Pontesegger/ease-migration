@@ -423,6 +423,10 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		return fScriptEngine;
 	}
 
+	public void changePartName(String newPartName) {
+		setPartName(newPartName);
+	}
+
 	@Override
 	public void notify(final IScriptEngine engine, final Script script, final int status) {
 
