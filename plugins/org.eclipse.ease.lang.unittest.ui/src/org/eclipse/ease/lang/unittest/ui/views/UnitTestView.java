@@ -13,10 +13,9 @@ package org.eclipse.ease.lang.unittest.ui.views;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -480,6 +479,8 @@ public class UnitTestView extends ViewPart {
 						return fResourceManager.createImage(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/status_running.png"));
 					case DISABLED:
 						return fResourceManager.createImage(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/status_ignore.png"));
+					default:
+						return super.getImage(element);
 					}
 				}
 
@@ -548,10 +549,6 @@ public class UnitTestView extends ViewPart {
 
 	public TreeViewer getFileTreeViewer() {
 		return fFileTreeViewer;
-	}
-
-	private enum UpdateUIType {
-		STRUCTURE, DECORATOR
 	}
 
 	public StructuredViewer getTableViewer() {
@@ -630,21 +627,7 @@ public class UnitTestView extends ViewPart {
 				fFinishedFileCount++;
 			}
 
-			// debug output of events
-			// if (!IRuntimePackage.Literals.TEST_ENTITY__ENTITY_STATUS.equals(notification.getFeature())) {
-			// System.out.println(notification);
-			// System.out.println("\t" + notification.getEventType());
-			// System.out.println("\t" + notification.getNotifier().getClass().getSimpleName());
-			// if (notification.getFeature() instanceof ENamedElement)
-			// System.out.println("\t" + ((ENamedElement) notification.getFeature()).getName());
-			// }
-
-			final UpdateUIType eventType = ((notification.getEventType() == Notification.ADD) || (notification.getEventType() == Notification.REMOVE))
-					? UpdateUIType.STRUCTURE
-					: UpdateUIType.DECORATOR;
-
-			if (notification.getNotifier() instanceof ITestEntity)
-				fUIJob.refresh((ITestEntity) notification.getNotifier(), eventType);
+			fUIJob.refresh(notification);
 		}
 
 		@Override
@@ -660,15 +643,15 @@ public class UnitTestView extends ViewPart {
 
 	private class UIUpdateJob extends UIJob {
 
-		private final Map<ITestEntity, UpdateUIType> fElements = new HashMap<>();
+		private final Collection<Notification> fElements = new HashSet<>();
 
 		public UIUpdateJob() {
 			super("Script Unittest UI update");
 		}
 
-		public void refresh(ITestEntity entity, UpdateUIType type) {
+		public void refresh(Notification notification) {
 			synchronized (fElements) {
-				fElements.put(entity, UpdateUIType.STRUCTURE.equals(fElements.get(entity)) ? UpdateUIType.STRUCTURE : type);
+				fElements.add(notification);
 			}
 
 			schedule(300);
@@ -679,14 +662,12 @@ public class UnitTestView extends ViewPart {
 			if (fFileTreeViewer.getTree().isDisposed())
 				return Status.CANCEL_STATUS;
 
-			Map<ITestEntity, UpdateUIType> elements;
-			synchronized (fElements) {
-				elements = new HashMap<>(fElements);
-				fElements.clear();
-			}
-
 			if (fFileTreeViewer.getInput() == null) {
 				// full update
+				synchronized (fElements) {
+					fElements.clear();
+				}
+
 				fFileTreeViewer.setInput(fCurrentEngine.getTestRoot());
 				fFileTreeViewer.expandAll();
 
@@ -694,13 +675,48 @@ public class UnitTestView extends ViewPart {
 
 			} else {
 				// partial update
-				for (final Entry<ITestEntity, UpdateUIType> entry : elements.entrySet()) {
-					if (UpdateUIType.STRUCTURE.equals(entry.getValue()))
-						fFileTreeViewer.refresh(entry.getKey());
+				boolean testRefresh = false;
+				final Object selection = fFileTreeViewer.getStructuredSelection().getFirstElement();
+				final Collection<ITestContainer> changedTestContainers = new HashSet<>();
+				final Collection<ITestContainer> changedStatus = new HashSet<>();
 
-					else
-						fFileTreeViewer.update(entry.getKey(), null);
+				synchronized (fElements) {
+					for (final Notification notification : fElements) {
+						if (notification.getNotifier() instanceof ITest) {
+							// check details view
+							if (((ITest) notification.getNotifier()).getParent().equals(selection))
+								testRefresh = true;
+
+						} else if (notification.getNotifier() instanceof ITestContainer) {
+
+							if ((notification.getEventType() == Notification.ADD) || (notification.getEventType() == Notification.REMOVE_MANY)) {
+								// structure
+								changedTestContainers.add((ITestContainer) notification.getNotifier());
+
+							} else {
+								// decorator
+								changedStatus.add((ITestContainer) notification.getNotifier());
+							}
+						}
+					}
+
+					fElements.clear();
 				}
+
+				for (final ITestContainer container : changedTestContainers) {
+					fFileTreeViewer.refresh(container);
+					changedStatus.add(container);
+				}
+
+				for (ITestContainer container : changedStatus) {
+					while (container != null) {
+						fFileTreeViewer.update(container, null);
+						container = container.getParent();
+					}
+				}
+
+				if (testRefresh)
+					fTestTreeViewer.refresh();
 			}
 
 			// check if we are done
@@ -773,7 +789,6 @@ public class UnitTestView extends ViewPart {
 
 			return Status.OK_STATUS;
 		}
-
 	}
 
 	public static String getDurationString(long duration) {
