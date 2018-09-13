@@ -14,12 +14,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.ease.ui.console.ScriptConsole;
+import org.eclipse.ease.ui.view.ScriptShell;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
@@ -603,6 +605,40 @@ public class UIModule extends AbstractScriptModule {
 		Display.getDefault().syncExec(runnable);
 
 		return runnable.getResult();
+	}
+
+	/**
+	 * Renames the script shell window to the specified name.
+	 *
+	 * @param newName
+	 *            new name for the script shell window
+	 */
+	@WrapToScript
+	public void renameScriptShell(String newName) {
+		Display.getDefault().asyncExec(() -> {
+			final IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+			if (part instanceof ScriptShell) {
+				// from same window
+				((ScriptShell) part).changePartName(newName);
+			} else {
+				// from another window
+				final IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getViewReferences();
+
+				ScriptShell renamingScriptShell = null;
+				for (final IViewReference viewReference : viewReferences) {
+					if (ScriptShell.VIEW_ID.equals(viewReference.getId())) {
+						if (renamingScriptShell != null) {
+							Logger.error(MODULE_ID, "Detected more than one script shell, no renaming can be performed");
+							return;
+						} else {
+							renamingScriptShell = (ScriptShell) viewReference.getView(true);
+						}
+					}
+				}
+				if (renamingScriptShell != null)
+					renamingScriptShell.changePartName(newName);
+			}
+		});
 	}
 
 	/**
