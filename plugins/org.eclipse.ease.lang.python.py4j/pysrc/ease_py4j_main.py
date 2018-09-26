@@ -92,6 +92,10 @@ def convert_value(
     if isinstance(value, integer_types):
         return value
 
+    # Floats can be send directly
+    if isinstance(value, float):
+        return value
+
     # Strings can be send directly
     if isinstance(value, string_types):
         return value

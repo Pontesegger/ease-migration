@@ -12,6 +12,7 @@
 package org.eclipse.ease.lang.python.py4j;
 
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -23,18 +24,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.IScriptable;
 import org.eclipse.ease.ScriptResult;
+import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author Kloesch
- *
- */
 public abstract class ModeTestBase extends Py4JEngineTestBase {
 	abstract protected ScriptResult executeCode(String code) throws Exception;
 
 	abstract protected void executeCode(String code, Object result) throws Exception;
+
+	@Before
+	public void loadModules() throws Exception {
+		executeCode("loadModule('/Py4jTests')");
+	}
 
 	@Test
 	public void pythonInteger() throws Exception {
@@ -123,5 +127,66 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		createEclipseClass();
 		javaInteger();
 		javaString();
+	}
+
+	@Test
+	public void javaStringArray() throws Exception {
+		executeCode("stringArray(['Hello', 'World'])", "Hello, World");
+	}
+
+	@Test
+	public void javaIntegerArray() throws Exception {
+		executeCode("integerArray([1, 2])", 3);
+	}
+
+	@Test
+	public void javaIntArray() throws Exception {
+		executeCode("intArray([1, 2])", 3);
+	}
+
+	@Test
+	public void javaDoubleArray() throws Exception {
+		executeCode("doubleArray([1.0, 2.0])", 3.0);
+	}
+
+	@Test
+	public void javaBooleanArray() throws Exception {
+		executeCode("booleanArray([True, False])", false);
+	}
+
+	@Test
+	public void javaByteArray() throws Exception {
+		executeCode("byteArray(bytearray(b'\\x01\\x02'))", "0102");
+	}
+
+	@Test
+	public void javaShortArray() throws Exception {
+		executeCode("shortArray([1, 2])", 3);
+	}
+
+	@Test
+	public void javaLongArray() throws Exception {
+		final ScriptResult result = executeCode("longArray([1, 2])", false);
+		assertNotNull(result);
+		assertNull(result.getException());
+		assertNotNull(result.getResult());
+
+		// FIXME: Different behavior between Python 2 and 3
+		assertEquals(new Long(3), Long.valueOf(result.getResult().toString()));
+	}
+
+	@Test
+	public void javaFloatArray() throws Exception {
+		executeCode("floatArray([1.0, 2.0])", 3.0);
+	}
+
+	@Test
+	public void javaObjectArray() throws Exception {
+		executeCode("javaObjectArray([org.eclipse.core.runtime.Path('..'), org.eclipse.core.runtime.Path('..')])", new Path("./../.."));
+	}
+
+	@Test
+	public void varargs() throws Exception {
+		executeCode("varargs([org.eclipse.core.runtime.Path('..'), org.eclipse.core.runtime.Path('..')])", new Path("./../.."));
 	}
 }

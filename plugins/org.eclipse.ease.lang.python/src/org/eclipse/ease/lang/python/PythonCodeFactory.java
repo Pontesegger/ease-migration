@@ -13,7 +13,9 @@ package org.eclipse.ease.lang.python;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.Logger;
@@ -181,6 +183,9 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		if (ModuleHelper.isDeprecated(method))
 			body.append("printError(\"" + method.getName() + "() is deprecated. Consider updating your code.\")").append(StringTools.LINE_DELIMITER);
 
+		// Convert Lists to Java arrays
+		body.append(buildArrayConversions(parameters)).append(StringTools.LINE_DELIMITER);
+
 		// check for callbacks
 		body.append("if not ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\"):")
 				.append(StringTools.LINE_DELIMITER);
@@ -306,5 +311,71 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	 */
 	public String createPep302WrapperCode(EnvironmentModule environment, Object instance, String identifier) {
 		return createWrapper(environment, instance, identifier, false, environment.getScriptEngine());
+	}
+
+	/**
+	 * Create wrapper code to convert all array parameters to actual Java arrays.
+	 *
+	 * @param parameters
+	 *            List of parameters to create array conversion for.
+	 * @return Wrapper code for performing array conversion.
+	 */
+	protected static String buildArrayConversions(List<Parameter> parameters) {
+		return parameters.stream().map(PythonCodeFactory::buildArrayConversion).collect(Collectors.joining(StringTools.LINE_DELIMITER));
+	}
+
+	/**
+	 * Create wrapper code to convert an array parameter to actual Java array.
+	 *
+	 * Generated code will have the following look: {@code
+	 * 	try:
+	 * 		tmp = gateway.new_array([array type], len([value to be converted]))
+	 *      for index, value in enumerate([value to be converted]):
+	 *          tmp[index] = value
+	 *      [value to be converted] = tmp
+	 *  except NameError:
+	 *      pass
+	 *  }
+	 *
+	 * @param parameter
+	 *            Parameter to create conversion code for.
+	 * @return Wrapper code for performing array conversion.
+	 */
+	protected static String buildArrayConversion(Parameter parameter) {
+		final StringBuilder builder = new StringBuilder();
+		if (parameter.getClazz().isArray()) {
+			final String arrayType = getPythonClassIdentifier(parameter.getClazz().getComponentType());
+			final String variableName = parameter.getName();
+			builder.append("try:").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("    tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("    for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("        tmp[index] = value").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("    %s =  tmp", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("except NameError:").append(StringTools.LINE_DELIMITER);
+			builder.append("    pass").append(StringTools.LINE_DELIMITER);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * List of Java primitive types as they need to be handled differently from normal classes when getting their py4j representation.
+	 *
+	 * bytes are handled differently as Python has native bytearray type.
+	 */
+	private static final List<Class<?>> PRIMITIVES = Arrays.asList(short.class, int.class, long.class, float.class, double.class, boolean.class, char.class);
+
+	/**
+	 * Returns the Python (py4j) identifier for the given class.
+	 *
+	 * @param cls
+	 *            Class to get py4j identifier for.
+	 * @return py4j class identifier.
+	 */
+	protected static String getPythonClassIdentifier(Class<?> cls) {
+		if (PRIMITIVES.contains(cls)) {
+			return String.format("gateway.jvm.%s", cls.getName());
+		} else {
+			return cls.getName();
+		}
 	}
 }

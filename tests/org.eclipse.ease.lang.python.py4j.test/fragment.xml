@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="org.eclipse.ease.modules">
+      <module
+            class="org.eclipse.ease.lang.python.py4j.modules.TestModule"
+            id="org.eclipse.ease.lang.python.py4j.test.module"
+            name="Py4jTests"
+            visible="false">
+      </module>
+   </extension>
+
+</fragment>
