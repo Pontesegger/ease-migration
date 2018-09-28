@@ -394,8 +394,8 @@ public class FileSelectionPage extends AbstractEditorPage {
 	}
 
 	public void updateTestFiles() {
-		final String[] includeFilters = fTxtIncludeFilters.getText().split("\r?\n");
-		final String[] excludeFilters = fTxtExcludeFilters.getText().split("\r?\n");
+		final String[] includeFilters = fTxtIncludeFilters.getText().split("(?:\r\n)|\r|\n");
+		final String[] excludeFilters = fTxtExcludeFilters.getText().split("(?:\r\n)|\r|\n");
 
 		if (getFile() != null) {
 			final Map<Object, String> acceptedFiles = UnitTestHelper.getTestFilesFromFilter(includeFilters, getFile());
