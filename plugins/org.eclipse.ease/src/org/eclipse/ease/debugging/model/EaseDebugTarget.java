@@ -28,6 +28,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.DebugTracer;
+import org.eclipse.ease.debugging.IScriptRegistry;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.debugging.events.IDebugEvent;
@@ -48,6 +49,8 @@ import org.eclipse.ease.debugging.events.model.IModelRequest;
 public abstract class EaseDebugTarget extends EaseDebugElement implements IDebugTarget, IEventProcessor {
 
 	private EventDispatchJob fDispatcher;
+
+	private IScriptRegistry fScriptRegistry;
 
 	private EaseDebugProcess fProcess = null;
 
@@ -137,6 +140,19 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	@Override
 	public void setDispatcher(final EventDispatchJob dispatcher) {
 		fDispatcher = dispatcher;
+
+		// TODO: Use setScriptRegistry explicitly
+		setScriptRegistry(dispatcher);
+	}
+
+	/**
+	 * Setter method for script registry for lookups between different types of file identifications.
+	 *
+	 * @param registry
+	 *            Script registry to be used.
+	 */
+	public void setScriptRegistry(final IScriptRegistry registry) {
+		fScriptRegistry = registry;
 	}
 
 	@Override
@@ -250,6 +266,14 @@ public abstract class EaseDebugTarget extends EaseDebugElement implements IDebug
 	private synchronized void handleBreakpointChange(final IBreakpoint breakpoint, final Mode mode) {
 		final IResource affectedResource = breakpoint.getMarker().getResource();
 
+		// Try to perform lookup via script registry (Thread independent)
+		if (fScriptRegistry != null) {
+			final Script script = fScriptRegistry.getScript(affectedResource);
+			if (script != null) {
+				fireDispatchEvent(new BreakpointRequest(script, breakpoint, mode));
+				return;
+			}
+		}
 		// see if we are affected by this breakpoint
 		for (final EaseDebugThread thread : getThreads()) {
 			for (final IStackFrame frame : thread.getStackFrames()) {

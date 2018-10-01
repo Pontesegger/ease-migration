@@ -61,7 +61,8 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 
 	@Override
 	public synchronized void terminate() {
-		getDebugTarget().getProcess().terminate();
+		if (getDebugTarget().getProcess() != null)
+			getDebugTarget().getProcess().terminate();
 	}
 
 	@Override
@@ -78,17 +79,22 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 
 	@Override
 	public boolean canDisconnect() {
-		return getDebugTarget().getProcess().canDisconnect();
+		if (getDebugTarget().getProcess() != null)
+			return getDebugTarget().getProcess().canDisconnect();
+		return false;
 	}
 
 	@Override
 	public void disconnect() {
-		getDebugTarget().getProcess().disconnect();
+		if (getDebugTarget().getProcess() != null)
+			getDebugTarget().getProcess().disconnect();
 	}
 
 	@Override
 	public boolean isDisconnected() {
-		return getDebugTarget().getProcess().isDisconnected();
+		if (getDebugTarget().getProcess() != null)
+			return getDebugTarget().getProcess().isDisconnected();
+		return false;
 	}
 
 	// ************************************************************

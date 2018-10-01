@@ -8,14 +8,13 @@
 # Contributors:
 #     Jonah Graham (Kichwa Coders) - initial API and implementation
 ###############################################################################
-
+import sys
 if __name__ == '__main__':
     # To be able to import all the py4j and related items, we need to add to the PYTHONPATH
     # all the correct paths. Because we may be launched with -E, the command line provides
     # all the paths to what we need.
     # sys.argv[1] - required - the port to conenct o
     # sys.argv[2:] - optional - paths to prepend on sys.path
-    import sys
     sys.path[0:0] = sys.argv[2:]
 
 import code
@@ -24,8 +23,7 @@ import py4j
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 from py4j.java_collections import MapConverter, ListConverter, SetConverter
 from py4j.java_gateway import JavaObject, JavaClass
-from py4j.protocol import Py4JJavaError, get_command_part
-import sys
+from py4j.protocol import Py4JJavaError
 import threading
 import __main__
 import ast
@@ -33,7 +31,6 @@ try:
     from six import integer_types
     from six import string_types
 except ImportError:
-    import sys
     if sys.version_info.major == 2:
         integer_types = (int, long)
         string_types = (basestring, )
@@ -61,6 +58,7 @@ def patch_builtins(name, value):
     '''
     builtins.__dict__.update({name: value})
 
+
 # To ease some debugging of the py4j engine itself it is useful to turn logging on,
 # uncomment the following lines for one way to do that
 # import logging
@@ -69,7 +67,7 @@ def patch_builtins(name, value):
 # logger.addHandler(logging.StreamHandler())
 def convert_value(
         value,
-        gw,
+        gw=None,
         integer_types=integer_types, 
         string_types=string_types,
         dict_types=dict,
@@ -84,6 +82,9 @@ def convert_value(
     :param value:    Value to be converted.
     :param gw:       py4j gateway necessary for converters.
     '''
+    if not gw:
+        gw = gateway._gateway_client
+
     # None will be mapped to Java null
     if value is None:
         return value
@@ -271,12 +272,16 @@ class ScriptEngineExecute(object):
 
         self.locals['net'] = gateway.jvm.net
         patch_builtins('net', gateway.jvm.net)
-        
+
         self.locals['jvm'] = gateway.jvm
         patch_builtins('jvm', gateway.jvm.jvm)
 
         self.locals['gateway'] = gateway
+        patch_builtins('gateway', gateway)
+
         self.locals['py4j'] = py4j
+        patch_builtins('py4j', py4j)
+
         sys.displayhook = self.displayhook
         self.display_data = None
         self.except_data = None
@@ -343,6 +348,9 @@ class ScriptEngineExecute(object):
     def wait_on_shutdown(self):
         self.shutdown_event.wait()
 
+    def addSearchPath(self, path):
+        sys.path.append(path)
+
     class Java:
         implements = ['org.eclipse.ease.lang.python.py4j.internal.IPythonSideEngine']
 
@@ -363,6 +371,7 @@ def watchdog(engine):
     timer = threading.Timer(10.0, os._exit, (1,))
     timer.setDaemon(True)
     timer.start()
+
 
 def main(argv):
     port = int(argv[1])
@@ -395,4 +404,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    # Will be patched via builtins
+    gateway = None
     main(sys.argv)

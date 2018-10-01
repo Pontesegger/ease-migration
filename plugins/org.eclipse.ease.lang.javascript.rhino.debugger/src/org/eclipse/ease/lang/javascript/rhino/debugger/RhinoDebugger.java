@@ -22,6 +22,7 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.AbstractEaseDebugger;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.IScriptRegistry;
 import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -150,6 +151,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			return "";
 		}
 
+		@Override
 		public Map<String, Object> getVariables() {
 			final Map<String, Object> result = getEngine().getVariables(fScope);
 
@@ -211,12 +213,20 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 	@Override
 	public void notify(final IScriptEngine engine, final Script script, final int status) {
+		final IScriptRegistry scriptRegistry = getDispatcher();
 		switch (status) {
 
 		case SCRIPT_START:
 			// fall through
 		case SCRIPT_INJECTION_START:
+			if (scriptRegistry != null) {
+				scriptRegistry.put(script);
+			}
 			fLastScript = script;
+			break;
+
+		case SCRIPT_END:
+			// TODO: Check if scripts should be removed to lower memory usage
 			break;
 
 		case ENGINE_END:
@@ -228,7 +238,6 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			// unknown event
 			break;
 		}
-
 		super.notify(engine, script, status);
 	}
 }

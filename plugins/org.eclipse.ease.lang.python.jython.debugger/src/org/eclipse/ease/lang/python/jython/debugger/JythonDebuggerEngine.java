@@ -21,11 +21,11 @@ import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
-import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
 import org.eclipse.ease.lang.python.debugger.IPythonDebugEngine;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
+import org.eclipse.ease.lang.python.debugger.PythonEventDispatchJob;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
 import org.eclipse.ease.lang.python.debugger.model.PythonDebugTarget;
 import org.eclipse.ease.lang.python.jython.JythonScriptEngine;
@@ -99,7 +99,7 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 
 		setDebugger(debugger);
 
-		new EventDispatchJob(target, debugger);
+		new PythonEventDispatchJob(target, debugger);
 	}
 
 	@Override

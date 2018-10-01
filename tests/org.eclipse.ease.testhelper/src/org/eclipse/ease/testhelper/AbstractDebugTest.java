@@ -56,7 +56,7 @@ import org.mockito.ArgumentCaptor;
 
 public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
-	private static final int TEST_TIMEOUT = 5000;
+	private static final int TEST_TIMEOUT = 7000;
 
 	private interface IDebugElementProvider {
 		EaseDebugElement getDebugElement();

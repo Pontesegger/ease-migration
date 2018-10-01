@@ -12,10 +12,7 @@
 package org.eclipse.ease.lang.python.debugger;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugEvent;
@@ -27,6 +24,7 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.AbstractEaseDebugger;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
+import org.eclipse.ease.debugging.IScriptRegistry;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 
@@ -52,7 +50,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 		 *            {@link IPyFrame} with information about the current execution frame.
 		 */
 		public PythonDebugFrame(final IPyFrame frame) {
-			super(fScriptRegistry.get(frame.getFilename()), frame.getLineNumber(), TYPE_FILE);
+			super(getScriptRegistry() != null ? getScriptRegistry().getScript(frame.getFilename()) : null, frame.getLineNumber(), TYPE_FILE);
 			fFrame = frame;
 
 		}
@@ -129,14 +127,19 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 *            Top frame of stack.
 	 * @return Stack based on given {@link IPyFrame}
 	 */
-	private ScriptStackTrace getStacktrace(final IPyFrame origin) {
+	protected ScriptStackTrace getStacktrace(final IPyFrame origin) {
 		final ScriptStackTrace trace = new ScriptStackTrace();
+
+		final IPythonScriptRegistry registry = getScriptRegistry();
+		if (registry == null) {
+			return trace;
+		}
 
 		IPyFrame frame = origin;
 		while (frame != null) {
-			final Script script = fScriptRegistry.get(frame.getFilename());
+			final Script script = registry.getScript(frame.getFilename());
 			if (script != null) {
-				if (isTrackedScript(fScriptRegistry.get(frame.getFilename())))
+				if (isTrackedScript(registry.getScript(frame.getFilename())))
 					trace.add(new PythonDebugFrame(frame));
 			}
 
@@ -155,7 +158,12 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 *            Type of trace step that occurred (ignored).
 	 */
 	public void traceDispatch(final IPyFrame frame, final String type) {
-		final Script script = fScriptRegistry.get(frame.getFilename());
+		Script script = null;
+		final IPythonScriptRegistry registry = getScriptRegistry();
+		if (registry != null) {
+			script = registry.getScript(frame.getFilename());
+		}
+
 		if (script != null) {
 			if (isTrackedScript(script)) {
 
@@ -192,7 +200,13 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 */
 	public Object execute(final Script script) {
 		try {
-			return fCodeTracer.run(script, registerScript(script));
+			String reference = script.getTitle();
+			final IPythonScriptRegistry registry = getScriptRegistry();
+			if (registry != null) {
+				registry.put(script);
+				reference = registry.getReference(script);
+			}
+			return fCodeTracer.run(script, reference);
 
 		} catch (final Exception e) {
 			/*
@@ -210,39 +224,17 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	}
 
 	/**
-	 * Map from custom filename to actual {@link Script} for easily identifying different scripts.
-	 * <p>
-	 * For each new file a unique filename is created using {@link #getHash(Script, Set)}.
-	 */
-	private final Map<String, Script> fScriptRegistry = new HashMap<>();
-
-	private String registerScript(final Script script) {
-		final String reference = getHash(script, fScriptRegistry.keySet());
-		fScriptRegistry.put(reference, script);
-
-		return reference;
-	}
-
-	/**
-	 * Creates a unique filename for the given {@link Script}.
+	 * Returns the {@link IPythonScriptRegistry} used by the debugger.
 	 *
-	 * @param script
-	 *            {@link Script} to get unique filename for.
-	 * @param existingKeys
-	 *            Existing keys to avoid duplicates.
-	 * @return Unique filename for given {@link Script}.
+	 * If debugger has been set up incorrectly (e.g. script registry not tailored for python) this will return {@code null}.
+	 *
+	 * @return {@link IPythonScriptRegistry} or {@code null}.
 	 */
-	private static String getHash(final Script script, final Set<String> existingKeys) {
-		final StringBuilder buffer = new StringBuilder("__ref_");
-		buffer.append(script.isDynamic() ? "dyn" : script.getCommand().toString());
-		buffer.append("_");
-
-		for (int index = 0; index < 10; index++)
-			buffer.append((char) ('a' + new Random().nextInt(26)));
-
-		if (existingKeys.contains(buffer.toString()))
-			return getHash(script, existingKeys);
-
-		return buffer.toString();
+	public IPythonScriptRegistry getScriptRegistry() {
+		final IScriptRegistry scriptRegistry = super.getScriptRegistry();
+		if (scriptRegistry instanceof IPythonScriptRegistry) {
+			return (IPythonScriptRegistry) scriptRegistry;
+		}
+		return null;
 	}
 }

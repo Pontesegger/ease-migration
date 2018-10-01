@@ -12,13 +12,12 @@ Contributors:
 
 # Python std library imports
 import sys
-import __main__
 import re
 import ast
-from pygments.lexers._scilab_builtins import variables_kw
 
 # : Regular expression if we are dealing with internal module.
 _pyease_INTERNAL_CHECKER = re.compile(r"^<.+>$")
+
 
 class _pyease_PyFrame:
     '''
@@ -30,6 +29,7 @@ class _pyease_PyFrame:
     Python frame documentation is available here:
     https://docs.python.org/3/reference/datamodel.html#types
     '''
+
     def __init__(self, frame):
         '''
         Constructor only stores frame to member.
@@ -177,7 +177,7 @@ class _pyease_CodeTracer:
             if len(field_[1]) > 0:
                 if isinstance(field_[1][-1], ast.Expr):
                     final_expr = ast.Expression()
-                    popped = field_[1].pop(len(field_[1]) - 1); # Jython pop() will not accept -1 as parameter
+                    popped = field_[1].pop(len(field_[1]) - 1);  # Jython pop() will not accept -1 as parameter
                     final_expr.body = popped.value
         
         return_value = None
@@ -224,7 +224,6 @@ class _pyease_CodeTracer:
     
         # Check parent in stack
         return self.ignore_frame(frame.f_back, False)
-
         
     class Java:
         implements = ['org.eclipse.ease.lang.python.debugger.ICodeTracer']

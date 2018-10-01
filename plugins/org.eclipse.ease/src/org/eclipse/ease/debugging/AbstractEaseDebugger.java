@@ -71,9 +71,11 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 
 	private EventDispatchJob fDispatcher;
 
+	private IScriptRegistry fScriptRegistry;
+
 	private IDebugEngine fEngine;
 
-	private final Map<Script, List<IBreakpoint>> fBreakpoints = new HashMap<>();
+	protected final Map<Script, List<IBreakpoint>> fBreakpoints = new HashMap<>();
 
 	private final boolean fShowDynamicCode;
 
@@ -92,6 +94,15 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	}
 
 	/**
+	 * Protected getter for event dispatch job.
+	 *
+	 * @return {@link #fDispatcher}.
+	 */
+	protected EventDispatchJob getDispatcher() {
+		return fDispatcher;
+	}
+
+	/**
 	 * Setter method for dispatcher.
 	 *
 	 * @param dispatcher
@@ -100,6 +111,28 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	@Override
 	public void setDispatcher(final EventDispatchJob dispatcher) {
 		fDispatcher = dispatcher;
+
+		// TODO: Use setScriptRegistry explicitly
+		setScriptRegistry(dispatcher);
+	}
+
+	/**
+	 * Setter method for script registry for lookups between different types of file identifications.
+	 *
+	 * @param registry
+	 *            Script registry to be used.
+	 */
+	public void setScriptRegistry(final IScriptRegistry registry) {
+		fScriptRegistry = registry;
+	}
+
+	/**
+	 * Protected getter for subclasses to have access to {@link #fScriptRegistry}.
+	 *
+	 * @return {@link #fScriptRegistry}
+	 */
+	protected IScriptRegistry getScriptRegistry() {
+		return fScriptRegistry;
 	}
 
 	/**
@@ -127,10 +160,15 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 					if (!fBreakpoints.containsKey(script))
 						fBreakpoints.put(script, new ArrayList<IBreakpoint>());
 
-					if (((BreakpointRequest) event).getMode() == BreakpointRequest.Mode.ADD)
-						fBreakpoints.get(script).add(((BreakpointRequest) event).getBreakpoint());
-					else
-						fBreakpoints.get(script).remove(((BreakpointRequest) event).getBreakpoint());
+					if (((BreakpointRequest) event).getMode() == BreakpointRequest.Mode.ADD) {
+						final IBreakpoint breakpoint = ((BreakpointRequest) event).getBreakpoint();
+						fBreakpoints.get(script).add(breakpoint);
+						breakpointAdded(script, breakpoint);
+					} else {
+						final IBreakpoint breakpoint = ((BreakpointRequest) event).getBreakpoint();
+						fBreakpoints.get(script).remove(breakpoint);
+						breakpointRemoved(script, breakpoint);
+					}
 				}
 
 			} else if (event instanceof TerminateRequest) {
@@ -147,6 +185,34 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 				}
 			}
 		}
+	}
+
+	/**
+	 * Callback triggered when breakpoint has been added.
+	 *
+	 * No-op implementations can be overridden by subclasses.
+	 *
+	 * @param script
+	 *            Script this breakpoint belongs to.
+	 * @param breakpoint
+	 *            Breakpoint information.
+	 */
+	protected void breakpointAdded(final Script script, final IBreakpoint breakpoint) {
+
+	}
+
+	/**
+	 * Callback triggered when breakpoint has been removed.
+	 *
+	 * No-op implementations can be overridden by subclasses.
+	 *
+	 * @param script
+	 *            Script this breakpoint belonged to.
+	 * @param breakpoint
+	 *            Breakpoint information.
+	 */
+	protected void breakpointRemoved(final Script script, final IBreakpoint breakpoint) {
+
 	}
 
 	protected void suspend(final IDebuggerEvent event) {
@@ -239,7 +305,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		}
 	}
 
-	private void resume(final int resumeType, Object thread) {
+	protected void resume(final int resumeType, Object thread) {
 		// called by engine thread
 
 		final ThreadState threadState = fThreadStates.get(thread);
@@ -331,7 +397,14 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		return null;
 	}
 
-	protected boolean isTrackedScript(final Script script) {
+	/**
+	 * Checks if the given script is tracked by debugger.
+	 *
+	 * @param script
+	 *            Script to be checked.
+	 * @return {@code true} if script is being tracked by debugger.
+	 */
+	public boolean isTrackedScript(final Script script) {
 		return (!script.isDynamic()) || fShowDynamicCode;
 	}
 

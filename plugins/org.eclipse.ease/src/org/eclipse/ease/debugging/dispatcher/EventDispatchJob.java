@@ -13,6 +13,7 @@ package org.eclipse.ease.debugging.dispatcher;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -20,14 +21,17 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.DebugTracer;
+import org.eclipse.ease.debugging.IScriptRegistry;
+import org.eclipse.ease.debugging.ScriptRegistry;
 import org.eclipse.ease.debugging.events.IDebugEvent;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
 import org.eclipse.ease.debugging.events.model.IModelRequest;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 
-public class EventDispatchJob extends Job {
+public class EventDispatchJob extends Job implements IScriptRegistry {
 
 	/** Cached events. */
 	private final List<IDebugEvent> fEvents = new ArrayList<>();
@@ -41,6 +45,9 @@ public class EventDispatchJob extends Job {
 	/** Debug engine. */
 	private final IEventProcessor fDebugger;
 
+	/** Script registry for performing script lookups */
+	private final IScriptRegistry fScriptRegistry;
+
 	/**
 	 * Creates a new dispatcher. The dispatcher automatically attaches to the host and the debugger. Further the job get automatically scheduled.
 	 *
@@ -50,6 +57,20 @@ public class EventDispatchJob extends Job {
 	 *            debugger implementation
 	 */
 	public EventDispatchJob(final IEventProcessor host, final IEventProcessor debugger) {
+		this(host, debugger, new ScriptRegistry());
+	}
+
+	/**
+	 * Protected constructor for externally setting {@link IScriptRegistry}.
+	 *
+	 * @param host
+	 *            debug model
+	 * @param debugger
+	 *            debugger implementation
+	 * @param scriptRegistry
+	 *            IScriptRegistry to be used (must not be {@code null})
+	 */
+	protected EventDispatchJob(final IEventProcessor host, final IEventProcessor debugger, final IScriptRegistry scriptRegistry) {
 		super(debugger + " event dispatcher");
 
 		fModel = host;
@@ -58,8 +79,17 @@ public class EventDispatchJob extends Job {
 		fModel.setDispatcher(this);
 		fDebugger.setDispatcher(this);
 
+		fScriptRegistry = scriptRegistry;
+
 		setSystem(true);
 		schedule();
+	}
+
+	/**
+	 * Protected getter for the {@link #fScriptRegistry}.
+	 */
+	protected IScriptRegistry getScriptRegistry() {
+		return fScriptRegistry;
 	}
 
 	public void addEvent(final IDebugEvent event) {
@@ -134,5 +164,20 @@ public class EventDispatchJob extends Job {
 		synchronized (fEvents) {
 			fEvents.notifyAll();
 		}
+	}
+
+	@Override
+	public Script getScript(IResource resource) {
+		return fScriptRegistry.getScript(resource);
+	}
+
+	@Override
+	public IResource getResource(Script script) {
+		return fScriptRegistry.getResource(script);
+	}
+
+	@Override
+	public void put(Script script) {
+		fScriptRegistry.put(script);
 	}
 }

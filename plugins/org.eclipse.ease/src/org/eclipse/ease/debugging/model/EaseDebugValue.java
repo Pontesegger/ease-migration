@@ -169,6 +169,13 @@ public class EaseDebugValue implements IValue {
 					fVariables.add(variable);
 				}
 
+			} else if (getValue() instanceof Collection<?>) {
+				final Collection<?> asCollection = (Collection<?>) getValue();
+				int index = 0;
+				for (final Object value : asCollection) {
+					final EaseDebugVariable variable = new EaseDebugVariable(String.format("[%d]", index++), value, fParent, null);
+					fVariables.add(variable);
+				}
 			} else {
 
 				// populate generic Java fields

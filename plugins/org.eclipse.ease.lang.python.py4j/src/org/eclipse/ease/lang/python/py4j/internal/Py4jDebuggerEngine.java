@@ -13,16 +13,18 @@ package org.eclipse.ease.lang.python.py4j.internal;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
+import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
-import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.lang.python.debugger.IPythonDebugEngine;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
+import org.eclipse.ease.lang.python.debugger.PythonEventDispatchJob;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
 import org.eclipse.ease.lang.python.debugger.model.PythonDebugTarget;
 
@@ -36,10 +38,15 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 
 	public static final String ENGINE_ID = "org.eclipse.ease.lang.python.py4j.debugger.engine";
 
-	private PythonDebugger fDebugger = null;
+	private Py4jDebugger fDebugger = null;
+	private ICodeTraceFilter fPyDebugger = null;
 
 	@Override
 	public void setDebugger(final PythonDebugger debugger) {
+		setDebugger((Py4jDebugger) debugger);
+	}
+
+	private void setDebugger(final Py4jDebugger debugger) {
 		fDebugger = debugger;
 	}
 
@@ -51,10 +58,12 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 		if (fDebugger != null) {
 			try {
 				// load python part of debugger
-				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/edb.py");
+				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python.py4j", "pysrc/py4jdb.py");
+				fPyDebugger = (ICodeTraceFilter) super.internalExecute(new Script("Load Python debugger", stream), null);
 
-				internalSetVariable(PythonDebugger.PYTHON_DEBUGGER_VARIABLE, fDebugger);
-				super.internalExecute(new Script("Load Python debugger", stream), null);
+				// Connect both sides
+				fPyDebugger.setDebugger(fDebugger);
+				fDebugger.setTraceFilter(fPyDebugger);
 
 			} catch (final Throwable e) {
 				throw new ScriptEngineException("Failed to load Python Debugger", e);
@@ -75,17 +84,16 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 		final PythonDebugTarget target = new PythonDebugTarget(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);
 		launch.addDebugTarget(target);
 
-		final PythonDebugger debugger = new PythonDebugger(this, showDynamicCode);
+		final Py4jDebugger debugger = new Py4jDebugger(this, showDynamicCode);
 
 		setDebugger(debugger);
 
-		new EventDispatchJob(target, debugger);
+		new PythonEventDispatchJob(target, debugger);
 	}
 
 	@Override
 	public ScriptStackTrace getExceptionStackTrace() {
-		// FIXME to be implemented
-		return null;
+		return getExceptionStackTrace(getThread());
 	}
 
 	@Override
@@ -101,11 +109,17 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 
 	@Override
 	public Collection<EaseDebugVariable> getVariables(Object scope) {
-		// FIXME to be implemented correctly on the scope
+		final Map<String, Object> variablesMap;
+		if (scope instanceof EaseDebugFrame) {
+			final EaseDebugFrame frame = (EaseDebugFrame) scope;
+			variablesMap = frame.getVariables();
+		} else {
+			variablesMap = getVariables();
+		}
 
 		final Collection<EaseDebugVariable> variables = new ArrayList<>();
 
-		for (final Entry<String, Object> entry : getVariables().entrySet())
+		for (final Entry<String, Object> entry : variablesMap.entrySet())
 			variables.add(createVariable(entry.getKey(), entry.getValue()));
 
 		return variables;

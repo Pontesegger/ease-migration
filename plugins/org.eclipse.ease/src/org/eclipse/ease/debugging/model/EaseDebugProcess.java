@@ -101,8 +101,11 @@ public class EaseDebugProcess extends EaseDebugElement implements IProcess, IEve
 			else if ((((ScriptReadyEvent) event).isRoot()) && (getDebugTarget().isSuspendOnStartup()))
 				debugThread.stepInto();
 
-			// default resume request
-			debugThread.resume();
+			else {
+				if (!debugThread.getState().equals(State.STEPPING)) {
+					debugThread.resume();
+				}
+			}
 
 		} else if (event instanceof ThreadCreatedEvent) {
 			EaseDebugThread debugThread = findDebugThread(((ThreadCreatedEvent) event).getThread());
