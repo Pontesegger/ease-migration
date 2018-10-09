@@ -1,5 +1,20 @@
+'''
+Copyright (c) 2018 Christian Pontesegger
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+
+Contributors:
+ * Christian Pontesegger - initial API and implementation
+'''
 import sys
-import imp
+
+# Fixme: Check version compatibility and refactor
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    import imp
  
 class EASEImporter(object):
     """EASE module loader.
