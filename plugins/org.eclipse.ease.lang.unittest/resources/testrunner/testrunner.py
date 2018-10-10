@@ -1,9 +1,12 @@
 import unittest
 import warnings
 import sys
+import os
+import re
 from unittest.signals import registerResult
 
 MOD_org_eclipse_ease_lang_unittest_UnitTestModule = loadModule("/Unittest")
+
 
 class EASETestResult(unittest.result.TestResult):
     def __init__(self, stream, descriptions, verbosity):
@@ -33,19 +36,22 @@ class EASETestResult(unittest.result.TestResult):
             pass
 
         super(EASETestResult, self).addError(test, err)
-        self.addTestResult(org.eclipse.ease.lang.unittest.runtime.TestStatus.ERROR, str(err[0].__name__) + ": " + str(err[1]))
+        self.addTestResult(org.eclipse.ease.lang.unittest.runtime.TestStatus.ERROR, str(err[0].__name__) + ": " + str(err[1]), self._convert_stacktrace(err[2]))
  
     def addFailure(self, test, err):
         super(EASETestResult, self).addFailure(test, err)
-        self.addTestResult(org.eclipse.ease.lang.unittest.runtime.TestStatus.FAILURE, str(err[1]))
+        self.addTestResult(org.eclipse.ease.lang.unittest.runtime.TestStatus.FAILURE, str(err[1]), self._convert_stacktrace(err[2]))
    
-    def addTestResult(self, type, message):
+    def addTestResult(self, type, message, stacktrace=None):
         result = org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory.eINSTANCE.createTestResult()
         result.setStatus(type);
         result.setMessage(message);
        
         try:
-            result.setStackTrace(getScriptEngine().getStackTrace())
+            if stacktrace:
+                result.setStackTrace(stacktrace)
+            else:
+                result.setStackTrace(getScriptEngine().getStackTrace())
         except Exception:
             print("could not set stacktrace")
             pass
@@ -59,7 +65,45 @@ class EASETestResult(unittest.result.TestResult):
     def addUnexpectedSuccess(self, test):
         super(EASETestResult, self).addUnexpectedSuccess(test)
         self.addTestResult(org.eclipse.ease.lang.unittest.runtime.TestStatus.FAILURE, "We expected an error")
-  
+
+    def _convert_stacktrace(self, traceback):
+        while traceback and self._is_relevant_tb_level(traceback):
+            traceback = traceback.tb_next
+
+        if not traceback:
+            return None
+
+        frame = traceback.tb_frame
+        stacktrace = org.eclipse.ease.debugging.ScriptStackTrace()
+        while frame:
+            filename = frame.f_code.co_filename
+            
+            # Name mangled workspace file
+            if re.match("^__ref_L/(.+)_[a-z]{10}$", filename):
+                filename = filename[8:-11]
+            
+            # Simple workspace file
+            elif filename.startswith("L/") and not os.path.exists(filename):
+                filename = filename[2:]
+            
+            # Not a workspace file (so ignore)
+            else:
+                break
+    
+            # Convert to debug frame            
+            path = org.eclipse.core.runtime.Path(filename)
+            workspace = org.eclipse.core.resources.ResourcesPlugin.getWorkspace()
+            file = workspace.getRoot().getFile(path)
+            script = org.eclipse.ease.Script(filename, file, False)
+            ease_frame = org.eclipse.ease.debugging.EaseDebugFrame(script, frame.f_lineno, 1, filename)
+            stacktrace.add(ease_frame)
+            
+            # Check next entry in stacktrace
+            frame = frame.f_back
+
+        return stacktrace
+
+
 class EASETestRunner(object):
     """A test runner class that cooperates with the Eclipse EASE framework.
     """

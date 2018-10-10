@@ -163,7 +163,8 @@ class EaseInteractiveConsole(code.InteractiveConsole):
         else:
             self.engine.except_data.append(data)
 
-    def runcode(self, code):
+    def runcode(self, code, filename=None):
+        filename = filename or '<...>'
         try:
             # If we have compiled code we cannot use AST
             if isinstance(code, string_types):
@@ -173,7 +174,7 @@ class EaseInteractiveConsole(code.InteractiveConsole):
                 # Check if we have multiline statement
                 if len(tree.body) > 1:
                     module = ast.Module(tree.body[:-1])
-                    compiled = compile(module, '<...>', 'exec')
+                    compiled = compile(module, filename, 'exec')
                     exec(compiled, self.locals)
 
                 # Check if at least one line given
@@ -181,12 +182,12 @@ class EaseInteractiveConsole(code.InteractiveConsole):
                     if isinstance(tree.body[-1], ast.Expr):
                         # Only expressions can be evaluated
                         expression = ast.Expression(tree.body[-1].value)
-                        compiled = compile(expression, '<...>', 'eval')
+                        compiled = compile(expression, filename, 'eval')
                         result = eval(compiled, self.locals)
                         return result, False
                     else:
                         module = ast.Module([tree.body[-1]])
-                        compiled = compile(module, '<...>', 'exec')
+                        compiled = compile(module, filename, 'exec')
                         exec(compiled, self.locals)
             else:
                 exec(code, self.locals)
@@ -205,6 +206,9 @@ class EaseInteractiveConsole(code.InteractiveConsole):
             # create information that will end up in a
             # ScriptExecutionException
             self.showtraceback()
+
+    def push(self, cmd, filename=None):
+        return code.InteractiveConsole.push(self, cmd)
 
 
 # Sentinel object for no result (different than None)
@@ -291,10 +295,10 @@ class ScriptEngineExecute(object):
         if data is not None:
             self.locals['_'] = data
 
-    def executeCommon(self, code_text, code_exec):
+    def executeCommon(self, code_text, code_exec, filename=None):
         self.display_data = None
         self.except_data = None
-        execution_result = code_exec(code_text)
+        execution_result = code_exec(code_text, filename)
 
         # Check if we received a tuple, meaning that we are in script mode 
         if isinstance(execution_result, tuple) and len(execution_result) == 2:
@@ -316,8 +320,7 @@ class ScriptEngineExecute(object):
             return InteractiveReturn(self.gateway._gateway_client, display_data=display_data, except_data=except_data, result=result)
 
     def executeScript(self, code_text, filename=None):
-        # TODO: Handle filename
-        return self.executeCommon(code_text, self.interp.runcode)
+        return self.executeCommon(code_text, self.interp.runcode, filename)
 
     def executeInteractive(self, code_text):
         return self.executeCommon(code_text, self.interp.push)

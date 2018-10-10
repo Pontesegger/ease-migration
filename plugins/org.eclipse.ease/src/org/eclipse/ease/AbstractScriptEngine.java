@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -189,6 +191,16 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return result.getResult();
 	}
 
+	private static String getFilename(Object file) {
+		if (file instanceof IFile) {
+			return ((IFile) file).toString();
+		} else if (file instanceof File) {
+			return ((File) file).getAbsolutePath();
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * Inject script code to the script engine. Injected code is processed synchronous by the current thread unless <i>uiThread</i> is set to <code>true</code>.
 	 * Nevertheless this is a blocking call.
@@ -206,8 +218,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		synchronized (script.getResult()) {
 			try {
 				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Executing script (" + script.getTitle() + "):", script.getCode());
-
-				fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE));
+				final String filename = getFilename(script.getFile());
+				fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE, filename));
 
 				// apply security checks
 				final List<ISecurityCheck> securityChecks = fSecurityChecks.get(ActionType.INJECT_CODE);
