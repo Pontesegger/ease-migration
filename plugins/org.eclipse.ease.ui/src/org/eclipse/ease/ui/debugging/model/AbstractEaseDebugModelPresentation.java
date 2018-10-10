@@ -11,7 +11,11 @@
 
 package org.eclipse.ease.ui.debugging.model;
 
+import java.io.File;
+
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.debugging.DynamicContentEditorInput;
@@ -23,6 +27,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
 public abstract class AbstractEaseDebugModelPresentation implements ILabelProvider {
@@ -112,9 +117,16 @@ public abstract class AbstractEaseDebugModelPresentation implements ILabelProvid
 			final Object file = ((Script) element).getFile();
 			if (file instanceof IFile)
 				return new FileEditorInput((IFile) file);
-
-			else
+			else {
+				if (file instanceof File) {
+					try {
+						return new FileStoreEditorInput(EFS.getStore(((File) file).toURI()));
+					} catch (final CoreException e) {
+						// Fall-through to DynamicContentEditorInput
+					}
+				}
 				return new DynamicContentEditorInput((Script) element);
+			}
 		}
 
 		return null;

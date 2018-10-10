@@ -94,7 +94,7 @@ public abstract class EaseDebugElement extends DebugElement implements ITerminat
 	public boolean isDisconnected() {
 		if (getDebugTarget().getProcess() != null)
 			return getDebugTarget().getProcess().isDisconnected();
-		return false;
+		return true;
 	}
 
 	// ************************************************************
