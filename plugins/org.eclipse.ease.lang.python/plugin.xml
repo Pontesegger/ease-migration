@@ -55,6 +55,14 @@
                state="true"
                style="toggle">
          </action>
+         <action
+               class="org.eclipse.ease.lang.python.debugger.actions.MagicFilterAction"
+               id="org.eclipse.ease.ui.variableview.show.magic"
+               label="Hide Python Magic Variables"
+               menubarPath="org.eclipse.ease.debug.ui.variableview.menu/ease"
+               state="true"
+               style="toggle">
+         </action>
       </viewContribution>
    </extension>
    <extension

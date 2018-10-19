@@ -8,15 +8,15 @@ http://www.eclipse.org/legal/epl-v10.html
 Contributors:
  * Christian Pontesegger - initial API and implementation
 '''
-import sys
+import sys as _pyease_sys
 
 # Fixme: Check version compatibility and refactor
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    import imp
+import warnings as _pyease_warnings
+with _pyease_warnings.catch_warnings():
+    _pyease_warnings.simplefilter("ignore")
+    import imp as _pyease_imp
  
-class EASEImporter(object):
+class _pyease_EASEImporter(object):
     """EASE module loader.
 
     Allows to use classic python import statements to load EASE modules.
@@ -62,7 +62,7 @@ class EASEImporter(object):
         """
         
         if (self.is_module_path(fullname)):
-            mod = sys.modules.setdefault(fullname, imp.new_module(fullname))
+            mod = _pyease_sys.modules.setdefault(fullname, _pyease_imp.new_module(fullname))
             mod.__file__ = "<%s>" % self.__class__.__name__
             mod.__loader__ = self
             mod.__path__ = []
@@ -71,7 +71,7 @@ class EASEImporter(object):
        
         elif (self.is_module(fullname)):
             code = self.get_code(fullname)
-            mod = sys.modules.setdefault(fullname, imp.new_module(fullname))
+            mod = _pyease_sys.modules.setdefault(fullname, _pyease_imp.new_module(fullname))
             mod.__file__ = "<%s>" % self.__class__.__name__
             mod.__loader__ = self
             mod.__package__ = fullname.rpartition('.')[0]
@@ -119,4 +119,4 @@ class EASEImporter(object):
         return org.eclipse.ease.lang.python.Pep302ModuleImporter.getCode(fullname, globals()["__EASE_MOD_org_eclipse_ease_modules_EnvironmentModule"]) 
 
 # Add our import hook to sys.meta_path
-sys.meta_path.append(EASEImporter())
+_pyease_sys.meta_path.append(_pyease_EASEImporter())

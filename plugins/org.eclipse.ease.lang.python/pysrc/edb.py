@@ -11,12 +11,12 @@ Contributors:
 '''
 
 # Python std library imports
-import sys
-import re
-import ast
+import sys as _pyease_sys
+import re as _pyease_re
+import ast as _pyease_ast
 
 # : Regular expression if we are dealing with internal module.
-_pyease_INTERNAL_CHECKER = re.compile(r"^<.+>$")
+_pyease_INTERNAL_CHECKER = _pyease_re.compile(r"^<.+>$")
 
 
 class _pyease_PyFrame:
@@ -130,7 +130,7 @@ class _pyease_CodeTracer:
     _framework_variables = {}
 
     def __init__(self):
-        sys.settrace(self.trace_dispatch)         
+        _pyease_sys.settrace(self.trace_dispatch)         
 
     def set_debugger(self, debugger):
         '''
@@ -168,15 +168,15 @@ class _pyease_CodeTracer:
         '''
         code = "{}\n".format(script.getCode())
 
-        ast_ = ast.parse(code, filename, 'exec')
+        ast_ = _pyease_ast.parse(code, filename, 'exec')
         final_expr = None
-        for field_ in ast.iter_fields(ast_):
+        for field_ in _pyease_ast.iter_fields(ast_):
             if 'body' != field_[0]:
                 continue
             
             if len(field_[1]) > 0:
-                if isinstance(field_[1][-1], ast.Expr):
-                    final_expr = ast.Expression()
+                if isinstance(field_[1][-1], _pyease_ast.Expr):
+                    final_expr = _pyease_ast.Expression()
                     popped = field_[1].pop(len(field_[1]) - 1);  # Jython pop() will not accept -1 as parameter
                     final_expr.body = popped.value
         

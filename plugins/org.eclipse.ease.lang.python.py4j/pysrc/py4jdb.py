@@ -10,18 +10,18 @@ Contributors:
 '''
 
 # Python std library imports
-import ast
-import bdb
-import functools
-import re
-import sys
-import threading
+import ast as _pyease_ast
+import bdb as _pyease_bdb
+import functools as _pyease_functools
+import re as _pyease_re
+import sys as _pyease_sys
+import threading as _pyease_threading
 
 # : Regular expression if we are dealing with internal module.
-INTERNAL_CHECKER = re.compile(r'^<.+>$')
+_pyease_INTERNAL_CHECKER = _pyease_re.compile(r'^<.+>$')
 
 
-class PyFrame:
+class _pyease_PyFrame:
     '''
     Python implementation of IPyFrame used for exchanging frame data
     with eclipse.
@@ -49,7 +49,7 @@ class PyFrame:
 
         :returns:    ``True`` if frame is valid.
         '''
-        return self._frame and not ignore_frame(self._frame)
+        return self._frame and not _pyease_ignore_frame(self._frame)
 
     def getFilename(self):
         '''
@@ -87,7 +87,7 @@ class PyFrame:
         :returns:    Parent frame in stack or `None`
         '''
         if self._valid_frame():
-            return PyFrame(self._frame.f_back)
+            return _pyease_PyFrame(self._frame.f_back)
         else:
             return None
 
@@ -145,7 +145,7 @@ class PyFrame:
         implements = ['org.eclipse.ease.lang.python.debugger.IPyFrame']
 
 
-def ignore_frame(frame, first=True):
+def _pyease_ignore_frame(frame, first=True):
     '''
     Utility to check if a frame should be ignored.
 
@@ -170,7 +170,7 @@ def ignore_frame(frame, first=True):
             return True
 
     # Check if we are in the standard modules
-    if INTERNAL_CHECKER.match(frame.f_code.co_filename):
+    if _pyease_INTERNAL_CHECKER.match(frame.f_code.co_filename):
         # Only ignore standard module if its the top of the stack
         return first
 
@@ -178,10 +178,10 @@ def ignore_frame(frame, first=True):
     if 'py4j' in frame.f_code.co_filename.lower():
         return True
 
-    return ignore_frame(frame.f_back, False)
+    return _pyease_ignore_frame(frame.f_back, False)
 
 
-class CodeTracer(bdb.Bdb):
+class _pyease_CodeTracer(_pyease_bdb.Bdb):
     '''
     Eclipse Debugger class.
     '''
@@ -190,7 +190,7 @@ class CodeTracer(bdb.Bdb):
         '''
         Constructor initializes instance variables.
         '''
-        bdb.Bdb.__init__(self, *args, **kwargs)
+        _pyease_bdb.Bdb.__init__(self, *args, **kwargs)
 
         # Debugger for communication with Java world
         self._debugger = None
@@ -200,7 +200,7 @@ class CodeTracer(bdb.Bdb):
         self._current_file = None
 
         # Async continuation handling
-        self._continue_event = threading.Event()
+        self._continue_event = _pyease_threading.Event()
         self._continue_func = lambda: None
 
         # TODO: Think about a better way to handle step return
@@ -227,8 +227,8 @@ class CodeTracer(bdb.Bdb):
         :param arg:      Optional argument for dispatching.
         '''
         # Pre-filter to avoid issues with library internals
-        if not ignore_frame(frame):
-            bdb.Bdb.trace_dispatch(self, frame, event, arg)
+        if not _pyease_ignore_frame(frame):
+            _pyease_bdb.Bdb.trace_dispatch(self, frame, event, arg)
         return self.trace_dispatch
 
     def user_line(self, frame):
@@ -268,7 +268,7 @@ class CodeTracer(bdb.Bdb):
         '''
         # Cache exception
         if self._debugger:
-            self._debugger.setExceptionStackTrace(PyFrame(frame))
+            self._debugger.setExceptionStackTrace(_pyease_PyFrame(frame))
 
         self._continue_func = self.set_continue
         self.dispatch(frame, 'exception')
@@ -293,7 +293,7 @@ class CodeTracer(bdb.Bdb):
             self._return_hack = False
 
         # Dispatch call to Java
-        self._debugger.traceDispatch(PyFrame(frame), dispatch_type)
+        self._debugger.traceDispatch(_pyease_PyFrame(frame), dispatch_type)
 
         # Make asynchronous call synchronous again
         self._continue_event.wait()
@@ -320,12 +320,12 @@ class CodeTracer(bdb.Bdb):
 
         # Step over
         elif resume_type == 2:
-            self._continue_func = functools.partial(self.set_next, frame)
+            self._continue_func = _pyease_functools.partial(self.set_next, frame)
 
         # Step return
         elif resume_type == 4:
             self._return_hack = True
-            self._continue_func = functools.partial(self.set_return, frame)
+            self._continue_func = _pyease_functools.partial(self.set_return, frame)
 
         # Continue
         else:
@@ -359,7 +359,7 @@ class CodeTracer(bdb.Bdb):
         linenos = self.breaks[filename]
         if lineno not in linenos:
             linenos .append(lineno)
-        bdb.Breakpoint(filename, lineno, 0, None, None)
+        _pyease_bdb.Breakpoint(filename, lineno, 0, None, None)
 
     def removeBreakpoint(self, breakpoint):
         '''
@@ -394,7 +394,7 @@ class CodeTracer(bdb.Bdb):
                 if breakpoints:
                     return True
 
-        return bdb.Bdb.stop_here(self, frame)
+        return _pyease_bdb.Bdb.stop_here(self, frame)
 
     def run(self, script, filename):
         '''
@@ -405,23 +405,23 @@ class CodeTracer(bdb.Bdb):
         '''
         # Compile code for better inspection
         code = '{}\n'.format(script.getCode())
-        ast_ = ast.parse(code, filename, 'exec')
+        ast_ = _pyease_ast.parse(code, filename, 'exec')
         final_expr = None
-        for field_ in ast.iter_fields(ast_):
+        for field_ in _pyease_ast.iter_fields(ast_):
             if 'body' != field_[0]:
                 continue
 
             # Check if last item is an expression
             if len(field_[1]) > 0:
-                if isinstance(field_[1][-1], ast.Expr):
-                    final_expr = ast.Expression()
+                if isinstance(field_[1][-1], _pyease_ast.Expr):
+                    final_expr = _pyease_ast.Expression()
                     popped = field_[1].pop(-1)
                     final_expr.body = popped.value
 
         # Run code up to last expression
         return_value = None
         compiled = compile(ast_, filename, 'exec')
-        bdb.Bdb.run(self, compiled)
+        _pyease_bdb.Bdb.run(self, compiled)
         self._keep_debugging()
 
         # Check if last expression still needs to be run
@@ -437,7 +437,7 @@ class CodeTracer(bdb.Bdb):
         Resets debugger state to be able to continue debugging after
         script injection.
         '''
-        sys.settrace(self.trace_dispatch)
+        _pyease_sys.settrace(self.trace_dispatch)
         self.quitting = False
 
     def toString(self):
@@ -457,4 +457,4 @@ class CodeTracer(bdb.Bdb):
 
 
 # Set up connection between eclipse and python
-CodeTracer()
+_pyease_CodeTracer()

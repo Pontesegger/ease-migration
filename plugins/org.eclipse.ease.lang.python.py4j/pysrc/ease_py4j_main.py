@@ -8,45 +8,51 @@
 # Contributors:
 #     Jonah Graham (Kichwa Coders) - initial API and implementation
 ###############################################################################
-import sys
+import sys as _pyease_sys
 if __name__ == '__main__':
     # To be able to import all the py4j and related items, we need to add to the PYTHONPATH
     # all the correct paths. Because we may be launched with -E, the command line provides
     # all the paths to what we need.
     # sys.argv[1] - required - the port to conenct o
     # sys.argv[2:] - optional - paths to prepend on sys.path
-    sys.path[0:0] = sys.argv[2:]
+    _pyease_sys.path[0:0] = _pyease_sys.argv[2:]
 
-import code
-import os
+import code as _pyease_code
+import os as _pyease_os
 import py4j
-from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
-from py4j.java_collections import MapConverter, ListConverter, SetConverter
-from py4j.java_gateway import JavaObject, JavaClass
-from py4j.protocol import Py4JJavaError
-import threading
+from py4j.clientserver import ClientServer as _pyease_ClientServer
+from py4j.clientserver import JavaParameters as _pyease_JavaParameters
+from py4j.clientserver import PythonParameters as _pyease_PythonParameters
+from py4j.java_collections import MapConverter as _pyease_MapConverter
+from py4j.java_collections import ListConverter as _pyease_ListConverter
+from py4j.java_collections import SetConverter as _pyease_SetConverter
+from py4j.java_gateway import JavaObject as _pyease_JavaObject
+from py4j.java_gateway import JavaClass as _pyease_JavaClass
+from py4j.protocol import Py4JJavaError as _pyease_Py4JJavaError
+import threading as _pyease_threading
 import __main__
-import ast
+import ast as _pyease_ast
 try:
-    from six import integer_types
-    from six import string_types
+    from six import integer_types as _pyease_integer_types
+    from six import string_types as _pyease_string_types
 except ImportError:
-    if sys.version_info.major == 2:
-        integer_types = (int, long)
-        string_types = (basestring, )
+    if _pyease_sys.version_info.major == 2:
+        _pyease_integer_types = (int, long)
+        _pyease_string_types = (basestring,)
     else:
-        integer_types = (int,)
-        string_types = (str,)
+        _pyease_integer_types = (int,)
+        _pyease_string_types = (str,)
 
 # builtins used to set global variables
 try:
     # Python 3.*
-    import builtins
+    import builtins as _pyease_builtins
 except ImportError:
     # Python 2.*
-    builtins = __builtins__
+    _pyease_builtins = __builtins__
 
-def patch_builtins(name, value):
+
+def _pyease_patch_builtins(name, value):
     '''
     Patches Python builtins to make given value available as a builtin
     Python object in all modules.
@@ -56,7 +62,7 @@ def patch_builtins(name, value):
     :param value:   Value for the builtin
     :type value:    object
     '''
-    builtins.__dict__.update({name: value})
+    _pyease_builtins.__dict__.update({name: value})
 
 
 # To ease some debugging of the py4j engine itself it is useful to turn logging on,
@@ -68,8 +74,8 @@ def patch_builtins(name, value):
 def convert_value(
         value,
         gw=None,
-        integer_types=integer_types, 
-        string_types=string_types,
+        integer_types=_pyease_integer_types,
+        string_types=_pyease_string_types,
         dict_types=dict,
         list_types=list,
         set_types=set):
@@ -103,16 +109,16 @@ def convert_value(
 
     # Recursively check collections
     if isinstance(value, dict_types):
-        return MapConverter().convert({
+        return _pyease_MapConverter().convert({
             convert_value(k, gw): convert_value(v, gw)
             for k, v in value.items()
         }, gw)
     if isinstance(value, list_types):
-        return ListConverter().convert([
+        return _pyease_ListConverter().convert([
             convert_value(v, gw) for v in value
         ], gw)
     if isinstance(value, set_types):
-        return SetConverter().convert({
+        return _pyease_SetConverter().convert({
             convert_value(v, gw) for v in value
         }, gw)
 
@@ -126,11 +132,11 @@ def convert_value(
                 pass
 
     # Issues with marshalling Java class objects
-    if isinstance(value, JavaClass):
+    if isinstance(value, _pyease_JavaClass):
         return repr(value)
 
     # Check if we have a Java object
-    if isinstance(value, py4j.java_gateway.JavaObject):
+    if isinstance(value, _pyease_JavaObject):
         return value
 
     # Check if we implement a Java interface
@@ -147,13 +153,14 @@ def convert_value(
     return repr(value)
 
 
-class EaseInteractiveConsole(code.InteractiveConsole):
+class _pyease_EaseInteractiveConsole(_pyease_code.InteractiveConsole):
     '''
     Extension to standard InteractiveConsole so we can handle and capture
     error output better
     '''
+
     def __init__(self, engine, *args, **kwargs):
-        code.InteractiveConsole.__init__(self, *args, **kwargs)
+        _pyease_code.InteractiveConsole.__init__(self, *args, **kwargs)
         self.engine = engine
 
     def write(self, data):
@@ -167,26 +174,26 @@ class EaseInteractiveConsole(code.InteractiveConsole):
         filename = filename or '<...>'
         try:
             # If we have compiled code we cannot use AST
-            if isinstance(code, string_types):
+            if isinstance(code, _pyease_string_types):
                 # Parse code input
-                tree = ast.parse(code)
+                tree = _pyease_ast.parse(code)
 
                 # Check if we have multiline statement
                 if len(tree.body) > 1:
-                    module = ast.Module(tree.body[:-1])
+                    module = _pyease_ast.Module(tree.body[:-1])
                     compiled = compile(module, filename, 'exec')
                     exec(compiled, self.locals)
 
                 # Check if at least one line given
                 if len(tree.body):
-                    if isinstance(tree.body[-1], ast.Expr):
+                    if isinstance(tree.body[-1], _pyease_ast.Expr):
                         # Only expressions can be evaluated
-                        expression = ast.Expression(tree.body[-1].value)
+                        expression = _pyease_ast.Expression(tree.body[-1].value)
                         compiled = compile(expression, filename, 'eval')
                         result = eval(compiled, self.locals)
                         return result, False
                     else:
-                        module = ast.Module([tree.body[-1]])
+                        module = _pyease_ast.Module([tree.body[-1]])
                         compiled = compile(module, filename, 'exec')
                         exec(compiled, self.locals)
             else:
@@ -194,8 +201,8 @@ class EaseInteractiveConsole(code.InteractiveConsole):
 
         except SystemExit:
             raise
-        except Py4JJavaError as e:
-            if isinstance(e.java_exception, JavaObject):
+        except _pyease_Py4JJavaError as e:
+            if isinstance(e.java_exception, _pyease_JavaObject):
                 # Skip self.showtraceback/self.write as we can get
                 # a Java exception instance already
                 self.engine.except_data = e.java_exception
@@ -208,18 +215,21 @@ class EaseInteractiveConsole(code.InteractiveConsole):
             self.showtraceback()
 
     def push(self, cmd, filename=None):
-        return code.InteractiveConsole.push(self, cmd)
+        return _pyease_code.InteractiveConsole.push(self, cmd)
 
 
 # Sentinel object for no result (different than None)
-NO_RESULT = object()
-class InteractiveReturn(object):
+_pyease_NO_RESULT = object()
+
+
+class _pyease_InteractiveReturn(object):
     '''
     Instance of Java's IInteractiveReturn.
     This class encapsulates the return state from the
     ScriptEngineExecute.executeInteractive() method
     '''
-    def __init__(self, gateway_client, display_data=None, except_data=None, result=NO_RESULT):
+
+    def __init__(self, gateway_client, display_data=None, except_data=None, result=_pyease_NO_RESULT):
         self.gateway_client = gateway_client
         self.display_data = display_data
         self.except_data = except_data
@@ -229,13 +239,13 @@ class InteractiveReturn(object):
         data = self.except_data
         if data is None:
             return None
-        if isinstance(data, JavaObject):
+        if isinstance(data, _pyease_JavaObject):
             return data
         return "".join(data)
 
     def getResult(self):
         # Check if we did not receive result
-        if self.result is NO_RESULT:
+        if self.result is _pyease_NO_RESULT:
             data = self.display_data
         else:
             data = self.result
@@ -247,46 +257,47 @@ class InteractiveReturn(object):
         implements = ['org.eclipse.ease.lang.python.py4j.internal.IInteractiveReturn']
 
 
-class ScriptEngineExecute(object):
+class _pyease_ScriptEngineExecute(object):
     '''
     Instance of Java's IPythonSideEngine.
     This class is the main class of the Python side.
     '''
+
     def __init__(self):
-        self.shutdown_event = threading.Event()
+        self.shutdown_event = _pyease_threading.Event()
 
     def set_gateway(self, gateway):
         self.gateway = gateway
         self.locals = __main__.__dict__
-        self.interp = EaseInteractiveConsole(self, self.locals)
+        self.interp = _pyease_EaseInteractiveConsole(self, self.locals)
         # Provide most common top level pacakage names in the namespace
         # so that code like "java.lang.String()" can work.
         # for other names, jvm.<package name> should be used
         self.locals['java'] = gateway.jvm.java
-        patch_builtins('java', gateway.jvm.java)
+        _pyease_patch_builtins('java', gateway.jvm.java)
 
         self.locals['javax'] = gateway.jvm.javax
-        patch_builtins('javax', gateway.jvm.javax)
+        _pyease_patch_builtins('javax', gateway.jvm.javax)
 
         self.locals['org'] = gateway.jvm.org
-        patch_builtins('org', gateway.jvm.org)
+        _pyease_patch_builtins('org', gateway.jvm.org)
 
         self.locals['com'] = gateway.jvm.com
-        patch_builtins('com', gateway.jvm.com)
+        _pyease_patch_builtins('com', gateway.jvm.com)
 
         self.locals['net'] = gateway.jvm.net
-        patch_builtins('net', gateway.jvm.net)
+        _pyease_patch_builtins('net', gateway.jvm.net)
 
         self.locals['jvm'] = gateway.jvm
-        patch_builtins('jvm', gateway.jvm.jvm)
+        _pyease_patch_builtins('jvm', gateway.jvm.jvm)
 
         self.locals['gateway'] = gateway
-        patch_builtins('gateway', gateway)
+        _pyease_patch_builtins('gateway', gateway)
 
         self.locals['py4j'] = py4j
-        patch_builtins('py4j', py4j)
+        _pyease_patch_builtins('py4j', py4j)
 
-        sys.displayhook = self.displayhook
+        _pyease_sys.displayhook = self.displayhook
         self.display_data = None
         self.except_data = None
 
@@ -305,19 +316,19 @@ class ScriptEngineExecute(object):
             result, needMore = execution_result
         else:
             # Set result to NO_RESULT to distinguish from None result
-            result = NO_RESULT
+            result = _pyease_NO_RESULT
             needMore = execution_result
 
         if needMore:
             # TODO, need to handle this with prompts, this message
             # is a workaround
-            return InteractiveReturn(self.gateway._gateway_client, display_data="... - more input required to complete statement")
+            return _pyease_InteractiveReturn(self.gateway._gateway_client, display_data="... - more input required to complete statement")
         else:
             display_data = self.display_data
             except_data = self.except_data
             self.display_data = None
             self.except_data = None
-            return InteractiveReturn(self.gateway._gateway_client, display_data=display_data, except_data=except_data, result=result)
+            return _pyease_InteractiveReturn(self.gateway._gateway_client, display_data=display_data, except_data=except_data, result=result)
 
     def executeScript(self, code_text, filename=None):
         return self.executeCommon(code_text, self.interp.runcode, filename)
@@ -333,17 +344,17 @@ class ScriptEngineExecute(object):
         filtered = {
             k: convert_value(v, self.gateway._gateway_client)
             for k, v in self.locals.items()
-            if k.startswith('__EASE') or (not k.startswith('__')) 
+            if k.startswith('__EASE') or (not k.startswith('__'))
         }
 
-        return MapConverter().convert(filtered, self.gateway._gateway_client)
+        return _pyease_MapConverter().convert(filtered, self.gateway._gateway_client)
 
     def internalHasVariable(self, name):
         return name in self.locals
 
     def internalSetVariable(self, name, content):
         self.locals[name] = content
-        builtins.__dict__.update({name: content}) 
+        _pyease_builtins.__dict__.update({name: content}) 
 
     def teardownEngine(self):
         self.shutdown_event.set()
@@ -352,17 +363,17 @@ class ScriptEngineExecute(object):
         self.shutdown_event.wait()
 
     def addSearchPath(self, path):
-        sys.path.append(path)
+        _pyease_sys.path.append(path)
 
     class Java:
         implements = ['org.eclipse.ease.lang.python.py4j.internal.IPythonSideEngine']
 
 
-def watchdog(engine):
+def _pyease_watchdog(engine):
     # Read from the parent process until EOF, EOF indicates the
     # parent process has terminated
     try:
-        sys.stdin.read()
+        _pyease_sys.stdin.read()
     except:
         pass
 
@@ -371,20 +382,20 @@ def watchdog(engine):
 
     # Allow some time for the shutdown to be clean, but
     # fallback to a hard exit if that fails
-    timer = threading.Timer(10.0, os._exit, (1,))
+    timer = _pyease_threading.Timer(10.0, _pyease_os._exit, (1,))
     timer.setDaemon(True)
     timer.start()
 
 
-def main(argv):
+def _pyease_main(argv):
     port = int(argv[1])
-    engine = ScriptEngineExecute()
+    engine = _pyease_ScriptEngineExecute()
     # Bug 517528: Disable memory management until Py4J #275 is resolved
     enable_memory_management = False
-    java_params = JavaParameters(auto_convert=True, port=port,
+    java_params = _pyease_JavaParameters(auto_convert=True, port=port,
                                  enable_memory_management=enable_memory_management)
-    gateway = ClientServer(java_parameters=java_params,
-                          python_parameters=PythonParameters(port=0),
+    gateway = _pyease_ClientServer(java_parameters=java_params,
+                          python_parameters=_pyease_PythonParameters(port=0),
                           python_server_entry_point=engine)
     # retrieve the port on which the python callback server was bound to.
     python_port = gateway.get_callback_server().get_listening_port()
@@ -395,7 +406,7 @@ def main(argv):
     gateway.entry_point.pythonStartupComplete(python_port, engine)
 
     # start a watchdog on stdin to make sure we terminate
-    thread = threading.Thread(target=watchdog, args=(engine,))
+    thread = _pyease_threading.Thread(target=_pyease_watchdog, args=(engine,))
     thread.setDaemon(True)
     thread.start()
 
@@ -409,4 +420,4 @@ def main(argv):
 if __name__ == '__main__':
     # Will be patched via builtins
     gateway = None
-    main(sys.argv)
+    _pyease_main(_pyease_sys.argv)
