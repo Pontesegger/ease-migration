@@ -13,8 +13,10 @@ package org.eclipse.ease.ui.view;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
@@ -23,12 +25,12 @@ import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.jface.resource.ColorDescriptor;
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GlyphMetrics;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -88,7 +90,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			fStarted = true;
 			if (fRun)
-				setBackground(fResourceManager.createColor(fColorDarkenedBackground));
+				setBackground(fResourceManager.createColor(fColorShadedBackground));
 
 			return Status.OK_STATUS;
 		}
@@ -102,7 +104,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	private final ColorDescriptor fColorDescriptorCommand = ColorDescriptor.createFrom(getShell().getDisplay().getSystemColor(SWT.COLOR_BLUE));
 	private final ColorDescriptor fColorDescriptorError = ColorDescriptor.createFrom(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
 	private ColorDescriptor fColorDefaultBackground = null;
-	private ColorDescriptor fColorDarkenedBackground = null;
+	private ColorDescriptor fColorShadedBackground = null;
 
 	private IReplEngine fCurrentEngine;
 
@@ -126,20 +128,27 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 		}
 	}
 
+	private ColorDescriptor createShadedBackground(Color defaultColor) {
+		final int defaultRgb = defaultColor.getRed() + defaultColor.getGreen() + defaultColor.getBlue();
+		if (defaultRgb >= 0x20)
+			return ColorDescriptor.createFrom(new RGB(Math.max(defaultColor.getRed() - 0x10, 0), Math.max(defaultColor.getGreen() - 0x10, 0),
+					Math.max(defaultColor.getBlue() - 0x10, 0)));
+
+		// original color is too dark, use a lighter color for shading
+		return ColorDescriptor.createFrom(new RGB(Math.min(defaultColor.getRed() + 0x10, 0xFF), Math.min(defaultColor.getGreen() + 0x10, 0xFF),
+				Math.min(defaultColor.getBlue() + 0x10, 0xFF)));
+	}
+
 	private void initialize() {
 		// set monospaced font
-		final Object os = Platform.getOS();
-		if ("win32".equals(os))
-			setFont(fResourceManager.createFont(FontDescriptor.createFrom("Courier New", 10, SWT.NONE)));
+		setFont(JFaceResources.getFont(IDebugUIConstants.PREF_CONSOLE_FONT));
+		fColorDefaultBackground = ColorDescriptor.createFrom(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR));
+		fColorShadedBackground = createShadedBackground(DebugUIPlugin.getPreferenceColor(IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR));
 
-		else if ("linux".equals(os))
-			setFont(fResourceManager.createFont(FontDescriptor.createFrom("Monospace", 10, SWT.NONE)));
-
-		fColorDefaultBackground = ColorDescriptor.createFrom(getBackground());
-
-		final RGB defaultBackground = getBackground().getRGB();
-		final RGB darkenedBackground = new RGB(defaultBackground.red - 0x10, defaultBackground.green - 0x10, defaultBackground.blue - 0x10);
-		fColorDarkenedBackground = ColorDescriptor.createFrom(darkenedBackground);
+		JFaceResources.getFontRegistry().addListener(event -> {
+			if (IDebugUIConstants.PREF_CONSOLE_FONT.equals(event.getProperty()))
+				setFont(JFaceResources.getFont(IDebugUIConstants.PREF_CONSOLE_FONT));
+		});
 
 		setEditable(false);
 
