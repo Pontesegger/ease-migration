@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="Oxygen" sequenceNumber="1515312108">
+<target name="2018-09" sequenceNumber="1542182564">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.7.2.v20171130-0510"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.7.2.v20171130-0510"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.13.2.v20171130-0906"/>
-      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.1.1.v20170906-1259"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.13.0.v20170609-0928"/>
-      <unit id="org.eclipse.papyrus.infra.feature.feature.group" version="3.0.0.201712060842"/>
-      <unit id="org.eclipse.papyrus.infra.gmfdiag.feature.feature.group" version="3.0.0.201712060842"/>
-      <unit id="org.eclipse.papyrus.uml.diagram.feature.feature.group" version="3.0.0.201712060842"/>
-      <unit id="org.eclipse.uml2.uml" version="5.3.0.v20170605-1616"/>
-      <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.8.0.201706061437"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.9.0.v20180906-1121"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.9.0.v20180906-1121"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.15.0.v20180906-0745"/>
+      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.100.v20180822-1357"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.15.0.v20180905-1732"/>
+      <unit id="org.eclipse.papyrus.infra.feature.feature.group" version="3.0.0.201809120950"/>
+      <unit id="org.eclipse.papyrus.infra.gmfdiag.feature.feature.group" version="3.0.0.201809120950"/>
+      <unit id="org.eclipse.papyrus.uml.diagram.feature.feature.group" version="3.0.0.201809120950"/>
+      <unit id="org.eclipse.uml2.uml" version="5.4.0.v20180903-1400"/>
+      <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.8.0.201806010809"/>
       <unit id="org.eclipse.emf.emfstore.client.ui.feature.feature.group" version="1.9.0.v20170530-0703"/>
-      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.3.0.v20170607-1133"/>
-      <unit id="org.eclipse.ocl.examples.feature.group" version="6.3.0.v20170613-1432"/>
-      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.9.1.v201707042225"/>
-      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.9.1.v201707252002"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.13.2.v20171130-0510"/>
-      <unit id="org.eclipse.jdt" version="3.13.2.v20171130-0510"/>
-      <unit id="org.eclipse.team.svn.feature.group" version="4.0.5.I20170425-1700"/>
-      <unit id="org.eclipse.egit.feature.group" version="4.9.2.201712150930-r"/>
-      <unit id="org.eclipse.jgit.feature.group" version="4.9.2.201712150930-r"/>
-      <unit id="org.eclipse.osgi" version="3.12.50.v20170928-1321"/>
-      <repository id="eclipse-oxygen" location="http://download.eclipse.org/releases/oxygen/"/>
+      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.6.0.v20180916-1223"/>
+      <unit id="org.eclipse.ocl.examples.feature.group" version="6.5.0.v20180916-1223"/>
+      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.11.0.v201808220605"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.11.0.v201807252207"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.13.200.v20180906-0745"/>
+      <unit id="org.eclipse.jdt" version="3.15.0.v20180906-0745"/>
+      <unit id="org.eclipse.egit.feature.group" version="5.1.0.201809111528-r"/>
+      <unit id="org.eclipse.jgit.feature.group" version="5.1.0.201809111528-r"/>
+      <unit id="org.eclipse.osgi" version="3.13.100.v20180827-1536"/>
+      <repository id="eclipse-2018-09" location="http://download.eclipse.org/releases/2018-09/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="1.9.5.v201605172210"/>
       <unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
-      <repository id="eclipse-orbit-oxygen" location="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
+      <repository id="eclipse-orbit-oxygen" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.team.svn.feature.group" version="4.0.5.I20170425-1700"/>
+      <repository location="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.feature.feature.group" version="0.0.0"/>
