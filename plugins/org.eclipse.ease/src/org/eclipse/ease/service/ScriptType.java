@@ -13,7 +13,6 @@ package org.eclipse.ease.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -99,15 +98,23 @@ public class ScriptType {
 		}
 
 		// sort engines to report highest priority first
-		Collections.sort(engines, new Comparator<EngineDescription>() {
-
-			@Override
-			public int compare(final EngineDescription o1, final EngineDescription o2) {
-				return o2.getPriority() - o1.getPriority();
-			}
-		});
+		Collections.sort(engines, (o1, o2) -> o2.getPriority() - o1.getPriority());
 
 		return engines;
+	}
+
+	public EngineDescription getEngine() {
+		final List<EngineDescription> engines = getEngines();
+		return (engines.isEmpty()) ? null : engines.get(0);
+	}
+
+	public EngineDescription getDebugEngine() {
+		for (final EngineDescription description : getEngines()) {
+			if (description.supportsDebugging())
+				return description;
+		}
+
+		return null;
 	}
 
 	@Override

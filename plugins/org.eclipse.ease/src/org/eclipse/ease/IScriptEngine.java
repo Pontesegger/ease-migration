@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.service.EngineDescription;
 
 /**
@@ -231,4 +232,11 @@ public interface IScriptEngine {
 	 *            check to be removed
 	 */
 	void removeSecurityCheck(ISecurityCheck check);
+
+	/**
+	 * Get the launch that was used to create this engine.
+	 *
+	 * @return launch or <code>null</code> in case this engine was created without launch configuration
+	 */
+	ILaunch getLaunch();
 }

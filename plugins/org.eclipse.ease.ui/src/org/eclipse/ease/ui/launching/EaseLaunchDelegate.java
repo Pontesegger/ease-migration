@@ -28,6 +28,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
@@ -149,6 +150,9 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 			if (engine instanceof IReplEngine)
 				((IReplEngine) engine).setTerminateOnIdle(true);
 
+			if (engine instanceof AbstractScriptEngine)
+				((AbstractScriptEngine) engine).setLaunch(launch);
+
 			// initialize console
 			final ScriptConsole console = ScriptConsole.create(engine.getName() + ": " + resource, engine);
 			engine.setOutputStream(console.getOutputStream());
@@ -244,25 +248,35 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 
 	private void setupDebugger(final IScriptEngine engine, final ILaunchConfiguration configuration, final ILaunch launch) {
 		if (engine instanceof IDebugEngine) {
-			boolean suspendOnStartup = false;
-			try {
-				suspendOnStartup = configuration.getAttribute(LaunchConstants.SUSPEND_ON_STARTUP, false);
-			} catch (final CoreException e) {
-			}
-
-			boolean suspendOnScriptLoad = false;
-			try {
-				suspendOnScriptLoad = configuration.getAttribute(LaunchConstants.SUSPEND_ON_SCRIPT_LOAD, false);
-			} catch (final CoreException e) {
-			}
-
-			boolean showDynamicCode = false;
-			try {
-				showDynamicCode = configuration.getAttribute(LaunchConstants.DISPLAY_DYNAMIC_CODE, false);
-			} catch (final CoreException e) {
-			}
-
-			((IDebugEngine) engine).setupDebugger(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);
+			((IDebugEngine) engine).setupDebugger(launch, getSuspendOnStartupValue(configuration), getSuspendOnScriptLoadValue(configuration),
+					getDisplayDynamicCodeValue(configuration));
 		}
+	}
+
+	public static boolean getSuspendOnStartupValue(ILaunchConfiguration configuration) {
+		try {
+			return configuration.getAttribute(LaunchConstants.SUSPEND_ON_STARTUP, false);
+		} catch (final CoreException e) {
+		}
+
+		return false;
+	}
+
+	public static boolean getSuspendOnScriptLoadValue(ILaunchConfiguration configuration) {
+		try {
+			return configuration.getAttribute(LaunchConstants.SUSPEND_ON_SCRIPT_LOAD, false);
+		} catch (final CoreException e) {
+		}
+
+		return false;
+	}
+
+	public static boolean getDisplayDynamicCodeValue(ILaunchConfiguration configuration) {
+		try {
+			return configuration.getAttribute(LaunchConstants.DISPLAY_DYNAMIC_CODE, false);
+		} catch (final CoreException e) {
+		}
+
+		return false;
 	}
 }

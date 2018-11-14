@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.ISecurityCheck.ActionType;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -87,7 +88,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	/** List of code junks to be executed. */
 	private final List<Script> fScheduledScripts = Collections.synchronizedList(new ArrayList<Script>());
 
-	private final ListenerList fExecutionListeners = new ListenerList();
+	private final ListenerList<IExecutionListener> fExecutionListeners = new ListenerList<>();
 
 	private PrintStream fOutputStream = null;
 
@@ -112,6 +113,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	private final HashMap<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();
 
 	private Object fExecutionRootFile;;
+
+	/** Launch associated with this engine. */
+	private ILaunch fLaunch = null;
 
 	/**
 	 * Constructor. Sets the name for the underlying job.
@@ -580,6 +584,15 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	protected List<Script> getScheduledScripts() {
 		return fScheduledScripts;
+	}
+
+	public void setLaunch(ILaunch launch) {
+		fLaunch = launch;
+	}
+
+	@Override
+	public ILaunch getLaunch() {
+		return fLaunch;
 	}
 
 	/**
