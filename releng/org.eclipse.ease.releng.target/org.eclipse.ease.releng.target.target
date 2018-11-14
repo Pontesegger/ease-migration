@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="Oxygen" sequenceNumber="1521706012">
+<target name="2018-09" sequenceNumber="1542182433">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.7.3.v20180301-0715"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.7.3.v20180301-0715"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.13.3.v20180301-0715"/>
-      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.1.1.v20170906-1259"/>
-      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.1.1.v201711211802"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.13.0.v20170609-0928"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.13.3.v20180301-1154"/>
-      <unit id="org.eclipse.jdt" version="3.13.3.v20180301-0715"/>
-      <repository id="eclipse-oxygen" location="http://download.eclipse.org/releases/oxygen/"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.9.0.v20180906-1121"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.9.0.v20180906-1121"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.15.0.v20180906-0745"/>
+      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.100.v20180822-1357"/>
+      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.1.1.v201804042202"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.15.0.v20180905-1732"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.13.200.v20180906-0745"/>
+      <unit id="org.eclipse.jdt" version="3.15.0.v20180906-0745"/>
+      <repository id="eclipse-2018-09" location="http://download.eclipse.org/releases/2018-09/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="1.9.5.v201605172210"/>
       <unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
-      <repository id="eclipse-orbit-oxygen" location="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
+      <repository id="eclipse-orbit-oxygen" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.engine.jython.feature.feature.group" version="0.0.0"/>
