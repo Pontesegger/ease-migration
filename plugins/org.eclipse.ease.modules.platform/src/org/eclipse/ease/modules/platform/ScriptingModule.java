@@ -21,7 +21,10 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptable;
@@ -36,6 +39,7 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ease.ui.launching.EaseLaunchDelegate;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -122,6 +126,9 @@ public class ScriptingModule extends AbstractScriptModule {
 	public ScriptResult fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
 
+		final ILaunch currentLaunch = getScriptEngine().getLaunch();
+		final boolean useDebugger = currentLaunch.getDebugTarget() != null;
+
 		IScriptService scriptService;
 		try {
 			scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
@@ -130,30 +137,46 @@ public class ScriptingModule extends AbstractScriptModule {
 			scriptService = ScriptService.getInstance();
 		}
 
-		if (engineID == null) {
+		EngineDescription description = null;
+		if (engineID != null) {
+			description = scriptService.getEngineByID(engineID);
+
+			if (description == null)
+				throw new RuntimeException("No script engine found for ID = \"" + engineID + "\"");
+		}
+
+		if (description == null) {
 			// try to find engine for script type
 			final String location = ResourceTools.toAbsoluteLocation(resource, getScriptEngine().getExecutedFile());
 			final ScriptType scriptType = scriptService.getScriptType(location);
 			if (scriptType != null) {
-				final List<EngineDescription> engines = scriptType.getEngines();
-				if (!engines.isEmpty())
-					engineID = engines.get(0).getID();
+				if (useDebugger)
+					description = scriptType.getDebugEngine();
+
+				if (description == null)
+					description = scriptType.getEngine();
 			}
 		}
 
-		if (engineID != null) {
-			// engineID available
-			final EngineDescription description = scriptService.getEngineByID(engineID);
-			if (description == null)
-				throw new RuntimeException("No script engine found for ID = \"" + engineID + "\"");
-
-			final IScriptEngine engine = scriptService.getEngineByID(engineID).createEngine();
+		if (description != null) {
+			final IScriptEngine engine = description.createEngine();
 
 			// connect streams
 			engine.setOutputStream(getScriptEngine().getOutputStream());
 			engine.setErrorStream(getScriptEngine().getErrorStream());
 			engine.setInputStream(getScriptEngine().getInputStream());
 			engine.setCloseStreamsOnTerminate(false);
+
+			// setup debugger
+			if ((useDebugger) && (engine instanceof IDebugEngine)) {
+				final ILaunchConfiguration launchConfiguration = currentLaunch.getLaunchConfiguration();
+				if (launchConfiguration != null) {
+					((IDebugEngine) engine).setupDebugger(currentLaunch, EaseLaunchDelegate.getSuspendOnStartupValue(launchConfiguration),
+							EaseLaunchDelegate.getSuspendOnScriptLoadValue(launchConfiguration),
+							EaseLaunchDelegate.getDisplayDynamicCodeValue(launchConfiguration));
+
+				}
+			}
 
 			// set input parameters
 			engine.setVariable("argv", AbstractScriptEngine.extractArguments(arguments));
