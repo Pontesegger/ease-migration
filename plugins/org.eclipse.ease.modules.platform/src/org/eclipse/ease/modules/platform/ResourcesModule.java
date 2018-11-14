@@ -13,6 +13,7 @@ package org.eclipse.ease.modules.platform;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -40,7 +41,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
@@ -54,11 +54,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.eclipse.ui.views.navigator.ResourceComparator;
+import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
+import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 /**
  * Provides file access for workspace and file system resources. Methods accepting location objects can deal with {@link String}, {@link URI}, {@link IFile} and
@@ -83,26 +86,6 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 
 	/** Open file handles managed by this module. */
 	private final Collection<IFileHandle> fOpenHandles = new HashSet<>();
-
-	/**
-	 * Monitor to wake up listeners when done.
-	 */
-	private class ProgressMonitor extends NullProgressMonitor {
-		private boolean fDone = false;
-
-		@Override
-		public void done() {
-			fDone = true;
-
-			synchronized (this) {
-				notifyAll();
-			}
-		}
-
-		public boolean isDone() {
-			return fDone;
-		}
-	}
 
 	private static final String LINE_DELIMITER = System.getProperty(Platform.PREF_LINE_SEPARATOR);
 
@@ -760,34 +743,78 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 *
 	 * @param location
 	 *            location of project (needs to contain <i>.project</i> file)
-	 * @return link result
+	 * @return linked project, throws otherwise
+	 * @throws CoreException
+	 *             when project description cannot be loaded from .project file
+	 * @throws IOException
+	 *             when project location cannot be read/linked
 	 */
 	@WrapToScript
-	public boolean linkProject(final String location) {
+	public IProject linkProject(final Object location) throws CoreException, IOException {
 		final Object resolvedLocation = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 
 		if (resolvedLocation instanceof IContainer) {
-			Logger.warning(PluginConstants.PLUGIN_ID, "The folder to link is already part of the workspace: " + location);
-			return false;
+			throw new IOException("The folder to link is already part of the workspace: " + location);
 
 		} else if (resolvedLocation instanceof File) {
-			final Path projectPath = new Path(((File) resolvedLocation).getAbsoluteFile() + File.separator + ".project");
-			try {
-				final IProjectDescription description = ResourcesPlugin.getWorkspace().loadProjectDescription(projectPath);
+			if (((File) resolvedLocation).isDirectory()) {
+
+				final IProjectDescription description = getProjectDescription((File) resolvedLocation);
 				final IProject project = getProject(description.getName());
 				project.create(description, null);
 				project.open(null);
+				return project;
 
-				return true;
-			} catch (final CoreException e) {
-				Logger.error(PluginConstants.PLUGIN_ID, "Could not link to project", e);
-				return false;
-			}
+			} else
+				throw new IOException("location is not a directory");
 
 		} else {
-			Logger.warning(PluginConstants.PLUGIN_ID, "Could not resolve location: " + location);
-			return false;
+			throw new IOException("Could not resolve file location \"" + location + "\"");
 		}
+	}
+
+	private IProjectDescription getProjectDescription(File rootPath) throws CoreException {
+		final Path projectPath = new Path(rootPath.getAbsoluteFile() + File.separator + ".project");
+		return ResourcesPlugin.getWorkspace().loadProjectDescription(projectPath);
+	}
+
+	/**
+	 * Imports a project into the current workspace. The project needs to be available on the file system and needs to be unpacked. Zipped projects cannot be
+	 * imported.
+	 *
+	 * @param location
+	 *            location of project (needs to contain <i>.project</i> file)
+	 * @return project instance, throws otherwise
+	 * @throws InvocationTargetException
+	 *             on errors during the import
+	 * @throws InterruptedException
+	 *             when import task got interrupted
+	 * @throws IOException
+	 *             when project cannot be located on disk
+	 * @throws CoreException
+	 *             when project description cannot be loaded from .project file
+	 */
+	@WrapToScript
+	public IProject importProject(final Object location) throws InvocationTargetException, InterruptedException, IOException, CoreException {
+
+		final Object resolvedFile = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		if (resolvedFile instanceof File) {
+
+			if (((File) resolvedFile).isDirectory()) {
+				final IProjectDescription projectDescription = getProjectDescription((File) resolvedFile);
+				final IProject project = createProject(projectDescription.getName());
+
+				final ImportOperation importOperation = new ImportOperation(project.getFullPath(), resolvedFile, FileSystemStructureProvider.INSTANCE,
+						file -> IOverwriteQuery.ALL);
+				importOperation.setCreateContainerStructure(false);
+				importOperation.run(new NullProgressMonitor());
+				return project;
+
+			} else
+				throw new IOException("location is not a directory");
+
+		} else
+			throw new IOException("Could not resolve file location \"" + location + "\"");
 	}
 
 	/**
