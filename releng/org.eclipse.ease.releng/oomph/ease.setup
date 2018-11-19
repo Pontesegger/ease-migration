@@ -4,22 +4,15 @@
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:git="http://www.eclipse.org/oomph/setup/git/1.0"
-    xmlns:jdt="http://www.eclipse.org/oomph/setup/jdt/1.0"
     xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="ease"
     label="EASE">
-  <setupTask
-      xsi:type="jdt:JRETask"
-      version="JavaSE-1.8"
-      location="${jre.location-1.8}">
-    <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
-  </setupTask>
   <setupTask
       xsi:type="setup:CompoundTask"
       name="Mylyn Integration">
@@ -47,11 +40,6 @@
           url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;product=Ease"/>
     </setupTask>
   </setupTask>
-  <setupTask
-      xsi:type="setup:VariableTask"
-      name="eclipse.target.platform"
-      defaultValue="2018-09"
-      storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup:CompoundTask"
       name="Preferences">
@@ -135,14 +123,10 @@
       <description>${scope.project.label}</description>
     </setupTask>
     <setupTask
-        xsi:type="setup.targlets:TargletTask"
-        programArguments=""
-        vmArguments="">
+        xsi:type="setup.targlets:TargletTask">
       <targlet
-          name="EASE Core"
-          activeRepositoryList="${eclipse.target.platform}"
-          includeAllPlatforms="true"
-          includeAllRequirements="false">
+          name="${scope.project.label}"
+          activeRepositoryList="2018-09">
         <requirement
             name="*"/>
         <sourceLocator
@@ -318,13 +302,10 @@
       <description>${scope.project.label} Modules</description>
     </setupTask>
     <setupTask
-        xsi:type="setup.targlets:TargletTask"
-        programArguments=""
-        vmArguments="">
+        xsi:type="setup.targlets:TargletTask">
       <targlet
-          name="EASE Modules"
-          activeRepositoryList="${eclipse.target.platform}"
-          includeAllPlatforms="true">
+          name="${scope.project.label}"
+          activeRepositoryList="2018-09">
         <requirement
             name="*"/>
         <sourceLocator
@@ -418,5 +399,5 @@
   <logicalProjectContainer
       xsi:type="setup:ProjectCatalog"
       href="index:/org.eclipse.setup#//@projectCatalogs[name='org.eclipse']"/>
-  <description>Setup for EASE core and modules developers.	</description>
+  <description>Setup for EASE core and modules developers.</description>
 </setup:Project>
