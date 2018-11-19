@@ -105,11 +105,6 @@
       <description>Install tpd editor</description>
     </setupTask>
   </setupTask>
-  <setupTask
-      xsi:type="setup:EclipseIniTask"
-      option="-Doomph.redirection.ease"
-      value="=https://git.eclipse.org/c/ease/org.eclipse.ease.core.git/plain/releng/org.eclipse.ease.releng/oomph/ease.setup->${ease.core.git.clone.location|uri}/releng/org.eclipse.ease.releng/oomph/ease.setup"
-      vm="true"/>
   <project name="core"
       label="Core Framework">
     <setupTask
@@ -284,6 +279,11 @@
         encoding="UTF-8">
       <description>Create a default launch configuration for EASE</description>
     </setupTask>
+    <setupTask
+        xsi:type="setup:EclipseIniTask"
+        option="-Doomph.redirection.ease"
+        value="=https://git.eclipse.org/c/ease/org.eclipse.ease.core.git/plain/releng/org.eclipse.ease.releng/oomph/ease.setup->${ease.core.git.clone.location|uri}/releng/org.eclipse.ease.releng/oomph/ease.setup"
+        vm="true"/>
     <stream
         name="master"
         label="Master"/>
