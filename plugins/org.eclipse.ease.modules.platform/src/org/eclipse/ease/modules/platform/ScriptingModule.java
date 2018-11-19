@@ -127,7 +127,7 @@ public class ScriptingModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
 
 		final ILaunch currentLaunch = getScriptEngine().getLaunch();
-		final boolean useDebugger = currentLaunch.getDebugTarget() != null;
+		final boolean useDebugger = (currentLaunch != null) && (currentLaunch.getDebugTarget() != null);
 
 		IScriptService scriptService;
 		try {
