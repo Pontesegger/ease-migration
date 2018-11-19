@@ -8,6 +8,7 @@
     xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
+    xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
     xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
@@ -18,13 +19,6 @@
       version="JavaSE-1.8"
       location="${jre.location-1.8}">
     <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
-  </setupTask>
-  <setupTask
-      xsi:type="setup:EclipseIniTask"
-      option="-Xmx"
-      value="1024m"
-      vm="true">
-    <description>Set the heap space needed to work with the projects of ${scope.project.label}</description>
   </setupTask>
   <setupTask
       xsi:type="setup:CompoundTask"
@@ -52,27 +46,11 @@
           summary="EASE bugs"
           url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;product=Ease"/>
     </setupTask>
-    <setupTask
-        xsi:type="mylyn:MylynQueriesTask"
-        connectorKind="org.eclipse.mylyn.gerrit"
-        repositoryURL="https://git.eclipse.org/r"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <query
-          summary="EASE reviews">
-        <attribute
-            key="gerrit query type"
-            value="custom"/>
-        <attribute
-            key="gerrit query string"
-            value="projects:ease status:open"/>
-      </query>
-    </setupTask>
   </setupTask>
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="Oxygen"
+      defaultValue="2018-09"
       storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup:CompoundTask"
@@ -115,13 +93,25 @@
     </setupTask>
     <description></description>
   </setupTask>
+  <setupTask
+      xsi:type="setup:CompoundTask"
+      name="Install Target Platform Definition Editor">
+    <setupTask
+        xsi:type="setup.p2:P2Task">
+      <requirement
+          name="org.eclipse.cbi.targetplatform-feature.feature.group"/>
+      <repository
+          url="http://download.eclipse.org/cbi/tpd/3.0.0-SNAPSHOT/"/>
+      <description>Install tpd editor</description>
+    </setupTask>
+  </setupTask>
+  <setupTask
+      xsi:type="setup:EclipseIniTask"
+      option="-Doomph.redirection.ease"
+      value="=https://git.eclipse.org/c/ease/org.eclipse.ease.core.git/plain/releng/org.eclipse.ease.releng/oomph/ease.setup->${ease.core.git.clone.location|uri}/releng/org.eclipse.ease.releng/oomph/ease.setup"
+      vm="true"/>
   <project name="core"
       label="Core Framework">
-    <setupTask
-        xsi:type="setup:EclipseIniTask"
-        option="-Doomph.redirection.ease"
-        value="=https://git.eclipse.org/c/ease/org.eclipse.ease.core.git/plain/releng/org.eclipse.ease.releng/oomph/ease.setup->${ease.core.git.clone.location|uri}/releng/org.eclipse.ease.releng/oomph/ease.setup"
-        vm="true"/>
     <setupTask
         xsi:type="git:GitCloneTask"
         id="ease.core.git.clone"
@@ -151,37 +141,15 @@
     </setupTask>
     <setupTask
         xsi:type="setup.targlets:TargletTask"
-        programArguments="-consolelog"
-        vmArguments="-Xms40m -Xmx512M -XX:MaxPermSize=256m -ea">
+        programArguments=""
+        vmArguments="">
       <targlet
           name="EASE Core"
-          activeRepositoryList="${eclipse.target.platform}">
+          activeRepositoryList="${eclipse.target.platform}"
+          includeAllPlatforms="true"
+          includeAllRequirements="false">
         <requirement
             name="*"/>
-        <requirement
-            name="org.eclipse.platform.feature.group"/>
-        <requirement
-            name="org.eclipse.rcp.feature.group"/>
-        <requirement
-            name="org.eclipse.jdt.feature.group"/>
-        <requirement
-            name="org.eclipse.equinox.p2.discovery.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.pde.feature.group"/>
-        <requirement
-            name="org.eclipse.jdt"/>
-        <requirement
-            name="org.hamcrest"/>
-        <requirement
-            name="org.hamcrest.core"/>
-        <requirement
-            name="org.mockito"/>
-        <requirement
-            name="org.eclipse.ease.engine.jython.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.wst.jsdt.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.feature.group"/>
         <sourceLocator
             rootFolder="${ease.core.git.clone.location}">
           <excludedPath>developers</excludedPath>
@@ -190,22 +158,11 @@
           <excludedPath>features/org.eclipse.ease.integration.modeling.uml.feature</excludedPath>
         </sourceLocator>
         <repositoryList
-            name="Oxygen">
-          <repository
-              url="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
-          <repository
-              url="https://bintray.com/artifact/download/pontesegger/ease-engines/"/>
-          <repository
-              url="http://download.eclipse.org/releases/oxygen/"/>
-          <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
-        </repositoryList>
-        <repositoryList
             name="2018-09">
           <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository/"/>
           <repository
-              url="https://bintray.com/artifact/download/pontesegger/ease-engines/"/>
+              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
           <repository
               url="http://download.eclipse.org/releases/2018-09/"/>
           <repository
@@ -218,52 +175,103 @@
       <workingSet
           name="EASE Core Framework">
         <predicate
-            xsi:type="predicates:OrPredicate">
+            xsi:type="predicates:AndPredicate">
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease"/>
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.ui.*"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.help"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.test"/>
+          </operand>
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.ui.*"/>
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*feature"/>
+          </operand>
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.help"/>
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease"/>
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.feature"/>
-          <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.releng.*"/>
-          <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.test"/>
-          <operand
-              xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.ease.lang.jvm.*"/>
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*test"/>
+          </operand>
         </predicate>
       </workingSet>
       <workingSet
-          name="EASE JavaScript Engines">
+          name="EASE Engines">
         <predicate
             xsi:type="predicates:AndPredicate">
           <operand
               xsi:type="predicates:RepositoryPredicate"
               project="org.eclipse.ease"/>
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern=".*javascript.*"/>
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*lang.*"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*feature"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*\.test"/>
+          </operand>
         </predicate>
       </workingSet>
       <workingSet
-          name="EASE Python Engines">
+          name="EASE Testing">
         <predicate
             xsi:type="predicates:AndPredicate">
           <operand
               xsi:type="predicates:RepositoryPredicate"
               project="org.eclipse.ease"/>
           <operand
-              xsi:type="predicates:NamePredicate"
-              pattern=".*python.*"/>
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*\.test"/>
+          </operand>
+        </predicate>
+      </workingSet>
+      <workingSet
+          name="Release Engineering">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease"/>
+          <operand
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*feature"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*releng.*"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.helpgenerator"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="EASE UI Design"/>
+          </operand>
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
@@ -311,94 +319,28 @@
     </setupTask>
     <setupTask
         xsi:type="setup.targlets:TargletTask"
-        programArguments="-consolelog"
-        vmArguments="-Xms40m -Xmx512M -XX:MaxPermSize=256m -ea">
+        programArguments=""
+        vmArguments="">
       <targlet
           name="EASE Modules"
-          activeRepositoryList="${eclipse.target.platform}">
+          activeRepositoryList="${eclipse.target.platform}"
+          includeAllPlatforms="true">
         <requirement
             name="*"/>
-        <requirement
-            name="org.eclipse.platform.feature.group"/>
-        <requirement
-            name="org.eclipse.rcp.feature.group"/>
-        <requirement
-            name="org.eclipse.jdt.feature.group"/>
-        <requirement
-            name="org.eclipse.equinox.p2.discovery.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.feature.group"/>
-        <requirement
-            name="org.eclipse.papyrus.infra.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.papyrus.infra.gmfdiag.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.papyrus.uml.diagram.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.uml2.uml"/>
-        <requirement
-            name="org.eclipse.gmf.runtime.diagram.ui"/>
-        <requirement
-            name="org.eclipse.emf.emfstore.client.ui.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.ocl.examples.classic.feature.group"/>
-        <requirement
-            name="org.eclipse.ocl.examples.feature.group"/>
-        <requirement
-            name="org.eclipse.wst.xml_core.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.wst.xml_ui.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.pde.feature.group"/>
-        <requirement
-            name="org.eclipse.jdt"/>
-        <requirement
-            name="org.eclipse.team.svn.feature.group"/>
-        <requirement
-            name="org.eclipse.egit.feature.group"/>
-        <requirement
-            name="org.eclipse.jgit.feature.group"/>
-        <requirement
-            name="org.eclipse.osgi"/>
-        <requirement
-            name="org.hamcrest"/>
-        <requirement
-            name="org.hamcrest.core"/>
-        <requirement
-            name="org.mockito"/>
-        <requirement
-            name="org.eclipse.nebula.visualization.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.ease.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.ease.ui.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.ease.lang.javascript.feature.feature.group"/>
-        <requirement
-            name="org.eclipse.ease.lang.jvm.feature.feature.group"/>
         <sourceLocator
             rootFolder="${ease.modules.git.clone.location}"/>
         <repositoryList
-            name="Oxygen">
-          <repository
-              url="http://download.eclipse.org/releases/oxygen/"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/R-builds/R20170516192513/repository/"/>
+            name="2018-09">
           <repository
               url="http://download.eclipse.org/ease/update/nightly"/>
           <repository
               url="http://download.eclipse.org/nebula/releases/1.0.0"/>
-        </repositoryList>
-        <repositoryList
-            name="2018-09">
+          <repository
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository/"/>
           <repository
               url="http://download.eclipse.org/releases/2018-09/"/>
           <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
-          <repository
-              url="http://download.eclipse.org/ease/update/nightly"/>
-          <repository
-              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+              url="http://download.eclipse.org/technology/subversive/3.0/update-site/"/>
         </repositoryList>
       </targlet>
     </setupTask>
@@ -414,6 +356,57 @@
           <operand
               xsi:type="predicates:NamePredicate"
               pattern=".*modules.*"/>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*feature"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*test"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*releng.*"/>
+          </operand>
+        </predicate>
+      </workingSet>
+      <workingSet
+          name="EASE Testing">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*test"/>
+          </operand>
+          <operand
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease.modules.platform"/>
+        </predicate>
+      </workingSet>
+      <workingSet
+          name="Release Engineering">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*feature"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*releng.*"/>
+          </operand>
+          <operand
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease.modules.platform"/>
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
