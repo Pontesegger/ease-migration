@@ -8,4 +8,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.ease,
  org.eclipse.ease.lang.groovy,
  org.codehaus.groovy;bundle-version="2.4.6",
- org.eclipse.ease.classloader
+ org.eclipse.ease.classloader,
+ org.eclipse.debug.core

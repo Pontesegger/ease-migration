@@ -6,5 +6,6 @@ Bundle-Version: 0.7.0.qualifier
 Eclipse-BuddyPolicy: global
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.ease,
- org.eclipse.ease.lang.javascript
+ org.eclipse.ease.lang.javascript,
+ org.eclipse.debug.core
 Export-Package: org.eclipse.ease.lang.javascript.nashorn
