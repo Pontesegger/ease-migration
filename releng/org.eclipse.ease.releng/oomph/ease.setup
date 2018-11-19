@@ -129,6 +129,8 @@
           activeRepositoryList="2018-09">
         <requirement
             name="*"/>
+        <requirement
+            name="org.eclipse.platform.feature.group"/>
         <sourceLocator
             rootFolder="${ease.core.git.clone.location}">
           <excludedPath>developers</excludedPath>
