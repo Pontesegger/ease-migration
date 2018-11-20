@@ -406,8 +406,10 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		if (outputStream instanceof PrintStream)
 			fOutputStream = (PrintStream) outputStream;
 
-		else
+		else if (outputStream != null)
 			fOutputStream = new PrintStream(outputStream);
+		else
+			fOutputStream = null;
 	}
 
 	@Override
@@ -430,8 +432,10 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		if (errorStream instanceof PrintStream)
 			fErrorStream = (PrintStream) errorStream;
 
-		else
+		else if (errorStream != null)
 			fErrorStream = new PrintStream(errorStream);
+		else
+			fErrorStream = null;
 	}
 
 	/**
