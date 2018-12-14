@@ -507,20 +507,22 @@ public class UnitTestModule extends AbstractScriptModule {
 	 *            report title
 	 * @param description
 	 *            report description (ignored by some reports)
+	 * @param reportData
+	 *            additional report data. Specific to report type
 	 * @throws CoreException
 	 *             when we could not write to a workspace file
 	 * @throws IOException
 	 *             when we could not write to the file system
 	 */
 	@WrapToScript
-	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation, final String title, final String description)
-			throws IOException, CoreException {
+	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation, final String title, final String description,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object reportData) throws IOException, CoreException {
 
 		final IReportGenerator report = ReportTools.getReport(reportType);
 		if (report != null) {
-			final String reportData = report.createReport(title, description, suite);
+			final String reportOutput = report.createReport(title, description, suite, reportData);
 
-			saveDataToFile(reportData.getBytes(), fileLocation);
+			saveDataToFile(reportOutput.getBytes(), fileLocation);
 
 		} else
 			throw new IOException("Report does not contain any data");

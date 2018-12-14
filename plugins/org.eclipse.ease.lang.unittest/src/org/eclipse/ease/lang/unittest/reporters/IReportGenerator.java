@@ -30,6 +30,23 @@ public interface IReportGenerator {
 	String createReport(final String title, final String description, final ITestEntity testEntity);
 
 	/**
+	 * Creates report data as string.
+	 *
+	 * @param title
+	 *            report title
+	 * @param description
+	 *            generic description
+	 * @param testEntity
+	 *            test element to be exported
+	 * @param reportData
+	 *            additional report data. Specific to report type. Could be <code>null</code>
+	 * @return String containing full test report
+	 */
+	default String createReport(final String title, final String description, final ITestEntity testEntity, Object reportData) {
+		return createReport(title, description, testEntity);
+	}
+
+	/**
 	 * Returns the default file extension to be used for this kind of report without the preceding dot (eg "txt").
 	 *
 	 * @return file extension to be used
