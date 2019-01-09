@@ -11,7 +11,9 @@
 package org.eclipse.ease.modules.svn;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -21,10 +23,10 @@ import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.modules.platform.UIModule;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.team.svn.core.connector.SVNDepth;
 import org.eclipse.team.svn.core.operation.CompositeOperation;
 import org.eclipse.team.svn.core.operation.IActionOperation;
+import org.eclipse.team.svn.core.operation.remote.CheckoutOperation;
 import org.eclipse.team.svn.core.operation.remote.LocateProjectsOperation;
 import org.eclipse.team.svn.core.operation.remote.management.AddRepositoryLocationOperation;
 import org.eclipse.team.svn.core.operation.remote.management.SaveRepositoryLocationsOperation;
@@ -124,11 +126,21 @@ public class SVNModule extends AbstractScriptModule {
 			checkoutResources = locateProjectsOp.getRepositoryResources();
 		}
 
-		final Shell shell = UIModule.isHeadless() ? null : Display.getDefault().getActiveShell();
-		final IActionOperation op = ExtensionsManager.getInstance().getCurrentCheckoutFactory().getCheckoutOperation(shell, checkoutResources, null, true, null,
-				SVNDepth.INFINITY, false);
+		if (UIModule.isHeadless()) {
+			final Map<String, IRepositoryResource> operateMap = new HashMap<>();
+			for (final IRepositoryResource resource : checkoutResources)
+				operateMap.put(resource.getName(), resource);
 
-		executeOperation(op);
+			final IActionOperation operation = new CheckoutOperation(operateMap, true, null, SVNDepth.INFINITY, false);
+			executeOperation(operation);
+
+		} else {
+			Display.getDefault().syncExec(() -> {
+				final IActionOperation operation = ExtensionsManager.getInstance().getCurrentCheckoutFactory()
+						.getCheckoutOperation(Display.getDefault().getActiveShell(), checkoutResources, null, true, null, SVNDepth.INFINITY, false);
+				UIMonitorUtility.doTaskNowDefault(operation, false);
+			});
+		}
 	}
 
 	/**
