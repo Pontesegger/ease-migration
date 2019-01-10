@@ -666,8 +666,8 @@ public final class ResourceTools {
 	}
 
 	/**
-	 * Creates a folder in the workspace if it does not exists already. Also creates any parent folder needed. Requires the project the folder resides to to
-	 * exist already.
+	 * Creates a folder in the workspace if it does not exists already. Also creates any parent folder needed. If the project is also missing it will not be
+	 * created.
 	 *
 	 * @param folder
 	 *            folder to be created

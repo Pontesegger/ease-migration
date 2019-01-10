@@ -566,8 +566,10 @@ public class UnitTestModule extends AbstractScriptModule {
 		if (file instanceof IFile) {
 			if (((IFile) file).exists())
 				((IFile) file).setContents(new ByteArrayInputStream(data), IResource.FORCE | IResource.KEEP_HISTORY, null);
-			else
+			else {
+				ResourceTools.createFolder(((IFile) file).getParent());
 				((IFile) file).create(new ByteArrayInputStream(data), true, null);
+			}
 
 		} else if (file instanceof File) {
 			final FileOutputStream outputStream = new FileOutputStream((File) file);
