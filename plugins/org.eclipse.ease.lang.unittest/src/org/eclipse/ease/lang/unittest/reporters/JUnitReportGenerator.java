@@ -77,7 +77,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 		suiteNode.putInteger("failures", countTests(testEntity, test -> test.getResults(TestStatus.FAILURE).size()));
 		suiteNode.putInteger("errors", countTests(testEntity, test -> test.getResults(TestStatus.ERROR).size()));
 		suiteNode.putInteger("disabled", countTests(testEntity, test -> (TestStatus.DISABLED.equals(test.getStatus())) ? 1 : 0));
-		suiteNode.putInteger("time", (int) (testEntity.getDuration() / 1000));
+		suiteNode.putFloat("time", (float) (testEntity.getDuration() / 1000.0));
 		suiteNode.putString("timestamp", timeFormat.format(testEntity.getStartTimestamp()));
 		suiteNode.putInteger("id", 0);
 
@@ -114,7 +114,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 			final IMemento testcaseNode = suiteNode.createChild("testcase");
 			testcaseNode.putString("name", escape(testEntity.getName()));
 			testcaseNode.putString("classname", escape(getClassName(testEntity)));
-			testcaseNode.putInteger("time", (int) (testEntity.getDuration() / 1000));
+			testcaseNode.putFloat("time", (float) (testEntity.getDuration() / 1000.0));
 			if (TestStatus.DISABLED.equals(testEntity.getStatus())) {
 				final IMemento skippedNode = testcaseNode.createChild("skipped");
 				skippedNode.putString("message", escape(testEntity.getResults(TestStatus.DISABLED).get(0).getMessage()));
