@@ -351,15 +351,19 @@ public class UnitTestModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Ignore the current test.
+	 * Ignore the current test, the current testfile or test suite. What is ignored depends on the scope this command is executed in.
 	 *
 	 * @param reason
 	 *            message why the test got ignored.
 	 */
-	@WrapToScript
-	public void ignoreTest(@ScriptParameter(defaultValue = "") String reason) {
+	@WrapToScript(alias = "ignoreTest")
+	public void ignore(@ScriptParameter(defaultValue = "") String reason) {
 		if (fCurrentTest != null)
-			addResult(TestStatus.DISABLED, reason, null);
+			addResult(getTest(), TestStatus.DISABLED, reason, null);
+		else if (getTestFile() != null)
+			addResult(getTestFile(), TestStatus.DISABLED, reason, null);
+		else if (getTestSuite() != null)
+			addResult(getTestSuite(), TestStatus.DISABLED, reason, null);
 	}
 
 	/**
@@ -386,10 +390,10 @@ public class UnitTestModule extends AbstractScriptModule {
 		if ((definition != null) && (definition.getFlag(Flag.PROMOTE_FAILURE_TO_ERROR, false)))
 			error(message, stackTrace);
 		else
-			addResult(TestStatus.FAILURE, message, stackTrace);
+			addResult(getTest(), TestStatus.FAILURE, message, stackTrace);
 	}
 
-	private void addResult(TestStatus status, String message, ScriptStackTrace stackTrace) {
+	private void addResult(ITestEntity owner, TestStatus status, String message, ScriptStackTrace stackTrace) {
 		final ITestResult result = IRuntimeFactory.eINSTANCE.createTestResult();
 		result.setStatus(status);
 		result.setMessage(message);
@@ -400,7 +404,7 @@ public class UnitTestModule extends AbstractScriptModule {
 		else if (getScriptEngine() instanceof IDebugEngine)
 			result.setStackTrace(((IDebugEngine) getScriptEngine()).getStackTrace());
 
-		getTest().getResults().add(result);
+		owner.getResults().add(result);
 	}
 
 	/**
@@ -446,7 +450,7 @@ public class UnitTestModule extends AbstractScriptModule {
 	 *            stacktrace of error event
 	 */
 	public void error(String message, ScriptStackTrace stackTrace) {
-		addResult(TestStatus.ERROR, message, stackTrace);
+		addResult(getTest(), TestStatus.ERROR, message, stackTrace);
 	}
 
 	/**
