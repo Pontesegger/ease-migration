@@ -102,10 +102,8 @@ public class RunHeadlessScript implements IApplication {
 								scriptObject = "include(\"" + parameters.get("script") + "\")";
 
 							final ScriptResult scriptResult = engine.executeSync(scriptObject);
-							if (scriptResult.hasException()) {
-								scriptResult.getException().printStackTrace(System.err);
+							if (scriptResult.hasException())
 								return -1;
-							}
 
 							final Object result = scriptResult.getResult();
 
