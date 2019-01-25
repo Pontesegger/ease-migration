@@ -44,16 +44,11 @@ public class Pep302ModuleImporter implements IScriptEngineLaunchExtension {
 		if (candidate.startsWith("eclipse.")) {
 			// remove eclipse prefix
 			candidate = candidate.substring("eclipse".length());
-
-			final String candidateA = candidate.replace('.', '/');
-			final String candidateB = candidateA.replace('_', ' ');
+			candidate = candidate.replace('.', '/').replaceAll("[^A-Za-z0-9/]", "_");
 
 			final IScriptService scriptService = ScriptService.getService();
 			for (final ModuleCategoryDefinition category : scriptService.getAvailableModuleCategories().values()) {
-				if (category.getFullName().toLowerCase().equals(candidateA))
-					return true;
-
-				if (category.getFullName().toLowerCase().equals(candidateB))
+				if (category.getFullName().toLowerCase().replaceAll("[^A-Za-z0-9/]", "_").equals(candidate))
 					return true;
 			}
 		}
@@ -72,16 +67,11 @@ public class Pep302ModuleImporter implements IScriptEngineLaunchExtension {
 		if (candidate.startsWith("eclipse"))
 			candidate = candidate.substring("eclipse".length());
 
-		final String candidateA = candidate.replace('.', '/');
-		final String candidateB = candidateA.replace('_', ' ');
+		candidate = candidate.replace('.', '/').replaceAll("[^A-Za-z0-9/]", "_");
 
 		final IScriptService scriptService = ScriptService.getService();
-
 		for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
-			if (definition.getPath().toString().toLowerCase().equals(candidateA))
-				return definition;
-
-			if (definition.getPath().toString().toLowerCase().equals(candidateB))
+			if (definition.getPath().toString().toLowerCase().replaceAll("[^A-Za-z0-9/]", "_").equals(candidate))
 				return definition;
 		}
 
