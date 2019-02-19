@@ -5,8 +5,7 @@ import os
 import re
 from unittest.signals import registerResult
 
-MOD_org_eclipse_ease_lang_unittest_UnitTestModule = loadModule("/Unittest")
-
+import eclipse.unittest as easeunit
 
 class EASETestResult(unittest.result.TestResult):
     def __init__(self, stream, descriptions, verbosity):
@@ -15,16 +14,13 @@ class EASETestResult(unittest.result.TestResult):
         self.showAll = verbosity > 1
         self.dots = verbosity == 1
         self.descriptions = descriptions
-       
-    def getUnitTestModule(self):
-        return MOD_org_eclipse_ease_lang_unittest_UnitTestModule
-       
+              
     def startTest(self, test):
         super(EASETestResult, self).startTest(test)
-        self.getUnitTestModule().startTest(test._testMethodName, test.shortDescription())
+        easeunit.startTest(test._testMethodName, test.shortDescription())
        
     def stopTest(self, test):
-        self.getUnitTestModule().endTest()
+        easeunit.endTest()
  
     def addError(self, test, err):
         try:
@@ -56,7 +52,7 @@ class EASETestResult(unittest.result.TestResult):
             print("could not set stacktrace")
             pass
        
-        self.getUnitTestModule().getTest().getResults().add(result);       
+        easeunit.getTest().getResults().add(result);       
     
     def addSkip(self, test, reason):
         super(EASETestResult, self).addSkip(test, reason)
