@@ -65,4 +65,10 @@ public class DefaultAssertion implements IAssertion {
 
 		return (fErrorMessage != null) ? fErrorMessage : IAssertion.INVALID.toString();
 	}
+
+	@Override
+	public void throwOnError() throws AssertionException {
+		if (!isValid())
+			throw new AssertionException(toString());
+	}
 }

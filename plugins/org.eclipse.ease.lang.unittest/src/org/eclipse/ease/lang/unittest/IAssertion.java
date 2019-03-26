@@ -28,6 +28,11 @@ public interface IAssertion {
 		public String toString() {
 			return "OK";
 		}
+
+		@Override
+		public void throwOnError() throws AssertionException {
+			// do nothing
+		}
 	};
 
 	/**
@@ -44,6 +49,11 @@ public interface IAssertion {
 		public String toString() {
 			return "Assertion failed";
 		}
+
+		@Override
+		public void throwOnError() throws AssertionException {
+			throw new AssertionException(toString());
+		}
 	};
 
 	/**
@@ -52,4 +62,12 @@ public interface IAssertion {
 	 * @return <code>true</code> on valid assertion
 	 */
 	boolean isValid();
+
+	/**
+	 * Throw exception in case {@link #isValid()} is <code>false</code>.
+	 *
+	 * @throws AssertionException
+	 *             when {@link #isValid()} is <code>false</code>
+	 */
+	void throwOnError() throws AssertionException;
 }
