@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.ease.service.EngineDescription;
@@ -239,4 +240,11 @@ public interface IScriptEngine {
 	 * @return launch or <code>null</code> in case this engine was created without launch configuration
 	 */
 	ILaunch getLaunch();
+
+	/**
+	 * Get the monitor of the current running engine. The monitor is only valid while the script engine is running.
+	 *
+	 * @return current monitor or <code>null</code>
+	 */
+	IProgressMonitor getMonitor();
 }

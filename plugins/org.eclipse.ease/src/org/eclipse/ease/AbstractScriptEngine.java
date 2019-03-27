@@ -117,6 +117,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	/** Launch associated with this engine. */
 	private ILaunch fLaunch = null;
 
+	private IProgressMonitor fMonitor;
+
 	/**
 	 * Constructor. Sets the name for the underlying job.
 	 *
@@ -272,6 +274,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	@Override
 	protected IStatus run(final IProgressMonitor monitor) {
+		fMonitor = monitor;
+
 		Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine started: " + getName());
 		IStatus returnStatus = Status.OK_STATUS;
 
@@ -363,7 +367,14 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		}
 
 		monitor.done();
+		fMonitor = null;
+
 		return returnStatus;
+	}
+
+	@Override
+	public IProgressMonitor getMonitor() {
+		return fMonitor;
 	}
 
 	private void closeStreams() {
