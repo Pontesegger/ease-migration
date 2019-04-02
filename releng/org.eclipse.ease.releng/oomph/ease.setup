@@ -6,11 +6,12 @@
     xmlns:git="http://www.eclipse.org/oomph/setup/git/1.0"
     xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
+    xmlns:projects="http://www.eclipse.org/oomph/setup/projects/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="ease"
     label="EASE">
   <setupTask
@@ -107,7 +108,7 @@
         </detail>
         <detail
             key="label">
-          <value>${scope.project.label} Git repository</value>
+          <value>${scope.project.label} Gerrit Repository</value>
         </detail>
         <detail
             key="target">
@@ -121,6 +122,33 @@
             value="true"/>
       </configSections>
       <description>${scope.project.label}</description>
+    </setupTask>
+    <setupTask
+        xsi:type="git:GitCloneTask"
+        id="ease.web.git.clone"
+        remoteURI="www.eclipse.org/ease">
+      <annotation
+          source="http://www.eclipse.org/oomph/setup/InducedChoices">
+        <detail
+            key="inherit">
+          <value>eclipse.gerrit.remoteURIs</value>
+        </detail>
+        <detail
+            key="label">
+          <value>${scope.project.label} Webpage</value>
+        </detail>
+        <detail
+            key="target">
+          <value>remoteURI</value>
+        </detail>
+      </annotation>
+      <configSections
+          name="gerrit">
+        <properties
+            key="createchangeid"
+            value="true"/>
+      </configSections>
+      <description>${scope.project.label} Webpage</description>
     </setupTask>
     <setupTask
         xsi:type="setup.targlets:TargletTask">
@@ -149,6 +177,17 @@
           <repository
               url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
         </repositoryList>
+        <repositoryList
+            name="2019-03">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository"/>
+          <repository
+              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+          <repository
+              url="http://download.eclipse.org/releases/2019-03"/>
+          <repository
+              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -170,7 +209,7 @@
                 pattern="org.eclipse.ease.help"/>
             <operand
                 xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.ease.test"/>
+                pattern="org.eclipse.ease.classloader"/>
           </operand>
           <operand
               xsi:type="predicates:NotPredicate">
@@ -228,31 +267,43 @@
             <operand
                 xsi:type="predicates:NamePredicate"
                 pattern=".*\.test"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern=".*\.testhelper"/>
           </operand>
         </predicate>
       </workingSet>
       <workingSet
           name="Release Engineering">
         <predicate
-            xsi:type="predicates:AndPredicate">
+            xsi:type="predicates:OrPredicate">
           <operand
-              xsi:type="predicates:RepositoryPredicate"
-              project="org.eclipse.ease"/>
-          <operand
-              xsi:type="predicates:OrPredicate">
+              xsi:type="predicates:AndPredicate">
             <operand
-                xsi:type="predicates:NamePredicate"
-                pattern=".*feature"/>
+                xsi:type="predicates:RepositoryPredicate"
+                project="org.eclipse.ease"/>
             <operand
-                xsi:type="predicates:NamePredicate"
-                pattern=".*releng.*"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.ease.helpgenerator"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="EASE UI Design"/>
+                xsi:type="predicates:OrPredicate">
+              <operand
+                  xsi:type="predicates:NamePredicate"
+                  pattern=".*feature"/>
+              <operand
+                  xsi:type="predicates:NamePredicate"
+                  pattern=".*releng.*"/>
+              <operand
+                  xsi:type="predicates:NamePredicate"
+                  pattern="org.eclipse.ease.helpgenerator"/>
+              <operand
+                  xsi:type="predicates:NamePredicate"
+                  pattern="EASE UI Design"/>
+              <operand
+                  xsi:type="predicates:NamePredicate"
+                  pattern="EASE Developer Documentation"/>
+            </operand>
           </operand>
+          <operand
+              xsi:type="predicates:NamePredicate"
+              pattern="org.eclipse.ease.releng.website"/>
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
@@ -270,6 +321,32 @@
         option="-Doomph.redirection.ease"
         value="=https://git.eclipse.org/c/ease/org.eclipse.ease.core.git/plain/releng/org.eclipse.ease.releng/oomph/ease.setup->${ease.core.git.clone.location|uri}/releng/org.eclipse.ease.releng/oomph/ease.setup"
         vm="true"/>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="eclipse.target.platform"
+        defaultValue="2019-03"
+        storageURI="scope://Workspace">
+      <description>Default target platform for EASE development.</description>
+    </setupTask>
+    <setupTask
+        xsi:type="projects:ProjectsImportTask">
+      <sourceLocator
+          rootFolder="${ease.core.git.clone.location}"
+          locateNestedProjects="true">
+        <predicate
+            xsi:type="predicates:NotPredicate">
+          <operand
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.integration.modeling.*examples"/>
+          </operand>
+        </predicate>
+      </sourceLocator>
+      <sourceLocator
+          rootFolder="${ease.web.git.clone.location}"
+          locateNestedProjects="true"/>
+    </setupTask>
     <stream
         name="master"
         label="Master"/>
@@ -393,6 +470,13 @@
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="eclipse.target.platform"
+        defaultValue="2019-03"
+        storageURI="scope://Workspace">
+      <description>Default target platform for EASE development.</description>
     </setupTask>
     <stream
         name="master"
