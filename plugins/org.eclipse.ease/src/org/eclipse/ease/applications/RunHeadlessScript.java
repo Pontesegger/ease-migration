@@ -13,6 +13,8 @@ package org.eclipse.ease.applications;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ease.Activator;
 import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.Logger;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
@@ -36,6 +40,9 @@ import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.ui.IStartup;
 
 public class RunHeadlessScript implements IApplication {
+
+	/** List of classes that should not be loaded on early startup. */
+	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList();
 
 	@Override
 	public Object start(final IApplicationContext context) throws Exception {
@@ -158,17 +165,20 @@ public class RunHeadlessScript implements IApplication {
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.startup");
 		for (final IConfigurationElement e : config) {
 			if (e.getName().equals("startup")) {
-				try {
-					final Object earlyStartupParticipant = e.createExecutableExtension("class");
-					if (earlyStartupParticipant instanceof IStartup) {
-						try {
-							((IStartup) earlyStartupParticipant).earlyStartup();
-						} catch (final Throwable e1) {
-							System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
+				if (!EARLY_STARTUP_BLACKLIST.contains(e.getAttribute("class"))) {
+					try {
+						Logger.info(Activator.PLUGIN_ID, "Loading early startup extension: " + e.getAttribute("class"));
+						final Object earlyStartupParticipant = e.createExecutableExtension("class");
+						if (earlyStartupParticipant instanceof IStartup) {
+							try {
+								((IStartup) earlyStartupParticipant).earlyStartup();
+							} catch (final Throwable e1) {
+								System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
+							}
 						}
+					} catch (final CoreException e1) {
+						System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
 					}
-				} catch (final CoreException e1) {
-					System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
 				}
 			}
 		}
