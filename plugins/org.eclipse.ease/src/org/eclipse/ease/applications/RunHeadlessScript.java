@@ -42,7 +42,8 @@ import org.eclipse.ui.IStartup;
 public class RunHeadlessScript implements IApplication {
 
 	/** List of classes that should not be loaded on early startup. */
-	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList();
+	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList("org.eclipse.team.svn.ui.startup.SVNCoreStartup",
+			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter");
 
 	@Override
 	public Object start(final IApplicationContext context) throws Exception {
