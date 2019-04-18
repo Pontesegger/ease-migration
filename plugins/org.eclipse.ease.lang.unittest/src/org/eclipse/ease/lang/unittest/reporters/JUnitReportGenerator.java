@@ -59,9 +59,9 @@ public final class JUnitReportGenerator implements IReportGenerator {
 	private static String getClassName(ITestEntity testEntity) {
 		if ((testEntity.getParent() != null) && (testEntity.getParent().getParent() != null))
 			// we do want to skip the first level as the root object is a virtual element used in the viewer only.
-			return getClassName(testEntity.getParent()) + "/" + testEntity.getName().replaceAll("\\s", "_");
+			return getClassName(testEntity.getParent()) + "." + testEntity.getName().replaceAll("\\s", "_").replaceAll("\\.", "_");
 
-		return testEntity.getName();
+		return testEntity.getName().replaceAll("\\s", "_").replaceAll("\\.", "_");
 	}
 
 	@Override
