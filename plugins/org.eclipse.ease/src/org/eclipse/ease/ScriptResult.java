@@ -102,7 +102,7 @@ public class ScriptResult {
 	 * @param result
 	 *            object to be stored
 	 */
-	final synchronized void setResult(final Object result) {
+	public final synchronized void setResult(final Object result) {
 		fResult = result;
 		fIsDone = true;
 		notifyAll();
@@ -114,7 +114,7 @@ public class ScriptResult {
 	 * @param e
 	 *            exception to be stored
 	 */
-	final synchronized void setException(final Throwable e) {
+	public final synchronized void setException(final Throwable e) {
 		fException = e;
 		fIsDone = true;
 		notifyAll();

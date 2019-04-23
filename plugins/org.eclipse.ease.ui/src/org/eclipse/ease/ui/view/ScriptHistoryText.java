@@ -248,8 +248,8 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 * @param result
 	 *            script execution result
 	 */
-	private void printResult(ScriptResult result) {
-		final String message = getResultMesage(result);
+	public void printResult(ScriptResult result) {
+		final String message = getResultMessage(result);
 		final Image image = getResultImage(result);
 
 		// // print to output pane
@@ -303,7 +303,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 *            script result
 	 * @return text string
 	 */
-	private String getResultMesage(ScriptResult result) {
+	private String getResultMessage(ScriptResult result) {
 		if (result.hasException()) {
 			final String message = result.getException().getLocalizedMessage();
 			return (message != null) ? message : result.getException().getClass().getName();

@@ -29,6 +29,7 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
@@ -463,8 +464,13 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		final IScriptEngine candidate = scriptService.getEngineByID(id).createEngine();
 		if (candidate instanceof IReplEngine)
 			fScriptEngine = (IReplEngine) candidate;
-		else
-			throw new RuntimeException("Invalid engine selected for shell");
+		else {
+			final ScriptResult invalidEngine = new ScriptResult();
+			invalidEngine.setException(new RuntimeException("Invalid engine selected for shell: " + id));
+			fOutputText.printResult(invalidEngine);
+		}
+
+		fInputCombo.setEnabled(fScriptEngine != null);
 
 		if (fScriptEngine != null) {
 			fScriptEngine.setTerminateOnIdle(false);
