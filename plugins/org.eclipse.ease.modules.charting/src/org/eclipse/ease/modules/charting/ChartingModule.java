@@ -28,6 +28,8 @@ import org.eclipse.nebula.visualization.xygraph.figures.Annotation.CursorLineSty
 import org.eclipse.nebula.visualization.xygraph.figures.Axis;
 import org.eclipse.nebula.visualization.xygraph.figures.Trace;
 import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 
@@ -65,6 +67,27 @@ public class ChartingModule extends AbstractScriptModule {
 		view.setViewName(secondaryId);
 		fChart = view.getChart();
 		fXYGraph = fChart.setPlotTitle(secondaryId);
+		return fChart;
+	}
+
+	/**
+	 * Create a new chart on a given parent composite.
+	 *
+	 * @param parent
+	 *            composite to create chart into
+	 * @param figureId
+	 *            name of the figure to be created
+	 * @return new chart instance
+	 */
+	@WrapToScript
+	public Chart createChart(Composite parent, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String figureId) {
+		final String secondaryId = (figureId == null) ? "Figure " + Integer.toString(fFigureIterator++) : figureId;
+
+		Display.getDefault().syncExec(() -> {
+			fChart = new Chart(parent, SWT.NONE);
+			fXYGraph = fChart.setPlotTitle(secondaryId);
+		});
+
 		return fChart;
 	}
 

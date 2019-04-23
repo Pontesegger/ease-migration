@@ -530,7 +530,7 @@ public class UIModule extends AbstractScriptModule {
 	 *            name of view
 	 * @return view ID or <code>null</code>
 	 */
-	private static String getIDForName(final String name) {
+	public static String getIDForName(final String name) {
 		String id = null;
 
 		final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();

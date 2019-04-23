@@ -30,6 +30,13 @@
             name="Build"
             visible="true">
       </module>
+      <module
+            category="org.eclipse.ease.category.system"
+            class="org.eclipse.ease.modules.platform.uibuilder.UIBuilderModule"
+            id="org.eclipse.ease.modules.platform.uibuilder"
+            name="UI Builder"
+            visible="true">
+      </module>
    </extension>
    <extension
          point="org.eclipse.ease.ui.shell">
