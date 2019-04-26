@@ -15,13 +15,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -904,5 +910,171 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 
 			fOpenHandles.clear();
 		}
+	}
+
+	/**
+	 * Create or update a zip file with given resources.
+	 *
+	 * @param sourceLocation
+	 *            source folder/file to zip
+	 * @param zipLocation
+	 *            zip file to use
+	 * @return zip file reference
+	 * @throws IOException
+	 *             when zip file cannot be created
+	 */
+	@WrapToScript
+	public Object zip(Object sourceLocation, Object zipLocation) throws IOException {
+		// resolve source
+		Object sourceFile = ResourceTools.resolve(sourceLocation, getScriptEngine().getExecutedFile());
+		if (sourceFile instanceof IResource)
+			sourceFile = ((IResource) sourceFile).getLocation().toFile();
+
+		if (!(sourceFile instanceof File))
+			throw new IOException("Cannot resolve source: " + sourceLocation);
+
+		final java.nio.file.Path sourceFilePath = ((File) sourceFile).toPath();
+
+		// resolve target
+		Object zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
+		if (zipFile instanceof IFile)
+			zipFile = ((IFile) zipFile).getLocation().toFile();
+
+		if (!(zipFile instanceof File))
+			throw new IOException("Cannot resolve target: " + zipLocation);
+
+		final java.nio.file.Path zipFilePath = ((File) zipFile).toPath();
+
+		// create zip file
+		final URI uri = URI.create("jar:file:" + zipFilePath.toUri().getPath());
+		final Map<String, String> env = new HashMap<>();
+		env.put("create", ((File) zipFile).exists() ? Boolean.FALSE.toString() : Boolean.TRUE.toString());
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(uri, env)) {
+
+			final java.nio.file.Path root = fileSystem.getPath("/");
+
+			if (Files.isDirectory(((File) sourceFile).toPath())) {
+				// source is a directory
+				Files.walkFileTree(((File) sourceFile).toPath(), new SimpleFileVisitor<java.nio.file.Path>() {
+					@Override
+					public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+						final java.nio.file.Path relativePath = sourceFilePath.relativize(file);
+						final java.nio.file.Path zipEntry = fileSystem.getPath(root.toString(), relativePath.toString());
+						Files.copy(file, zipEntry, StandardCopyOption.REPLACE_EXISTING);
+						return FileVisitResult.CONTINUE;
+					}
+
+					@Override
+					public FileVisitResult preVisitDirectory(java.nio.file.Path dir, BasicFileAttributes attrs) throws IOException {
+						final java.nio.file.Path relativePath = sourceFilePath.relativize(dir);
+						final java.nio.file.Path zipDirectory = fileSystem.getPath(root.toString(), relativePath.toString());
+
+						if (Files.notExists(zipDirectory))
+							Files.createDirectories(zipDirectory);
+
+						return FileVisitResult.CONTINUE;
+					}
+				});
+
+			} else {
+				// source is a simple file
+				if (Files.notExists(root))
+					Files.createDirectories(root);
+
+				final java.nio.file.Path destinationPath = fileSystem.getPath(root.toString(), sourceFilePath.getFileName().toString());
+				Files.copy(sourceFilePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+		}
+
+		// refresh workspace
+		zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
+		if (zipFile instanceof IFile) {
+			try {
+				((IFile) zipFile).getParent().refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+			} catch (final CoreException e) {
+				// ignore any refresh problems
+			}
+		}
+
+		return zipFile;
+	}
+
+	/**
+	 * Unzip a zip file to the provided target location.
+	 *
+	 * @param zipLocation
+	 *            zip file to unzip
+	 * @param targetLocation
+	 *            folder to unzip to
+	 * @return target location reference
+	 * @throws IOException
+	 *             when zip file cannot be unzipped
+	 */
+	@WrapToScript
+	public Object unzip(Object zipLocation, Object targetLocation) throws IOException {
+		// resolve zip
+		Object zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
+		if (zipFile instanceof IResource)
+			zipFile = ((IResource) zipFile).getLocation().toFile();
+
+		if (!(zipFile instanceof File))
+			throw new IOException("Cannot resolve source: " + zipLocation);
+
+		final java.nio.file.Path zipFilePath = ((File) zipFile).toPath();
+
+		// resolve target directory
+		Object targetDirectory = ResourceTools.resolve(targetLocation, getScriptEngine().getExecutedFile());
+		if (targetDirectory instanceof IResource)
+			targetDirectory = ((IResource) targetDirectory).getLocation().toFile();
+
+		if (!(targetDirectory instanceof File))
+			throw new IOException("Cannot resolve target: " + targetLocation);
+
+		if (!((File) targetDirectory).exists())
+			Files.createDirectories(((File) targetDirectory).toPath());
+
+		final java.nio.file.Path targetDirectoryPath = ((File) targetDirectory).toPath();
+
+		// create zip file
+		final URI uri = URI.create("jar:file:" + zipFilePath.toUri().getPath());
+		final Map<String, String> env = new HashMap<>();
+		env.put("create", Boolean.FALSE.toString());
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(uri, env)) {
+
+			final java.nio.file.Path root = fileSystem.getPath("/");
+
+			// walk the zip file tree and copy files to the destination
+			Files.walkFileTree(root, new SimpleFileVisitor<java.nio.file.Path>() {
+				@Override
+				public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
+					final java.nio.file.Path targetFile = java.nio.file.Paths.get(targetDirectoryPath.toString(), file.toString());
+					Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult preVisitDirectory(java.nio.file.Path dir, BasicFileAttributes attrs) throws IOException {
+					final java.nio.file.Path targetDirectory = java.nio.file.Paths.get(targetDirectoryPath.toString(), dir.toString());
+					if (Files.notExists(targetDirectory))
+						Files.createDirectory(targetDirectory);
+
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		}
+
+		// refresh workspace
+		targetDirectory = ResourceTools.resolve(targetLocation, getScriptEngine().getExecutedFile());
+		if (targetDirectory instanceof IContainer) {
+			try {
+				((IContainer) targetDirectory).getParent().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			} catch (final CoreException e) {
+				// ignore any refresh problems
+			}
+		}
+
+		return targetDirectory;
 	}
 }
