@@ -26,8 +26,13 @@ public class Location {
 	private final Point fPosition = new Point(DYNAMIC_POSITION, DYNAMIC_POSITION);
 	private final GridData fGridData = new GridData();
 
+	public Location(Point position) {
+		fPosition.x = position.x;
+		fPosition.y = position.y;
+	}
+
 	public Location() {
-		this(null);
+		this((String) null);
 	}
 
 	public Location(String layout) {

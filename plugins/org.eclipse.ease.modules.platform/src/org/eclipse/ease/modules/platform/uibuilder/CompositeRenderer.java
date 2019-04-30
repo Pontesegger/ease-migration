@@ -81,8 +81,6 @@ public class CompositeRenderer implements IRenderer, PaintListener {
 			if (element instanceof LabelPlaceHolder)
 				((LabelPlaceHolder) element).setVisible(showGrid);
 		}
-
-		getParent().layout(true);
 	}
 
 	@Override

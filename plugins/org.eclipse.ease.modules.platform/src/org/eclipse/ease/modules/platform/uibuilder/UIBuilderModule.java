@@ -11,51 +11,78 @@
 
 package org.eclipse.ease.modules.platform.uibuilder;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.modules.platform.UIModule;
 import org.eclipse.ease.tools.RunnableWithResult;
+import org.eclipse.ease.ui.tools.LocationImageDescriptor;
+import org.eclipse.jface.layout.AbstractColumnLayout;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.BaseLabelProvider;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Create dynamic views by adding SWT controls via script commands to a dynamic {@link GridLayout}. Each element allow to provide layout data, which accepts a
+ * Create UI elements by adding SWT controls via script commands to a dynamic {@link GridLayout}. Each element allows to provide layout data, which accepts a
  * fairly simple syntax: &lt;coordinates&gt; &lt;horizontal align&gt; &lt;vertical align&gt;
  *
  * <dl>
- * <dd>coordinates</dd>
- * <dt>Provides X/Y coordinates for elements in the grid where 1/1 denotes the upper left corner. 2/1 would create the element in the second column of the first
+ * <dt>coordinates</dt>
+ * <dd>Provides X/Y coordinates for elements in the grid where 1/1 denotes the upper left corner. 2/1 would create the element in the second column of the first
  * row. Coordinates may also provide rowSpan/columnSpan information: 1-3/2-3 would create the element spanning columns 1 to 3 in rows 2 to 3.
- * {@module #showGrid(boolean)} adds visual indications to help in layouting.</dt>
+ * {@module #showGrid(boolean)} adds visual indications to help layouting.</dd>
  *
- * <dd>horizontal alignment</dd>
- * <dt>
+ * <dt>horizontal alignment</dt>
+ * <dd>
  * <ul>
  * <li>&lt; ... align left</li>
  * <li>x ... align center</li>
@@ -63,10 +90,10 @@ import org.eclipse.ui.PlatformUI;
  * <li>o ... fill</li>
  * <li>o! ... grab horizontal space (! may be added to any alignment)</li>
  * </ul>
- * </dt>
+ * </dd>
  *
- * <dd>vertical alignment</dd>
- * <dt>
+ * <dt>vertical alignment</dt>
+ * <dd>
  * <ul>
  * <li>^ ... align top</li>
  * <li>x ... align middle</li>
@@ -74,14 +101,32 @@ import org.eclipse.ui.PlatformUI;
  * <li>o ... fill</li>
  * <li>o! ... grab vertical space (! may be added to any alignment)</li>
  * </ul>
- * </dt> Most methods of this module deal with SWT components. To access them the code needs to be run in the UI thread. See {@link UIModule} for more
- * information.
+ * </dd>
  * </dl>
+ *
+ * <p>
+ * Most methods of this module deal with SWT components. To access them the code needs to be run in the UI thread. See
+ * {@module org.eclipse.ease.modules.platform.ui#executeUI(Object)} for more information.
+ * </p>
+ *
+ * <p>
+ * Whenever callback code is registered the executing engine is automatically set to be kept alive after script execution. This is required as a callback needs
+ * the engine to be executed. The
+ * </p>
  */
 public class UIBuilderModule extends AbstractScriptModule {
 
-	private ViewModel fViewModel;
-	private CompositeRenderer fRenderer;
+	private static int fCounter = 1;
+
+	/** Holds viewModel, renderer, and further elements for created composites. */
+	private final List<UICompositor> fUICompositors = new ArrayList<>();
+
+	/** Holds the current event during event callbacks. */
+	private volatile Object fUiEvent = null;
+
+	/** Holds the current element during label/content provider callbacks. */
+	private Object fProviderElement = null;
+
 	private ScriptableDialog fScriptableDialog;
 
 	/**
@@ -90,39 +135,48 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *
 	 * @param title
 	 *            view title
-	 * @param onTopOfView
-	 *            name/ID of an existing view to put this view on top of
+	 * @param iconUri
+	 *            URI of view icon to be used
+	 * @param relativeTo
+	 *            name/ID of an existing view to put this view relative to
+	 * @param position
+	 *            one of
+	 *            <ul>
+	 *            <li>x,o ... same stack</li>
+	 *            <li>v ... below target view</li>
+	 *            <li>^ ... above target view</li>
+	 *            <li>&lt; ... left of target view</li>
+	 *            <li>&gt; ... right of target view</li>
+	 *            </ul>
 	 * @return view instance
 	 * @throws Throwable
 	 *             when the view cannot be created
 	 */
 	@WrapToScript
-	public MPart createView(String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String onTopOfView) throws Throwable {
+	public MPart createView(String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String iconUri,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) String relativeTo, @ScriptParameter(defaultValue = "x") String position) throws Throwable {
 		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
 
 			@Override
 			public void runWithTry() throws Throwable {
 				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
-				final IWorkbench workbench = PlatformUI.getWorkbench().getService(IWorkbench.class);
-				final MApplication mApplication = workbench.getApplication();
-
-				final EModelService modelService = PlatformUI.getWorkbench().getService(EModelService.class);
 
 				// create part
 				final MPart part = MBasicFactory.INSTANCE.createPart();
 				part.setLabel(title);
-				part.setElementId("org.eclipse.ease.view.dynamic:1");
+				if (iconUri != null)
+					part.setIconURI(iconUri);
+
+				part.setElementId("org.eclipse.ease.view.dynamic:" + fCounter++);
 				part.setCloseable(true);
 				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
 
-				// find stack to put it into
-				final List<MPartStack> stacks = modelService.findElements(mApplication, null, MPartStack.class, null);
-				stacks.get(0).getChildren().add(part);
-				partService.showPart(part, PartState.ACTIVATE);
+				partService.showPart(part, PartState.VISIBLE);
 
 				setResult(part);
 
-				setComposite((Composite) part.getWidget());
+				fUICompositors.clear();
+				pushComposite((Composite) part.getWidget());
 
 				// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
 				PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
@@ -141,6 +195,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 		};
 
 		Display.getDefault().syncExec(runnable);
+
+		Display.getDefault().syncExec(() -> {
+			UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
+		});
 
 		return runnable.getResultFromTry();
 	}
@@ -169,7 +227,9 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 					@Override
 					public void run() {
-						UIBuilderModule.this.setComposite(getComposite());
+						fUICompositors.clear();
+						pushComposite(getComposite());
+
 						fScriptableDialog = getDialog();
 						getScriptEngine().inject(layoutCode);
 						fScriptableDialog = null;
@@ -185,22 +245,37 @@ public class UIBuilderModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Sets the active composite for further commands. The composite layout will be set to {@link GridLayout} if not already done.
+	 * Sets the active composite for further commands. The composite layout will be set to {@link GridLayout} if not already done. When creating multiple
+	 * composites you may return to a previous one using {@module #popComposite()}.
 	 *
 	 * @param composite
 	 *            composite to be used
 	 */
 	@WrapToScript
-	public void setComposite(Composite composite) {
-		if ((composite.getLayout() == null) || !(composite.getLayout() instanceof GridLayout)) {
-			final GridLayout gridLayout = new GridLayout();
-			gridLayout.numColumns = 1;
+	public void pushComposite(Composite composite) {
+		Display.getDefault().syncExec(() -> {
+			if ((composite.getLayout() == null) || !(composite.getLayout() instanceof GridLayout)) {
+				final GridLayout gridLayout = new GridLayout();
+				gridLayout.numColumns = 1;
 
-			composite.setLayout(gridLayout);
-		}
+				composite.setLayout(gridLayout);
+			}
+		});
 
-		fRenderer = new CompositeRenderer(composite);
-		fViewModel = new ViewModel(fRenderer);
+		fUICompositors.add(0, new UICompositor(composite));
+	}
+
+	/**
+	 * Remove the current composite from the composite stack. For the topmost composite this method does nothing.
+	 *
+	 * @return current composite after the removal
+	 */
+	@WrapToScript
+	public Composite popComposite() {
+		if (fUICompositors.size() > 1)
+			fUICompositors.remove(0);
+
+		return getComposite();
 	}
 
 	/**
@@ -210,7 +285,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public Composite getComposite() {
-		return fRenderer.getParent();
+		return getUICompositor().getComposite();
 	}
 
 	/**
@@ -222,16 +297,16 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public void setColumnCount(int columns) {
 		Display.getDefault().syncExec(() -> {
-			fViewModel.setColumnCount(columns);
-			fRenderer.update();
+			getUICompositor().fViewModel.setColumnCount(columns);
+			getUICompositor().update();
 		});
 	}
 
 	/**
 	 * Create a label.
 	 *
-	 * @param label
-	 *            label text
+	 * @param labelOrImage
+	 *            label text or image to be used
 	 * @param layout
 	 *            layout data (see module documentation)
 	 * @return label instance
@@ -239,17 +314,42 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public Label createLabel(String label, @ScriptParameter(defaultValue = "<") String layout) throws Throwable {
+	public Label createLabel(Object labelOrImage, @ScriptParameter(defaultValue = "<") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Label>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Label swtLabel = new Label(fRenderer.getParent(), SWT.NONE);
-				swtLabel.setText(label);
+				final Label swtLabel = new Label(getUICompositor().getComposite(), SWT.NONE);
+				if (labelOrImage instanceof Image)
+					swtLabel.setImage((Image) labelOrImage);
+				else
+					swtLabel.setText(labelOrImage.toString());
 
-				fViewModel.insertElement(swtLabel, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(swtLabel, new Location(layout));
 
 				setResult(swtLabel);
+			}
+		});
+	}
+
+	/**
+	 * Create a new composite. Further create commands will target this composite. To revert back to the parent use {@module #popComposite()}.
+	 *
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return composite instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public Composite createComposite(@ScriptParameter(defaultValue = "o o") String layout) throws Throwable {
+		return runInUIThread(new RunnableWithResult<Composite>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
+
+				getUICompositor().insertElement(composite, new Location(layout));
+
+				setResult(composite);
 			}
 		});
 	}
@@ -271,12 +371,71 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return runInUIThread(new RunnableWithResult<Label>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Label swtLabel = new Label(fRenderer.getParent(), SWT.SEPARATOR | (horizontal ? SWT.HORIZONTAL : SWT.VERTICAL));
+				final Label swtLabel = new Label(getUICompositor().getComposite(), SWT.SEPARATOR | (horizontal ? SWT.HORIZONTAL : SWT.VERTICAL));
 
-				fViewModel.insertElement(swtLabel, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(swtLabel, new Location(layout));
 
 				setResult(swtLabel);
+			}
+		});
+	}
+
+	/**
+	 * Create a progress bar.
+	 *
+	 * @param value
+	 *            start value of the progress bar
+	 * @param maximum
+	 *            maximum value of the progress bar
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return progress bar instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public ProgressBar createProgressBar(@ScriptParameter(defaultValue = "0") int value, @ScriptParameter(defaultValue = "100") int maximum,
+			@ScriptParameter(defaultValue = "o") String layout) throws Throwable {
+		return runInUIThread(new RunnableWithResult<ProgressBar>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				final ProgressBar progressBar = new ProgressBar(getUICompositor().getComposite(), SWT.NONE);
+				progressBar.setMaximum(maximum);
+				progressBar.setSelection(value);
+
+				getUICompositor().insertElement(progressBar, new Location(layout));
+
+				setResult(progressBar);
+			}
+		});
+	}
+
+	/**
+	 * Create a group composite. Further create commands will target this composite. To revert back to the parent use {@module #popComposite()}.
+	 *
+	 * @param label
+	 *            group label
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return group instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public Group createGroup(@ScriptParameter(defaultValue = ScriptParameter.NULL) String label, @ScriptParameter(defaultValue = "o o") String layout)
+			throws Throwable {
+		return runInUIThread(new RunnableWithResult<Group>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				final Group group = new Group(getUICompositor().getComposite(), SWT.NONE);
+				if (label != null)
+					group.setText(label);
+
+				getUICompositor().insertElement(group, new Location(layout));
+
+				setResult(group);
+
+				pushComposite(group);
 			}
 		});
 	}
@@ -295,10 +454,9 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return runInUIThread(new RunnableWithResult<Text>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Text text = new Text(fRenderer.getParent(), SWT.BORDER);
+				final Text text = new Text(getUICompositor().getComposite(), SWT.BORDER);
 
-				fViewModel.insertElement(text, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(text, new Location(layout));
 
 				setResult(text);
 			}
@@ -319,10 +477,9 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return runInUIThread(new RunnableWithResult<Text>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Text text = new Text(fRenderer.getParent(), SWT.BORDER | SWT.MULTI | SWT.WRAP);
+				final Text text = new Text(getUICompositor().getComposite(), SWT.BORDER | SWT.MULTI | SWT.WRAP);
 
-				fViewModel.insertElement(text, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(text, new Location(layout));
 
 				setResult(text);
 			}
@@ -330,12 +487,318 @@ public class UIBuilderModule extends AbstractScriptModule {
 	}
 
 	/**
+	 * Create an image instance. Images will not directly be displayed. Instead they can be used when creating controls or views. When an image is created, its
+	 * lifecycle gets bound to the current composite. When the composite gets disposed also all images bound to that composite get disposed.
+	 *
+	 * @param location
+	 *            location to create image from
+	 * @return image instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public Image createImage(String location) throws Throwable {
+		return runInUIThread(new RunnableWithResult<Image>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				setResult(getUICompositor().getResourceManager().createImageWithDefault(LocationImageDescriptor.createFromLocation(location)));
+			}
+		});
+	}
+
+	/**
+	 * Get the current element for the label/content provider. Only valid while a provider callback is evaluated.
+	 *
+	 * @return the element for the current provider evaluation or <code>null</code>
+	 */
+	@WrapToScript
+	public Object getProviderElement() {
+		return fProviderElement;
+	}
+
+	/**
+	 * Create a label provider to be used for combos, lists or tables. While the callback is executed you may call {@module #getLabelProviderElement()} to get
+	 * the current element.
+	 *
+	 * @param textCallback
+	 *            script callback to return the text for the element
+	 * @param imageCallback
+	 *            script callback to return an {@link Image} or {@link ImageDescriptor} for the element
+	 * @return label provider instance
+	 */
+	@WrapToScript
+	public ColumnLabelProvider createLabelProvider(@ScriptParameter(defaultValue = ScriptParameter.NULL) Object textCallback,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object imageCallback) {
+		return new GenericLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if (textCallback != null) {
+					try {
+						fProviderElement = element;
+						final Object result = getScriptEngine().inject(textCallback);
+
+						if (result != null)
+							return result.toString();
+
+					} catch (final Throwable e) {
+						// silently swallow
+					} finally {
+						fProviderElement = null;
+					}
+				}
+
+				return super.getText(element);
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				if (imageCallback != null) {
+					try {
+						fProviderElement = element;
+						final Object result = getScriptEngine().inject(imageCallback);
+
+						if (result instanceof Image)
+							return (Image) result;
+
+						if (result instanceof ImageDescriptor)
+							return getUICompositor().getResourceManager().createImage((ImageDescriptor) result);
+
+					} catch (final Throwable e) {
+						// silently swallow
+					} finally {
+						fProviderElement = null;
+					}
+				}
+
+				return super.getImage(element);
+			}
+		};
+	}
+
+	/**
+	 * Create a table viewer. To enhance look and feel create columns using {@module #createViewerColumn(ColumnViewer, String, BaseLabelProvider, int)}.
+	 *
+	 * @param elements
+	 *            table elements to display
+	 * @param callback
+	 *            callback when selection changes. Use {module #getUiEvent()} to access the {@link SelectionChangedEvent}.
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return table viewer instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public TableViewer createTableViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
+			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
+		return runInUIThread(new RunnableWithResult<TableViewer>() {
+			@Override
+			public void runWithTry() throws Throwable {
+
+				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
+				final TableColumnLayout tcl_composite = new TableColumnLayout();
+				composite.setLayout(tcl_composite);
+
+				final TableViewer tableViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
+				tableViewer.getTable().setLinesVisible(true);
+				tableViewer.getTable().setHeaderVisible(false);
+
+				tableViewer.setContentProvider(ArrayContentProvider.getInstance());
+				tableViewer.setInput(elements);
+
+				if (callback != null) {
+					tableViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
+				}
+
+				getUICompositor().insertElement(composite, new Location(layout));
+
+				if (fScriptableDialog != null)
+					fScriptableDialog.registerViewer(tableViewer.getControl(), tableViewer);
+
+				setResult(tableViewer);
+			}
+		});
+	}
+
+	/**
+	 * Create a tree viewer. To enhance look and feel create columns using {@module #createViewerColumn(ColumnViewer, String, BaseLabelProvider, int)}.
+	 *
+	 * @param rootElements
+	 *            tree root elements to display
+	 * @param getChildrenCallback
+	 *            script callback to return element children. During the callback {@link #getProviderElement()} can be used to retrieve the current element.
+	 * @param callback
+	 *            callback when selection changes. Use {module #getUiEvent()} to access the {@link SelectionChangedEvent}.
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return tree viewer instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public TreeViewer createTreeViewer(Object[] rootElements, Object getChildrenCallback, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
+			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
+		return runInUIThread(new RunnableWithResult<TreeViewer>() {
+			@Override
+			public void runWithTry() throws Throwable {
+
+				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
+				final TreeColumnLayout tcl_composite = new TreeColumnLayout();
+				composite.setLayout(tcl_composite);
+
+				final TreeViewer treeViewer = new TreeViewer(composite, SWT.BORDER);
+				treeViewer.getTree().setLinesVisible(false);
+				treeViewer.getTree().setHeaderVisible(false);
+
+				treeViewer.setContentProvider(new ITreeContentProvider() {
+
+					@Override
+					public boolean hasChildren(Object element) {
+						final Object[] children = getChildren(element);
+						return (children != null) && (children.length > 0);
+					}
+
+					@Override
+					public Object getParent(Object element) {
+						return null;
+					}
+
+					@Override
+					public Object[] getElements(Object inputElement) {
+						return rootElements;
+					}
+
+					@Override
+					public Object[] getChildren(Object parentElement) {
+						if (getChildrenCallback != null) {
+							try {
+								fProviderElement = parentElement;
+								final Object result = getScriptEngine().inject(getChildrenCallback);
+
+								if (result instanceof Object[])
+									return (Object[]) result;
+
+								if (result instanceof Object)
+									return new Object[] { result };
+
+							} catch (final Exception e) {
+								// silently swallow
+							} finally {
+								fProviderElement = null;
+							}
+						}
+
+						return new Object[0];
+					}
+				});
+				treeViewer.setInput(rootElements);
+
+				if (callback != null) {
+					treeViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
+				}
+
+				getUICompositor().insertElement(composite, new Location(layout));
+
+				if (fScriptableDialog != null)
+					fScriptableDialog.registerViewer(treeViewer.getControl(), treeViewer);
+
+				setResult(treeViewer);
+			}
+		});
+	}
+
+	/**
+	 * Create a column for a table viewer. The viewer will automatically use a weighted layout for columns, distributing the horizontal space on all columns
+	 * depending on their weight.
+	 *
+	 * @param viewer
+	 *            viewer to create column for
+	 * @param title
+	 *            column title
+	 * @param labelProvider
+	 *            label provider for column
+	 * @param weight
+	 *            column weight
+	 * @return table viewer column
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public ViewerColumn createViewerColumn(ColumnViewer viewer, String title,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) BaseLabelProvider labelProvider, @ScriptParameter(defaultValue = "1") int weight)
+			throws Throwable {
+
+		return runInUIThread(new RunnableWithResult<ViewerColumn>() {
+			@Override
+			public void runWithTry() throws Throwable {
+
+				ViewerColumn column;
+				final AbstractColumnLayout tcl_composite = (AbstractColumnLayout) viewer.getControl().getParent().getLayout();
+				if (viewer instanceof TableViewer) {
+					column = new TableViewerColumn((TableViewer) viewer, SWT.NONE);
+					final TableColumn tblclmnNewColumn = ((TableViewerColumn) column).getColumn();
+
+					tcl_composite.setColumnData(tblclmnNewColumn, new ColumnWeightData(weight, ColumnWeightData.MINIMUM_WIDTH, true));
+					if (title != null) {
+						tblclmnNewColumn.setText(title);
+						((TableViewer) viewer).getTable().setHeaderVisible(true);
+					}
+
+				} else if (viewer instanceof TreeViewer) {
+					column = new TreeViewerColumn((TreeViewer) viewer, SWT.NONE);
+					final TreeColumn trclmnNewColumn = ((TreeViewerColumn) column).getColumn();
+
+					tcl_composite.setColumnData(trclmnNewColumn, new ColumnWeightData(weight, ColumnWeightData.MINIMUM_WIDTH, true));
+					if (title != null) {
+						trclmnNewColumn.setText(title);
+						((TreeViewer) viewer).getTree().setHeaderVisible(true);
+					}
+
+				} else
+					throw new IllegalArgumentException("viewer is neither a TableViewer nor a TreeViewer");
+
+				// add label provider
+				if (labelProvider instanceof CellLabelProvider)
+					column.setLabelProvider((CellLabelProvider) labelProvider);
+
+				else if (labelProvider instanceof LabelProvider) {
+					column.setLabelProvider(new GenericLabelProvider() {
+						@Override
+						public String getText(Object element) {
+							return ((LabelProvider) labelProvider).getText(element);
+						}
+
+						@Override
+						public Image getImage(Object element) {
+							return ((LabelProvider) labelProvider).getImage(element);
+						}
+					});
+
+				} else
+					column.setLabelProvider(new GenericLabelProvider());
+
+				// layout to recalculate column size
+				viewer.getControl().getParent().layout(true);
+				getUICompositor().update();
+
+				viewer.refresh(true);
+
+				setResult(column);
+			}
+		});
+	}
+
+	/**
 	 * Create a push button.
 	 *
-	 * @param label
-	 *            button text
+	 * @param labelOrImage
+	 *            button text or image to be used
 	 * @param callback
-	 *            callback code when button gets pressed
+	 *            callback code when button gets pressed. Use {module #getUiEvent()} to access the {@link SelectionEvent}.
 	 * @param layout
 	 *            layout data (see module documentation)
 	 * @return button instance
@@ -343,23 +806,27 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public Button createButton(String label, Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+	public Button createButton(Object labelOrImage, Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Button button = new Button(fRenderer.getParent(), SWT.NONE);
-				button.setText(label);
+				final Button button = new Button(getUICompositor().getComposite(), SWT.NONE);
+				if (labelOrImage instanceof Image)
+					button.setImage((Image) labelOrImage);
+				else
+					button.setText(labelOrImage.toString());
 
 				button.addSelectionListener(new SelectionAdapter() {
 
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						getScriptEngine().inject(callback);
+						runEventCallback(e, callback);
 					}
 				});
+				if (getScriptEngine() instanceof IReplEngine)
+					((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 
-				fViewModel.insertElement(button, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(button, new Location(layout));
 
 				setResult(button);
 			}
@@ -371,8 +838,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *
 	 * @param label
 	 *            checkbox text
+	 * @param selected
+	 *            initial state of the checkbox
 	 * @param callback
-	 *            callback code when the checkbox gets ticked/unticked
+	 *            callback code when the checkbox gets ticked/unticked. Use {module #getUiEvent()} to access the {@link SelectionEvent}.
 	 * @param layout
 	 *            layout data (see module documentation)
 	 * @return checkbox instance
@@ -380,26 +849,76 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public Button createCheckBox(String label, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+	public Button createCheckBox(String label, @ScriptParameter(defaultValue = "true") boolean selected,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout)
+			throws Throwable {
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final Button button = new Button(fRenderer.getParent(), SWT.CHECK);
+				final Button button = new Button(getUICompositor().getComposite(), SWT.CHECK);
 				button.setText(label);
+				button.setSelection(selected);
 
 				if (callback != null) {
 					button.addSelectionListener(new SelectionAdapter() {
 
 						@Override
 						public void widgetSelected(SelectionEvent e) {
-							getScriptEngine().inject(callback);
+							runEventCallback(e, callback);
 						}
 					});
+
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 				}
 
-				fViewModel.insertElement(button, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(button, new Location(layout));
+
+				setResult(button);
+			}
+		});
+	}
+
+	/**
+	 * Create a radio button.
+	 *
+	 * @param label
+	 *            radio text
+	 * @param selected
+	 *            initial state of the checkbox
+	 * @param callback
+	 *            callback code when the radio button gets ticked/unticked. Use {module #getUiEvent()} to access the {@link SelectionEvent}.
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return radio button instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public Button createRadioButton(String label, @ScriptParameter(defaultValue = "true") boolean selected,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout)
+			throws Throwable {
+		return runInUIThread(new RunnableWithResult<Button>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				final Button button = new Button(getUICompositor().getComposite(), SWT.RADIO);
+				button.setText(label);
+				button.setSelection(selected);
+
+				if (callback != null) {
+					button.addSelectionListener(new SelectionAdapter() {
+
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							runEventCallback(e, callback);
+						}
+					});
+
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
+				}
+
+				getUICompositor().insertElement(button, new Location(layout));
 
 				setResult(button);
 			}
@@ -412,7 +931,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 * @param elements
 	 *            combo elements to display.
 	 * @param callback
-	 *            callback code when selection changes
+	 *            callback code when selection changes. Use {module #getUiEvent()} to access the {@link SelectionChangedEvent}.
 	 * @param layout
 	 *            layout data (see module documentation)
 	 * @return combo viewer instance
@@ -420,24 +939,26 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public ComboViewer createCombo(String[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
+	public ComboViewer createComboViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ComboViewer>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final ComboViewer comboViewer = new ComboViewer(fRenderer.getParent());
-				comboViewer.setLabelProvider(new LabelProvider());
+				final ComboViewer comboViewer = new ComboViewer(getUICompositor().getComposite());
+				comboViewer.setLabelProvider(new GenericLabelProvider());
 				comboViewer.setContentProvider(ArrayContentProvider.getInstance());
 				comboViewer.setInput(elements);
 
 				comboViewer.setSelection(new StructuredSelection(elements[0]));
 
 				if (callback != null) {
-					comboViewer.addSelectionChangedListener(event -> getScriptEngine().inject(callback));
+					comboViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
+
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 				}
 
-				fViewModel.insertElement(comboViewer.getControl(), new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(comboViewer.getControl(), new Location(layout));
 
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(comboViewer.getControl(), comboViewer);
@@ -453,7 +974,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 * @param elements
 	 *            list elements to display
 	 * @param callback
-	 *            callback when selection changes
+	 *            callback when selection changes. Use {module #getUiEvent()} to access the {@link SelectionChangedEvent}.
 	 * @param layout
 	 *            layout data (see module documentation)
 	 * @return list viewer instance
@@ -461,22 +982,24 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public ListViewer createList(String[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
+	public ListViewer createListViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ListViewer>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				final ListViewer listViewer = new ListViewer(fRenderer.getParent());
-				listViewer.setLabelProvider(new LabelProvider());
+				final ListViewer listViewer = new ListViewer(getUICompositor().getComposite());
+				listViewer.setLabelProvider(new GenericLabelProvider());
 				listViewer.setContentProvider(ArrayContentProvider.getInstance());
 				listViewer.setInput(elements);
 
 				if (callback != null) {
-					listViewer.addSelectionChangedListener(event -> getScriptEngine().inject(callback));
+					listViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
+
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 				}
 
-				fViewModel.insertElement(listViewer.getControl(), new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(listViewer.getControl(), new Location(layout));
 
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(listViewer.getControl(), listViewer);
@@ -502,12 +1025,35 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return runInUIThread(new RunnableWithResult<Control>() {
 			@Override
 			public void runWithTry() throws Throwable {
-				fViewModel.insertElement(control, new Location(layout));
-				fRenderer.update();
+				getUICompositor().insertElement(control, new Location(layout));
 
 				setResult(control);
 			}
 		});
+	}
+
+	/**
+	 * Remove a control.
+	 *
+	 * @param controlOrLocation
+	 *            either the control instance returned from a create* method or the coordinates the control is created in.
+	 */
+	@WrapToScript
+	public void removeControl(Object controlOrLocation) {
+		Location location = null;
+
+		if (controlOrLocation instanceof Viewer)
+			controlOrLocation = ((Viewer) controlOrLocation).getControl();
+
+		if (controlOrLocation instanceof Control) {
+			final int index = Arrays.asList(getUICompositor().getComposite().getChildren()).indexOf(controlOrLocation);
+			location = new Location(getUICompositor().fViewModel.indexToPoint(index));
+
+		} else
+			location = new Location(controlOrLocation.toString());
+
+		if (location != null)
+			getUICompositor().insertElement(getUICompositor().fRenderer.createPlaceHolder(location.getPosition()), location);
 	}
 
 	/**
@@ -518,12 +1064,113 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public void showGrid(@ScriptParameter(defaultValue = "true") boolean showGrid) {
-		Display.getDefault().syncExec(() -> fRenderer.setShowGrid(showGrid));
+		Display.getDefault().syncExec(() -> {
+
+			getUICompositor().setShowGrid(showGrid);
+		});
+	}
+
+	/**
+	 * Get the current event in case we are within a UI callback method.
+	 *
+	 * @return current UI event or <code>null</code>
+	 */
+	@WrapToScript
+	public Object getUiEvent() {
+		return fUiEvent;
 	}
 
 	private <T> T runInUIThread(RunnableWithResult<T> runnable) throws Throwable {
 		Display.getDefault().syncExec(runnable);
 
 		return runnable.getResultFromTry();
+	}
+
+	private void runEventCallback(Object event, Object callback) {
+		fUiEvent = event;
+		try {
+			getScriptEngine().inject(callback);
+		} catch (final Throwable e) {
+			// silently swallow
+		} finally {
+			fUiEvent = null;
+		}
+	}
+
+	private UICompositor getUICompositor() {
+		return fUICompositors.get(0);
+	}
+
+	private class UICompositor {
+
+		private final ViewModel fViewModel;
+		private final CompositeRenderer fRenderer;
+		private ResourceManager fResourceManager = null;
+
+		public UICompositor(Composite composite) {
+			fRenderer = new CompositeRenderer(composite);
+			fViewModel = new ViewModel(fRenderer);
+		}
+
+		public Composite getComposite() {
+			return fRenderer.getParent();
+		}
+
+		public void insertElement(Object element, Location location) {
+			fViewModel.insertElement(element, location);
+			update();
+		}
+
+		public void setShowGrid(boolean showGrid) {
+			for (final UICompositor compositor : fUICompositors)
+				compositor.fRenderer.setShowGrid(showGrid);
+
+			update();
+		}
+
+		public void update() {
+			fUICompositors.get(fUICompositors.size() - 1).fRenderer.update();
+		}
+
+		public ResourceManager getResourceManager() {
+			if (fResourceManager == null)
+				fResourceManager = new LocalResourceManager(JFaceResources.getResources(), getComposite());
+
+			return fResourceManager;
+		}
+	}
+
+	private class GenericLabelProvider extends ColumnLabelProvider {
+
+		@Override
+		public String getText(Object element) {
+			if (element != null) {
+				String text = callMethod("getName", String.class, element);
+				if (text != null)
+					return text;
+
+				text = callMethod("getIdentifier", String.class, element);
+				if (text != null)
+					return text;
+			}
+
+			return super.getText(element);
+		}
+
+		private <T> T callMethod(String methodName, Class<T> returnType, Object element) {
+			final Class<? extends Object> elementClass = element.getClass();
+			try {
+				final Method method = elementClass.getMethod(methodName, null);
+				if (method != null) {
+					if (returnType.equals(method.getReturnType()))
+						return (T) method.invoke(element, null);
+				}
+
+			} catch (final Exception e) {
+				// silently swallow
+			}
+
+			return null;
+		}
 	}
 }

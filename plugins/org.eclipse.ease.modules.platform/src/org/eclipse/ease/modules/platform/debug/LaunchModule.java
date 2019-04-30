@@ -93,7 +93,7 @@ public class LaunchModule extends AbstractScriptModule {
 	 *             if the name is not known to the launch manager
 	 * @throws CoreException
 	 *             if an exception occurs retrieving configurations
-	 * @see {@link ILaunchConfiguration#getWorkingCopy()}.
+	 * @see ILaunchConfiguration#getWorkingCopy()
 	 */
 	@WrapToScript
 	public static ILaunchConfiguration getLaunchConfiguration(String name) throws CoreException, IllegalArgumentException {

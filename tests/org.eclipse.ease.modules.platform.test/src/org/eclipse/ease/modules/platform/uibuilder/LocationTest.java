@@ -22,7 +22,7 @@ public class LocationTest {
 
 	@Test
 	public void nullLocation() {
-		final Location location = new Location(null);
+		final Location location = new Location((String) null);
 		assertEquals(Location.DYNAMIC_POSITION, location.getPosition().x);
 		assertEquals(Location.DYNAMIC_POSITION, location.getPosition().y);
 

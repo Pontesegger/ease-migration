@@ -3,12 +3,14 @@ package org.eclipse.ease.modules.platform;
 import java.util.List;
 
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -21,13 +23,42 @@ import org.eclipse.ui.PlatformUI;
 public class UIModelManipulator {
 
 	/**
-	 * Find a placeholder for a given <i>id</i>.
+	 * Find ID for a given view name. If <i>name</i> already contains a valid id, it will be returned.
+	 *
+	 * @param name
+	 *            name of view
+	 * @return view ID or <code>null</code>
+	 */
+	public static String getIDForName(final String name) {
+		// look for a matching part descriptor
+		final EModelService modelService = PlatformUI.getWorkbench().getService(EModelService.class);
+
+		final IWorkbench workbench = PlatformUI.getWorkbench().getService(IWorkbench.class);
+		final MApplication mApplication = workbench.getApplication();
+
+		final List<MPartDescriptor> descriptors = modelService.findElements(mApplication, null, MPartDescriptor.class, null);
+		for (final MPartDescriptor descriptor : descriptors) {
+			if ((descriptor.getElementId().matches(name)) || (descriptor.getLabel().equals(name)))
+				return descriptor.getElementId();
+		}
+
+		final List<MPart> partDescriptors = modelService.findElements(mApplication, null, MPart.class, null);
+		for (final MPart descriptor : partDescriptors) {
+			if ((descriptor.getElementId().matches(name)) || (descriptor.getLabel().equals(name)))
+				return descriptor.getElementId();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Find the UI element for a given <i>id</i>.
 	 *
 	 * @param id
 	 *            id to look for
-	 * @return placeholder instance or <code>null</code>
+	 * @return UI element instance or <code>null</code>
 	 */
-	public static MPlaceholder findPlaceHolder(String id) {
+	public static MUIElement findElement(String id) {
 		final EModelService modelService = PlatformUI.getWorkbench().getService(EModelService.class);
 
 		final IWorkbench workbench = PlatformUI.getWorkbench().getService(IWorkbench.class);
@@ -39,6 +70,15 @@ public class UIModelManipulator {
 			if (placeholder.getElementId().equals(id)) {
 				if (perspectiveContains(perspective, placeholder))
 					return placeholder;
+			}
+		}
+
+		final List<MPart> parts = modelService.findElements(mApplication, null, MPart.class, null);
+
+		for (final MPart part : parts) {
+			if (part.getElementId().equals(id)) {
+				if (perspectiveContains(perspective, part))
+					return part;
 			}
 		}
 
@@ -108,41 +148,41 @@ public class UIModelManipulator {
 	}
 
 	/**
-	 * Move a placeholder to another container.
+	 * Move a UI element to another container.
 	 *
-	 * @param placeholder
-	 *            placeholder to move
+	 * @param uiElement
+	 *            element to move
 	 * @param targetContainer
 	 *            target container to move to
 	 */
-	public static void move(MPlaceholder placeholder, MElementContainer<MUIElement> targetContainer) {
-		remove(placeholder);
-		add(placeholder, targetContainer);
+	public static void move(MUIElement uiElement, MElementContainer<MUIElement> targetContainer) {
+		remove(uiElement);
+		add(uiElement, targetContainer);
 	}
 
 	/**
 	 * Add a placeholder to a parent container.
 	 *
-	 * @param placeholder
-	 *            placeholder to add
+	 * @param uiElement
+	 *            element to add
 	 * @param targetContainer
 	 *            container to add placeholder to
 	 */
-	private static void add(MPlaceholder placeholder, MElementContainer<MUIElement> targetContainer) {
-		targetContainer.getChildren().add(placeholder);
+	private static void add(MUIElement uiElement, MElementContainer<MUIElement> targetContainer) {
+		targetContainer.getChildren().add(uiElement);
 		if (targetContainer.getChildren().size() == 1)
-			targetContainer.setSelectedElement(placeholder);
+			targetContainer.setSelectedElement(uiElement);
 	}
 
 	/**
 	 * Remove a placeholder from its parent.
 	 *
-	 * @param placeholder
-	 *            placeholder to remove
+	 * @param uiElement
+	 *            element to remove
 	 */
-	private static void remove(MPlaceholder placeholder) {
-		final MElementContainer<MUIElement> parent = placeholder.getParent();
-		parent.getChildren().remove(placeholder);
+	private static void remove(MUIElement uiElement) {
+		final MElementContainer<MUIElement> parent = uiElement.getParent();
+		parent.getChildren().remove(uiElement);
 
 		reconcileContainer(parent);
 	}

@@ -16,7 +16,6 @@ import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.AbstractScriptModule;
@@ -56,8 +55,6 @@ import org.eclipse.ui.console.IOConsoleInputStream;
 import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.views.IViewDescriptor;
-import org.eclipse.ui.views.IViewRegistry;
 
 /**
  * Methods providing access to UI components. Allows to show dialogs, execute code in the UI thread, access views and editors.
@@ -389,7 +386,7 @@ public class UIModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = "" + IWorkbenchPage.VIEW_ACTIVATE) final int mode) throws Throwable {
 
 		// find view ID
-		final String viewID = getIDForName(name);
+		final String viewID = UIModelManipulator.getIDForName(name);
 
 		if (viewID != null) {
 			final RunnableWithResult<IViewPart> runnable = new RunnableWithResult<IViewPart>() {
@@ -491,7 +488,7 @@ public class UIModule extends AbstractScriptModule {
 		final ISelectionService selectionService = PlatformUI.getWorkbench().getWorkbenchWindows()[0].getSelectionService();
 
 		if ((name != null) && (!name.isEmpty())) {
-			final String partID = getIDForName(name);
+			final String partID = UIModelManipulator.getIDForName(name);
 			if (partID != null)
 				return selectionService.getSelection(partID);
 
@@ -526,56 +523,6 @@ public class UIModule extends AbstractScriptModule {
 			return ((ITextSelection) selection).getText();
 
 		return null;
-	}
-
-	/**
-	 * Find ID for a given view name. If <i>name</i> already contains a valid id, it will be returned.
-	 *
-	 * @param name
-	 *            name of view
-	 * @return view ID or <code>null</code>
-	 */
-	public static String getIDForName(final String name) {
-		String id = null;
-
-		// search the stack of open views as there might exist dynamic contributions
-		final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
-			@Override
-			public void runWithTry() throws Throwable {
-				final IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getViewReferences();
-				for (final IViewReference reference : viewReferences) {
-					if (reference.getId().equals(name)) {
-						// this is a valid view ID
-						setResult(reference.getId());
-						break;
-
-					} else if (reference.getPartName().equals(name)) {
-						setResult(reference.getId());
-						// continue as we might have a match with an ID later
-					}
-				}
-			}
-		};
-
-		Display.getDefault().syncExec(runnable);
-		id = runnable.getResult();
-
-		if (id == null) {
-			// look for additional contributions
-			final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();
-			for (final IViewDescriptor descriptor : viewRegistry.getViews()) {
-				if (descriptor.getId().equals(name)) {
-					// this is a valid view ID
-					return descriptor.getId();
-
-				} else if (descriptor.getLabel().equals(name)) {
-					id = descriptor.getId();
-					// continue as we might have a match with an ID later
-				}
-			}
-		}
-
-		return id;
 	}
 
 	/**
@@ -797,7 +744,7 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public static void closeView(final String name, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String secondaryID) {
 		// find view ID
-		final String viewID = getIDForName(name);
+		final String viewID = UIModelManipulator.getIDForName(name);
 
 		final Runnable runnable = () -> {
 			final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -855,7 +802,7 @@ public class UIModule extends AbstractScriptModule {
 	 * @return color instance
 	 */
 	@WrapToScript
-	public Color createColor(int red, int green, int blue) {
+	public static Color createColor(int red, int green, int blue) {
 		return new Color(Display.getDefault(), red, green, blue);
 	}
 
@@ -877,25 +824,24 @@ public class UIModule extends AbstractScriptModule {
 	 *            </ul>
 	 */
 	@WrapToScript
-	public void moveView(String sourceView, String relativeTo, @ScriptParameter(defaultValue = "x") String position) {
-		final String sourceId = getIDForName(sourceView);
+	public static void moveView(String sourceView, String relativeTo, @ScriptParameter(defaultValue = "x") String position) {
+		final String sourceId = UIModelManipulator.getIDForName(sourceView);
 		if (sourceId == null)
 			throw new IllegalArgumentException("Cannot find view: " + sourceView);
 
-		final String targetId = getIDForName(relativeTo);
+		final String targetId = UIModelManipulator.getIDForName(relativeTo);
 		if (targetId == null)
 			throw new IllegalArgumentException("Cannot find view: " + relativeTo);
 
 		Display.getDefault().syncExec(() -> {
-			final MPlaceholder sourcePlaceholder = UIModelManipulator.findPlaceHolder(sourceId);
-			final MPlaceholder targetPlaceholder = UIModelManipulator.findPlaceHolder(targetId);
+			final MUIElement sourcePlaceholder = UIModelManipulator.findElement(sourceId);
+			final MUIElement targetPlaceholder = UIModelManipulator.findElement(targetId);
 
 			final MElementContainer<MUIElement> targetPartStack = targetPlaceholder.getParent();
 
 			MPartSashContainer sashContainer;
 			switch (position) {
 			case "<":
-
 				sashContainer = UIModelManipulator.splitPartStack(targetPartStack, SWT.RIGHT);
 				UIModelManipulator.move(sourcePlaceholder, (MElementContainer<MUIElement>) sashContainer.getChildren().get(0));
 				break;
