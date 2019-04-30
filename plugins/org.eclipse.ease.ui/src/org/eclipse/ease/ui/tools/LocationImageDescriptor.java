@@ -40,13 +40,13 @@ public class LocationImageDescriptor extends ImageDescriptor {
 	@Override
 	public ImageData getImageData() {
 		ImageData result = null;
-		InputStream in = ResourceTools.getInputStream(fLocation);
+		final InputStream in = ResourceTools.getInputStream(fLocation);
 
 		// implementation copied from org.eclipse.jface.URLImageDescriptor
 		if (in != null) {
 			try {
 				result = new ImageData(in);
-			} catch (SWTException e) {
+			} catch (final SWTException e) {
 				if (e.code != SWT.ERROR_INVALID_IMAGE) {
 					throw e;
 					// fall through otherwise
@@ -54,12 +54,37 @@ public class LocationImageDescriptor extends ImageDescriptor {
 			} finally {
 				try {
 					in.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
 				}
 			}
 		}
 
 		return (result != null) ? result : ImageDescriptor.getMissingImageDescriptor().getImageData();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((fLocation == null) ? 0 : fLocation.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final LocationImageDescriptor other = (LocationImageDescriptor) obj;
+		if (fLocation == null) {
+			if (other.fLocation != null)
+				return false;
+		} else if (!fLocation.equals(other.fLocation))
+			return false;
+		return true;
 	}
 }
