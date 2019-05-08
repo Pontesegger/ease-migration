@@ -45,8 +45,8 @@ public class DialogHelper {
 		final RunnableWithResult<Integer> run = new RunnableWithResult<Integer>() {
 
 			@Override
-			public void run() {
-				setResult(window.open());
+			public Integer runWithTry() throws Throwable {
+				return window.open();
 			}
 		};
 		Display.getDefault().syncExec(run);
@@ -67,11 +67,13 @@ public class DialogHelper {
 		final RunnableWithResult<Object[]> runnable = new RunnableWithResult<Object[]>() {
 
 			@Override
-			public void run() {
+			public Object[] runWithTry() throws Throwable {
 				final ElementListSelectionDialog dialog = new ElementListSelectionDialog(Display.getDefault().getActiveShell(), labelProvider);
 				dialog.setElements(selectionOption);
 				if (dialog.open() == Window.OK)
-					setResult(dialog.getResult());
+					return dialog.getResult();
+
+				return null;
 			}
 		};
 		Display.getDefault().syncExec(runnable);

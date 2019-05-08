@@ -535,18 +535,17 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 				break;
 			}
 			final File dialogRoot = (File) root;
-
 			final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
 
 				@Override
-				public void run() {
+				public String runWithTry() throws Throwable {
 					final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), mode);
 
 					if (title != null)
 						dialog.setText(title);
 
 					dialog.setFilterPath(dialogRoot.getAbsolutePath());
-					setResult(dialog.open());
+					return dialog.open();
 				}
 			};
 
@@ -560,7 +559,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
 
 				@Override
-				public void run() {
+				public String runWithTry() throws Throwable {
 					if ((type == WRITE) || (type == APPEND)) {
 						// open a save as dialog
 						final SaveAsDialog dialog = new SaveAsDialog(Display.getDefault().getActiveShell());
@@ -572,7 +571,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 						dialog.setMessage(message);
 
 						if (dialog.open() == Window.OK)
-							setResult("workspace:/" + dialog.getResult().toPortableString());
+							return "workspace:/" + dialog.getResult().toPortableString();
 
 					} else {
 						// open a select file dialog
@@ -585,10 +584,11 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 						dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
 
 						if (dialog.open() == Window.OK)
-							setResult("workspace:/" + ((IResource) dialog.getFirstResult()).getFullPath().toPortableString());
+							return "workspace:/" + ((IResource) dialog.getFirstResult()).getFullPath().toPortableString();
 					}
-				}
 
+					return null;
+				}
 			};
 
 			Display.getDefault().syncExec(runnable);
@@ -626,7 +626,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
 
 				@Override
-				public void run() {
+				public String runWithTry() throws Throwable {
 					final DirectoryDialog dialog = new DirectoryDialog(Display.getCurrent().getActiveShell());
 
 					if (title != null)
@@ -636,7 +636,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 						dialog.setMessage(message);
 
 					dialog.setFilterPath(dialogRoot.getAbsolutePath());
-					setResult(dialog.open());
+					return dialog.open();
 				}
 			};
 
@@ -650,14 +650,15 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
 
 				@Override
-				public void run() {
+				public String runWithTry() throws Throwable {
 					final ContainerSelectionDialog dialog = new ContainerSelectionDialog(Display.getDefault().getActiveShell(), dialogRoot, true, message);
 					dialog.setTitle(title);
 
 					if (dialog.open() == Window.OK)
-						setResult("workspace:/" + ((IPath) dialog.getResult()[0]).toPortableString());
-				}
+						return "workspace:/" + ((IPath) dialog.getResult()[0]).toPortableString();
 
+					return null;
+				}
 			};
 
 			Display.getDefault().syncExec(runnable);

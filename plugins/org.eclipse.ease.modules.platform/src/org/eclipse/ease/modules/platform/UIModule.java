@@ -131,8 +131,8 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<Boolean> runnable = new RunnableWithResult<Boolean>() {
 
 				@Override
-				public void run() {
-					setResult(MessageDialog.openQuestion(Display.getDefault().getActiveShell(), title, message));
+				public Boolean runWithTry() throws Throwable {
+					return MessageDialog.openQuestion(Display.getDefault().getActiveShell(), title, message);
 				}
 			};
 
@@ -183,10 +183,12 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
 
 				@Override
-				public void run() {
+				public String runWithTry() throws Throwable {
 					final InputDialog dialog = new InputDialog(Display.getDefault().getActiveShell(), title, message, initialValue, null);
 					if (dialog.open() == Window.OK)
-						setResult(dialog.getValue());
+						return dialog.getValue();
+
+					return null;
 				}
 			};
 
@@ -250,7 +252,7 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
 
 				@Override
-				public void run() {
+				public Object runWithTry() throws Throwable {
 					final ListDialog selectionDialog = new ListDialog(Display.getDefault().getActiveShell());
 
 					selectionDialog.setTitle(title);
@@ -262,10 +264,10 @@ public class UIModule extends AbstractScriptModule {
 					if (selectionDialog.open() == Window.OK) {
 						final Object[] result = selectionDialog.getResult();
 						if ((result != null) && (result.length > 0))
-							setResult(result[0]);
-						else
-							setResult(null);
+							return result[0];
 					}
+
+					return null;
 				}
 			};
 
@@ -294,8 +296,8 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<Boolean> runnable = new RunnableWithResult<Boolean>() {
 
 				@Override
-				public void run() {
-					setResult(MessageDialog.openConfirm(Display.getDefault().getActiveShell(), title, message));
+				public Boolean runWithTry() throws Throwable {
+					return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), title, message);
 				}
 			};
 			Display.getDefault().syncExec(runnable);
@@ -392,22 +394,24 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<IViewPart> runnable = new RunnableWithResult<IViewPart>() {
 
 				@Override
-				public void runWithTry() throws Throwable {
+				public IViewPart runWithTry() throws Throwable {
 					try {
-						setResult(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewID, secondaryId, mode));
+						return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(viewID, secondaryId, mode);
 					} catch (final NullPointerException e) {
 						if (PlatformUI.getWorkbench().getWorkbenchWindowCount() > 0)
-							setResult(PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage().showView(viewID, secondaryId, mode));
+							return PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage().showView(viewID, secondaryId, mode);
 					}
+
+					return null;
 				}
 			};
 
 			Display.getDefault().syncExec(runnable);
-			return runnable.getResultFromTry();
+			return runnable.getResultOrThrow();
 		}
 
 		// maybe this view is already open, search for view titles
-
+		// FIXME needs to be reworked for dynamic views
 		for (final IViewReference part : PlatformUI.getWorkbench().getWorkbenchWindows()[0].getPages()[0].getViewReferences()) {
 			if (part.getTitle().equals(name))
 				return part.getView(false);
@@ -454,22 +458,24 @@ public class UIModule extends AbstractScriptModule {
 			final RunnableWithResult<IEditorPart> runnable = new RunnableWithResult<IEditorPart>() {
 
 				@Override
-				public void runWithTry() throws Throwable {
+				public IEditorPart runWithTry() throws Throwable {
 					try {
 
-						setResult(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(file),
-								editorDescriptor.getId()));
+						return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(file),
+								editorDescriptor.getId());
 					} catch (final NullPointerException e) {
 						if (PlatformUI.getWorkbench().getWorkbenchWindowCount() > 0)
-							setResult(PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage().openEditor(new FileEditorInput(file),
-									editorDescriptor.getId()));
+							return PlatformUI.getWorkbench().getWorkbenchWindows()[0].getActivePage().openEditor(new FileEditorInput(file),
+									editorDescriptor.getId());
 					}
+
+					return null;
 				}
 			};
 
 			Display.getDefault().syncExec(runnable);
 
-			return runnable.getResultFromTry();
+			return runnable.getResultOrThrow();
 		}
 
 		return null;
@@ -499,8 +505,8 @@ public class UIModule extends AbstractScriptModule {
 		final RunnableWithResult<ISelection> runnable = new RunnableWithResult<ISelection>() {
 
 			@Override
-			public void run() {
-				setResult(selectionService.getSelection());
+			public ISelection runWithTry() throws Throwable {
+				return selectionService.getSelection();
 			}
 		};
 		Display.getDefault().syncExec(runnable);
@@ -531,19 +537,21 @@ public class UIModule extends AbstractScriptModule {
 	 * @param dialog
 	 *            dialog to display
 	 * @return result of dialog.open() method
+	 * @throws Throwable
+	 *             when we cannot open the dialog
 	 */
 	@WrapToScript
-	public static int openDialog(final Window dialog) {
+	public static int openDialog(final Window dialog) throws Throwable {
 		final RunnableWithResult<Integer> run = new RunnableWithResult<Integer>() {
 
 			@Override
-			public void run() {
-				setResult(dialog.open());
+			public Integer runWithTry() throws Throwable {
+				return dialog.open();
 			}
 		};
 		Display.getDefault().syncExec(run);
 
-		return run.getResult();
+		return run.getResultOrThrow();
 	}
 
 	/**
@@ -554,9 +562,10 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public static Shell getShell() {
 		final RunnableWithResult<Shell> runnable = new RunnableWithResult<Shell>() {
+
 			@Override
-			public void run() {
-				setResult(Display.getCurrent().getActiveShell());
+			public Shell runWithTry() throws Throwable {
+				return Display.getCurrent().getActiveShell();
 			}
 		};
 
@@ -573,9 +582,10 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public static IWorkbenchPart getActiveView() {
 		final RunnableWithResult<IWorkbenchPart> runnable = new RunnableWithResult<IWorkbenchPart>() {
+
 			@Override
-			public void run() {
-				setResult(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
+			public IWorkbenchPart runWithTry() throws Throwable {
+				return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 			}
 		};
 
@@ -626,9 +636,10 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public static IEditorPart getActiveEditor() {
 		final RunnableWithResult<IEditorPart> runnable = new RunnableWithResult<IEditorPart>() {
+
 			@Override
-			public void run() {
-				setResult(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor());
+			public IEditorPart runWithTry() throws Throwable {
+				return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 			}
 		};
 
@@ -661,10 +672,11 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public static Object getClipboard() {
 		final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
+
 			@Override
-			public void run() {
+			public Object runWithTry() throws Throwable {
 				final Clipboard clipboard = new Clipboard(Display.getDefault());
-				setResult(clipboard.getContents(TextTransfer.getInstance()));
+				return clipboard.getContents(TextTransfer.getInstance());
 			}
 		};
 

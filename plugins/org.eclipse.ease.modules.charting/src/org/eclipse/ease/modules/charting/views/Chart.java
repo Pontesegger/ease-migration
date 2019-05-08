@@ -38,7 +38,6 @@ import org.eclipse.nebula.visualization.xygraph.figures.XYGraph;
 import org.eclipse.nebula.visualization.xygraph.figures.ZoomType;
 import org.eclipse.nebula.visualization.xygraph.util.XYGraphMediaFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
@@ -52,8 +51,8 @@ import org.eclipse.swt.widgets.MessageBox;
 public class Chart extends Composite {
 
 	private final XYGraph fXYGraph;
-	private final List<Trace> fTraces = new ArrayList<Trace>();
-	private final List<CircularBufferDataProvider> fTraceDataProviders = new ArrayList<CircularBufferDataProvider>();
+	private final List<Trace> fTraces = new ArrayList<>();
+	private final List<CircularBufferDataProvider> fTraceDataProviders = new ArrayList<>();
 	private boolean fPerformAutoScale = true;
 	private int fIndex = -1;
 	private int fSeriesCounter = 1;
@@ -87,30 +86,26 @@ public class Chart extends Composite {
 			}
 		});
 		lws.setContents(fXYGraph);
-		addMouseWheelListener(new MouseWheelListener() {
+		addMouseWheelListener(e -> {
+			final IFigure figureUnderMouse = fXYGraph.findFigureAt(e.x, e.y, new TreeSearch() {
 
-			@Override
-			public void mouseScrolled(final org.eclipse.swt.events.MouseEvent e) {
-				final IFigure figureUnderMouse = fXYGraph.findFigureAt(e.x, e.y, new TreeSearch() {
-
-					@Override
-					public boolean prune(final IFigure figure) {
-						return false;
-					}
-
-					@Override
-					public boolean accept(final IFigure figure) {
-						return (figure instanceof Axis) || (figure instanceof PlotArea);
-					}
-				});
-				if (figureUnderMouse instanceof Axis) {
-					final Axis axis = ((Axis) figureUnderMouse);
-					final double valuePosition = axis.getPositionValue(axis.isHorizontal() ? e.x : e.y, false);
-					axis.zoomInOut(valuePosition, (e.count * 0.1) / 3);
-				} else if (figureUnderMouse instanceof PlotArea) {
-					final PlotArea plotArea = (PlotArea) figureUnderMouse;
-					plotArea.zoomInOut(true, true, e.x, e.y, (e.count * 0.1) / 3);
+				@Override
+				public boolean prune(final IFigure figure) {
+					return false;
 				}
+
+				@Override
+				public boolean accept(final IFigure figure) {
+					return (figure instanceof Axis) || (figure instanceof PlotArea);
+				}
+			});
+			if (figureUnderMouse instanceof Axis) {
+				final Axis axis = ((Axis) figureUnderMouse);
+				final double valuePosition = axis.getPositionValue(axis.isHorizontal() ? e.x : e.y, false);
+				axis.zoomInOut(valuePosition, (e.count * 0.1) / 3);
+			} else if (figureUnderMouse instanceof PlotArea) {
+				final PlotArea plotArea = (PlotArea) figureUnderMouse;
+				plotArea.zoomInOut(true, true, e.x, e.y, (e.count * 0.1) / 3);
 			}
 		});
 	}
@@ -139,13 +134,10 @@ public class Chart extends Composite {
 	}
 
 	public Trace plot(final double x, final double y) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				if (fIndex == (-1))
-					getTraceIndex("Series " + Integer.toString(fSeriesCounter++));
-				plotPoint(x, y);
-			}
+		Display.getDefault().syncExec(() -> {
+			if (fIndex == (-1))
+				getTraceIndex("Series " + Integer.toString(fSeriesCounter++));
+			plotPoint(x, y);
 		});
 		return fTraces.get(fIndex);
 	}
@@ -235,54 +227,33 @@ public class Chart extends Composite {
 	}
 
 	public XYGraph setPlotTitle(final String title) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.setTitle(title);
-			}
-		});
+		Display.getDefault().syncExec(() -> fXYGraph.setTitle(title));
 		return fXYGraph;
 	}
 
 	public Axis setXLabel(final String title) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.primaryXAxis.setTitle(title);
-			}
-		});
+		Display.getDefault().syncExec(() -> fXYGraph.primaryXAxis.setTitle(title));
 		return fXYGraph.primaryXAxis;
 	}
 
 	public Axis setYLabel(final String title) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.primaryYAxis.setTitle(title);
-			}
-		});
+		Display.getDefault().syncExec(() -> fXYGraph.primaryYAxis.setTitle(title));
 		return fXYGraph.primaryYAxis;
 	}
 
 	public void setAxisRange(final double[] xrange, final double[] yrange) {
 		if ((xrange.length != 2) || (yrange.length != 2))
 			throw new IndexOutOfBoundsException();
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.primaryXAxis.setRange(xrange[0], xrange[1]);
-				fXYGraph.primaryYAxis.setRange(yrange[0], yrange[1]);
-			}
+		Display.getDefault().syncExec(() -> {
+			fXYGraph.primaryXAxis.setRange(xrange[0], xrange[1]);
+			fXYGraph.primaryYAxis.setRange(yrange[0], yrange[1]);
 		});
 	}
 
 	public void showGrid(final boolean showGrid) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.primaryXAxis.setShowMajorGrid(showGrid);
-				fXYGraph.primaryYAxis.setShowMajorGrid(showGrid);
-			}
+		Display.getDefault().syncExec(() -> {
+			fXYGraph.primaryXAxis.setShowMajorGrid(showGrid);
+			fXYGraph.primaryYAxis.setShowMajorGrid(showGrid);
 		});
 	}
 
@@ -291,18 +262,13 @@ public class Chart extends Composite {
 	}
 
 	public void zoom(final String zoomType) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				fXYGraph.setZoomType(ZoomType.valueOf(zoomType));
-			}
-		});
+		Display.getDefault().syncExec(() -> fXYGraph.setZoomType(ZoomType.valueOf(zoomType)));
 	}
 
 	public void export(final Object object, final boolean overwrite) throws Throwable {
 		final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Object runWithTry() throws Throwable {
 				final ImageLoader loader = new ImageLoader();
 				loader.data = new ImageData[] { fXYGraph.getImage().getImageData() };
 				boolean done = true;
@@ -351,90 +317,77 @@ public class Chart extends Composite {
 						loader.save(path, SWT.IMAGE_PNG);
 					}
 				}
+
+				return null;
 			}
 		};
 		Display.getDefault().syncExec(runnable);
 
 		// simply fetch result to eventually trigger a thrown exception
-		runnable.getResultFromTry();
+		runnable.getResultOrThrow();
 	}
 
 	public void setCursor(final String cursorName, final String traceName) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				Trace currentTrace = null;
-				for (final Trace trace : fTraces) {
-					if (trace.getName().equals(traceName)) {
-						currentTrace = trace;
-						break;
-					}
+		Display.getDefault().syncExec(() -> {
+			Trace currentTrace = null;
+			for (final Trace trace : fTraces) {
+				if (trace.getName().equals(traceName)) {
+					currentTrace = trace;
+					break;
 				}
-				if (currentTrace == null)
-					return;
-				final Annotation annotation = new Annotation(cursorName, currentTrace);
-				fXYGraph.addAnnotation(annotation);
 			}
+			if (currentTrace == null)
+				return;
+			final Annotation annotation = new Annotation(cursorName, currentTrace);
+			fXYGraph.addAnnotation(annotation);
 		});
 	}
 
 	public void removeCursor(final String cursorName) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				Annotation currentAnnotation = null;
-				for (final Annotation annotation : fXYGraph.getPlotArea().getAnnotationList()) {
-					if (annotation.getName().equals(cursorName)) {
-						currentAnnotation = annotation;
-						break;
-					}
+		Display.getDefault().syncExec(() -> {
+			Annotation currentAnnotation = null;
+			for (final Annotation annotation : fXYGraph.getPlotArea().getAnnotationList()) {
+				if (annotation.getName().equals(cursorName)) {
+					currentAnnotation = annotation;
+					break;
 				}
-				if (currentAnnotation == null)
-					return;
-				fXYGraph.removeAnnotation(currentAnnotation);
 			}
+			if (currentAnnotation == null)
+				return;
+			fXYGraph.removeAnnotation(currentAnnotation);
 		});
 	}
 
 	public void removeSeries(final String traceName) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				for (final Trace trace : fTraces) {
-					if (trace.getName().equals(traceName)) {
-						fXYGraph.removeTrace(trace);
-						fTraceDataProviders.remove((trace.getDataProvider()));
-						fTraces.remove(trace);
-						return;
-					}
+		Display.getDefault().syncExec(() -> {
+			for (final Trace trace : fTraces) {
+				if (trace.getName().equals(traceName)) {
+					fXYGraph.removeTrace(trace);
+					fTraceDataProviders.remove((trace.getDataProvider()));
+					fTraces.remove(trace);
+					return;
 				}
 			}
 		});
 	}
 
 	public void clear() {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				for (final Trace trace : fTraces) {
-					fXYGraph.removeTrace(trace);
-				}
-				fTraceDataProviders.clear();
-				fTraces.clear();
-				fSeriesCounter = 1;
-				fIndex = -1;
+		Display.getDefault().syncExec(() -> {
+			for (final Trace trace : fTraces) {
+				fXYGraph.removeTrace(trace);
 			}
+			fTraceDataProviders.clear();
+			fTraces.clear();
+			fSeriesCounter = 1;
+			fIndex = -1;
 		});
 	}
 
 	public Trace plot(final double[] x, final double[] y) {
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				if (fIndex == (-1))
-					getTraceIndex("Series " + Integer.toString(fSeriesCounter++));
-				plotArray(x, y);
-			}
+		Display.getDefault().syncExec(() -> {
+			if (fIndex == (-1))
+				getTraceIndex("Series " + Integer.toString(fSeriesCounter++));
+			plotArray(x, y);
 		});
 		return fTraces.get(fIndex);
 	}
@@ -448,13 +401,14 @@ public class Chart extends Composite {
 
 	public Trace series(final String seriesName, final String format) {
 		final RunnableWithResult<Trace> runnable = new RunnableWithResult<Trace>() {
-
 			@Override
-			public void run() {
+			public Trace runWithTry() throws Throwable {
 				final String traceName = (seriesName == null) ? "Series " + Integer.toString(fSeriesCounter++) : seriesName;
 				getTraceIndex(traceName);
-				setResult(fTraces.get(fIndex));
-				setStyle(getResult(), format);
+				final Trace result = fTraces.get(fIndex);
+				setStyle(result, format);
+
+				return result;
 			}
 		};
 

@@ -159,7 +159,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
 
 			@Override
-			public void runWithTry() throws Throwable {
+			public MPart runWithTry() throws Throwable {
 				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
 
 				// create part
@@ -175,8 +175,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
 
 				partService.showPart(part, PartState.VISIBLE);
-
-				setResult(part);
 
 				UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
 
@@ -196,12 +194,14 @@ public class UIBuilderModule extends AbstractScriptModule {
 					public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
 					}
 				});
+
+				return part;
 			}
 		};
 
 		Display.getDefault().syncExec(runnable);
 
-		return runnable.getResultFromTry();
+		return runnable.getResultOrThrow();
 	}
 
 	/**
@@ -223,7 +223,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String message) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ScriptableDialog>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public ScriptableDialog runWithTry() throws Throwable {
 				final ScriptableDialog dialog = new ScriptableDialog(Display.getDefault().getActiveShell(), new DialogRunnable() {
 
 					@Override
@@ -240,7 +240,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				dialog.setTitleText(title);
 				dialog.setMessageText(message);
 
-				setResult(dialog);
+				return dialog;
 			}
 		});
 	}
@@ -318,7 +318,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Label createLabel(Object labelOrImage, @ScriptParameter(defaultValue = "<") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Label>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Label runWithTry() throws Throwable {
 				final Label swtLabel = new Label(getUICompositor().getComposite(), SWT.NONE);
 				if (labelOrImage instanceof Image)
 					swtLabel.setImage((Image) labelOrImage);
@@ -327,7 +327,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				getUICompositor().insertElement(swtLabel, new Location(layout));
 
-				setResult(swtLabel);
+				return swtLabel;
 			}
 		});
 	}
@@ -345,12 +345,12 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Composite createComposite(@ScriptParameter(defaultValue = "o o") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Composite>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Composite runWithTry() throws Throwable {
 				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
 
 				getUICompositor().insertElement(composite, new Location(layout));
 
-				setResult(composite);
+				return composite;
 			}
 		});
 	}
@@ -371,12 +371,12 @@ public class UIBuilderModule extends AbstractScriptModule {
 			throws Throwable {
 		return runInUIThread(new RunnableWithResult<Label>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Label runWithTry() throws Throwable {
 				final Label swtLabel = new Label(getUICompositor().getComposite(), SWT.SEPARATOR | (horizontal ? SWT.HORIZONTAL : SWT.VERTICAL));
 
 				getUICompositor().insertElement(swtLabel, new Location(layout));
 
-				setResult(swtLabel);
+				return swtLabel;
 			}
 		});
 	}
@@ -399,14 +399,14 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = "o") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ProgressBar>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public ProgressBar runWithTry() throws Throwable {
 				final ProgressBar progressBar = new ProgressBar(getUICompositor().getComposite(), SWT.NONE);
 				progressBar.setMaximum(maximum);
 				progressBar.setSelection(value);
 
 				getUICompositor().insertElement(progressBar, new Location(layout));
 
-				setResult(progressBar);
+				return progressBar;
 			}
 		});
 	}
@@ -427,16 +427,15 @@ public class UIBuilderModule extends AbstractScriptModule {
 			throws Throwable {
 		return runInUIThread(new RunnableWithResult<Group>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Group runWithTry() throws Throwable {
 				final Group group = new Group(getUICompositor().getComposite(), SWT.NONE);
 				if (label != null)
 					group.setText(label);
 
 				getUICompositor().insertElement(group, new Location(layout));
-
-				setResult(group);
-
 				pushComposite(group);
+
+				return group;
 			}
 		});
 	}
@@ -454,12 +453,12 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Text createText(@ScriptParameter(defaultValue = "o!") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Text>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Text runWithTry() throws Throwable {
 				final Text text = new Text(getUICompositor().getComposite(), SWT.BORDER);
 
 				getUICompositor().insertElement(text, new Location(layout));
 
-				setResult(text);
+				return text;
 			}
 		});
 	}
@@ -477,12 +476,12 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Text createTextBox(@ScriptParameter(defaultValue = "o!") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Text>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Text runWithTry() throws Throwable {
 				final Text text = new Text(getUICompositor().getComposite(), SWT.BORDER | SWT.MULTI | SWT.WRAP);
 
 				getUICompositor().insertElement(text, new Location(layout));
 
-				setResult(text);
+				return text;
 			}
 		});
 	}
@@ -501,8 +500,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Image createImage(String location) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Image>() {
 			@Override
-			public void runWithTry() throws Throwable {
-				setResult(getUICompositor().getResourceManager().createImageWithDefault(LocationImageDescriptor.createFromLocation(location)));
+			public Image runWithTry() throws Throwable {
+				return getUICompositor().getResourceManager().createImageWithDefault(LocationImageDescriptor.createFromLocation(location));
 			}
 		});
 	}
@@ -594,7 +593,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<TableViewer>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public TableViewer runWithTry() throws Throwable {
 
 				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
 				final TableColumnLayout tcl_composite = new TableColumnLayout();
@@ -618,7 +617,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(tableViewer.getControl(), tableViewer);
 
-				setResult(tableViewer);
+				return tableViewer;
 			}
 		});
 	}
@@ -643,7 +642,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<TreeViewer>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public TreeViewer runWithTry() throws Throwable {
 
 				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
 				final TreeColumnLayout tcl_composite = new TreeColumnLayout();
@@ -707,7 +706,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(treeViewer.getControl(), treeViewer);
 
-				setResult(treeViewer);
+				return treeViewer;
 			}
 		});
 	}
@@ -735,7 +734,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 		return runInUIThread(new RunnableWithResult<ViewerColumn>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public ViewerColumn runWithTry() throws Throwable {
 
 				ViewerColumn column;
 				final AbstractColumnLayout tcl_composite = (AbstractColumnLayout) viewer.getControl().getParent().getLayout();
@@ -788,7 +787,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				viewer.refresh(true);
 
-				setResult(column);
+				return column;
 			}
 		});
 	}
@@ -810,7 +809,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Button createButton(Object labelOrImage, Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Button runWithTry() throws Throwable {
 				final Button button = new Button(getUICompositor().getComposite(), SWT.NONE);
 				if (labelOrImage instanceof Image)
 					button.setImage((Image) labelOrImage);
@@ -829,7 +828,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				getUICompositor().insertElement(button, new Location(layout));
 
-				setResult(button);
+				return button;
 			}
 		});
 	}
@@ -855,7 +854,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			throws Throwable {
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Button runWithTry() throws Throwable {
 				final Button button = new Button(getUICompositor().getComposite(), SWT.CHECK);
 				button.setText(label);
 				button.setSelection(selected);
@@ -875,7 +874,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				getUICompositor().insertElement(button, new Location(layout));
 
-				setResult(button);
+				return button;
 			}
 		});
 	}
@@ -901,7 +900,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			throws Throwable {
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Button runWithTry() throws Throwable {
 				final Button button = new Button(getUICompositor().getComposite(), SWT.RADIO);
 				button.setText(label);
 				button.setSelection(selected);
@@ -921,7 +920,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				getUICompositor().insertElement(button, new Location(layout));
 
-				setResult(button);
+				return button;
 			}
 		});
 	}
@@ -944,7 +943,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ComboViewer>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public ComboViewer runWithTry() throws Throwable {
 				final ComboViewer comboViewer = new ComboViewer(getUICompositor().getComposite());
 				comboViewer.setLabelProvider(new GenericLabelProvider());
 				comboViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -964,7 +963,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(comboViewer.getControl(), comboViewer);
 
-				setResult(comboViewer);
+				return comboViewer;
 			}
 		});
 	}
@@ -987,7 +986,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<ListViewer>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public ListViewer runWithTry() throws Throwable {
 				final ListViewer listViewer = new ListViewer(getUICompositor().getComposite());
 				listViewer.setLabelProvider(new GenericLabelProvider());
 				listViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -1005,7 +1004,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (fScriptableDialog != null)
 					fScriptableDialog.registerViewer(listViewer.getControl(), listViewer);
 
-				setResult(listViewer);
+				return listViewer;
 			}
 		});
 	}
@@ -1025,10 +1024,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Control addControl(Control control, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Control>() {
 			@Override
-			public void runWithTry() throws Throwable {
+			public Control runWithTry() throws Throwable {
 				getUICompositor().insertElement(control, new Location(layout));
 
-				setResult(control);
+				return control;
 			}
 		});
 	}
@@ -1084,7 +1083,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	private <T> T runInUIThread(RunnableWithResult<T> runnable) throws Throwable {
 		Display.getDefault().syncExec(runnable);
 
-		return runnable.getResultFromTry();
+		return runnable.getResultOrThrow();
 	}
 
 	private void runEventCallback(Object event, Object callback) {
