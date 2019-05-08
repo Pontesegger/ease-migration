@@ -15,42 +15,37 @@ public abstract class RunnableWithResult<T extends Object> implements Runnable {
 	private T fResult = null;
 	private Throwable fThrowable = null;
 
-	/**
-	 * Set the result of the runnable.
-	 *
-	 * @param result
-	 *            runnable result
-	 */
-	protected void setResult(final T result) {
-		fResult = result;
-	}
-
-	/**
-	 * Get the result of the run execution. Does not consider eventually thrown exceptions.
-	 *
-	 * @return runnable result
-	 */
-	public T getResult() {
-		return fResult;
-	}
-
 	@Override
-	public void run() {
+	public final void run() {
 		try {
-			runWithTry();
-		} catch (Throwable e) {
+			fResult = runWithTry();
+		} catch (final Throwable e) {
 			fThrowable = e;
 		}
+	}
+
+	/**
+	 * Get the result of the run execution. In case an exception was thrown it gets rethrown encapsulated in a {@link RuntimeException}.
+	 *
+	 * @return runnable result
+	 * @throws RuntimeException
+	 *             encapsulated exception encountered during run
+	 */
+	public T getResult() throws RuntimeException {
+		if (fThrowable != null)
+			throw new RuntimeException("", fThrowable);
+
+		return fResult;
 	}
 
 	/**
 	 * Get the result of the run execution. Does rethrow exceptions that occurred during the run.
 	 *
 	 * @return runnable result
-	 * @throws Throwable
-	 *             exceptions encountered during run
+	 * @throws RuntimeException
+	 *             encapsulated exception encountered during run
 	 */
-	public T getResultFromTry() throws Throwable {
+	public T getResultOrThrow() throws Throwable {
 		if (fThrowable != null)
 			throw fThrowable;
 
@@ -60,6 +55,5 @@ public abstract class RunnableWithResult<T extends Object> implements Runnable {
 	/**
 	 * Run method to be implemented by the derived class. Exceptions thrown will automatically get caught an rethrown on a {@link #getResult()}.
 	 */
-	public void runWithTry() throws Throwable {
-	}
+	public abstract T runWithTry() throws Throwable;
 }

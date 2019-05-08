@@ -124,14 +124,11 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 					// ask user if he wants to change the engine: once, permanently or not
 					final RunnableWithResult<Boolean> runnable = new RunnableWithResult<Boolean>() {
 						@Override
-						public void run() {
-							final boolean confirmEngineSwitch = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Configuration change needed",
+						public Boolean runWithTry() throws Throwable {
+							return MessageDialog.openConfirm(Display.getDefault().getActiveShell(), "Configuration change needed",
 									"The currently selected script engine does not support debugging. However an alternative engine is available. Do you want to debug your script using that alternative engine?");
-
-							setResult(confirmEngineSwitch);
 						}
 					};
-
 					Display.getDefault().syncExec(runnable);
 
 					if (!runnable.getResult())

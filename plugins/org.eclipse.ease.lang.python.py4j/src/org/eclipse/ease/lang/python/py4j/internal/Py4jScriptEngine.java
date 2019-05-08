@@ -214,13 +214,13 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
 
 				@Override
-				public void runWithTry() throws Throwable {
-					setResult(internalExecute(script, fileName));
+				public Object runWithTry() throws Throwable {
+					return internalExecute(script, fileName);
 				}
 			};
 
 			Display.getDefault().syncExec(runnable);
-			return runnable.getResultFromTry();
+			return runnable.getResultOrThrow();
 
 		} else {
 			return internalExecute(script, fileName);

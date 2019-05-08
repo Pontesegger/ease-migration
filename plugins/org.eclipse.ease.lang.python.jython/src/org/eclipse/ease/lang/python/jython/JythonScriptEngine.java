@@ -147,16 +147,16 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
 
 				@Override
-				public void runWithTry() throws Throwable {
+				public Object runWithTry() throws Throwable {
 
 					// call execute again, now from correct thread
-					setResult(internalExecute(script, reference, fileName));
+					return internalExecute(script, reference, fileName);
 				}
 			};
 
 			Display.getDefault().syncExec(runnable);
 
-			return runnable.getResultFromTry();
+			return runnable.getResultOrThrow();
 
 		} else
 			// run in engine thread

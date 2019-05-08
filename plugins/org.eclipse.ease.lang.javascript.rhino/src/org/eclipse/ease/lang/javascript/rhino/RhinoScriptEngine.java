@@ -134,12 +134,17 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		fContext.setInstructionObserverThreshold(10);
 
 		// enable JS v1.8 language constructs
+		// try {
+		// Context.class.getDeclaredField("VERSION_ES6");
+		// fContext.setLanguageVersion(Context.VERSION_ES6);
+		// } catch (final Exception e) {
 		try {
 			Context.class.getDeclaredField("VERSION_1_8");
 			fContext.setLanguageVersion(Context.VERSION_1_8);
-		} catch (final Exception e) {
+		} catch (final Exception e1) {
 			fContext.setLanguageVersion(Context.VERSION_1_7);
 		}
+		// }
 	}
 
 	@Override
@@ -163,18 +168,18 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
 
 				@Override
-				public void runWithTry() throws Throwable {
+				public Object runWithTry() throws Throwable {
 					// initialize scope
 					getContext().initStandardObjects(fScope);
 
 					// call execute again, now from correct thread
-					setResult(internalExecute(script, reference, fileName));
+					return internalExecute(script, reference, fileName);
 				}
 			};
 
 			Display.getDefault().syncExec(runnable);
 
-			return runnable.getResultFromTry();
+			return runnable.getResultOrThrow();
 
 		} else
 			// run in engine thread
@@ -324,12 +329,12 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	private Object getVariable(final Scriptable scope, final String name) {
 		return runInJobContext(new RunnableWithResult<Object>() {
 			@Override
-			public void run() {
+			public Object runWithTry() throws Throwable {
 				final Object value = scope.get(name, scope);
 				if (value instanceof NativeJavaObject)
-					setResult(((NativeJavaObject) value).unwrap());
+					return ((NativeJavaObject) value).unwrap();
 				else
-					setResult(value);
+					return value;
 			}
 		});
 	}
@@ -339,9 +344,9 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 		return runInJobContext(new RunnableWithResult<Boolean>() {
 			@Override
-			public void run() {
+			public Boolean runWithTry() throws Throwable {
 				final Object value = fScope.get(name, fScope);
-				setResult(!Scriptable.NOT_FOUND.equals(value));
+				return !Scriptable.NOT_FOUND.equals(value);
 			}
 		});
 	}
@@ -362,7 +367,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	protected void internalSetVariable(final String name, final Object content) {
 		runInJobContext(new RunnableWithResult<Boolean>() {
 			@Override
-			public void run() {
+			public Boolean runWithTry() throws Throwable {
 				if (!JavaScriptHelper.isSaveName(name))
 					throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
 
@@ -370,6 +375,8 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 				final Object jsOut = internaljavaToJS(content, scope);
 				scope.put(name, scope, jsOut);
+
+				return true;
 			}
 		});
 	}
