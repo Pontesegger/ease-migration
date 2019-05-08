@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
@@ -30,6 +34,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -533,15 +538,40 @@ public class UIModule extends AbstractScriptModule {
 	public static String getIDForName(final String name) {
 		String id = null;
 
-		final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();
-		for (final IViewDescriptor descriptor : viewRegistry.getViews()) {
-			if (descriptor.getId().equals(name)) {
-				// this is a valid view ID
-				return name;
+		// search the stack of open views as there might exist dynamic contributions
+		final RunnableWithResult<String> runnable = new RunnableWithResult<String>() {
+			@Override
+			public void runWithTry() throws Throwable {
+				final IViewReference[] viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getViewReferences();
+				for (final IViewReference reference : viewReferences) {
+					if (reference.getId().equals(name)) {
+						// this is a valid view ID
+						setResult(reference.getId());
+						break;
 
-			} else if (descriptor.getLabel().equals(name)) {
-				id = descriptor.getId();
-				// continue as we might have a match with an ID later
+					} else if (reference.getPartName().equals(name)) {
+						setResult(reference.getId());
+						// continue as we might have a match with an ID later
+					}
+				}
+			}
+		};
+
+		Display.getDefault().syncExec(runnable);
+		id = runnable.getResult();
+
+		if (id == null) {
+			// look for additional contributions
+			final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();
+			for (final IViewDescriptor descriptor : viewRegistry.getViews()) {
+				if (descriptor.getId().equals(name)) {
+					// this is a valid view ID
+					return descriptor.getId();
+
+				} else if (descriptor.getLabel().equals(name)) {
+					id = descriptor.getId();
+					// continue as we might have a match with an ID later
+				}
 			}
 		}
 
@@ -827,5 +857,73 @@ public class UIModule extends AbstractScriptModule {
 	@WrapToScript
 	public Color createColor(int red, int green, int blue) {
 		return new Color(Display.getDefault(), red, green, blue);
+	}
+
+	/**
+	 * Move an existing view to a new position relative to another view.
+	 *
+	 * @param sourceView
+	 *            view to move: view ID or view title
+	 * @param relativeTo
+	 *            view to move source relative to: view ID or view title
+	 * @param position
+	 *            one of
+	 *            <ul>
+	 *            <li>x,o ... same stack</li>
+	 *            <li>v ... below target view</li>
+	 *            <li>^ ... above target view</li>
+	 *            <li>&lt; ... left of target view</li>
+	 *            <li>&gt; ... right of target view</li>
+	 *            </ul>
+	 */
+	@WrapToScript
+	public void moveView(String sourceView, String relativeTo, @ScriptParameter(defaultValue = "x") String position) {
+		final String sourceId = getIDForName(sourceView);
+		if (sourceId == null)
+			throw new IllegalArgumentException("Cannot find view: " + sourceView);
+
+		final String targetId = getIDForName(relativeTo);
+		if (targetId == null)
+			throw new IllegalArgumentException("Cannot find view: " + relativeTo);
+
+		Display.getDefault().syncExec(() -> {
+			final MPlaceholder sourcePlaceholder = UIModelManipulator.findPlaceHolder(sourceId);
+			final MPlaceholder targetPlaceholder = UIModelManipulator.findPlaceHolder(targetId);
+
+			final MElementContainer<MUIElement> targetPartStack = targetPlaceholder.getParent();
+
+			MPartSashContainer sashContainer;
+			switch (position) {
+			case "<":
+
+				sashContainer = UIModelManipulator.splitPartStack(targetPartStack, SWT.RIGHT);
+				UIModelManipulator.move(sourcePlaceholder, (MElementContainer<MUIElement>) sashContainer.getChildren().get(0));
+				break;
+
+			case ">":
+				sashContainer = UIModelManipulator.splitPartStack(targetPartStack, SWT.LEFT);
+				UIModelManipulator.move(sourcePlaceholder, (MElementContainer<MUIElement>) sashContainer.getChildren().get(1));
+				break;
+
+			case "^":
+				sashContainer = UIModelManipulator.splitPartStack(targetPartStack, SWT.BOTTOM);
+				UIModelManipulator.move(sourcePlaceholder, (MElementContainer<MUIElement>) sashContainer.getChildren().get(0));
+				break;
+
+			case "v":
+				sashContainer = UIModelManipulator.splitPartStack(targetPartStack, SWT.TOP);
+				UIModelManipulator.move(sourcePlaceholder, (MElementContainer<MUIElement>) sashContainer.getChildren().get(1));
+				break;
+
+			case "x":
+				// fall through
+			case "o":
+				UIModelManipulator.move(sourcePlaceholder, targetPlaceholder.getParent());
+				break;
+
+			default:
+				throw new IllegalArgumentException("Invalid position indicator: " + position);
+			}
+		});
 	}
 }
