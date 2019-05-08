@@ -110,8 +110,8 @@ import org.eclipse.ui.PlatformUI;
  * </p>
  *
  * <p>
- * Whenever callback code is registered the executing engine is automatically set to be kept alive after script execution. This is required as a callback needs
- * the engine to be executed. The
+ * Whenever callback code is registered the executing engine is automatically set to be kept alive after script execution. This is required as callback
+ * execution needs a script engine.
  * </p>
  */
 public class UIBuilderModule extends AbstractScriptModule {
@@ -155,6 +155,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public MPart createView(String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String iconUri,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String relativeTo, @ScriptParameter(defaultValue = "x") String position) throws Throwable {
+
 		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
 
 			@Override
@@ -166,6 +167,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 				part.setLabel(title);
 				if (iconUri != null)
 					part.setIconURI(iconUri);
+				else
+					part.setIconURI("platform:/plugin/org.eclipse.ease.modules.platform/icons/eview16/scripted_view.png");
 
 				part.setElementId("org.eclipse.ease.view.dynamic:" + fCounter++);
 				part.setCloseable(true);
@@ -174,6 +177,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 				partService.showPart(part, PartState.VISIBLE);
 
 				setResult(part);
+
+				UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
 
 				fUICompositors.clear();
 				pushComposite((Composite) part.getWidget());
@@ -195,10 +200,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 		};
 
 		Display.getDefault().syncExec(runnable);
-
-		Display.getDefault().syncExec(() -> {
-			UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
-		});
 
 		return runnable.getResultFromTry();
 	}
