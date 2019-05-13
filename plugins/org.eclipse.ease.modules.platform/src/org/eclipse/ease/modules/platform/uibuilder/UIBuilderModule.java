@@ -176,7 +176,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				partService.showPart(part, PartState.VISIBLE);
 
-				UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
+				if (relativeTo != null)
+					UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
 
 				fUICompositors.clear();
 				pushComposite((Composite) part.getWidget());
