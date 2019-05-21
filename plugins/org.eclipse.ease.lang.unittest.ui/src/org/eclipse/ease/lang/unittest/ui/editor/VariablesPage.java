@@ -15,18 +15,24 @@ import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionPackage;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.definition.IVariable;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
+import org.eclipse.ease.lang.unittest.ui.Activator;
 import org.eclipse.ease.ui.tools.AbstractVirtualTreeProvider;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
@@ -41,6 +47,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
@@ -120,6 +127,10 @@ public class VariablesPage extends AbstractEditorPage {
 
 	private static final Pattern VARIABLE_NAME_PATTERN = Pattern.compile("([a-zA-Z_$][0-9a-zA-Z_$]*)");
 
+	private static final String EXTENSION_VARIABLES_ID = Activator.PLUGIN_ID + ".variables";
+
+	private static final Object EXTENSION_VARIABLES_PROVIDER = "provider";
+
 	/**
 	 * Verify that a variables name is valid regarding coding rules.
 	 *
@@ -129,6 +140,32 @@ public class VariablesPage extends AbstractEditorPage {
 	 */
 	private static boolean isValidNamePattern(final String name) {
 		return VARIABLE_NAME_PATTERN.matcher(name).matches();
+	}
+
+	/**
+	 * Get an instance of a variables provider.
+	 *
+	 * @param providerID
+	 *            id of the provider to create
+	 * @return variables provider or <code>null</code>
+	 */
+	private static IVariablesProvider createVariablesProvider(String providerID) {
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_VARIABLES_ID);
+		for (final IConfigurationElement e : config) {
+			try {
+				if (providerID.equals(e.getAttribute("id"))) {
+					if (e.getName().equals(EXTENSION_VARIABLES_PROVIDER)) {
+						final Object extension = e.createExecutableExtension("class");
+						if (extension instanceof IVariablesProvider)
+							return (IVariablesProvider) extension;
+					}
+				}
+			} catch (InvalidRegistryObjectException | CoreException e1) {
+				Logger.warning(Activator.PLUGIN_ID, "Invalid variables provider extension: " + providerID, e1);
+			}
+		}
+
+		return null;
 	}
 
 	/** Job triggered on changes on the underlying EMF model. */
@@ -356,12 +393,31 @@ public class VariablesPage extends AbstractEditorPage {
 
 			@Override
 			protected CellEditor getCellEditor(final Object element) {
+				if (element instanceof IVariable) {
+					final IVariablesProvider valueProvider = getValueProvider((IVariable) element);
+					if (valueProvider != null) {
+						if (valueProvider.allowsCustomValues())
+							return new ComboBoxCellEditor(fTreeViewer.getTree(), getValueProvider((IVariable) element).getValues().toArray(new String[0]));
+						else
+							return new ComboBoxCellEditor(fTreeViewer.getTree(), getValueProvider((IVariable) element).getValues().toArray(new String[0]),
+									SWT.READ_ONLY);
+					}
+				}
+
 				return new TextCellEditor(fTreeViewer.getTree());
 			}
 
 			@Override
 			protected boolean canEdit(final Object element) {
 				return (element instanceof IVariable);
+			}
+
+			private IVariablesProvider getValueProvider(IVariable variable) {
+				final String enumProviderID = variable.getEnumProviderID();
+				if (enumProviderID != null)
+					return createVariablesProvider(enumProviderID);
+
+				return null;
 			}
 		});
 
