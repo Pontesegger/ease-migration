@@ -12,6 +12,7 @@ package org.eclipse.ease.lang.unittest.ui.editor;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -369,11 +370,15 @@ public class VariablesPage extends AbstractEditorPage {
 		});
 
 		treeViewerColumn_1.setEditingSupport(new EditingSupport(fTreeViewer) {
+
+			private List<String> fValues = null;
+
 			@Override
 			protected void setValue(final Object element, final Object value) {
 				if (element instanceof IVariable) {
+
 					final String oldContent = ((IVariable) element).getContent();
-					final String newContent = value.toString();
+					final String newContent = (fValues != null) ? fValues.get(Integer.parseInt(value.toString())) : value.toString();
 					if (!oldContent.equals(newContent)) {
 						final Command command = SetCommand.create(getEditingDomain(), element, IDefinitionPackage.Literals.VARIABLE__CONTENT, newContent);
 						getEditor().executeCommand(command);
@@ -385,8 +390,12 @@ public class VariablesPage extends AbstractEditorPage {
 
 			@Override
 			protected Object getValue(final Object element) {
-				if (element instanceof IVariable)
+				if (element instanceof IVariable) {
+					if (fValues != null)
+						return fValues.indexOf(((IVariable) element).getContent());
+
 					return ((IVariable) element).getContent();
+				}
 
 				return "";
 			}
@@ -396,11 +405,11 @@ public class VariablesPage extends AbstractEditorPage {
 				if (element instanceof IVariable) {
 					final IVariablesProvider valueProvider = getValueProvider((IVariable) element);
 					if (valueProvider != null) {
+						fValues = valueProvider.getValues();
 						if (valueProvider.allowsCustomValues())
-							return new ComboBoxCellEditor(fTreeViewer.getTree(), getValueProvider((IVariable) element).getValues().toArray(new String[0]));
+							return new ComboBoxCellEditor(fTreeViewer.getTree(), fValues.toArray(new String[0]));
 						else
-							return new ComboBoxCellEditor(fTreeViewer.getTree(), getValueProvider((IVariable) element).getValues().toArray(new String[0]),
-									SWT.READ_ONLY);
+							return new ComboBoxCellEditor(fTreeViewer.getTree(), fValues.toArray(new String[0]), SWT.READ_ONLY);
 					}
 				}
 
