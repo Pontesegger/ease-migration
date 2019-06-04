@@ -66,11 +66,10 @@ public final class JUnitReportGenerator implements IReportGenerator {
 
 	@Override
 	public String createReport(final String title, final String description, final ITestEntity testEntity) {
-		final XMLMemento root = XMLMemento.createWriteRoot("root");
 
 		final DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
-		final IMemento suiteNode = root.createChild("testsuite");
+		final IMemento suiteNode = XMLMemento.createWriteRoot("testsuite");
 		suiteNode.putString("name", title);
 		suiteNode.putString("hostname", "localhost");
 		suiteNode.putInteger("tests", countTests(testEntity, test -> 1));
@@ -100,7 +99,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 
 		addTestResults(suiteNode, testEntity);
 
-		return root.toString();
+		return suiteNode.toString();
 	}
 
 	private void addTestResults(IMemento suiteNode, ITestEntity testEntity) {
