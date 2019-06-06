@@ -104,15 +104,17 @@ public class PlatformModule {
 	}
 
 	/**
-	 * Get a system property value
+	 * Get a system property or environment value. First we try to look up a system property. If not found we query the environment for the key.
 	 *
 	 * @param key
 	 *            key to query
-	 * @return system property for <i>key</i>
+	 * @return system property/environment variable for <i>key</i>
 	 */
 	@WrapToScript
 	public static String getSystemProperty(final String key) {
-		return System.getProperty(key);
+		final String value = System.getProperty(key);
+
+		return (value != null) ? value : System.getenv(key);
 	}
 
 	/**
