@@ -137,4 +137,10 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 	protected Object getLanguageIdentifier() {
 		return "Ruby";
 	}
+
+	@Override
+	protected String toSafeName(String name) {
+		// TODO we do not have KEYWORDS yet, so we cannot filter
+		return name;
+	}
 }

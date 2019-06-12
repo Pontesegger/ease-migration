@@ -132,6 +132,18 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		RESERVED_KEYWORDS.add("zip");
 	}
 
+	private static String toSafeNameStatic(String name) {
+		while (RESERVED_KEYWORDS.contains(name))
+			name = name + "_";
+
+		return name;
+	}
+
+	@Override
+	protected String toSafeName(String name) {
+		return toSafeNameStatic(name);
+	}
+
 	@Override
 	public String createFunctionWrapper(IEnvironment environment, final String moduleVariable, final Method method) {
 
@@ -145,8 +157,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		final StringBuilder methodCall = new StringBuilder();
 
 		for (final Parameter parameter : parameters) {
-			methodSignature.append(", ").append(parameter.getName());
-			methodCall.append(", ").append(parameter.getName());
+			methodSignature.append(", ").append(toSafeName(parameter.getName()));
+			methodCall.append(", ").append(toSafeName(parameter.getName()));
 			if (parameter.isOptional())
 				methodSignature.append(" = ").append(getDefaultValue(parameter));
 		}
@@ -205,8 +217,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 				// Py4J cannot execute
 				// gateway.new_array(gateway.jvm.Object, 1)[0] = None
 				// as the default value for array elements is null anyway, we simply do not set those
-				body.append("    if ").append(parameters.get(index).getName()).append(" != None:").append(StringTools.LINE_DELIMITER);
-				body.append("        ").append("parameters_array[").append(index).append("] = ").append(parameters.get(index).getName())
+				body.append("    if ").append(toSafeName(parameters.get(index).getName())).append(" != None:").append(StringTools.LINE_DELIMITER);
+				body.append("        ").append("parameters_array[").append(index).append("] = ").append(toSafeName(parameters.get(index).getName()))
 						.append(StringTools.LINE_DELIMITER);
 			}
 
@@ -345,7 +357,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		final StringBuilder builder = new StringBuilder();
 		if (parameter.getClazz().isArray()) {
 			final String arrayType = getPythonClassIdentifier(parameter.getClazz().getComponentType());
-			final String variableName = parameter.getName();
+			final String variableName = toSafeNameStatic(parameter.getName());
 			builder.append("try:").append(StringTools.LINE_DELIMITER);
 			builder.append(String.format("    tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
 			builder.append(String.format("    for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);

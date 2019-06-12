@@ -34,11 +34,11 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	/** Default line break character. */
 	public static final String LINE_DELIMITER = System.getProperty(Platform.PREF_LINE_SEPARATOR);
 
-	protected static String buildParameterList(List<Parameter> parameters) {
+	protected String buildParameterList(List<Parameter> parameters) {
 		// build parameter string
 		final StringBuilder parameterList = new StringBuilder();
 		for (final Parameter parameter : parameters)
-			parameterList.append(", ").append(parameter.getName());
+			parameterList.append(", ").append(toSafeName(parameter.getName()));
 
 		if (parameterList.length() > 2)
 			parameterList.delete(0, 2);
@@ -401,5 +401,14 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	 * @return script code to be injected into the script engine
 	 */
 	protected abstract String createFunctionWrapper(IEnvironment environment, String identifier, Method method);
-}
 
+	/**
+	 * Convert a given name to a script language safe name. To make sure it is safe we check against a list of given keywords. We then append '_' until the
+	 * value is save.
+	 *
+	 * @param name
+	 *            name to check
+	 * @return safe name
+	 */
+	protected abstract String toSafeName(String name);
+}

@@ -305,4 +305,12 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	protected Object getLanguageIdentifier() {
 		return "JavaScript";
 	}
+
+	@Override
+	protected String toSafeName(String name) {
+		while (RESERVED_KEYWORDS.contains(name))
+			name = name + "_";
+
+		return name;
+	}
 }

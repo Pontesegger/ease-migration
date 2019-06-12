@@ -158,7 +158,7 @@ public class GroovyCodeFactory extends org.eclipse.ease.AbstractCodeFactory {
 		// build parameter string
 		final StringBuilder parameterList = new StringBuilder();
 		for (final Parameter parameter : parameters)
-			parameterList.append(", ").append(parameter.getName());
+			parameterList.append(", ").append(toSafeName(parameter.getName()));
 
 		if (parameterList.length() > 2)
 			parameterList.delete(0, 2);
@@ -202,5 +202,13 @@ public class GroovyCodeFactory extends org.eclipse.ease.AbstractCodeFactory {
 	@Override
 	protected Object getLanguageIdentifier() {
 		return "Groovy";
+	}
+
+	@Override
+	protected String toSafeName(String name) {
+		while (RESERVED_KEYWORDS.contains(name))
+			name = name + "_";
+
+		return name;
 	}
 }
