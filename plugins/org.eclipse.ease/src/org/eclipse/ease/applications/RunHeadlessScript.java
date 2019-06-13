@@ -144,6 +144,9 @@ public class RunHeadlessScript implements IApplication {
 						}
 					}
 				} finally {
+					// persist workspace
+					ResourcesPlugin.getWorkspace().save(true, null);
+
 					// make sure we do not lock the workspace permanently
 					if (location != null)
 						location.release();
