@@ -19,6 +19,8 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.views.IViewDescriptor;
+import org.eclipse.ui.views.IViewRegistry;
 
 public class UIModelManipulator {
 
@@ -46,6 +48,14 @@ public class UIModelManipulator {
 		for (final MPart descriptor : partDescriptors) {
 			if ((descriptor.getElementId().matches(name)) || (descriptor.getLabel().equals(name)))
 				return descriptor.getElementId();
+		}
+
+		// last resort: query view registry
+		// see Bug 548226: some view IDs are not available in the model
+		final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();
+		for (final IViewDescriptor descriptor : viewRegistry.getViews()) {
+			if ((descriptor.getId().equals(name)) || (descriptor.getLabel().equals(name)))
+				return descriptor.getId();
 		}
 
 		return null;
