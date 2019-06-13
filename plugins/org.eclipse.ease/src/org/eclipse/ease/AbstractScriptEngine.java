@@ -255,7 +255,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 				// only do the printing if this is the last script on the stack
 				// otherwise we will print multiple times for each rethrow
-				if (fStackTrace.size() == 1)
+				if (fStackTrace.size() <= 1)
 					e.printStackTrace(getErrorStream());
 
 			} finally {
