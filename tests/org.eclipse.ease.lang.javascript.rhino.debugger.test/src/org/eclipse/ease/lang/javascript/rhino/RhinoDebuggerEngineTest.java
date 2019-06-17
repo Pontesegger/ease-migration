@@ -34,7 +34,6 @@ import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebuggerEngine;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -243,7 +242,7 @@ public class RhinoDebuggerEngineTest {
 
 	@Test
 	public void getExceptionStackTrace() throws InterruptedException {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 		final IReplEngine engine = (IReplEngine) scriptService.getEngineByID("org.eclipse.ease.javascript.rhinoDebugger").createEngine();
 		// make sure engine does not terminate automatically (would discard the exception stacktrace)
 		engine.setTerminateOnIdle(false);
