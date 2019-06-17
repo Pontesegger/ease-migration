@@ -18,6 +18,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class Py4JEngineTest extends Py4JEngineTestBase {
+
+	@Ignore
 	@Test
 	public void mixedMode() throws Exception {
 		// define a function in shell mode
