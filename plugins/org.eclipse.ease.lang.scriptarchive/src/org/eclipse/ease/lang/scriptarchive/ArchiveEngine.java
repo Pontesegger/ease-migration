@@ -27,10 +27,10 @@ import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.tools.ResourceTools.NonClosingInputStream;
-import org.eclipse.ui.PlatformUI;
 
 public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine {
 
@@ -227,7 +227,8 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 				// manifest found
 				final Object mainScript = fManifest.get("Main-Script");
 				if (mainScript != null) {
-					final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+					// to work in headless mode we need to retrieve the service directly
+					final IScriptService scriptService = ScriptService.getInstance();
 					final ScriptType scriptType = scriptService.getScriptType(mainScript.toString());
 					if (scriptType != null) {
 						final EngineDescription engineDescription = scriptService.getEngine(scriptType.getName());
