@@ -13,42 +13,42 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ease.service.ScriptService;
 import org.junit.Test;
 
 public class ArchiveEngineTest {
 
 	@Test
 	public void zipFileRegistration() {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 		final EngineDescription engine = scriptService.getEngine(scriptService.getScriptType("foo.zip").getName());
 		assertEquals("org.eclipse.ease.lang.scriptarchive.engine", engine.getID());
 	}
 
 	@Test
 	public void jarFileRegistration() {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 		final EngineDescription engine = scriptService.getEngine(scriptService.getScriptType("foo.jar").getName());
 		assertEquals("org.eclipse.ease.lang.scriptarchive.engine", engine.getID());
 	}
 
 	@Test
 	public void sarFileRegistration() {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 		final EngineDescription engine = scriptService.getEngine(scriptService.getScriptType("foo.sar").getName());
 		assertEquals("org.eclipse.ease.lang.scriptarchive.engine", engine.getID());
 	}
 
 	@Test
 	public void engineIdRegistration() {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 		final EngineDescription engine = scriptService.getEngineByID("org.eclipse.ease.lang.scriptarchive.engine");
 		assertEquals("org.eclipse.ease.lang.scriptarchive.engine", engine.getID());
 	}
 
 	@Test
 	public void executeWithManifest() throws MalformedURLException, InterruptedException {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 
 		final EngineDescription engineDescription = scriptService.getEngine(scriptService.getScriptType("foo.sar").getName());
 		final IScriptEngine engine = engineDescription.createEngine();
@@ -61,7 +61,7 @@ public class ArchiveEngineTest {
 
 	@Test
 	public void executeWithIncludes() throws MalformedURLException, InterruptedException {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 
 		final EngineDescription engineDescription = scriptService.getEngine(scriptService.getScriptType("foo.sar").getName());
 		final IScriptEngine engine = engineDescription.createEngine();
@@ -78,7 +78,7 @@ public class ArchiveEngineTest {
 
 	@Test
 	public void executeWithErrors() throws MalformedURLException, InterruptedException {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getInstance();
 
 		final EngineDescription engineDescription = scriptService.getEngine(scriptService.getScriptType("foo.sar").getName());
 		final IScriptEngine engine = engineDescription.createEngine();
