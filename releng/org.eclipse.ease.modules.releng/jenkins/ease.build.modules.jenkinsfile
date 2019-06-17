@@ -1,0 +1,65 @@
+pipeline {
+
+	agent {
+	    label 'migration'	    
+	}
+
+    options {
+        timestamps()
+        timeout(time: 60, unit: 'MINUTES')
+    }
+              
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout poll: false,
+                scm: [$class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'CleanCheckout']],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[url: 'git://git.eclipse.org/gitroot/ease/org.eclipse.ease.modules.git']]
+                    ]
+            }
+        }
+
+		stage('Info') {
+			steps {
+				sh "java -version"	    
+			}
+		}
+
+		stage('Fetch Doclet') {
+			steps {
+				sh "curl ${JENKINS_URL}job/ease.build.module.doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar --output ease.module.doclet.jar"	    
+			}
+		}
+
+        
+        stage('Build') {
+            steps {
+            
+	            withMaven(
+	            	jdk: 'oracle-jdk8-latest',
+	            	maven: 'apache-maven-latest',
+	            	options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
+	            {
+					sh 'mvn clean verify -Psource -Pmodule-docs -Papi-docs -Psign'
+                }
+            }
+        }
+    }
+    
+    post {
+        failure {
+			archiveArtifacts artifacts: '**', fingerprint: false
+            emailext body: "Build ${BUILD_URL} failed.", subject: "[EASE] ${JOB_NAME } failed", to: 'christian.pontesegger@web.de'
+        }
+
+        success {
+            archiveArtifacts artifacts: 'releng/org.eclipse.ease.modules.releng.p2.source/target/repository/', fingerprint: true            
+			junit '**/target/surefire-reports/*.xml'    	    
+        }
+    }
+}
