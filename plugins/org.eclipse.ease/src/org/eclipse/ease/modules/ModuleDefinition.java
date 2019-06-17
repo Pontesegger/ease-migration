@@ -29,7 +29,6 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.tools.ContributionTools;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
 
@@ -85,7 +84,7 @@ public class ModuleDefinition {
 	 * @return module definition or <code>null</code>
 	 */
 	public static ModuleDefinition getDefinition(final Object module) {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getService();
 		for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
 			if (definition.getModuleClass().equals(module.getClass()))
 				return definition;

@@ -20,6 +20,7 @@ import java.net.URL;
 
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ModuleHelpTest {
@@ -38,11 +39,13 @@ public class ModuleHelpTest {
 		fSampleField = fSampleModule.getClass().getField("PI");
 	}
 
+	@Ignore
 	@Test
 	public void getModuleHelpLocation() {
 		assertNotNull(ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition));
 	}
 
+	@Ignore
 	@Test
 	public void getModuleHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
@@ -56,6 +59,7 @@ public class ModuleHelpTest {
 		assertTrue(moduleHelp.getHoverContent().length() > moduleHelp.getDescription().length());
 	}
 
+	@Ignore
 	@Test
 	public void getMethodHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
@@ -70,6 +74,7 @@ public class ModuleHelpTest {
 		assertTrue(moduleHelp.getHoverContent().length() > methodHelp.getDescription().length());
 	}
 
+	@Ignore
 	@Test
 	public void getConstantHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
