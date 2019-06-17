@@ -122,6 +122,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void hasDebugTarget() throws CoreException {
 		assertNotNull(getDebugTarget());
