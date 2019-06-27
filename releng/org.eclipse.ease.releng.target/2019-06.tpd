@@ -21,6 +21,7 @@ location "https://download.eclipse.org/tools/orbit/downloads/drops/R201906022121
 	// needed for unit tests
 	org.mockito [1.9.5,2.0.0)
 	org.hamcrest [1.1.0,2.0.0)
+	org.mozilla.javascript [1.7.10,1.8.0)
 }
 
 location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
