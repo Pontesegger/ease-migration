@@ -35,7 +35,6 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IPluginDescriptor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
@@ -581,11 +580,6 @@ public class VirtualProject implements IProject {
 	@Override
 	public IProjectNature getNature(final String natureId) throws CoreException {
 		throw new RuntimeException("getNature not implemented");
-	}
-
-	@Override
-	public IPath getPluginWorkingLocation(final IPluginDescriptor plugin) {
-		throw new RuntimeException("getPluginWorkingLocation not implemented");
 	}
 
 	@Override
