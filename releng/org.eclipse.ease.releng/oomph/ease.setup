@@ -167,15 +167,15 @@
           <excludedPath>features/org.eclipse.ease.integration.modeling.uml.feature</excludedPath>
         </sourceLocator>
         <repositoryList
-            name="2018-09">
+            name="2019-06">
           <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository/"/>
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository"/>
           <repository
               url="https://dl.bintray.com/pontesegger/ease-engines/"/>
           <repository
-              url="http://download.eclipse.org/releases/2018-09/"/>
+              url="http://download.eclipse.org/releases/2019-06"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
+              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
         </repositoryList>
         <repositoryList
             name="2019-03">
@@ -189,15 +189,15 @@
               url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
         </repositoryList>
         <repositoryList
-            name="2019-06">
+            name="2018-09">
           <repository
-              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository"/>
+              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository/"/>
           <repository
               url="https://dl.bintray.com/pontesegger/ease-engines/"/>
           <repository
-              url="http://download.eclipse.org/releases/2019-06"/>
+              url="http://download.eclipse.org/releases/2018-09/"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
         </repositoryList>
       </targlet>
     </setupTask>
