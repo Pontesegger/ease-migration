@@ -180,6 +180,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 				pythonCode.append("def ").append(name).append('(').append(methodSignature).append("):\n");
 				pythonCode.append(indent(body, "    "));
 				pythonCode.append('\n');
+				pythonCode.append(name).append(".__ease__ = True\n");
+				pythonCode.append('\n');
 			}
 		}
 

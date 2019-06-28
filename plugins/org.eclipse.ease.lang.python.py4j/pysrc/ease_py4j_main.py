@@ -344,7 +344,7 @@ class _pyease_ScriptEngineExecute(object):
         filtered = {
             k: convert_value(v, self.gateway._gateway_client)
             for k, v in self.locals.items()
-            if k.startswith('__EASE') or (not k.startswith('__'))
+            if k.startswith('__EASE') or ((not k.startswith('__')) and (not k.startswith('_pyease_')) and (not v.__class__.__module__.startswith('py4j.')) and (not hasattr(v, '__ease__')) and (not v.__class__.__name__ == 'module'))
         }
 
         return _pyease_MapConverter().convert(filtered, self.gateway._gateway_client)
