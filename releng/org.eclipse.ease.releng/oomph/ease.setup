@@ -159,6 +159,10 @@
             name="*"/>
         <requirement
             name="org.eclipse.platform.feature.group"/>
+        <requirement
+            name="org.py4j.feature.feature.group"
+            versionRange="0.10.8.1"
+            optional="true"/>
         <sourceLocator
             rootFolder="${ease.core.git.clone.location}">
           <excludedPath>developers</excludedPath>
