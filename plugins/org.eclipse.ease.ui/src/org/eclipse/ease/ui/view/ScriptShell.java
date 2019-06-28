@@ -295,8 +295,14 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 				final Collection<ScriptCompletionProposal> proposals = new HashSet<>();
 
 				for (final String history : fHistory) {
-					if (history.startsWith(context.getOriginalCode()))
-						proposals.add(new ScriptCompletionProposal(context, history, history, fImageResolver, ScriptCompletionProposal.ORDER_HISTORY, null));
+					if (history.startsWith(context.getOriginalCode())) {
+						proposals.add(new ScriptCompletionProposal(context, history, history, fImageResolver, ScriptCompletionProposal.ORDER_HISTORY, null) {
+							@Override
+							public String getContent() {
+								return getReplacementString();
+							}
+						});
+					}
 				}
 
 				return proposals;
