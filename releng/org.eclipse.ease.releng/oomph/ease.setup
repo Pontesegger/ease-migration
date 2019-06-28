@@ -154,7 +154,7 @@
         xsi:type="setup.targlets:TargletTask">
       <targlet
           name="${scope.project.label}"
-          activeRepositoryList="2018-09">
+          activeRepositoryList="${eclipse.target.platform}">
         <requirement
             name="*"/>
         <requirement
@@ -395,7 +395,7 @@
         xsi:type="setup.targlets:TargletTask">
       <targlet
           name="${scope.project.label}"
-          activeRepositoryList="2018-09">
+          activeRepositoryList="${eclipse.target.platform}">
         <requirement
             name="*"/>
         <sourceLocator
