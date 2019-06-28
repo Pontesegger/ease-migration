@@ -309,21 +309,30 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	public Map<String, Object> getVariables(final Scriptable scope) {
-		final Map<String, Object> result = new TreeMap<>();
+		return runInJobContext(new RunnableWithResult<Map<String, Object>>() {
 
-		// first handle parent scope
-		final Scriptable parent = scope.getParentScope();
-		if (parent != null)
-			result.putAll(getVariables(parent));
+			@Override
+			public Map<String, Object> runWithTry() throws Throwable {
+				final Map<String, Object> result = new TreeMap<>();
 
-		// local scope variables may hide parent scope variables
-		for (final Object key : scope.getIds()) {
-			final Object value = getVariable(scope, key.toString());
-			if ((value == null) || (!value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
-				result.put(key.toString(), value);
-		}
+				// first handle parent scope
+				final Scriptable parent = scope.getParentScope();
+				if (parent != null)
+					result.putAll(getVariables(parent));
 
-		return result;
+				// make sure current thread has a context attached, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=548644
+				getContext();
+
+				// local scope variables may hide parent scope variables
+				for (final Object key : scope.getIds()) {
+					final Object value = getVariable(scope, key.toString());
+					if ((value == null) || (!value.getClass().getName().startsWith("org.mozilla.javascript.gen")))
+						result.put(key.toString(), value);
+				}
+
+				return result;
+			}
+		});
 	}
 
 	private Object getVariable(final Scriptable scope, final String name) {
