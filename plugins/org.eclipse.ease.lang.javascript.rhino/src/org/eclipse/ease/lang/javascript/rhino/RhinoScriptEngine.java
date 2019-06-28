@@ -134,17 +134,17 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		fContext.setInstructionObserverThreshold(10);
 
 		// enable JS v1.8 language constructs
-		// try {
-		// Context.class.getDeclaredField("VERSION_ES6");
-		// fContext.setLanguageVersion(Context.VERSION_ES6);
-		// } catch (final Exception e) {
 		try {
-			Context.class.getDeclaredField("VERSION_1_8");
-			fContext.setLanguageVersion(Context.VERSION_1_8);
-		} catch (final Exception e1) {
-			fContext.setLanguageVersion(Context.VERSION_1_7);
+			Context.class.getDeclaredField("VERSION_ES6");
+			fContext.setLanguageVersion(Context.VERSION_ES6);
+		} catch (final Exception e) {
+			try {
+				Context.class.getDeclaredField("VERSION_1_8");
+				fContext.setLanguageVersion(Context.VERSION_1_8);
+			} catch (final Exception e1) {
+				fContext.setLanguageVersion(Context.VERSION_1_7);
+			}
 		}
-		// }
 	}
 
 	@Override
