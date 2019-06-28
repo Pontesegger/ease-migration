@@ -161,11 +161,12 @@ public class AbstractReplScriptEngineTest {
 	}
 
 	@Test
-	public void terminateEngine() {
+	public void terminateEngine() throws InterruptedException {
 		fTestEngine.setTerminateOnIdle(false);
 		fTestEngine.schedule();
 
 		fTestEngine.terminate();
+		fTestEngine.join(5000);
 
 		assertEquals(Job.NONE, fTestEngine.getState());
 	}
