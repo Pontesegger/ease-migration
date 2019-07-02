@@ -40,13 +40,13 @@ public class UIModelManipulator {
 
 		final List<MPartDescriptor> descriptors = modelService.findElements(mApplication, null, MPartDescriptor.class, null);
 		for (final MPartDescriptor descriptor : descriptors) {
-			if ((descriptor.getElementId().matches(name)) || (descriptor.getLabel().equals(name)))
+			if ((name.equals(descriptor.getElementId())) || (name.equals(descriptor.getLabel())))
 				return descriptor.getElementId();
 		}
 
 		final List<MPart> partDescriptors = modelService.findElements(mApplication, null, MPart.class, null);
 		for (final MPart descriptor : partDescriptors) {
-			if ((descriptor.getElementId().matches(name)) || (descriptor.getLabel().equals(name)))
+			if ((name.equals(descriptor.getElementId())) || (name.equals(descriptor.getLabel())))
 				return descriptor.getElementId();
 		}
 
@@ -54,7 +54,7 @@ public class UIModelManipulator {
 		// see Bug 548226: some view IDs are not available in the model
 		final IViewRegistry viewRegistry = PlatformUI.getWorkbench().getViewRegistry();
 		for (final IViewDescriptor descriptor : viewRegistry.getViews()) {
-			if ((descriptor.getId().equals(name)) || (descriptor.getLabel().equals(name)))
+			if ((name.equals(descriptor.getId())) || (name.equals(descriptor.getLabel())))
 				return descriptor.getId();
 		}
 
