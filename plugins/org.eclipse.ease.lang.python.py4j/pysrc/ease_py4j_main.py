@@ -152,6 +152,7 @@ def convert_value(
     # Last resort use string representation
     return repr(value)
 
+convert_value.__ease__ = True
 
 class _pyease_EaseInteractiveConsole(_pyease_code.InteractiveConsole):
     '''
