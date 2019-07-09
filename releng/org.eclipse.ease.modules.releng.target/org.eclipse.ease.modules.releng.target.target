@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2019-06" sequenceNumber="1561628719">
+<target name="2019-06" sequenceNumber="1562698895">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.platform.feature.group" version="4.12.0.v20190605-1801"/>
@@ -40,7 +40,7 @@
       <unit id="org.eclipse.ease.ui.feature.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.ease.lang.javascript.feature.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.ease.lang.jvm.feature.feature.group" version="0.0.0"/>
-      <repository location="https://hudson.eclipse.org/ease/job/ease-build-core/lastSuccessfulBuild/artifact/releng/org.eclipse.ease.releng.p2/target/repository/"/>
+      <repository location="http://download.eclipse.org/ease/update/nightly"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.nebula.visualization.feature.feature.group" version="0.0.0"/>
