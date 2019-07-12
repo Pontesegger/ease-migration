@@ -213,10 +213,9 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		final StringBuilder code = new StringBuilder();
 
 		code.append(method.getName()).append('(');
-
 		for (final Object parameter : parameters) {
 			if (parameter instanceof String)
-				code.append('"').append(((String) parameter).replace("\"", "\\\"")).append('"');
+				code.append('"').append(((String) parameter).replace("\"", "\\\"").replace("\\", "\\\\")).append('"');
 			else if (parameter == null)
 				code.append(getNullString());
 			else if (parameter instanceof Boolean)
