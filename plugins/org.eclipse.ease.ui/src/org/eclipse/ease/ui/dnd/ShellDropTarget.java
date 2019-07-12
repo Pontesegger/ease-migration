@@ -15,14 +15,15 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -48,7 +49,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 
 	private static Collection<IShellDropHandler> getDropTargetListeners() {
 
-		final List<AbstractMap.SimpleEntry<Integer, IShellDropHandler>> candidates = new ArrayList<AbstractMap.SimpleEntry<Integer, IShellDropHandler>>();
+		final List<AbstractMap.SimpleEntry<Integer, IShellDropHandler>> candidates = new ArrayList<>();
 
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_DROP_HANDLER_ID);
 		for (final IConfigurationElement e : config) {
@@ -65,7 +66,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 						} catch (final NullPointerException e1) {
 						}
 
-						candidates.add(new AbstractMap.SimpleEntry<Integer, IShellDropHandler>(priority, (IShellDropHandler) executable));
+						candidates.add(new AbstractMap.SimpleEntry<>(priority, (IShellDropHandler) executable));
 					}
 
 				} catch (final CoreException e1) {
@@ -76,15 +77,9 @@ public final class ShellDropTarget extends DropTargetAdapter {
 		}
 
 		// sort handler by priority
-		Collections.sort(candidates, new Comparator<AbstractMap.SimpleEntry<Integer, IShellDropHandler>>() {
+		Collections.sort(candidates, (e1, e2) -> e2.getKey() - e1.getKey());
 
-			@Override
-			public int compare(final AbstractMap.SimpleEntry<Integer, IShellDropHandler> e1, final AbstractMap.SimpleEntry<Integer, IShellDropHandler> e2) {
-				return e2.getKey() - e1.getKey();
-			}
-		});
-
-		final Collection<IShellDropHandler> handler = new ArrayList<IShellDropHandler>(candidates.size());
+		final Collection<IShellDropHandler> handler = new ArrayList<>(candidates.size());
 		for (final AbstractMap.SimpleEntry<Integer, IShellDropHandler> candidate : candidates)
 			handler.add(candidate.getValue());
 
@@ -134,7 +129,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 	@Override
 	public void drop(final DropTargetEvent event) {
 
-		final Object element = unpackElement(event.data);
+		Object element = unpackElement(event.data);
 
 		// first ask registered drop handlers
 		final Collection<IShellDropHandler> listeners = getDropTargetListeners();
@@ -158,7 +153,12 @@ public final class ShellDropTarget extends DropTargetAdapter {
 		}
 
 		// no drop processor found, try generic approaches
-		fScriptEngineProvider.getScriptEngine().executeAsync(element);
+
+		// resolve nice filename for workspace resources
+		if (element instanceof IResource)
+			element = ResourceTools.toAbsoluteLocation(element, null);
+
+		fScriptEngineProvider.getScriptEngine().executeAsync(element.toString());
 	}
 
 	private Object unpackElement(Object element) {
