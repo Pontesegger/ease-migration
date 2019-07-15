@@ -259,28 +259,12 @@ public class TestFile extends TestContainer implements ITestFile {
 						}
 					}
 
-					// now check if there were any tests included. If not use testrunner to launch tests
-					if (children.isEmpty()) {
-
-						// TODO check if we can have a smarter binding than a string constant
-						if (scriptType.getName().equals("JavaScript")) {
-							if (!fScriptEngine.hasVariable("__EASE_UnitTest_TestRunner")) {
-								// load the unittest runner
-								try {
-									final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.js");
-									executionResult = fScriptEngine.executeSync(url);
-									if (executionResult.hasException())
-										getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
-
-								} catch (final MalformedURLException e) {
-									getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
-								}
-							}
-
-						} else if (scriptType.getName().equals("Python")) {
+					// TODO check if we can have a smarter binding than a string constant
+					if (scriptType.getName().equals("JavaScript")) {
+						if (!fScriptEngine.hasVariable("__EASE_UnitTest_TestRunner")) {
 							// load the unittest runner
 							try {
-								final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.py");
+								final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.js");
 								executionResult = fScriptEngine.executeSync(url);
 								if (executionResult.hasException())
 									getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
@@ -288,6 +272,19 @@ public class TestFile extends TestContainer implements ITestFile {
 							} catch (final MalformedURLException e) {
 								getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 							}
+						}
+					}
+
+					if (children.isEmpty() && scriptType.getName().equals("Python")) {
+						// load the unittest runner
+						try {
+							final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.py");
+							executionResult = fScriptEngine.executeSync(url);
+							if (executionResult.hasException())
+								getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
+
+						} catch (final MalformedURLException e) {
+							getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 						}
 					}
 				}

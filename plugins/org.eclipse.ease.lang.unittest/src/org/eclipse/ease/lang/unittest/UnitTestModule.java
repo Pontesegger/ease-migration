@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -327,18 +329,31 @@ public class UnitTestModule extends AbstractScriptModule {
 		}
 	}
 
+	/**
+	 * Adds a new Testclass to the list of {@link ITestFile} in the Test. If testClass already exists, then it returns the first testNode with given className.
+	 *
+	 * @param className
+	 *            Name of testClass
+	 * @return {@link ITestContainer}
+	 */
 	public ITestContainer addTestClass(String className) {
 		if (fCurrentTestClass != null) {
-			// testclass finished
 			fCurrentTestClass.setEntityStatus(TestStatus.FINISHED);
 			fCurrentTestClass = null;
 		}
 
 		if (className != null) {
-			// new testclass created
 			final ITestFile testFile = getTestFile();
-			fCurrentTestClass = IRuntimeFactory.eINSTANCE.createTestClass();
-			fCurrentTestClass.setName(className);
+			final List<ITestEntity> duplicateClasses = testFile.getChildren().stream()
+					.filter(p -> ITestClass.class.isAssignableFrom(p.getClass()) && p.getName().equals(className)).collect(Collectors.toList());
+
+			if (duplicateClasses.isEmpty()) {
+				fCurrentTestClass = IRuntimeFactory.eINSTANCE.createTestClass();
+				fCurrentTestClass.setName(className);
+			} else {
+				fCurrentTestClass = (ITestClass) duplicateClasses.get(0);
+			}
+
 			fCurrentTestClass.setEntityStatus(TestStatus.RUNNING);
 
 			if (getScriptEngine() instanceof IDebugEngine)
