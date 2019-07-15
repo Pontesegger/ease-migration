@@ -98,34 +98,59 @@ public class SVNModule extends AbstractScriptModule {
 	 *            recursive)
 	 */
 	@WrapToScript
-	public void importProjectsFromSVN(Object rootLocation, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] projectLocations) {
-		if (!(rootLocation instanceof IRepositoryResource))
-			rootLocation = createRepositoryLocation(rootLocation.toString(), null, null);
+	public void importProjectsFromSVN(final Object rootLocation, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] projectLocations) {
 
-		IRepositoryResource[] checkoutResources;
+		final IRepositoryLocation repoLocation = getRepositoryLocation(rootLocation);
+
+		final IRepositoryResource[] checkoutResources;
 		if (projectLocations != null) {
-			// checkout user defined projects
-			final List<IRepositoryResource> checkoutList = new ArrayList<>();
-
-			for (final String location : projectLocations) {
-				final IRepositoryResource projectResource = SVNRemoteStorage.instance().asRepositoryResource((IRepositoryLocation) rootLocation,
-						((IRepositoryLocation) rootLocation).getUrl() + "/" + location, false);
-				checkoutList.add(projectResource);
-			}
-			checkoutResources = checkoutList.toArray(new IRepositoryResource[checkoutList.size()]);
-
+			checkoutResources = getCheckoutResourcesFromList(repoLocation, projectLocations);
 		} else {
 			// checkout all projects
-			final IRepositoryResource res = (IRepositoryResource) rootLocation;
-			final IRepositoryResource[] doCeckout = new IRepositoryResource[] { res };
-			final LocateProjectsOperation locateProjectsOp = new LocateProjectsOperation(doCeckout,
-					ExtensionsManager.getInstance().getCurrentCheckoutFactory().getLocateFilter(), 5);
-
-			// Execute the locate project operation first, to get a list of all repository projects
-			executeOperation(locateProjectsOp);
-			checkoutResources = locateProjectsOp.getRepositoryResources();
+			checkoutResources = getCheckoutResourcesFromRoot(repoLocation);
 		}
 
+		checkoutResources(checkoutResources);
+	}
+
+	/*
+	 * Extract repository location from Object
+	 */
+	private IRepositoryLocation getRepositoryLocation(Object rootLocation) {
+		if ((rootLocation instanceof IRepositoryLocation)) {
+			return (IRepositoryLocation) rootLocation;
+		} else {
+			return createRepositoryLocation(rootLocation.toString(), null, null);
+		}
+	}
+
+	private IRepositoryResource[] getCheckoutResourcesFromList(IRepositoryLocation repoLocation, String[] projectLocations) {
+		// checkout user defined projects
+		final List<IRepositoryResource> checkoutList = new ArrayList<>();
+
+		for (final String location : projectLocations) {
+			final IRepositoryResource projectResource = SVNRemoteStorage.instance().asRepositoryResource(repoLocation, repoLocation.getUrl() + "/" + location,
+					false);
+			checkoutList.add(projectResource);
+		}
+		return checkoutList.toArray(new IRepositoryResource[checkoutList.size()]);
+	}
+
+	/*
+	 * Get all the projects in the repository root
+	 */
+	private IRepositoryResource[] getCheckoutResourcesFromRoot(IRepositoryLocation repoLocation) {
+		final IRepositoryResource res = SVNRemoteStorage.instance().asRepositoryResource(repoLocation, repoLocation.getUrl(), false);
+		final IRepositoryResource[] doCeckout = new IRepositoryResource[] { res };
+		final LocateProjectsOperation locateProjectsOp = new LocateProjectsOperation(doCeckout,
+				ExtensionsManager.getInstance().getCurrentCheckoutFactory().getLocateFilter(), 5);
+
+		// Execute the locate project operation first, to get a list of all repository projects
+		executeOperation(locateProjectsOp);
+		return locateProjectsOp.getRepositoryResources();
+	}
+
+	private void checkoutResources(IRepositoryResource[] checkoutResources) {
 		if (UIModule.isHeadless()) {
 			final Map<String, IRepositoryResource> operateMap = new HashMap<>();
 			for (final IRepositoryResource resource : checkoutResources)
