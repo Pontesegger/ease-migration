@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.eclipse.ease.modules</groupId>
@@ -105,6 +106,59 @@
 					<format>${build-prefix}yyyyMMddHHmm</format>
 				</configuration>
 			</plugin>
+
+			<!-- enable source feature generation -->
+			<plugin>
+				<groupId>org.eclipse.tycho.extras</groupId>
+				<artifactId>tycho-source-feature-plugin</artifactId>
+				<version>${tycho.extras.version}</version>
+
+				<executions>
+					<execution>
+						<id>source-feature</id>
+						<phase>package</phase>
+						<goals>
+							<goal>source-feature</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<excludes>
+						<plugin id="org.eclipse.ease.modules.help" />
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho.version}</version>
+
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>attached-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -117,9 +171,7 @@
 		<module>../../plugins/org.eclipse.ease.modules.modeling.ui</module>
 		<module>../../plugins/org.eclipse.ease.modules.help</module>
 		<module>../../plugins/org.eclipse.ease.modules.team.git</module>
-		<!-- temporary disabled due to API breakage in egit dependencies
-		<module>../../plugins/org.eclipse.ease.modules.team.git.ui</module>
-		-->
+		<!-- temporary disabled due to API breakage in egit dependencies <module>../../plugins/org.eclipse.ease.modules.team.git.ui</module> -->
 		<module>../../plugins/org.eclipse.ease.modules.team.svn</module>
 		<module>../../plugins/org.eclipse.ease.modules.jvm</module>
 
@@ -159,15 +211,11 @@
 		</profile>
 
 		<profile>
-			<!-- build help pages for modules using javadoc. Needs variable doclet.path
-				to be set to the location of the ModuleDoclet jar.
-				The jar can be built with:
-				   mvn clean package -f org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/pom.xml
-				in which case the doclet.path would be:
-				   org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar
-				or the pre-built jar can downloaded from:
-				   https://hudson.eclipse.org/ease/job/ease-build-module-doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar
-			-->
+			<!-- build help pages for modules using javadoc. Needs variable doclet.path 
+				to be set to the location of the ModuleDoclet jar. The jar can be built with: 
+				mvn clean package -f org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/pom.xml 
+				in which case the doclet.path would be: org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar 
+				or the pre-built jar can downloaded from: https://hudson.eclipse.org/ease/job/ease-build-module-doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar -->
 			<id>module-docs</id>
 
 			<build>
@@ -182,14 +230,13 @@
 							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
 							<doclet>org.eclipse.ease.helpgenerator.ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
-							<additionalparam>-root ${basedir} -failOnHTMLError true -failOnMissingDocs true</additionalparam>
+							<additionalparam>-root ${basedir} -failOnHTMLError true
+								-failOnMissingDocs true</additionalparam>
 
 							<useStandardDocletOptions>true</useStandardDocletOptions>
 							<links>
 								<link>https://osgi.org/javadoc/r6/cmpn</link>
-								<!--
-								<link>http://docs.oracle.com/javase/8/docs/api/</link>
-								 -->
+								<!-- <link>http://docs.oracle.com/javase/8/docs/api/</link> -->
 							</links>
 							<offlineLinks>
 								<offlineLink>
@@ -248,71 +295,6 @@
 		</profile>
 
 		<profile>
-			<id>source</id>
-
-			<modules>
-				<module>../org.eclipse.ease.modules.releng.p2.source</module>
-			</modules>
-
-			<build>
-				<plugins>
-					<!-- enable source feature generation -->
-					<plugin>
-						<groupId>org.eclipse.tycho.extras</groupId>
-						<artifactId>tycho-source-feature-plugin</artifactId>
-						<version>${tycho.extras.version}</version>
-
-						<executions>
-							<execution>
-								<id>source-feature</id>
-								<phase>package</phase>
-								<goals>
-									<goal>source-feature</goal>
-								</goals>
-							</execution>
-						</executions>
-
-						<configuration>
-							<excludes>
-								<plugin id="org.eclipse.ease.modules.help" />
-							</excludes>
-						</configuration>
-					</plugin>
-
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-source-plugin</artifactId>
-						<version>${tycho.version}</version>
-
-						<executions>
-							<execution>
-								<id>plugin-source</id>
-								<goals>
-									<goal>plugin-source</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-p2-plugin</artifactId>
-						<version>${tycho.version}</version>
-						<executions>
-							<execution>
-								<id>attached-p2-metadata</id>
-								<phase>package</phase>
-								<goals>
-									<goal>p2-metadata</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
 			<id>sonar</id>
 
 			<build>
@@ -344,7 +326,7 @@
 		</profile>
 
 		<profile>
-			<!-- sign plugins and features using the eclipse.org certificate. Works
+			<!-- sign plugins and features using the eclipse.org certificate. Works 
 				only when running on the eclipse build servers (hudson) -->
 			<id>sign</id>
 
