@@ -47,12 +47,14 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumn;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -518,8 +520,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Create a label provider to be used for combos, lists or tables. While the callback is executed you may call {@module #getLabelProviderElement()} to get
-	 * the current element.
+	 * Create a label provider to be used for combos, lists or tables. While the callback is executed you may call {@module #getProviderElement()} to get the
+	 * current element.
 	 *
 	 * @param textCallback
 	 *            script callback to return the text for the element
@@ -530,6 +532,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public ColumnLabelProvider createLabelProvider(@ScriptParameter(defaultValue = ScriptParameter.NULL) Object textCallback,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object imageCallback) {
+
+		if ((textCallback != null) || (imageCallback != null))
+			keepScriptEngineAlive();
+
 		return new GenericLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -592,6 +598,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public TableViewer createTableViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<TableViewer>() {
 			@Override
 			public TableViewer runWithTry() throws Throwable {
@@ -607,11 +617,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 				tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 				tableViewer.setInput(elements);
 
-				if (callback != null) {
+				if (callback != null)
 					tableViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
-				}
 
 				getUICompositor().insertElement(composite, new Location(layout));
 
@@ -641,6 +648,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public TreeViewer createTreeViewer(Object[] rootElements, Object getChildrenCallback, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
+
+		if ((getChildrenCallback != null) || (callback != null))
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<TreeViewer>() {
 			@Override
 			public TreeViewer runWithTry() throws Throwable {
@@ -696,11 +707,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 				});
 				treeViewer.setInput(rootElements);
 
-				if (callback != null) {
+				if (callback != null)
 					treeViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
-				}
 
 				getUICompositor().insertElement(composite, new Location(layout));
 
@@ -808,6 +816,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 */
 	@WrapToScript
 	public Button createButton(Object labelOrImage, Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
 			public Button runWithTry() throws Throwable {
@@ -824,8 +836,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 						runEventCallback(e, callback);
 					}
 				});
-				if (getScriptEngine() instanceof IReplEngine)
-					((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 
 				getUICompositor().insertElement(button, new Location(layout));
 
@@ -853,6 +863,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Button createCheckBox(String label, @ScriptParameter(defaultValue = "true") boolean selected,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout)
 			throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
 			public Button runWithTry() throws Throwable {
@@ -868,9 +882,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 							runEventCallback(e, callback);
 						}
 					});
-
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 				}
 
 				getUICompositor().insertElement(button, new Location(layout));
@@ -899,6 +910,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public Button createRadioButton(String label, @ScriptParameter(defaultValue = "true") boolean selected,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout)
 			throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<Button>() {
 			@Override
 			public Button runWithTry() throws Throwable {
@@ -914,9 +929,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 							runEventCallback(e, callback);
 						}
 					});
-
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
 				}
 
 				getUICompositor().insertElement(button, new Location(layout));
@@ -942,6 +954,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public ComboViewer createComboViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<ComboViewer>() {
 			@Override
 			public ComboViewer runWithTry() throws Throwable {
@@ -952,12 +968,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 				comboViewer.setSelection(new StructuredSelection(elements[0]));
 
-				if (callback != null) {
+				if (callback != null)
 					comboViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
-
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
-				}
 
 				getUICompositor().insertElement(comboViewer.getControl(), new Location(layout));
 
@@ -965,6 +977,82 @@ public class UIBuilderModule extends AbstractScriptModule {
 					fScriptableDialog.registerViewer(comboViewer.getControl(), comboViewer);
 
 				return comboViewer;
+			}
+		});
+	}
+
+	/**
+	 * Create a comparator (sorter) to be used for combos, lists or tables. The comparator is automatically attached to the provided viewer.
+	 *
+	 * @param viewer
+	 *            viewer to create the comparator for
+	 * @param categoryCallback
+	 *            script callback to return the category type for an element. The element can be retrieved with {@module #getProviderElement()}. The return type
+	 *            is expected to be an integer. Lower numbers get displayed first.
+	 * @param compareCallback
+	 *            script callback to return the comparison result of 2 elements. The elements are stored as array in {@module #getProviderElement()}. The return
+	 *            type is expected to be an integer. If &lt;0 then the first element gets listed first, &gt;0 lists the 2nd element first
+	 * @return the viewer comparator
+	 * @throws Throwable
+	 *             when comparator cannot be set
+	 */
+	@WrapToScript
+	public ViewerComparator createComparator(StructuredViewer viewer, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object categoryCallback,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object compareCallback) throws Throwable {
+
+		if ((categoryCallback != null) || (compareCallback != null))
+			keepScriptEngineAlive();
+
+		return runInUIThread(new RunnableWithResult<ViewerComparator>() {
+
+			@Override
+			public ViewerComparator runWithTry() throws Throwable {
+
+				viewer.setComparator(new ViewerComparator() {
+					@Override
+					public int category(Object element) {
+
+						if (categoryCallback != null) {
+							try {
+								fProviderElement = element;
+								final Object result = getScriptEngine().inject(categoryCallback);
+
+								if (result != null)
+									return Integer.parseInt(result.toString());
+
+							} catch (final Throwable e) {
+								// silently swallow
+							} finally {
+								fProviderElement = null;
+							}
+						}
+
+						return super.category(element);
+					}
+
+					@Override
+					public int compare(Viewer viewer, Object e1, Object e2) {
+						if (compareCallback != null) {
+							try {
+								fProviderElement = new Object[] { e1, e2 };
+
+								final Object result = getScriptEngine().inject(compareCallback);
+
+								if (result != null)
+									return Integer.parseInt(result.toString());
+
+							} catch (final Throwable e) {
+								// silently swallow
+							} finally {
+								fProviderElement = null;
+							}
+						}
+
+						return super.compare(viewer, e1, e2);
+					}
+				});
+
+				return viewer.getComparator();
 			}
 		});
 	}
@@ -985,6 +1073,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	@WrapToScript
 	public ListViewer createListViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+
+		if (callback != null)
+			keepScriptEngineAlive();
+
 		return runInUIThread(new RunnableWithResult<ListViewer>() {
 			@Override
 			public ListViewer runWithTry() throws Throwable {
@@ -993,12 +1085,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 				listViewer.setContentProvider(ArrayContentProvider.getInstance());
 				listViewer.setInput(elements);
 
-				if (callback != null) {
+				if (callback != null)
 					listViewer.addSelectionChangedListener(event -> runEventCallback(event, callback));
-
-					if (getScriptEngine() instanceof IReplEngine)
-						((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
-				}
 
 				getUICompositor().insertElement(listViewer.getControl(), new Location(layout));
 
@@ -1081,6 +1169,14 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return fUiEvent;
 	}
 
+	/**
+	 * Make sure that script engine does not get terminated. This is necessary whenever callbacks are registered.
+	 */
+	private void keepScriptEngineAlive() {
+		if (getScriptEngine() instanceof IReplEngine)
+			((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
+	}
+
 	private <T> T runInUIThread(RunnableWithResult<T> runnable) throws Throwable {
 		Display.getDefault().syncExec(runnable);
 
@@ -1158,13 +1254,14 @@ public class UIBuilderModule extends AbstractScriptModule {
 			return super.getText(element);
 		}
 
+		@SuppressWarnings("unchecked")
 		private <T> T callMethod(String methodName, Class<T> returnType, Object element) {
 			final Class<? extends Object> elementClass = element.getClass();
 			try {
-				final Method method = elementClass.getMethod(methodName, null);
+				final Method method = elementClass.getMethod(methodName);
 				if (method != null) {
-					if (returnType.equals(method.getReturnType()))
-						return (T) method.invoke(element, null);
+					if (returnType.isAssignableFrom(method.getReturnType()))
+						return (T) method.invoke(element);
 				}
 
 			} catch (final Exception e) {
