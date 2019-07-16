@@ -24,6 +24,7 @@ import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Image;
@@ -98,7 +99,7 @@ public class CustomCodePage extends AbstractEditorPage {
 		fCmbCodeLocation.setInput(getLocations());
 
 		fCmbCodeLocation.addSelectionChangedListener(event -> {
-			final String location = event.getStructuredSelection().getFirstElement().toString();
+			final String location = ((IStructuredSelection) event.getSelection()).getFirstElement().toString();
 			final ICode customCode = getTestSuiteDefinition().getCustomCode(location);
 			final String code = (customCode != null) ? customCode.getContent() : null;
 
