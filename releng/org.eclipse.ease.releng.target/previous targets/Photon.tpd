@@ -1,6 +1,6 @@
-target "Neon" with source requirements
+target "Oxygen" with source requirements
 
-location "http://download.eclipse.org/releases/neon/" eclipse-neon {
+location "http://download.eclipse.org/releases/photon/" eclipse-photon {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -17,6 +17,12 @@ location "http://download.eclipse.org/releases/neon/" eclipse-neon {
 	org.eclipse.jdt
 }
 
+location "http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository" eclipse-orbit-photon {
+	// needed for unit tests
+	org.mockito [1.9.5,2.0.0)
+	org.hamcrest [1.1.0,2.0.0)
+}
+
 location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
 	// jython interpreter
 	org.eclipse.ease.engine.jython.feature.feature.group lazy
@@ -24,11 +30,6 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 	org.eclipse.ease.engine.groovy.feature.feature.group lazy
 	// ruby interpreter
 	org.eclipse.ease.engine.jruby.feature.feature.group lazy
-}
-
-location "http://download.eclipse.org/tools/orbit/downloads/drops/R20160520211859/repository/" eclipse-orbit-neon {
-	org.mockito [1.9.5,2.0.0)
-	org.hamcrest [1.1.0,2.0.0)
 }
 
 location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {
