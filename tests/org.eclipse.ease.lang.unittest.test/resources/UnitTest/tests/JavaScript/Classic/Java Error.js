@@ -15,7 +15,7 @@ startTest("five");
 {
 	// error
 	print("five");
-	throw "JavaScript error";
+	new java.lang.String("").substring(3);
 	endTest();
 }
 
