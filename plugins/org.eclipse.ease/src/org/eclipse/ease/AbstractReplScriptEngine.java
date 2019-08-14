@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
@@ -44,6 +45,12 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	@Override
 	public final void setTerminateOnIdle(final boolean terminate) {
 		fTerminateOnIdle = terminate;
+
+		// if the engine remains active when IDLE this is likely a shell, therefore hide its job from users
+		if (getState() == Job.NONE)
+			// we can only set this before the engine got started
+			setSystem(!terminate);
+
 		synchronized (this) {
 			notifyAll();
 		}

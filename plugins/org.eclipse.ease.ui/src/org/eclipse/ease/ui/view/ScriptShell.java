@@ -482,7 +482,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			fScriptEngine.setTerminateOnIdle(false);
 
 			// set view title
-			final String partName = fScriptEngine.getName() + " Script Shell";
+			final String partName = scriptService.getEngineByID(id).getName() + " Script Shell";
 			setPartName(partName);
 
 			// prepare console

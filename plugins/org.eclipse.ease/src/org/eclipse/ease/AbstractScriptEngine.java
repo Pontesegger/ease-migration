@@ -35,6 +35,7 @@ import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
+import org.eclipse.ease.tools.ResourceTools;
 
 /**
  * Base implementation for a script engine. Handles Job implementation of script engine, adding script code for execution, module loading support and a basic
@@ -126,10 +127,10 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 *            name of script engine job
 	 */
 	public AbstractScriptEngine(final String name) {
-		super(name);
+		super("[EASE " + name + " Engine]");
 
-		// make this a system job (not visible to the user)
-		setSystem(true);
+		// by default an engine shall be visible to the user. If the engine
+		setSystem(false);
 	}
 
 	@Override
@@ -199,9 +200,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	private static String getFilename(Object file) {
 		if (file instanceof IFile) {
-			return ((IFile) file).toString();
+			return ResourceTools.toAbsoluteLocation(file, null);
 		} else if (file instanceof File) {
-			return ((File) file).getAbsolutePath();
+			return ResourceTools.toAbsoluteLocation(file, null);
 		} else {
 			return null;
 		}
@@ -226,6 +227,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Executing script (" + script.getTitle() + "):", script.getCode());
 				final String filename = getFilename(script.getFile());
 				fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE, filename));
+				updateJobName(filename);
 
 				// apply security checks
 				final List<ISecurityCheck> securityChecks = fSecurityChecks.get(ActionType.INJECT_CODE);
@@ -270,6 +272,19 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		}
 
 		return script.getResult();
+	}
+
+	/**
+	 * @param filename
+	 */
+	private void updateJobName(String filename) {
+		if (filename != null) {
+			String baseName = getName();
+			if (baseName.contains("]"))
+				baseName = baseName.substring(0, baseName.indexOf(']') + 1);
+
+			setName(baseName + " " + filename);
+		}
 	}
 
 	@Override
