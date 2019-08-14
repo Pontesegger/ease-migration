@@ -1,70 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature id="org.eclipse.ease.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.feature" version="0.8.0.qualifier">
       <category name="Core"/>
    </feature>
-   <feature id="org.eclipse.ease.ui.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.ui.feature" version="0.8.0.qualifier">
       <category name="Core"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.javascript.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.javascript.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.python.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.python.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.jvm.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.jvm.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.python.jython.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.python.jython.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.groovy.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.groovy.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.ruby.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.ruby.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.python.py4j.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.python.py4j.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.scriptarchive.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.scriptarchive.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.unittest.feature" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.unittest.feature" version="0.8.0.qualifier">
       <category name="Lang"/>
    </feature>
 
-   <feature id="org.eclipse.ease.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.ui.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.ui.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.javascript.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.javascript.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.python.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.python.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.jvm.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.jvm.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.python.jython.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.python.jython.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.groovy.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.groovy.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.ruby.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.ruby.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.python.py4j.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.python.py4j.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.scriptarchive.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.scriptarchive.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.lang.unittest.feature.source" version="0.7.0.qualifier">
+   <feature id="org.eclipse.ease.lang.unittest.feature.source" version="0.8.0.qualifier">
       <category name="Developers"/>
    </feature>
 
