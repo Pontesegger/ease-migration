@@ -289,8 +289,11 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	public void terminateCurrent() {
-		// typically requested by a different thread, so do not use getContext() here
-		((ObservingContextFactory) ContextFactory.getGlobal()).terminate(fContext);
+		if (Thread.currentThread().equals(getThread()))
+			throw new ScriptExecutionException("Script got terminated");
+		else
+			// requested by a different thread, so do not use getContext() here
+			((ObservingContextFactory) ContextFactory.getGlobal()).terminate(fContext);
 	}
 
 	@Override

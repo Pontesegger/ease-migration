@@ -13,18 +13,18 @@ package org.eclipse.ease.lang.javascript.rhino;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.ease.ExitException;
+import org.eclipse.ease.ScriptExecutionException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 
 public class ObservingContextFactory extends ContextFactory {
 
-	private final Set<Context> mTerminationRequests = new HashSet<Context>();
+	private final Set<Context> mTerminationRequests = new HashSet<>();
 
 	@Override
 	protected synchronized void observeInstructionCount(final Context cx, final int instructionCount) {
 		if (mTerminationRequests.remove(cx))
-			throw new ExitException();
+			throw new ScriptExecutionException("Engine got terminated");
 
 		super.observeInstructionCount(cx, instructionCount);
 	}

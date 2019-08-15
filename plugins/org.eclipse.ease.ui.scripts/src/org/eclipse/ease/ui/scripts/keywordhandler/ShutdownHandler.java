@@ -40,30 +40,27 @@ public class ShutdownHandler implements EventHandler, IWorkbenchListener {
 		@Override
 		protected IStatus run(final IProgressMonitor monitor) {
 			// wait for engines to be completed
-			for (IScriptEngine engine : fEngines) {
-				long timeout = (fStartTime + fShutdownTimeout) - System.currentTimeMillis();
+			for (final IScriptEngine engine : fEngines) {
+				final long timeout = (fStartTime + fShutdownTimeout) - System.currentTimeMillis();
 				if (timeout > 0) {
 					try {
-						engine.join(timeout);
-					} catch (InterruptedException e) {
+						engine.joinEngine(timeout);
+					} catch (final InterruptedException e) {
 					}
 				} else
 					break;
 			}
 
 			// terminate engines that are not completed
-			for (IScriptEngine engine : fEngines) {
+			for (final IScriptEngine engine : fEngines) {
 				if (!engine.isFinished())
 					engine.terminate();
 			}
 
 			// call final shutdown
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					fShutdownScripts.clear();
-					PlatformUI.getWorkbench().close();
-				}
+			Display.getDefault().asyncExec(() -> {
+				fShutdownScripts.clear();
+				PlatformUI.getWorkbench().close();
 			});
 
 			return Status.OK_STATUS;
@@ -71,7 +68,7 @@ public class ShutdownHandler implements EventHandler, IWorkbenchListener {
 	}
 
 	/** Registered shutdown scripts. */
-	Collection<IScript> fShutdownScripts = new HashSet<IScript>();
+	Collection<IScript> fShutdownScripts = new HashSet<>();
 
 	/** Default script timeout: 10s. */
 	private long fShutdownTimeout = 10 * 1000;
@@ -85,7 +82,7 @@ public class ShutdownHandler implements EventHandler, IWorkbenchListener {
 	@Override
 	public void handleEvent(final Event event) {
 		final IScript script = (IScript) event.getProperty("script");
-		String value = (String) event.getProperty("value");
+		final String value = (String) event.getProperty("value");
 
 		if (value == null)
 			fShutdownScripts.remove(script);
@@ -95,7 +92,7 @@ public class ShutdownHandler implements EventHandler, IWorkbenchListener {
 			if (!value.isEmpty()) {
 				try {
 					fShutdownTimeout = Math.max(fShutdownTimeout, Integer.parseInt(value) * 1000);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					Logger.error(Activator.PLUGIN_ID, "Invalid onShutdown timeout for script: " + script.getLocation());
 				}
 			}
@@ -111,8 +108,8 @@ public class ShutdownHandler implements EventHandler, IWorkbenchListener {
 	public boolean preShutdown(final IWorkbench workbench, final boolean forced) {
 		if ((!forced) && (!fShutdownScripts.isEmpty())) {
 			fStartTime = System.currentTimeMillis();
-			fEngines = new HashSet<IScriptEngine>();
-			for (IScript script : fShutdownScripts)
+			fEngines = new HashSet<>();
+			for (final IScript script : fShutdownScripts)
 				fEngines.add(script.run());
 
 			new ShutdownJob().schedule();

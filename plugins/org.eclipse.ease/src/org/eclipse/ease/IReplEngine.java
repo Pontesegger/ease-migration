@@ -17,14 +17,6 @@ import org.eclipse.ease.debugging.model.EaseDebugVariable;
 public interface IReplEngine extends IScriptEngine {
 
 	/**
-	 * Returns the execution state of the engine. If the engine is processing code or is terminated this will return <code>false</code>. If the engine is
-	 * waiting for further scripts to execute this will return <code>true</code>.
-	 *
-	 * @return execution state.
-	 */
-	boolean isIdle();
-
-	/**
 	 * Set a marker that the interpreter should terminate instead entering IDLE mode. If set, the interpreter will execute all pending requests and terminate
 	 * afterwards.
 	 *

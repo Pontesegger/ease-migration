@@ -555,8 +555,21 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		fModuleCallbacks.add(callbackProvider);
 	}
 
-	// needed by dynamic script code
+	//
+	/**
+	 * Check if java callbacks are registered for a module method. This method get called on each module function invokation.
+	 * <p>
+	 * ATTENTION: needed by dynamic script code, do not alter synopsis!
+	 * </p>
+	 *
+	 * @param methodToken
+	 *            unique method token
+	 * @return <code>true</code> when callbacks are registered
+	 */
 	public boolean hasMethodCallback(String methodToken) {
+		if (getScriptEngine() instanceof AbstractScriptEngine)
+			((AbstractScriptEngine) getScriptEngine()).checkForCancellation();
+
 		final Method method = fRegisteredMethods.get(methodToken);
 
 		for (final IModuleCallbackProvider callbackProvider : fModuleCallbacks) {

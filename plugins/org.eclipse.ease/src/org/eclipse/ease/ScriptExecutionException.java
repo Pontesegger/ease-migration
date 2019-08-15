@@ -44,6 +44,15 @@ public class ScriptExecutionException extends RuntimeException {
 		fErrorName = null;
 	}
 
+	public ScriptExecutionException(String message) {
+		super(message);
+
+		fLineSource = null;
+		fColumnNumber = 0;
+		fScriptStackTrace = null;
+		fErrorName = null;
+	}
+
 	/**
 	 * Instantiate wrapper exception.
 	 *

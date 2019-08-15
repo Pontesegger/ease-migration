@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
@@ -36,43 +38,13 @@ import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
 
 /**
  * Base implementation for a script engine. Handles Job implementation of script engine, adding script code for execution, module loading support and a basic
  * online help system.
  */
 public abstract class AbstractScriptEngine extends Job implements IScriptEngine {
-
-	/**
-	 * Watches over the script execution job and forwards termination requests from the Progress UI.
-	 */
-	private class ScriptTerminator extends Job {
-
-		private final IProgressMonitor fMonitor;
-
-		/**
-		 * @param monitor
-		 *            monitor from the script engine job
-		 */
-		public ScriptTerminator(IProgressMonitor monitor) {
-			super("ScriptEngine termination guard");
-			fMonitor = monitor;
-
-			setSystem(true);
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			if (fMonitor.isCanceled())
-				terminate();
-
-			else
-				// check again in a second
-				schedule(1000);
-
-			return Status.OK_STATUS;
-		}
-	}
 
 	/**
 	 * Get the current script engine. Works only if executed from the script engine thread.
@@ -84,6 +56,23 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			return (IScriptEngine) Job.getJobManager().currentJob();
 
 		return null;
+	}
+
+	/**
+	 * Get the beautified name of a file to be set as part of the job title.
+	 *
+	 * @param file
+	 *            executed file
+	 * @return beautified name or <code>null</code>
+	 */
+	private static String getFilename(Object file) {
+		if (file instanceof IFile) {
+			return ResourceTools.toAbsoluteLocation(file, null);
+		} else if (file instanceof File) {
+			return ResourceTools.toAbsoluteLocation(file, null);
+		} else {
+			return null;
+		}
 	}
 
 	/** List of code junks to be executed. */
@@ -107,8 +96,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	private final Map<String, Object> fBufferedVariables = new HashMap<>();
 
 	private boolean fCloseStreamsOnTerminate;
-
-	private boolean fTerminated = false;
 
 	/** Registered security checks for engine actions. */
 	private final HashMap<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();
@@ -198,16 +185,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return result.getResult();
 	}
 
-	private static String getFilename(Object file) {
-		if (file instanceof IFile) {
-			return ResourceTools.toAbsoluteLocation(file, null);
-		} else if (file instanceof File) {
-			return ResourceTools.toAbsoluteLocation(file, null);
-		} else {
-			return null;
-		}
-	}
-
 	/**
 	 * Inject script code to the script engine. Injected code is processed synchronous by the current thread unless <i>uiThread</i> is set to <code>true</code>.
 	 * Nevertheless this is a blocking call.
@@ -234,7 +211,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 				if (securityChecks != null) {
 					for (final ISecurityCheck check : securityChecks) {
 						if (!check.doIt(ActionType.INJECT_CODE, script, uiThread))
-							throw new ExitException();
+							throw new ScriptEngineException("Security check failed: " + check.toString());
 					}
 				}
 
@@ -245,9 +222,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 					notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_START);
 
 				script.setResult(execute(script, script.getFile(), fStackTrace.get(0).getName(), uiThread));
-
-			} catch (final ExitException e) {
-				script.setResult(e.getCondition());
 
 			} catch (final BreakException e) {
 				script.setResult(e.getCondition());
@@ -274,9 +248,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return script.getResult();
 	}
 
-	/**
-	 * @param filename
-	 */
 	private void updateJobName(String filename) {
 		if (filename != null) {
 			String baseName = getName();
@@ -291,17 +262,46 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	protected IStatus run(final IProgressMonitor monitor) {
 		fMonitor = monitor;
 
+		addStopButtonMonitor();
+
+		IStatus returnStatus = setupRun();
+		if (Status.OK_STATUS.equals(returnStatus)) {
+			// main loop
+			while (!shallTerminate()) {
+
+				// execute code
+				if (!fScheduledScripts.isEmpty()) {
+					final Script piece = fScheduledScripts.remove(0);
+					final ScriptResult scriptResult = inject(piece, true, false);
+					if (scriptResult.hasException())
+						returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Script execution failed", scriptResult.getException());
+
+				} else {
+					synchronized (this) {
+						try {
+							Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine idle: " + getName());
+							wait();
+						} catch (final InterruptedException e) {
+						}
+					}
+				}
+			}
+		}
+
+		if ((Status.OK_STATUS.equals(returnStatus)) && (getMonitor().isCanceled()))
+			returnStatus = Status.CANCEL_STATUS;
+
+		return cleanupRun(returnStatus);
+	}
+
+	private IStatus setupRun() {
 		Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine started: " + getName());
-		IStatus returnStatus = Status.OK_STATUS;
 
 		addSecurityCheck(ActionType.INJECT_CODE, ScriptUIAccess.getInstance());
 
 		try {
 			setupEngine();
 			fSetupDone = true;
-
-			if (!isSystem())
-				new ScriptTerminator(monitor).schedule();
 
 			// engine is initialized, set buffered variables
 			for (final Entry<String, Object> entry : fBufferedVariables.entrySet()) {
@@ -315,76 +315,119 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 			notifyExecutionListeners(null, IExecutionListener.ENGINE_START);
 
-			// main loop
-			while ((!monitor.isCanceled()) && (!isTerminated())) {
-
-				// execute code
-				if (!fScheduledScripts.isEmpty()) {
-					final Script piece = fScheduledScripts.remove(0);
-					inject(piece, true, false);
-
-				} else {
-
-					synchronized (this) {
-						if (!isTerminated()) {
-							try {
-								Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine idle: " + getName());
-								wait();
-							} catch (final InterruptedException e) {
-							}
-						}
-					}
-				}
-			}
-
-			returnStatus = (!isTerminated()) ? Status.OK_STATUS : Status.CANCEL_STATUS;
-
 		} catch (final ScriptEngineException e) {
-			returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not setup script engine", e);
-
-		} finally {
-			// discard pending code pieces
-			synchronized (fScheduledScripts) {
-				for (final Script script : fScheduledScripts)
-					script.setException(new ExitException());
-			}
-
-			fScheduledScripts.clear();
-
-			notifyExecutionListeners(null, IExecutionListener.ENGINE_END);
-
-			try {
-				teardownEngine();
-			} catch (final ScriptEngineException e) {
-				if (returnStatus.getSeverity() < IStatus.ERROR) {
-					// We were almost all OK (or just warnings/infos) but then we failed at shutdown
-					// Note we don't override a CANCEL
-					returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not teardown script engine", e);
-				}
-			} finally {
-				fTerminated = true;
-				synchronized (this) {
-					notifyAll();
-				}
-
-				// discard pending code pieces
-				synchronized (fScheduledScripts) {
-					for (final Script script : fScheduledScripts)
-						script.setException(new ExitException());
-
-					fScheduledScripts.clear();
-				}
-
-				closeStreams();
-
-				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine terminated: " + getName());
-			}
+			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not setup script engine", e);
 		}
 
-		monitor.done();
-		fMonitor = null;
+		return Status.OK_STATUS;
+	}
+
+	private IStatus cleanupRun(IStatus returnStatus) {
+
+		// discard pending code pieces
+		synchronized (fScheduledScripts) {
+			for (final Script script : fScheduledScripts)
+				script.setException(new ScriptExecutionException("Engine got terminated"));
+		}
+
+		fScheduledScripts.clear();
+
+		notifyExecutionListeners(null, IExecutionListener.ENGINE_END);
+
+		try {
+			teardownEngine();
+		} catch (final ScriptEngineException e) {
+			if (returnStatus.getSeverity() < IStatus.ERROR) {
+				// We were almost all OK (or just warnings/infos) but then we failed at shutdown
+				// Note we don't override a CANCEL
+				returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not teardown script engine", e);
+			}
+		} finally {
+			synchronized (this) {
+				notifyAll();
+			}
+
+			closeStreams();
+
+			Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine terminated: " + getName());
+
+			fMonitor.done();
+			fMonitor = null;
+		}
 
 		return returnStatus;
+	}
+
+	/**
+	 * Add monitor to detect clicks on the stop button in the Progress view.
+	 */
+	private void addStopButtonMonitor() {
+		if (fMonitor instanceof JobMonitor)
+			((JobMonitor) fMonitor).addProgressListener(new ScriptEngineMonitor());
+	}
+
+	/**
+	 * Evaluate if the engine shall terminate.
+	 *
+	 * @return <code>true</code> when termination is requested or there is no more work to be done
+	 */
+	protected boolean shallTerminate() {
+		return getMonitor().isCanceled() || fScheduledScripts.isEmpty();
+	}
+
+	@Override
+	public void terminate() {
+
+		final IProgressMonitor monitor = getMonitor();
+		if ((monitor != null) && (!monitor.isCanceled()))
+			monitor.setCanceled(true);
+
+		terminateCurrent();
+
+		synchronized (this) {
+			notify();
+		}
+	}
+
+	/**
+	 * Check engine for cancellation request and terminate if indicated by the monitor.
+	 */
+	public void checkForCancellation() {
+		final IProgressMonitor monitor = getMonitor();
+		if ((monitor != null) && (monitor.isCanceled())) {
+			if (Thread.currentThread().equals(getThread()))
+				throw new ScriptExecutionException("Engine got terminated");
+		}
+	}
+
+	@Override
+	public boolean isFinished() {
+		// setup was done, hence we were started
+		return (Job.NONE == getState()) && fSetupDone;
+	}
+
+	@Override
+	public void joinEngine() throws InterruptedException {
+		if (!Thread.currentThread().equals(getThread())) {
+			// we cannot join our own thread
+
+			synchronized (this) {
+				while (!isFinished())
+					wait(1000);
+			}
+		}
+	}
+
+	@Override
+	public void joinEngine(final long timeout) throws InterruptedException {
+		if (!Thread.currentThread().equals(getThread())) {
+			// we cannot join our own thread
+
+			synchronized (this) {
+				if (!isFinished())
+					wait(timeout);
+			}
+		}
 	}
 
 	@Override
@@ -464,15 +507,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			fErrorStream = null;
 	}
 
-	/**
-	 * Get termination status of the interpreter. A terminated interpreter cannot be restarted.
-	 *
-	 * @return true if interpreter is terminated.
-	 */
-	protected boolean isTerminated() {
-		return fScheduledScripts.isEmpty();
-	}
-
 	@Override
 	public void addExecutionListener(final IExecutionListener listener) {
 		fExecutionListeners.add(listener);
@@ -486,20 +520,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	protected void notifyExecutionListeners(final Script script, final int status) {
 		for (final Object listener : fExecutionListeners.getListeners())
 			((IExecutionListener) listener).notify(this, script, status);
-	}
-
-	@Override
-	public void terminate() {
-		fScheduledScripts.clear();
-		terminateCurrent();
-
-		// ask thread to terminate
-		cancel();
-
-		// see bug 512607
-		final Thread thread = getThread();
-		if (thread != null)
-			thread.interrupt();
 	}
 
 	public ScriptStackTrace getStackTrace() {
@@ -584,19 +604,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	}
 
 	@Override
-	public boolean isFinished() {
-		return fTerminated;
-	}
-
-	@Override
-	public void join(final long timeout) throws InterruptedException {
-		synchronized (this) {
-			if (!isFinished())
-				wait(timeout);
-		}
-	}
-
-	@Override
 	public void addSecurityCheck(ActionType type, ISecurityCheck check) {
 		if (!fSecurityChecks.containsKey(type))
 			fSecurityChecks.put(type, new ArrayList<ISecurityCheck>());
@@ -672,4 +679,28 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 *             any exception thrown during script execution
 	 */
 	protected abstract Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable;
+
+	/**
+	 * Simple monitor to forward cancellation requests to the script engine.
+	 */
+	private class ScriptEngineMonitor extends NullProgressMonitor implements IProgressMonitorWithBlocking {
+
+		@Override
+		public void setCanceled(boolean cancelled) {
+			super.setCanceled(cancelled);
+
+			if (isCanceled())
+				terminate();
+		}
+
+		@Override
+		public void setBlocked(IStatus reason) {
+			// nothing to do
+		}
+
+		@Override
+		public void clearBlocked() {
+			// nothing to do
+		}
+	}
 }

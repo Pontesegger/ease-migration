@@ -200,14 +200,22 @@ public interface IScriptEngine {
 	void registerJar(final URL url);
 
 	/**
-	 * Join engine execution thread. Waits for engine execution up to <i>timeout</i>
+	 * Join engine execution thread. Waits for engine execution up to <i>timeout</i> milliseconds.
 	 *
 	 * @param timeout
 	 *            command timeout in milliseconds
 	 * @throws InterruptedException
 	 *             when join command got interrupted
 	 */
-	void join(long timeout) throws InterruptedException;
+	void joinEngine(long timeout) throws InterruptedException;
+
+	/**
+	 * Join engine execution thread. Waits for engine termination.
+	 *
+	 * @throws InterruptedException
+	 *             when join command got interrupted
+	 */
+	void joinEngine() throws InterruptedException;
 
 	/**
 	 * Verify that engine was started and terminated.

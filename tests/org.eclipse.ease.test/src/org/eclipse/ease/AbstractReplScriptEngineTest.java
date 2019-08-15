@@ -1,9 +1,6 @@
 package org.eclipse.ease;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
@@ -16,173 +13,109 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractReplScriptEngineTest {
+public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 
 	private static final String SAMPLE_CODE = "Hello world";
 
-	private AbstractReplScriptEngine fTestEngine;
+	private class MockedScriptEngine extends AbstractReplScriptEngine {
 
+		public MockedScriptEngine() {
+			super("Mocked Engine");
+		}
+
+		@Override
+		public void terminateCurrent() {
+		}
+
+		@Override
+		public void registerJar(URL url) {
+		}
+
+		@Override
+		protected Object internalGetVariable(String name) {
+			return null;
+		}
+
+		@Override
+		protected Map<String, Object> internalGetVariables() {
+			return null;
+		}
+
+		@Override
+		protected boolean internalHasVariable(String name) {
+			return false;
+		}
+
+		@Override
+		protected void internalSetVariable(String name, Object content) {
+		}
+
+		@Override
+		protected void setupEngine() throws ScriptEngineException {
+		}
+
+		@Override
+		protected Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable {
+			final String input = script.getCommand().toString();
+			if (input.contains(ERROR_MARKER))
+				throw new RuntimeException(input);
+			else
+				getOutputStream().write(input.getBytes());
+
+			return input;
+		}
+	}
+
+	@Override
 	@Before
 	public void setup() {
-		fTestEngine = new AbstractReplScriptEngine("Test engine") {
-
-			@Override
-			public void terminateCurrent() {
-			}
-
-			@Override
-			public void registerJar(final URL url) {
-			}
-
-			@Override
-			protected void teardownEngine() throws ScriptEngineException {
-			}
-
-			@Override
-			protected void setupEngine() throws ScriptEngineException {
-			}
-
-			@Override
-			protected void internalSetVariable(final String name, final Object content) {
-			}
-
-			@Override
-			protected boolean internalHasVariable(final String name) {
-				return false;
-			}
-
-			@Override
-			protected Map<String, Object> internalGetVariables() {
-				return null;
-			}
-
-			@Override
-			protected Object internalGetVariable(final String name) {
-				return null;
-			}
-
-			@Override
-			protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
-				return script.getCommand();
-			}
-		};
+		fTestEngine = new MockedScriptEngine();
 	}
 
-	@Test
-	public void isJob() {
-		assertTrue(fTestEngine instanceof Job);
+	private AbstractReplScriptEngine getTestEngine() {
+		return (AbstractReplScriptEngine) fTestEngine;
 	}
 
-	@Test(timeout = 1000)
-	public void executeAsync() {
-
-		final ScriptResult result = fTestEngine.executeAsync(SAMPLE_CODE);
-		assertFalse(result.isReady());
-
-		fTestEngine.schedule();
-
-		synchronized (result) {
-			try {
-				while (!result.isReady())
-					result.wait();
-			} catch (final InterruptedException e) {
-			}
-		}
-		assertTrue(result.isReady());
-	}
-
-	@Test(timeout = 1000)
-	public void executeSync() throws InterruptedException {
-
-		fTestEngine.setTerminateOnIdle(false);
-		fTestEngine.schedule();
-
-		final ScriptResult result = fTestEngine.executeSync(SAMPLE_CODE);
-		assertTrue(result.isReady());
-
-		fTestEngine.terminate();
-	}
-
-	@Test(timeout = 1000)
-	public void inject() throws InterruptedException {
-		assertEquals(SAMPLE_CODE, fTestEngine.inject(SAMPLE_CODE));
-	}
-
-	@Test
-	public void streamsAvailable() {
-		assertNotNull(fTestEngine.getOutputStream());
-		assertNotNull(fTestEngine.getErrorStream());
-		assertNotNull(fTestEngine.getInputStream());
-	}
-
-	@Test(timeout = 1000)
-	public void terminateOnIdle() throws InterruptedException {
-		fTestEngine.setTerminateOnIdle(true);
-		fTestEngine.schedule();
-		fTestEngine.join();
-
-		// test valid if it terminates within the timeout period
-	}
-
-	@Test(timeout = 1000)
+	@Test(timeout = TEST_TIMEOUT)
 	public void terminateOnIdleAfterSchedule() throws InterruptedException {
-		fTestEngine.setTerminateOnIdle(false);
-		fTestEngine.schedule();
+		getTestEngine().setTerminateOnIdle(false);
+		getTestEngine().schedule();
 		while (true) {
 			Thread.sleep(10);
-			if (fTestEngine.getState() != Job.RUNNING) {
+			if (getTestEngine().getState() != Job.RUNNING) {
 				// eclipse job has not started yet
 				continue;
 			}
-			if (!fTestEngine.isIdle()) {
-				// ease still has work to do in the job
-				continue;
-			}
-			if (fTestEngine.getThread().getState() != Thread.State.WAITING) {
+			if (getTestEngine().getThread().getState() != Thread.State.WAITING) {
 				// thread is still running, we want it to be waiting
 				continue;
 			}
 			break;
 		}
-		fTestEngine.setTerminateOnIdle(true);
-		fTestEngine.join();
+		getTestEngine().setTerminateOnIdle(true);
+		getTestEngine().joinEngine();
 
 		// test valid if it terminates within the timeout period
 	}
 
-	@Test
+	@Test(timeout = TEST_TIMEOUT)
 	public void keepRunningOnIdle() throws InterruptedException {
-		fTestEngine.setTerminateOnIdle(false);
-		fTestEngine.executeAsync(SAMPLE_CODE);
-		fTestEngine.schedule();
+		getTestEngine().setTerminateOnIdle(false);
+		getTestEngine().executeAsync(SAMPLE_CODE);
+		getTestEngine().schedule();
 
-		final ScriptResult result = fTestEngine.executeSync(SAMPLE_CODE);
+		final ScriptResult result = getTestEngine().executeSync(SAMPLE_CODE);
 		assertTrue(result.isReady());
 	}
 
-	@Test
+	@Test(timeout = TEST_TIMEOUT)
 	public void terminateEngine() throws InterruptedException {
-		fTestEngine.setTerminateOnIdle(false);
-		fTestEngine.schedule();
+		getTestEngine().setTerminateOnIdle(false);
+		getTestEngine().schedule();
 
-		fTestEngine.terminate();
-		fTestEngine.join(5000);
+		getTestEngine().terminate();
+		getTestEngine().joinEngine();
 
-		assertEquals(Job.NONE, fTestEngine.getState());
-	}
-
-	@Test
-	public void extractEmptyArguments() {
-		assertEquals(0, AbstractScriptEngine.extractArguments(null).length);
-		assertEquals(0, AbstractScriptEngine.extractArguments("").length);
-		assertEquals(0, AbstractScriptEngine.extractArguments("    ").length);
-		assertEquals(0, AbstractScriptEngine.extractArguments("\t\t").length);
-	}
-
-	@Test
-	public void extractArguments() {
-		assertArrayEquals(new String[] { "one" }, AbstractScriptEngine.extractArguments("one"));
-		assertArrayEquals(new String[] { "one with spaces" }, AbstractScriptEngine.extractArguments("one with spaces"));
-		assertArrayEquals(new String[] { "one", "and", "another" }, AbstractScriptEngine.extractArguments("one,and, another"));
+		assertEquals(Job.NONE, getTestEngine().getState());
 	}
 }

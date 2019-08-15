@@ -61,24 +61,12 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 		return fTerminateOnIdle;
 	}
 
-	/**
-	 * Get termination status of the interpreter. A terminated interpreter cannot be restarted.
-	 *
-	 * @return true if interpreter is terminated.
-	 */
 	@Override
-	protected boolean isTerminated() {
-		return fTerminateOnIdle && isIdle();
-	}
+	protected boolean shallTerminate() {
+		if (getTerminateOnIdle())
+			return super.shallTerminate();
 
-	/**
-	 * Get idle status of the interpreter. The interpreter is IDLE if there are no pending execution requests and the interpreter is not terminated.
-	 *
-	 * @return true if interpreter is IDLE
-	 */
-	@Override
-	public boolean isIdle() {
-		return super.isTerminated();
+		return getMonitor().isCanceled();
 	}
 
 	@Override
