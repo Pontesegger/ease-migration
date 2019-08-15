@@ -272,9 +272,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 				// execute code
 				if (!fScheduledScripts.isEmpty()) {
 					final Script piece = fScheduledScripts.remove(0);
-					final ScriptResult scriptResult = inject(piece, true, false);
-					if (scriptResult.hasException())
-						returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Script execution failed", scriptResult.getException());
+					inject(piece, true, false);
 
 				} else {
 					synchronized (this) {
@@ -288,7 +286,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			}
 		}
 
-		if ((Status.OK_STATUS.equals(returnStatus)) && (getMonitor().isCanceled()))
+		if (getMonitor().isCanceled())
 			returnStatus = Status.CANCEL_STATUS;
 
 		return cleanupRun(returnStatus);
