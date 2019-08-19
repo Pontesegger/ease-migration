@@ -97,6 +97,9 @@ def convert_value(
 
     # Integers can be send directly
     if isinstance(value, integer_types):
+        if (value > java.lang.Long.MAX_VALUE) or (value < java.lang.Long.MIN_VALUE):
+            return java.math.BigInteger(str(value))
+
         return value
 
     # Floats can be send directly
