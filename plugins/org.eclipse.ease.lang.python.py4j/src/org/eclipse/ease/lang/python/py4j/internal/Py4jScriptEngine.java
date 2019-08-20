@@ -262,7 +262,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected void teardownEngine() throws ScriptEngineException {
+	protected void teardownEngine() {
 		// TODO: this clean shutdown isn't working as intended.
 		// Sometimes (on Linux) the Python process seems to shutdown
 		// before fully acknowledging the call to teardownEngine, leaving

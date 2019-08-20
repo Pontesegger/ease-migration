@@ -137,10 +137,6 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected void teardownEngine() throws ScriptEngineException {
-	}
-
-	@Override
 	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Throwable {
 		if (uiThread) {
 			// run in UI thread

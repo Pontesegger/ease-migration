@@ -84,7 +84,7 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected void teardownEngine() throws ScriptEngineException {
+	protected void teardownEngine() {
 		fEngine = null;
 	}
 

@@ -89,6 +89,16 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		return context;
 	}
 
+	private static boolean hasNoChildElements(Object scope) {
+		if (scope instanceof Double)
+			return true;
+
+		if (scope == null)
+			return true;
+
+		return false;
+	}
+
 	/** Rhino Scope. Created when interpreter is initialized */
 	private ScriptableObject fScope;
 
@@ -159,6 +169,8 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 
 		// unregister from classloader
 		CLASSLOADER.unregisterEngine(this);
+
+		super.teardownEngine();
 	}
 
 	@Override
@@ -480,16 +492,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			return null;
 
 		return result;
-	}
-
-	private static boolean hasNoChildElements(Object scope) {
-		if (scope instanceof Double)
-			return true;
-
-		if (scope == null)
-			return true;
-
-		return false;
 	}
 
 	@Override

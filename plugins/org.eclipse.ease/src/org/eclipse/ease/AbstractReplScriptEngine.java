@@ -90,6 +90,13 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 		return result;
 	}
 
+	/**
+	 * Check if variable should be filtered.
+	 *
+	 * @param value
+	 *            value to verify
+	 * @return <code>true</code> if variable should be shown
+	 */
 	protected boolean acceptVariable(Object value) {
 		return true;
 	}
@@ -242,7 +249,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	}
 
 	@Override
-	protected void teardownEngine() throws ScriptEngineException {
+	protected void teardownEngine() {
 		fLastExecutionResult = null;
 	}
 }
