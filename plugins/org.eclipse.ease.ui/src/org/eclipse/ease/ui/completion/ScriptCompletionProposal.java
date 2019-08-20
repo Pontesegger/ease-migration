@@ -11,6 +11,13 @@
 
 package org.eclipse.ease.ui.completion;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.Logger;
@@ -115,8 +122,21 @@ public class ScriptCompletionProposal
 	@Override
 	public String getAdditionalProposalInfo() {
 		if (fHelpResolver != null) {
-			final String htmlHelp = fHelpResolver.resolveHTMLHelp();
-			return (htmlHelp != null) ? htmlHelp : fHelpResolver.resolveHelp();
+
+			try {
+				final FutureTask<String> futureTask = new FutureTask<>(() -> {
+					final String htmlHelp = fHelpResolver.resolveHTMLHelp();
+					return (htmlHelp != null) ? htmlHelp : fHelpResolver.resolveHelp();
+				});
+
+				final ExecutorService executor = Executors.newSingleThreadExecutor();
+				executor.execute(futureTask);
+
+				return futureTask.get(500, TimeUnit.MILLISECONDS);
+
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				// completion did not finish in time, do not provide help
+			}
 		}
 
 		return null;
@@ -165,9 +185,5 @@ public class ScriptCompletionProposal
 
 	public int getCursorStartPosition() {
 		return fContext.getOriginalCode().length() - fContext.getFilter().length();
-	}
-
-	public IHelpResolver getHelpResolver() {
-		return fHelpResolver;
 	}
 }

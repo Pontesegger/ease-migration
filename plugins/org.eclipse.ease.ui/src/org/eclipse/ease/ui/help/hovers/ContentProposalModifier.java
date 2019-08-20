@@ -38,8 +38,6 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -96,27 +94,24 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					 * Ignore this event if it's only happening because focus is moving between the popup shells, their controls, or a scrollbar. Do this in an
 					 * async since the focus is not actually switched when this event is received.
 					 */
-					e.display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (isValid()) {
-								if (scrollbarClicked || hasFocus()) {
-									return;
-								}
-								// Workaround a problem on X and Mac, whereby at
-								// this point, the focus control is not known.
-								// This can happen, for example, when resizing
-								// the popup shell on the Mac.
-								// Check the active shell.
-								Shell activeShell = e.display.getActiveShell();
-								if ((activeShell == getShell()) || ((infoPopup != null) && (infoPopup.getShell() == activeShell))) {
-									return;
-								}
-								/*
-								 * System.out.println(e); System.out.println(e.display.getFocusControl()); System.out.println(e.display.getActiveShell());
-								 */
-								close();
+					e.display.asyncExec(() -> {
+						if (isValid()) {
+							if (scrollbarClicked || hasFocus()) {
+								return;
 							}
+							// Workaround a problem on X and Mac, whereby at
+							// this point, the focus control is not known.
+							// This can happen, for example, when resizing
+							// the popup shell on the Mac.
+							// Check the active shell.
+							final Shell activeShell = e.display.getActiveShell();
+							if ((activeShell == getShell()) || ((infoPopup != null) && (infoPopup.getShell() == activeShell))) {
+								return;
+							}
+							/*
+							 * System.out.println(e); System.out.println(e.display.getFocusControl()); System.out.println(e.display.getActiveShell());
+							 */
+							close();
 						}
 					});
 					return;
@@ -137,7 +132,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			void installListeners() {
 				// Listeners on this popup's table and scroll bar
 				proposalTable.addListener(SWT.FocusOut, this);
-				ScrollBar scrollbar = proposalTable.getVerticalBar();
+				final ScrollBar scrollbar = proposalTable.getVerticalBar();
 				if (scrollbar != null) {
 					scrollbar.addListener(SWT.Selection, this);
 				}
@@ -152,7 +147,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 				control.addListener(SWT.Dispose, this);
 				control.addListener(SWT.FocusOut, this);
 				// Listeners on the target control's shell
-				Shell controlShell = control.getShell();
+				final Shell controlShell = control.getShell();
 				controlShell.addListener(SWT.Move, this);
 				controlShell.addListener(SWT.Resize, this);
 
@@ -162,7 +157,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			void removeListeners() {
 				if (isValid()) {
 					proposalTable.removeListener(SWT.FocusOut, this);
-					ScrollBar scrollbar = proposalTable.getVerticalBar();
+					final ScrollBar scrollbar = proposalTable.getVerticalBar();
 					if (scrollbar != null) {
 						scrollbar.removeListener(SWT.Selection, this);
 					}
@@ -178,7 +173,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					control.removeListener(SWT.Dispose, this);
 					control.removeListener(SWT.FocusOut, this);
 
-					Shell controlShell = control.getShell();
+					final Shell controlShell = control.getShell();
 					controlShell.removeListener(SWT.Move, this);
 					controlShell.removeListener(SWT.Resize, this);
 				}
@@ -196,7 +191,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					return;
 				}
 
-				char key = e.character;
+				final char key = e.character;
 
 				// Traverse events are handled depending on whether the
 				// event has a character.
@@ -226,7 +221,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 
 				if (key == 0) {
 					int newSelection = proposalTable.getSelectionIndex();
-					int visibleRows = (proposalTable.getSize().y / proposalTable.getItemHeight()) - 1;
+					final int visibleRows = (proposalTable.getSize().y / proposalTable.getItemHeight()) - 1;
 					switch (e.keyCode) {
 					case SWT.ARROW_UP:
 						newSelection -= 1;
@@ -304,7 +299,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 							e.doit = false;
 						} else {
 							e.doit = true;
-							String contents = getControlContentAdapter().getControlContents(getControl());
+							final String contents = getControlContentAdapter().getControlContents(getControl());
 							// If there are no contents, changes in cursor
 							// position have no effect. Note also that we do
 							// not affect the filter text on ARROW_LEFT as
@@ -346,7 +341,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 				case SWT.LF:
 				case SWT.CR:
 					e.doit = false;
-					Object p = getSelectedProposal();
+					final Object p = getSelectedProposal();
 					if (p != null) {
 						acceptCurrentProposal();
 					} else {
@@ -375,7 +370,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					// clients provide their own filtering based on content.
 					// Recompute the proposals if the cursor position
 					// will change (is not at 0).
-					int pos = getControlContentAdapter().getCursorPosition(getControl());
+					final int pos = getControlContentAdapter().getCursorPosition(getControl());
 					// We rely on the fact that the contents and pos do not yet
 					// reflect the result of the BS. If the contents were
 					// already empty, then BS should not cause
@@ -431,7 +426,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			@Override
 			protected Control createDialogArea(final Composite parent) {
 
-				GridLayout gridLayout = new GridLayout(1, true);
+				final GridLayout gridLayout = new GridLayout(1, true);
 				final Composite composite = new Composite(parent, SWT.NONE);
 				composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 				composite.setLayout(gridLayout);
@@ -455,7 +450,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			 */
 			@Override
 			protected void adjustBounds() {
-				Rectangle parentBounds = getParentShell().getBounds();
+				final Rectangle parentBounds = getParentShell().getBounds();
 				Rectangle proposedBounds;
 				// Try placing the info popup to the right
 				Rectangle rightProposedBounds = new Rectangle(parentBounds.x + parentBounds.width + PopupDialog.POPUP_HORIZONTALSPACING,
@@ -617,12 +612,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			if (USE_VIRTUAL) {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
 
-				Listener listener = new Listener() {
-					@Override
-					public void handleEvent(final Event event) {
-						handleSetData(event);
-					}
-				};
+				final Listener listener = event -> handleSetData(event);
 				proposalTable.addListener(SWT.SetData, listener);
 			} else {
 				proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -667,13 +657,13 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		@Override
 		protected void adjustBounds() {
 			// Get our control's location in display coordinates.
-			Point location = control.getDisplay().map(control.getParent(), null, control.getLocation());
+			final Point location = control.getDisplay().map(control.getParent(), null, control.getLocation());
 			int initialX = location.x + POPUP_OFFSET;
 			int initialY = location.y + control.getSize().y + POPUP_OFFSET;
 			// If we are inserting content, use the cursor position to
 			// position the control.
 			if (getProposalAcceptanceStyle() == PROPOSAL_INSERT) {
-				Rectangle insertionBounds = controlContentAdapter.getInsertionBounds(control);
+				final Rectangle insertionBounds = controlContentAdapter.getInsertionBounds(control);
 				initialX = initialX + insertionBounds.x;
 				initialY = location.y + insertionBounds.y + insertionBounds.height;
 			}
@@ -681,7 +671,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			// If there is no specified size, force it by setting
 			// up a layout on the table.
 			if (popupSize == null) {
-				GridData data = new GridData(GridData.FILL_BOTH);
+				final GridData data = new GridData(GridData.FILL_BOTH);
 				data.heightHint = proposalTable.getItemHeight() * POPUP_CHAR_HEIGHT;
 				data.widthHint = Math.max(control.getSize().x, POPUP_MINIMUM_WIDTH);
 				proposalTable.setLayoutData(data);
@@ -690,7 +680,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			}
 
 			// Constrain to the display
-			Rectangle constrainedBounds = getConstrainedShellBounds(new Rectangle(initialX, initialY, popupSize.x, popupSize.y));
+			final Rectangle constrainedBounds = getConstrainedShellBounds(new Rectangle(initialX, initialY, popupSize.x, popupSize.y));
 
 			// If there has been an adjustment causing the popup to overlap
 			// with the control, then put the popup above the control.
@@ -700,13 +690,10 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 				getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
 
 			// Now set up a listener to monitor any changes in size.
-			getShell().addListener(SWT.Resize, new Listener() {
-				@Override
-				public void handleEvent(final Event e) {
-					popupSize = getShell().getSize();
-					if (infoPopup != null) {
-						infoPopup.adjustBounds();
-					}
+			getShell().addListener(SWT.Resize, e -> {
+				popupSize = getShell().getSize();
+				if (infoPopup != null) {
+					infoPopup.adjustBounds();
 				}
 			});
 		}
@@ -715,20 +702,20 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		 * Handle the set data event. Set the item data of the requested item to the corresponding proposal in the proposal cache.
 		 */
 		private void handleSetData(final Event event) {
-			TableItem item = (TableItem) event.item;
-			int index = proposalTable.indexOf(item);
+			final TableItem item = (TableItem) event.item;
+			final int index = proposalTable.indexOf(item);
 
 			if ((0 <= index) && (index < proposals.length)) {
-				IContentProposal current = proposals[index];
+				final IContentProposal current = proposals[index];
 				item.setText(getString(current));
 				item.setImage(getImage(current));
 				item.setData(current);
 
 				// colored labels
 				if (current instanceof ICompletionProposalExtension6) {
-					StyledString styledString = ((ICompletionProposalExtension6) current).getStyledDisplayString();
+					final StyledString styledString = ((ICompletionProposalExtension6) current).getStyledDisplayString();
 					item.setText(styledString.getString());
-					StyleRange[] styleRanges = styledString.getStyleRanges();
+					final StyleRange[] styleRanges = styledString.getStyleRanges();
 					TableOwnerDrawSupport.storeStyleRanges(item, 0, styleRanges);
 				}
 
@@ -758,10 +745,10 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					// Populate the table manually
 					proposalTable.setRedraw(false);
 					proposalTable.setItemCount(newSize);
-					TableItem[] items = proposalTable.getItems();
+					final TableItem[] items = proposalTable.getItems();
 					for (int i = 0; i < items.length; i++) {
-						TableItem item = items[i];
-						IContentProposal proposal = newProposals[i];
+						final TableItem item = items[i];
+						final IContentProposal proposal = newProposals[i];
 						item.setText(getString(proposal));
 						item.setImage(getImage(proposal));
 						item.setData(proposal);
@@ -839,7 +826,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		 */
 		private IContentProposal getSelectedProposal() {
 			if (isValid()) {
-				int i = proposalTable.getSelectionIndex();
+				final int i = proposalTable.getSelectionIndex();
 				if ((proposals == null) || (i < 0) || (i >= proposals.length)) {
 					return null;
 				}
@@ -872,12 +859,12 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		 */
 		@Override
 		public int open() {
-			int value = super.open();
+			final int value = super.open();
 			if (popupCloser == null) {
 				popupCloser = new PopupCloserListener();
 			}
 			popupCloser.installListeners();
-			IContentProposal p = getSelectedProposal();
+			final IContentProposal p = getSelectedProposal();
 			if (p != null) {
 				showProposalDescription();
 			}
@@ -895,7 +882,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			if (infoPopup != null) {
 				infoPopup.close();
 			}
-			boolean ret = super.close();
+			final boolean ret = super.close();
 			notifyPopupClosed();
 			return ret;
 		}
@@ -911,48 +898,37 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 				// before creating the popup. We do not use Jobs since this
 				// code must be able to run independently of the Eclipse
 				// runtime.
-				Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						pendingDescriptionUpdate = true;
-						try {
-							Thread.sleep(POPUP_DELAY);
-						} catch (InterruptedException e) {
-						}
-						if (!isValid()) {
-							return;
-						}
-						getShell().getDisplay().syncExec(new Runnable() {
-							@Override
-							public void run() {
-								// Query the current selection since we have
-								// been delayed
-								IContentProposal p = getSelectedProposal();
-								if (p != null) {
-									String description = p.getDescription();
-									if (description != null) {
-										if (infoPopup == null) {
-											infoPopup = new InfoPopupDialog(getShell());
-											infoPopup.open();
-											infoPopup.getShell().addDisposeListener(new DisposeListener() {
-												@Override
-												public void widgetDisposed(final DisposeEvent event) {
-													infoPopup = null;
-												}
-											});
-										}
-										infoPopup.setContents(p.getDescription());
-									} else if (infoPopup != null) {
-										infoPopup.close();
-									}
-									pendingDescriptionUpdate = false;
-
-								}
-							}
-						});
+				final Runnable runnable = () -> {
+					pendingDescriptionUpdate = true;
+					try {
+						Thread.sleep(POPUP_DELAY);
+					} catch (final InterruptedException e) {
 					}
+					if (!isValid()) {
+						return;
+					}
+					getShell().getDisplay().syncExec(() -> {
+						// Query the current selection since we have
+						// been delayed
+						final IContentProposal p = getSelectedProposal();
+						if (p != null) {
+							final String description = p.getDescription();
+							if (description != null) {
+								if (infoPopup == null) {
+									infoPopup = new InfoPopupDialog(getShell());
+									infoPopup.open();
+									infoPopup.getShell().addDisposeListener(event -> infoPopup = null);
+								}
+								infoPopup.setContents(description);
+							} else if (infoPopup != null) {
+								infoPopup.close();
+							}
+							pendingDescriptionUpdate = false;
+
+						}
+					});
 				};
-				Thread t = new Thread(runnable);
+				final Thread t = new Thread(runnable);
 				t.start();
 			}
 		}
@@ -965,7 +941,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			// so that the cursor position can be properly restored at
 			// acceptance, which does not work without focus on some controls.
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=127108
-			IContentProposal proposal = getSelectedProposal();
+			final IContentProposal proposal = getSelectedProposal();
 			close();
 			proposalAccepted(proposal);
 		}
@@ -995,12 +971,9 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		 */
 		private void asyncRecomputeProposals(final String filterText) {
 			if (isValid()) {
-				control.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						recordCursorPosition();
-						recomputeProposals(filterText);
-					}
+				control.getDisplay().asyncExec(() -> {
+					recordCursorPosition();
+					recomputeProposals(filterText);
 				});
 			} else {
 				recomputeProposals(filterText);
@@ -1017,11 +990,11 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
-			ArrayList<IContentProposal> list = new ArrayList<IContentProposal>();
-			for (int i = 0; i < proposals.length; i++) {
-				String string = getString(proposals[i]);
+			final ArrayList<IContentProposal> list = new ArrayList<>();
+			for (final IContentProposal proposal : proposals) {
+				final String string = getString(proposal);
 				if ((string.length() >= filterString.length()) && string.substring(0, filterString.length()).equalsIgnoreCase(filterString)) {
-					list.add(proposals[i]);
+					list.add(proposal);
 				}
 
 			}
@@ -1727,7 +1700,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			 *            the event
 			 */
 			private void dump(final String who, final Event e) {
-				StringBuffer sb = new StringBuffer("--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
+				final StringBuffer sb = new StringBuffer("--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
 				sb.append(who);
 				sb.append(" - e: keyCode=" + e.keyCode + hex(e.keyCode)); //$NON-NLS-1$
 				sb.append("; character=" + e.character + hex(e.character)); //$NON-NLS-1$
@@ -1763,7 +1736,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			if (popup == null) {
 				// Check whether there are any proposals to be shown.
 				recordCursorPosition(); // must be done before getting proposals
-				IContentProposal[] proposals = getProposals();
+				final IContentProposal[] proposals = getProposals();
 				if (proposals.length > 0) {
 					if (DEBUG) {
 						System.out.println("POPUP OPENED BY PRECEDING EVENT"); //$NON-NLS-1$
@@ -1771,12 +1744,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 					recordCursorPosition();
 					popup = new ContentProposalPopup(null, proposals);
 					popup.open();
-					popup.getShell().addDisposeListener(new DisposeListener() {
-						@Override
-						public void widgetDisposed(final DisposeEvent event) {
-							popup = null;
-						}
-					});
+					popup.getShell().addDisposeListener(event -> popup = null);
 					internalPopupOpened();
 					notifyPopupOpened();
 				} else if (!autoActivated) {
@@ -1876,7 +1844,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 	 */
 	private void recordCursorPosition() {
 		if (isValid()) {
-			IControlContentAdapter adapter = getControlContentAdapter();
+			final IControlContentAdapter adapter = getControlContentAdapter();
 			insertionPos = adapter.getCursorPosition(control);
 			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=139063
 			if (adapter instanceof IControlContentAdapter2) {
@@ -1900,8 +1868,8 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		if (position == -1) {
 			position = getControlContentAdapter().getCursorPosition(getControl());
 		}
-		String contents = getControlContentAdapter().getControlContents(getControl());
-		IContentProposal[] proposals = proposalProvider.getProposals(contents, position);
+		final String contents = getControlContentAdapter().getControlContents(getControl());
+		final IContentProposal[] proposals = proposalProvider.getProposals(contents, position);
 		return proposals;
 	}
 
@@ -1910,26 +1878,18 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 	 */
 	private void autoActivate() {
 		if (autoActivationDelay > 0) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					receivedKeyDown = false;
-					try {
-						Thread.sleep(autoActivationDelay);
-					} catch (InterruptedException e) {
-					}
-					if (!isValid() || receivedKeyDown) {
-						return;
-					}
-					getControl().getDisplay().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							openProposalPopup(true);
-						}
-					});
+			final Runnable runnable = () -> {
+				receivedKeyDown = false;
+				try {
+					Thread.sleep(autoActivationDelay);
+				} catch (final InterruptedException e) {
 				}
+				if (!isValid() || receivedKeyDown) {
+					return;
+				}
+				getControl().getDisplay().syncExec(() -> openProposalPopup(true));
 			};
-			Thread t = new Thread(runnable);
+			final Thread t = new Thread(runnable);
 			t.start();
 		} else {
 			// Since we do not sleep, we must open the popup
@@ -1938,12 +1898,9 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			// some event that will cause the cursor position or
 			// other important info to change as a result of this
 			// event occurring.
-			getControl().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (isValid()) {
-						openProposalPopup(true);
-					}
+			getControl().getDisplay().asyncExec(() -> {
+				if (isValid()) {
+					openProposalPopup(true);
 				}
 			});
 		}
@@ -1957,8 +1914,8 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			System.out.println("Notify listeners - proposal accepted."); //$NON-NLS-1$
 		}
 		final Object[] listenerArray = proposalListeners.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener) listenerArray[i]).proposalAccepted(proposal);
+		for (final Object element : listenerArray) {
+			((IContentProposalListener) element).proposalAccepted(proposal);
 		}
 	}
 
@@ -1970,8 +1927,8 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			System.out.println("Notify listeners - popup opened."); //$NON-NLS-1$
 		}
 		final Object[] listenerArray = proposalListeners2.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener2) listenerArray[i]).proposalPopupOpened(this);
+		for (final Object element : listenerArray) {
+			((IContentProposalListener2) element).proposalPopupOpened(this);
 		}
 	}
 
@@ -1983,8 +1940,8 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 			System.out.println("Notify listeners - popup closed."); //$NON-NLS-1$
 		}
 		final Object[] listenerArray = proposalListeners2.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((IContentProposalListener2) listenerArray[i]).proposalPopupClosed(this);
+		for (final Object element : listenerArray) {
+			((IContentProposalListener2) element).proposalPopupClosed(this);
 		}
 	}
 
@@ -2025,7 +1982,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 		// If we always autoactivate or never autoactivate, it should remain open
 		if ((autoActivateString == null) || (autoActivateString.length() == 0))
 			return true;
-		String content = getControlContentAdapter().getControlContents(getControl());
+		final String content = getControlContentAdapter().getControlContents(getControl());
 		for (int i = 0; i < autoActivateString.length(); i++) {
 			if (content.indexOf(autoActivateString.charAt(i)) >= 0)
 				return true;
