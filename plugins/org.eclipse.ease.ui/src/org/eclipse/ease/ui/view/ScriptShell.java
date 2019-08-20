@@ -278,6 +278,12 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 		if (engineDescription != null)
 			setEngine(engineDescription.getID());
+
+		else {
+			final ScriptResult invalidEngine = new ScriptResult();
+			invalidEngine.setException(new RuntimeException("No script engines available"));
+			fOutputText.printResult(invalidEngine);
+		}
 	}
 
 	private void addAutoCompletion() {
