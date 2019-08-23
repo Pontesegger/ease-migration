@@ -249,17 +249,20 @@ public class ModuleExplorerView extends ViewPart implements IPreferenceChangeLis
 				try {
 					if (detail instanceof ModuleDefinition) {
 						final URL helpLocation = ModuleHelp.getModuleHelpLocation((ModuleDefinition) detail);
-						return new ModuleHelp(helpLocation).getHoverContent();
+						if (helpLocation != null)
+							return new ModuleHelp(helpLocation).getHoverContent();
 					}
 
 					if (detail instanceof Field) {
 						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule((Field) detail));
-						return new ModuleHelp(helpLocation).getConstantHelp((Field) detail).getHoverContent();
+						if (helpLocation != null)
+							return new ModuleHelp(helpLocation).getConstantHelp((Field) detail).getHoverContent();
 					}
 
 					if (detail instanceof Method) {
 						final URL helpLocation = ModuleHelp.getModuleHelpLocation(ModulesTools.getDeclaringModule((Method) detail));
-						return new ModuleHelp(helpLocation).getMethodHelp((Method) detail).getHoverContent();
+						if (helpLocation != null)
+							return new ModuleHelp(helpLocation).getMethodHelp((Method) detail).getHoverContent();
 					}
 				} catch (final Exception e) {
 					// no help available, fail silently
