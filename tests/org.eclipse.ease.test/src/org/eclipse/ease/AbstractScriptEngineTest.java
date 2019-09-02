@@ -139,7 +139,7 @@ public class AbstractScriptEngineTest {
 		assertTrue(fTestEngine instanceof Job);
 	}
 
-	@Test
+	@Test(timeout = TEST_TIMEOUT)
 	public void executeValidCodeAndTerminate() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
@@ -164,7 +164,7 @@ public class AbstractScriptEngineTest {
 		assertNull(result2.getException());
 	}
 
-	@Test
+	@Test(timeout = TEST_TIMEOUT)
 	public void executeErrorCodeAndTerminate() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
@@ -189,7 +189,7 @@ public class AbstractScriptEngineTest {
 		assertEquals(RuntimeException.class, result2.getException().getClass());
 	}
 
-	@Test
+	@Test(timeout = TEST_TIMEOUT)
 	public void executeSync() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
