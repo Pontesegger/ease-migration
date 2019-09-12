@@ -25,6 +25,7 @@ import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
+import org.eclipse.ease.modules.platform.PluginConstants;
 import org.eclipse.ease.modules.platform.UIModule;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.ease.ui.tools.LocationImageDescriptor;
@@ -120,6 +121,54 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 	private static int fCounter = 1;
 
+	public static String getDynamicViewId() {
+		return "org.eclipse.ease.view.dynamic." + fCounter++;
+	}
+
+	public static MPart createDynamicPart(String title, String iconUri) throws Throwable {
+		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
+
+			@Override
+			public MPart runWithTry() throws Throwable {
+				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
+
+				// create part
+				final MPart part = MBasicFactory.INSTANCE.createPart();
+				part.setLabel(title);
+				if (iconUri != null)
+					part.setIconURI(iconUri);
+				else
+					part.setIconURI("platform:/plugin/" + PluginConstants.PLUGIN_ID + "/icons/eview16/scripted_view.png");
+
+				part.setElementId(getDynamicViewId());
+				part.setCloseable(true);
+				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
+
+				partService.showPart(part, PartState.VISIBLE);
+
+				// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
+				PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
+
+					@Override
+					public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
+						partService.hidePart(part, true);
+						return true;
+					}
+
+					@Override
+					public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
+					}
+				});
+
+				return part;
+			}
+		};
+
+		Display.getDefault().syncExec(runnable);
+
+		return runnable.getResultOrThrow();
+	}
+
 	/** Holds viewModel, renderer, and further elements for created composites. */
 	private final List<UICompositor> fUICompositors = new ArrayList<>();
 
@@ -158,53 +207,15 @@ public class UIBuilderModule extends AbstractScriptModule {
 	public MPart createView(String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String iconUri,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String relativeTo, @ScriptParameter(defaultValue = "x") String position) throws Throwable {
 
-		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
+		final MPart part = createDynamicPart(title, iconUri);
 
-			@Override
-			public MPart runWithTry() throws Throwable {
-				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
+		if (relativeTo != null)
+			UIModule.moveView(part.getElementId(), relativeTo, position);
 
-				// create part
-				final MPart part = MBasicFactory.INSTANCE.createPart();
-				part.setLabel(title);
-				if (iconUri != null)
-					part.setIconURI(iconUri);
-				else
-					part.setIconURI("platform:/plugin/org.eclipse.ease.modules.platform/icons/eview16/scripted_view.png");
+		fUICompositors.clear();
+		pushComposite((Composite) part.getWidget());
 
-				part.setElementId("org.eclipse.ease.view.dynamic:" + fCounter++);
-				part.setCloseable(true);
-				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
-
-				partService.showPart(part, PartState.VISIBLE);
-
-				if (relativeTo != null)
-					UIModule.moveView("org.eclipse.ease.view.dynamic:" + (fCounter - 1), relativeTo, position);
-
-				fUICompositors.clear();
-				pushComposite((Composite) part.getWidget());
-
-				// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
-				PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
-
-					@Override
-					public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
-						partService.hidePart(part, true);
-						return true;
-					}
-
-					@Override
-					public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
-					}
-				});
-
-				return part;
-			}
-		};
-
-		Display.getDefault().syncExec(runnable);
-
-		return runnable.getResultOrThrow();
+		return part;
 	}
 
 	/**

@@ -1,0 +1,72 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Christian Pontesegger and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ *
+ * Contributors:
+ *     Christian Pontesegger - initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.ease.modules.platform.keywords;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
+import org.eclipse.ease.ui.scripts.repository.IScript;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbenchListener;
+import org.eclipse.ui.PlatformUI;
+
+public class ScriptedView {
+
+	private Composite fParent;
+
+	@Inject
+	public ScriptedView(MPart part) {
+		final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
+		final IScript script = repositoryService.getScript(part.getProperties().get("script"));
+
+		createPartControl((Composite) part.getWidget(), script);
+
+		// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
+		final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
+		PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
+
+			@Override
+			public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
+				partService.hidePart(part, true);
+				return true;
+			}
+
+			@Override
+			public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
+			}
+		});
+	}
+
+	public void createPartControl(Composite parent, IScript script) {
+		fParent = parent;
+
+		final Map<String, Object> parameters = new HashMap<>();
+		parameters.put("view", this);
+		parameters.put("viewComposite", parent);
+
+		script.run(parameters);
+	}
+
+	/**
+	 * Get the root composite for this view.
+	 *
+	 * @return root composite
+	 */
+	public Composite getComposite() {
+		return fParent;
+	}
+}
