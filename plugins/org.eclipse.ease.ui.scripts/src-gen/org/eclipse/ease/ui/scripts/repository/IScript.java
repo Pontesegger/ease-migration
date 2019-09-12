@@ -178,6 +178,17 @@ public interface IScript extends IRawLocation {
 	IScriptEngine run(String... parameters);
 
 	/**
+	 * Run script with named startup parameters.
+	 *
+	 * @param parameters
+	 *            startup parameters passed to the script
+	 * @return script engine
+	 *
+	 * @generated NOT
+	 */
+	IScriptEngine run(Map<String, Object> parameters);
+
+	/**
 	 * Prepare a script engine ready to run. The script is already scheduled for execution. Typically used when the launching application wants to modify engine
 	 * parameters or inject variables before the launch.
 	 *

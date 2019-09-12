@@ -18,6 +18,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -539,6 +540,20 @@ public class ScriptImpl extends RawLocationImpl implements IScript {
 
 		if (engine != null) {
 			engine.setVariable("argv", parameters);
+			engine.schedule();
+		}
+
+		return engine;
+	}
+
+	@Override
+	public IScriptEngine run(final Map<String, Object> parameters) {
+		final IScriptEngine engine = prepareEngine();
+
+		if (engine != null) {
+			for (final Entry<String, Object> entry : parameters.entrySet())
+				engine.setVariable(entry.getKey(), entry.getValue());
+
 			engine.schedule();
 		}
 
