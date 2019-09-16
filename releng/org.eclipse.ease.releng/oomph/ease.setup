@@ -506,6 +506,12 @@
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
+    <setupTask
+        xsi:type="projects:ProjectsImportTask">
+      <sourceLocator
+          rootFolder="${ease.modules.git.clone.location}"
+          locateNestedProjects="true"/>
+    </setupTask>
     <stream
         name="master"
         label="Master"/>
