@@ -139,6 +139,43 @@ public class GitModule extends AbstractScriptModule {
 	}
 
 	/**
+	 * Set a repository configuration entry.
+	 *
+	 * @param repository
+	 *            repository to apply setting on
+	 * @param section
+	 *            config section (eg: 'user')
+	 * @param subsection
+	 *            subsection or <code>null</code>
+	 * @param name
+	 *            value name (eg: 'email')
+	 * @param value
+	 *            value to set
+	 */
+	@WrapToScript
+	public void setRepositoryConfig(Git repository, String section, String subsection, String name, String value) {
+		repository.getRepository().getConfig().setString(section, subsection, name, value.toString());
+	}
+
+	/**
+	 * Read a repository configuration entry.
+	 *
+	 * @param repository
+	 *            repository to read setting from
+	 * @param section
+	 *            config section (eg: 'user')
+	 * @param subsection
+	 *            subsection or <code>null</code>
+	 * @param name
+	 *            value name (eg: 'email')
+	 * @return configuration content
+	 */
+	@WrapToScript
+	public String getRepositoryConfig(Git repository, String section, String subsection, String name) {
+		return repository.getRepository().getConfig().getString(section, subsection, name);
+	}
+
+	/**
 	 * Add git repository to EGit repositories view, if available.
 	 *
 	 * @param directory
