@@ -99,7 +99,7 @@ public class GitModule extends AbstractScriptModule {
 		if (location instanceof Git)
 			return (Git) location;
 
-		final Object resource = ResourceTools.resolve(location);
+		final Object resource = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
 		if (resource != null) {
 			final File folder = ResourceTools.toFile(resource);
 
