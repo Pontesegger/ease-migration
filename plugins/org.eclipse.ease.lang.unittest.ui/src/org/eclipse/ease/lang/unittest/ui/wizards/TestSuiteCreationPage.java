@@ -16,6 +16,7 @@ import java.io.InputStream;
 
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.unittest.UnitTestHelper;
+import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.IDefinitionFactory;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.ui.Activator;
@@ -34,6 +35,11 @@ public class TestSuiteCreationPage extends WizardNewFileCreationPage {
 		final ITestSuiteDefinition testSuite = IDefinitionFactory.eINSTANCE.createTestSuiteDefinition();
 		testSuite.setVersion("1.0");
 		testSuite.setIncludeFilter("project://**.js" + StringTools.LINE_DELIMITER + "project://**.py");
+		testSuite.getFlags().put(Flag.PREFERRED_ENGINE_ID, "");
+		testSuite.getFlags().put(Flag.PROMOTE_FAILURE_TO_ERROR, "false");
+		testSuite.getFlags().put(Flag.STOP_SUITE_ON_ERROR, "false");
+		testSuite.getFlags().put(Flag.RUN_TEARDOWN_ON_ERROR, "true");
+		testSuite.getFlags().put(Flag.THREAD_COUNT, "1");
 
 		try {
 			return new ByteArrayInputStream(UnitTestHelper.serializeTestSuite(testSuite));
