@@ -22,11 +22,14 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.ease.IReplEngine;
+import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.modules.AbstractScriptModule;
+import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.modules.platform.PluginConstants;
 import org.eclipse.ease.modules.platform.UIModule;
+import org.eclipse.ease.modules.platform.keywords.ScriptedView;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.ease.ui.tools.LocationImageDescriptor;
 import org.eclipse.jface.layout.AbstractColumnLayout;
@@ -179,6 +182,15 @@ public class UIBuilderModule extends AbstractScriptModule {
 	private Object fProviderElement = null;
 
 	private ScriptableDialog fScriptableDialog;
+
+	@Override
+	public void initialize(IScriptEngine engine, IEnvironment environment) {
+		super.initialize(engine, environment);
+
+		final Object composite = getScriptEngine().getVariable(ScriptedView.SCRIPT_VARIABLE_COMPOSITE);
+		if (composite instanceof Composite)
+			pushComposite((Composite) composite);
+	}
 
 	/**
 	 * Create a view with scripted content. Automatically sets the active composite for further commands. This view will not be stored when the workbench gets

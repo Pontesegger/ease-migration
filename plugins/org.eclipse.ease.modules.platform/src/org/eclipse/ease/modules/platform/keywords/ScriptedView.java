@@ -18,6 +18,7 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.swt.widgets.Composite;
@@ -26,7 +27,11 @@ import org.eclipse.ui.PlatformUI;
 
 public class ScriptedView {
 
+	public static final String SCRIPT_VARIABLE_VIEW = "view";
+	public static final String SCRIPT_VARIABLE_COMPOSITE = "viewComposite";
+
 	private Composite fParent;
+	private IScriptEngine fScriptEngine;
 
 	@Inject
 	public ScriptedView(MPart part) {
@@ -42,6 +47,7 @@ public class ScriptedView {
 			@Override
 			public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
 				partService.hidePart(part, true);
+				fScriptEngine.terminate();
 				return true;
 			}
 
@@ -55,10 +61,13 @@ public class ScriptedView {
 		fParent = parent;
 
 		final Map<String, Object> parameters = new HashMap<>();
-		parameters.put("view", this);
-		parameters.put("viewComposite", parent);
+		parameters.put(SCRIPT_VARIABLE_VIEW, this);
+		parameters.put(SCRIPT_VARIABLE_COMPOSITE, parent);
 
-		script.run(parameters);
+		fScriptEngine = script.run(parameters);
+		parent.addDisposeListener(e -> {
+			fScriptEngine.terminate();
+		});
 	}
 
 	/**
