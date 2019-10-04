@@ -80,21 +80,7 @@ public class Logger {
 	 *            info message
 	 */
 	public static void info(final String pluginID, final String message) {
-		error(pluginID, message, null);
-	}
-
-	/**
-	 * Log an info.
-	 *
-	 * @param pluginID
-	 *            origin plug-in ID
-	 * @param message
-	 *            info message
-	 * @param throwable
-	 *            throwable to be added
-	 */
-	public static void info(final String pluginID, final String message, final Throwable throwable) {
-		Activator.getDefault().getLog().log(new Status(IStatus.INFO, pluginID, message, throwable));
+		Activator.getDefault().getLog().log(new Status(IStatus.INFO, pluginID, message, null));
 	}
 
 	/**
