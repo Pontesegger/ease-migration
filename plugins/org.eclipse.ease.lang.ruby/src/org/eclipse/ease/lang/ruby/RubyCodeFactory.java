@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.ruby;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,21 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 	@Override
 	public String getSaveVariableName(final String variableName) {
 		return RubyHelper.getSaveName(variableName);
+	}
+
+	@Override
+	protected String createFieldWrapper(IEnvironment environment, String identifier, Field field) {
+		final StringBuilder groovyCode = new StringBuilder();
+
+		groovyCode.append(field.getName());
+		groovyCode.append(" = ");
+		groovyCode.append(field.getDeclaringClass().getName());
+		groovyCode.append("::");
+		groovyCode.append(field.getName());
+		groovyCode.append(';');
+		groovyCode.append(StringTools.LINE_DELIMITER);
+
+		return groovyCode.toString();
 	}
 
 	@Override
@@ -62,7 +79,11 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 				.append(parameters.isEmpty() ? "" : ", ").append(parameterList).append(");").append(StringTools.LINE_DELIMITER);
 
 		// insert method call
-		body.append("\t").append(RESULT_NAME).append(" = ").append('$').append(moduleVariable).append('.').append(method.getName()).append('(');
+		if (Modifier.isStatic(method.getModifiers()))
+			body.append("\t").append(RESULT_NAME).append(" = ").append(method.getDeclaringClass().getName()).append('.').append(method.getName()).append('(');
+		else
+			body.append("\t").append(RESULT_NAME).append(" = ").append('$').append(moduleVariable).append('.').append(method.getName()).append('(');
+
 		body.append(parameterList);
 		body.append(");\n");
 

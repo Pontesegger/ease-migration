@@ -297,24 +297,11 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 			// create wrappers for final fields
 			for (final Field field : ModuleHelper.getFields(instance.getClass())) {
 				if (isSupportedByLanguage(field)) {
-					try {
-						final Object toBeInjected = field.get(instance);
+					final String code = createFieldWrapper(environment, identifier, field);
 
-						// only wrap if field is not already declared
-						if (!engine.hasVariable(getSaveVariableName(field.getName()))) {
-							engine.setVariable(getSaveVariableName(field.getName()), toBeInjected);
-
-						} else {
-							// see if the defined variable equals the one we want to set
-							final Object existing = engine.getVariable(getSaveVariableName(field.getName()));
-							if (((existing != null) && (!existing.equals(toBeInjected))) || ((existing == null) && (toBeInjected != null))) {
-								Logger.trace(Activator.PLUGIN_ID, ICodeFactory.TRACE_MODULE_WRAPPER, "Skipped wrapping of field \"" + field.getName()
-										+ "\" (module \"" + instance.getClass().getName() + "\") as variable is already declared.");
-							}
-						}
-
-					} catch (final IllegalArgumentException | IllegalAccessException e) {
-						Logger.error(Activator.PLUGIN_ID, "Could not wrap field \"" + field.getName() + " \" of module \"" + instance.getClass() + "\".", e);
+					if ((code != null) && !code.isEmpty()) {
+						scriptCode.append(code);
+						scriptCode.append('\n');
 					}
 				}
 			}
@@ -389,7 +376,7 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	protected abstract Object getLanguageIdentifier();
 
 	/**
-	 * Create code for a wrapper function in the global namespace of the script engine.
+	 * Create code for a method wrapper function in the global namespace of the script engine.
 	 *
 	 * @param environment
 	 *            environment instance
@@ -400,6 +387,19 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	 * @return script code to be injected into the script engine
 	 */
 	protected abstract String createFunctionWrapper(IEnvironment environment, String identifier, Method method);
+
+	/**
+	 * Create code for a field wrapper function in the global namespace of the script engine.
+	 *
+	 * @param environment
+	 *            environment instance
+	 * @param identifier
+	 *            function name to be used
+	 * @param field
+	 *            field to refer to
+	 * @return script code to be injected into the script engine
+	 */
+	protected abstract String createFieldWrapper(IEnvironment environment, String identifier, Field field);
 
 	/**
 	 * Convert a given name to a script language safe name. To make sure it is safe we check against a list of given keywords. We then append '_' until the

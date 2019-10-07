@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,6 +143,34 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	@Override
 	protected String toSafeName(String name) {
 		return toSafeNameStatic(name);
+	}
+
+	@Override
+	protected String createFieldWrapper(IEnvironment environment, String identifier, Field field) {
+		final StringBuilder pythonCode = new StringBuilder();
+
+		pythonCode.append("import sys").append(StringTools.LINE_DELIMITER);
+
+		pythonCode.append("if \"py4j\" in sys.modules:").append(StringTools.LINE_DELIMITER);
+		pythonCode.append("    ");
+		pythonCode.append(field.getName());
+		pythonCode.append(" = py4j.java_gateway.get_field(");
+		pythonCode.append(identifier);
+		pythonCode.append(", \"");
+		pythonCode.append(field.getName());
+		pythonCode.append("\")");
+		pythonCode.append(StringTools.LINE_DELIMITER);
+
+		pythonCode.append("else:").append(StringTools.LINE_DELIMITER);
+		pythonCode.append("    ");
+		pythonCode.append(field.getName());
+		pythonCode.append(" = ");
+		pythonCode.append(identifier);
+		pythonCode.append(".");
+		pythonCode.append(field.getName());
+		pythonCode.append(StringTools.LINE_DELIMITER);
+
+		return pythonCode.toString();
 	}
 
 	@Override

@@ -257,6 +257,21 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		return javaScriptCode.toString();
 	}
 
+	@Override
+	protected String createFieldWrapper(IEnvironment environment, String identifier, Field field) {
+		final StringBuilder javaScriptCode = new StringBuilder();
+
+		javaScriptCode.append(field.getName());
+		javaScriptCode.append(" = ");
+		javaScriptCode.append(identifier);
+		javaScriptCode.append('.');
+		javaScriptCode.append(field.getName());
+		javaScriptCode.append(';');
+		javaScriptCode.append(StringTools.LINE_DELIMITER);
+
+		return javaScriptCode.toString();
+	}
+
 	private String buildMethodBody(List<Parameter> parameters, Method method, String classIdentifier) {
 		final StringBuilder body = new StringBuilder();
 		// insert parameter checks
