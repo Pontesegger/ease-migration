@@ -228,6 +228,10 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	protected Object internalExecute(final Script script, final String fileName) throws Throwable, Exception {
+
+		if (hasVariable("argv"))
+			fPythonSideEngine.executeScript("import sys\nsys.argv = argv\n", "<dynamic>");
+
 		IInteractiveReturn interactiveReturn;
 		if (script.isShellMode()) {
 			interactiveReturn = fPythonSideEngine.executeInteractive(script.getCode());
