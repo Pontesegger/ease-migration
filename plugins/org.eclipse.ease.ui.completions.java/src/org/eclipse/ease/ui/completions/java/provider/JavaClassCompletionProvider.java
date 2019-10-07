@@ -135,11 +135,7 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 			Timer timer = new Timer();
 
 			// read java classes
-			try {
-				final URL url = new URL(
-						"platform:/plugin/org.eclipse.ease.ui/resources/java" + System.getProperty("java.runtime.version").charAt(2) + " classes.txt");
-				final InputStream inputStream = url.openConnection().getInputStream();
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			try (BufferedReader reader = JavaPackagesCompletionProvider.getJavaClassDefinitions()) {
 				String fullQualifiedName;
 				while ((fullQualifiedName = reader.readLine()) != null) {
 					addClass(fullQualifiedName);
@@ -150,6 +146,7 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 			} catch (final IOException e) {
 				Logger.error(EaseUICompletionsJavaFragment.FRAGMENT_ID, "Cannot read class list for code completion", e);
 			}
+
 			Logger.trace(EaseUICompletionsJavaFragment.FRAGMENT_ID, TRACE_CODE_COMPLETION, "Load java classes took: " + timer.getMilliSeconds() + " ms");
 
 			// read eclipse classes
@@ -209,7 +206,8 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 								if ((candidate.endsWith(".class")) && (!candidate.contains("$"))) {
 									final String fullQualifiedName = candidate.substring(0, candidate.length() - 6).replace('/', '.');
 									final String packageName = fullQualifiedName.contains(".")
-											? fullQualifiedName.substring(0, fullQualifiedName.lastIndexOf('.')) : "";
+											? fullQualifiedName.substring(0, fullQualifiedName.lastIndexOf('.'))
+											: "";
 									if (exportedPackages.contains(packageName))
 										addClass(fullQualifiedName);
 								}

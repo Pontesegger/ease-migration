@@ -34,6 +34,8 @@ public class Activator extends AbstractUIPlugin {
 
 	public static final String ICON_METHOD = "/icons/eobj16/function.png";
 
+	public static final int JAVA_CLASSES_MAX_VERSION = 12;
+
 	private static Activator fInstance;
 
 	private BundleContext fContext;

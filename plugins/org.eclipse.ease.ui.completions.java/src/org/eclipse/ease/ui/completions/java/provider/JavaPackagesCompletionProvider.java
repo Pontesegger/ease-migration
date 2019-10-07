@@ -12,17 +12,19 @@ package org.eclipse.ease.ui.completions.java.provider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.IHelpResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
@@ -36,6 +38,26 @@ import org.osgi.framework.FrameworkUtil;
 public class JavaPackagesCompletionProvider extends AbstractCompletionProvider {
 
 	private static Map<String, Collection<String>> PACKAGES = null;
+
+	private static final Pattern JAVA_VERSION_MATCHER = Pattern.compile("1\\.(\\d)\\..*");
+
+	/**
+	 * Get the major version number of the java runtime.
+	 *
+	 * @return java major version, eg 6, 8, 12
+	 */
+	private static int getJavaMajorVersion() {
+		int result = 0;
+
+		final String version = System.getProperty("java.runtime.version");
+		final Matcher matcher = JAVA_VERSION_MATCHER.matcher(version);
+		if (matcher.matches())
+			result = Integer.parseInt(matcher.group(1));
+		else
+			result = Integer.parseInt(version.substring(0, version.indexOf('.')));
+
+		return Math.min(result, Activator.JAVA_CLASSES_MAX_VERSION);
+	}
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
@@ -67,19 +89,22 @@ public class JavaPackagesCompletionProvider extends AbstractCompletionProvider {
 		}
 	}
 
+	public static BufferedReader getJavaClassDefinitions() throws IOException {
+		final URL url = new URL("platform:/plugin/org.eclipse.ease.ui/resources/java" + getJavaMajorVersion() + " classes.txt");
+		return new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
+	}
+
 	public static Map<String, Collection<String>> getPackages() {
 		if (PACKAGES == null) {
 			PACKAGES = new HashMap<>();
 
 			// read java packages
-			try {
-				final URL url = new URL(
-						"platform:/plugin/org.eclipse.ease.ui/resources/java" + System.getProperty("java.runtime.version").charAt(2) + " packages.txt");
-				final InputStream inputStream = url.openConnection().getInputStream();
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-				String packageName;
-				while ((packageName = reader.readLine()) != null)
+			try (BufferedReader reader = getJavaClassDefinitions()) {
+				String className;
+				while ((className = reader.readLine()) != null) {
+					final String packageName = className.substring(0, className.lastIndexOf('.'));
 					registerPackage(packageName);
+				}
 
 				reader.close();
 
