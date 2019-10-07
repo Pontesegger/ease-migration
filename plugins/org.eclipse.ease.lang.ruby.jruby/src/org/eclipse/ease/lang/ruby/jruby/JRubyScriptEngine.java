@@ -13,12 +13,12 @@ package org.eclipse.ease.lang.ruby.jruby;
 import java.net.URL;
 import java.util.Map;
 
-import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 
-public class JRubyScriptEngine extends AbstractScriptEngine {
+public class JRubyScriptEngine extends AbstractReplScriptEngine {
 
 	private ScriptingContainer fEngine;
 

@@ -6,13 +6,13 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
 
-import org.eclipse.ease.AbstractScriptEngine;
+import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.classloader.EaseClassLoader;
 
 import groovy.lang.GroovyShell;
 
-public class GroovyScriptEngine extends AbstractScriptEngine {
+public class GroovyScriptEngine extends AbstractReplScriptEngine {
 
 	/** Classloader used by the groovy shell. */
 	private EaseClassLoader fClassloader;
