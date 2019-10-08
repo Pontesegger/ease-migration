@@ -80,7 +80,7 @@ public class ModuleTracker {
 	}
 
 	public ModuleState getModuleState(ModuleDefinition definition) {
-		for (final ModuleState state : fAvailableModules) {
+		for (final ModuleState state : getAvailableModules()) {
 			if (state.getModuleDefinition() != null) {
 				if (definition.getId().equals(state.getModuleDefinition().getId()))
 					return state;
@@ -97,6 +97,6 @@ public class ModuleTracker {
 	}
 
 	public List<ModuleState> getAvailableModules() {
-		return fAvailableModules;
+		return new ArrayList<>(fAvailableModules);
 	}
 }
