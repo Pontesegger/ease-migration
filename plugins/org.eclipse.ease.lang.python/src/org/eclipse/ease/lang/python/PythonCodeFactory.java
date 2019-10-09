@@ -389,13 +389,14 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		if (parameter.getClazz().isArray()) {
 			final String arrayType = getPythonClassIdentifier(parameter.getClazz().getComponentType());
 			final String variableName = toSafeNameStatic(parameter.getName());
-			builder.append("try:").append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("    tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("    for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append("        tmp[index] = value").append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("    %s =  tmp", variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append("except NameError:").append(StringTools.LINE_DELIMITER);
-			builder.append("    pass").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("if %s is not None:", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("    try:").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("            tmp[index] = value").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        %s =  tmp", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("    except NameError:").append(StringTools.LINE_DELIMITER);
+			builder.append("        pass").append(StringTools.LINE_DELIMITER);
 		}
 		return builder.toString();
 	}
