@@ -29,4 +29,5 @@ Bundle-Name: Platform modules (Incubation)
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.ease.modules.platform;singleton:=true
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: org.eclipse.ease.modules.platform
 

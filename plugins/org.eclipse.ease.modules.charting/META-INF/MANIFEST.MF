@@ -15,3 +15,4 @@ Require-Bundle: org.eclipse.swt;bundle-version="[3.103.2,4.0.0)",
 Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.ease.modules.charting,
  org.eclipse.ease.modules.charting.views
+Automatic-Module-Name: org.eclipse.ease.modules.charting
