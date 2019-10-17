@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.view;
 
-import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ease.tools.ListenerList;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -88,8 +88,8 @@ public class TextSelectionProvider implements ISelectionProvider, SelectionListe
 			if (!fListeners.isEmpty()) {
 				// send event to listeners
 				final SelectionChangedEvent event = new SelectionChangedEvent(this, fSelection);
-				for (final Object listener : fListeners.getListeners())
-					((ISelectionChangedListener) listener).selectionChanged(event);
+				for (final ISelectionChangedListener listener : fListeners)
+					listener.selectionChanged(event);
 			}
 		}
 	}

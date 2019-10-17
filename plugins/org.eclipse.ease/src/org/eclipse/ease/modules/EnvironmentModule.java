@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.AbstractScriptEngine;
@@ -39,6 +38,7 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.modules.ModuleDefinition.ModuleDependency;
 import org.eclipse.ease.modules.ModuleTracker.ModuleState;
 import org.eclipse.ease.service.ScriptService;
+import org.eclipse.ease.tools.ListenerList;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;

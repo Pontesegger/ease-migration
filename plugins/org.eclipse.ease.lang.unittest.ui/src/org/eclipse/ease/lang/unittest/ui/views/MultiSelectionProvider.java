@@ -13,7 +13,7 @@ package org.eclipse.ease.lang.unittest.ui.views;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ease.tools.ListenerList;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -24,9 +24,9 @@ import org.eclipse.swt.events.FocusListener;
 
 public class MultiSelectionProvider implements ISelectionProvider, ISelectionChangedListener, FocusListener {
 
-	private final ListenerList fListeners = new ListenerList();
+	private final ListenerList<ISelectionChangedListener> fListeners = new ListenerList<>();
 
-	private final Collection<ISelectionProvider> fBaseProviders = new HashSet<ISelectionProvider>();
+	private final Collection<ISelectionProvider> fBaseProviders = new HashSet<>();
 
 	private ISelectionProvider fCurrentProvider;
 
@@ -66,8 +66,8 @@ public class MultiSelectionProvider implements ISelectionProvider, ISelectionCha
 		fCurrentProvider = event.getSelectionProvider();
 
 		// promote event
-		for (final Object listener : fListeners.getListeners())
-			((ISelectionChangedListener) listener).selectionChanged(event);
+		for (final ISelectionChangedListener listener : fListeners)
+			listener.selectionChanged(event);
 	}
 
 	@Override
