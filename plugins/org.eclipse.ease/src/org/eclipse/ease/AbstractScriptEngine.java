@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
@@ -39,6 +40,7 @@ import org.eclipse.ease.security.ScriptUIAccess;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
+import org.osgi.framework.Version;
 
 /**
  * Base implementation for a script engine. Handles Job implementation of script engine, adding script code for execution, module loading support and a basic
@@ -360,8 +362,13 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 * Add monitor to detect clicks on the stop button in the Progress view.
 	 */
 	private void addStopButtonMonitor() {
-		if (fMonitor instanceof JobMonitor)
-			((JobMonitor) fMonitor).addProgressListener(new ScriptEngineMonitor());
+		final Version workbenchBundleVersion = Platform.getBundle("org.eclipse.ui.workbench").getVersion();
+		if (workbenchBundleVersion.compareTo(Version.valueOf("3.110.1")) >= 0) {
+			// JobMonitor is a private class up to 3.110.1 (Eclipse Oxygen)
+			// this functionality improves usability, but is not essential to scripting
+			if (fMonitor instanceof JobMonitor)
+				((JobMonitor) fMonitor).addProgressListener(new ScriptEngineMonitor());
+		}
 	}
 
 	/**
