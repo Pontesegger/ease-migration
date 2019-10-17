@@ -26,6 +26,7 @@
 							<goal>mirror</goal>
 						</goals>
 						<configuration>
+							<name>${p2.name}</name>
 							<source>
 								<repository>
 									<url>${p2.source}</url>
