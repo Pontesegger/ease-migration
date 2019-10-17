@@ -39,7 +39,7 @@ import org.junit.runner.Description;
 public abstract class EaseTestBase {
 
 	@Rule
-	public Timeout fGlobalTimeout = Timeout.seconds(30);
+	public Timeout fGlobalTimeout = new Timeout(30000);
 
 	@Rule
 	public TestRule fPrintTestName = new TestWatcher() {
