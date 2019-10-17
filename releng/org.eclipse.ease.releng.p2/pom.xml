@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.eclipse.ease.releng.p2</artifactId>
@@ -36,10 +37,20 @@
 				</executions>
 				<configuration>
 					<associateSites>
-						<site>https://bintray.com/artifact/download/pontesegger/ease-engines</site>
+						<site>https://bintray.com/artifact/download/pontesegger/ease-engines
+						</site>
 						<site>https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1</site>
 					</associateSites>
 					<skipBuildInfo>true</skipBuildInfo>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-repository-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<repositoryName>EASE</repositoryName>
 				</configuration>
 			</plugin>
 		</plugins>
