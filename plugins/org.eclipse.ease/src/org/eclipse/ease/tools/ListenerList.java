@@ -20,21 +20,22 @@ import org.osgi.framework.Version;
  * This utility class provides backwards compatibility for older target platforms. Using this implementation allows to benefit from the new iterable interface.
  * Still it can be used on old platforms where this is not provided.
  */
-public class ListenerList<T> extends org.eclipse.core.runtime.ListenerList<T> implements Iterable<T> {
+public class ListenerList<E> extends org.eclipse.core.runtime.ListenerList<E> implements Iterable<E> {
 
 	@Override
-	public Iterator<T> iterator() {
-		final Version workbenchBundleVersion = Platform.getBundle("org.eclipse.equinox.common").getVersion();
-		if (workbenchBundleVersion.compareTo(Version.valueOf("3.2")) < 0) {
+	public Iterator<E> iterator() {
+		final Version equinoxBundleVersion = Platform.getBundle("org.eclipse.equinox.common").getVersion();
+		if (equinoxBundleVersion.compareTo(Version.valueOf("3.2.0")) < 0) {
 			// old ListenerList does not support iterators
 			return new ListenerListIterator<>(getListeners());
 		}
+		System.out.println("====================================== > using new implementation, version is " + equinoxBundleVersion);
 
 		return super.iterator();
 	}
 
 	/**
-	 * Copied from org.eclipse.core.runtime.ListenerList<T>
+	 * Copied from org.eclipse.core.runtime.ListenerList
 	 */
 	private static class ListenerListIterator<E> implements Iterator<E> {
 		private final Object[] fListeners;
