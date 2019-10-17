@@ -36,7 +36,7 @@
 				</executions>
 				<configuration>
 					<associateSites>
-						<site>http://download.eclipse.org/nebula/releases/1.3.0/</site>
+						<site>http://download.eclipse.org/nebula/releases/2.2.0</site>
 					</associateSites>
 					<skipBuildInfo>true</skipBuildInfo>
 				</configuration>
