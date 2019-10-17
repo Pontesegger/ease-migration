@@ -10,3 +10,4 @@ Require-Bundle: org.eclipse.ease,
  org.codehaus.groovy;bundle-version="2.4.6",
  org.eclipse.ease.classloader,
  org.eclipse.debug.core
+Automatic-Module-Name: org.eclipse.ease.lang.groovy.interpreter

@@ -12,7 +12,6 @@ package org.eclipse.ease.adapters;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
@@ -25,57 +24,28 @@ import org.eclipse.ease.IScriptable;
  */
 public class ScriptableAdapter implements IAdapterFactory {
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
-	public final Object getAdapter(final Object adaptableObject, final Class adapterType) {
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adapterType.equals(IScriptable.class)) {
-			if (adaptableObject instanceof IFile) {
-				return new IScriptable() {
+			if (adaptableObject instanceof IFile)
+				return (T) (IScriptable) () -> ((IFile) adaptableObject).getContents();
 
-					@Override
-					public InputStream getSourceCode() throws Exception {
-						return ((IFile) adaptableObject).getContents();
-					}
-				};
-			}
+			if (adaptableObject instanceof File)
+				return (T) (IScriptable) () -> new FileInputStream((File) adaptableObject);
 
-			if (adaptableObject instanceof File) {
-				return new IScriptable() {
+			if (adaptableObject instanceof URL)
+				return (T) (IScriptable) () -> ((URL) adaptableObject).openStream();
 
-					@Override
-					public InputStream getSourceCode() throws Exception {
-						return new FileInputStream((File) adaptableObject);
-					}
-				};
-			}
-
-			if (adaptableObject instanceof URL) {
-				return new IScriptable() {
-
-					@Override
-					public InputStream getSourceCode() throws Exception {
-						return ((URL) adaptableObject).openStream();
-					}
-				};
-			}
-
-			if (adaptableObject instanceof URI) {
-				return new IScriptable() {
-
-					@Override
-					public InputStream getSourceCode() throws Exception {
-						return ((URI) adaptableObject).toURL().openStream();
-					}
-				};
-			}
+			if (adaptableObject instanceof URI)
+				return (T) (IScriptable) () -> ((URI) adaptableObject).toURL().openStream();
 		}
 
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public final Class[] getAdapterList() {
+	public Class<?>[] getAdapterList() {
 		return new Class[] { IScriptable.class };
 	}
 }

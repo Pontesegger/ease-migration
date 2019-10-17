@@ -10,3 +10,4 @@ Require-Bundle: org.junit,
  org.eclipse.core.runtime,
  org.mockito;bundle-version="[1.9.5,2.0.0)",
  org.eclipse.ease.testhelper
+Automatic-Module-Name: org.eclipse.ease.lang.python.py4j.test

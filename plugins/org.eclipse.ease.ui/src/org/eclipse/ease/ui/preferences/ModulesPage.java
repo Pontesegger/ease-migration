@@ -23,8 +23,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceAdapter;
@@ -73,16 +73,14 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 
 	public static final String PREFERENCES_ID = "org.eclipse.ease.preferences.modules";
 
-	private IWorkbench fWorkbench;
-	private TreeViewer visibleTreeViewer;
-	private TreeViewer invisibleTreeViewer;
+	private TreeViewer fVisibleTreeViewer;
+	private TreeViewer fInvisibleTreeViewer;
 
 	public ModulesPage() {
 	}
 
 	@Override
 	public void init(final IWorkbench workbench) {
-		fWorkbench = workbench;
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
@@ -101,38 +99,38 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		final Label lblHiddenModules = new Label(composite, SWT.NONE);
 		lblHiddenModules.setText(Messages.ModulesPage_hiddenModules);
 
-		visibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
-		final Tree tree = visibleTreeViewer.getTree();
+		fVisibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
+		final Tree tree = fVisibleTreeViewer.getTree();
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
-		visibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
-		visibleTreeViewer.setContentProvider(new ModulesContentProvider());
-		visibleTreeViewer.setSorter(new ViewerSorter() {
+		fVisibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
+		fVisibleTreeViewer.setContentProvider(new ModulesContentProvider());
+		fVisibleTreeViewer.setComparator(new ViewerComparator() {
 			@Override
-			public int category(final Object element) {
+			public int category(Object element) {
 				return (element instanceof IPath) ? 1 : 2;
 			}
 		});
-		visibleTreeViewer.setFilters(new ViewerFilter[] { new VisibilityFilter(true) });
-		addDNDSupport(visibleTreeViewer, true);
+		fVisibleTreeViewer.setFilters(new ViewerFilter[] { new VisibilityFilter(true) });
+		addDNDSupport(fVisibleTreeViewer, true);
 
-		invisibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
-		final Tree tree_1 = invisibleTreeViewer.getTree();
+		fInvisibleTreeViewer = new TreeViewer(composite, SWT.BORDER | SWT.MULTI);
+		final Tree tree_1 = fInvisibleTreeViewer.getTree();
 		tree_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
-		invisibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
-		invisibleTreeViewer.setContentProvider(new ModulesContentProvider());
-		invisibleTreeViewer.setSorter(new ViewerSorter() {
+		fInvisibleTreeViewer.setLabelProvider(new ModulesLabelProvider());
+		fInvisibleTreeViewer.setContentProvider(new ModulesContentProvider());
+		fInvisibleTreeViewer.setComparator(new ViewerComparator() {
 			@Override
-			public int category(final Object element) {
+			public int category(Object element) {
 				return (element instanceof IPath) ? 1 : 2;
 			}
 		});
-		invisibleTreeViewer.setFilters(new ViewerFilter[] { new VisibilityFilter(false) });
-		addDNDSupport(invisibleTreeViewer, false);
+		fInvisibleTreeViewer.setFilters(new ViewerFilter[] { new VisibilityFilter(false) });
+		addDNDSupport(fInvisibleTreeViewer, false);
 
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		final Collection<ModuleDefinition> modules = scriptService.getAvailableModules();
-		visibleTreeViewer.setInput(modules);
-		invisibleTreeViewer.setInput(modules);
+		fVisibleTreeViewer.setInput(modules);
+		fInvisibleTreeViewer.setInput(modules);
 
 		return composite;
 	}
@@ -167,8 +165,8 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 					}
 				}
 
-				visibleTreeViewer.refresh();
-				invisibleTreeViewer.refresh();
+				fVisibleTreeViewer.refresh();
+				fInvisibleTreeViewer.refresh();
 			}
 		});
 	}
@@ -179,7 +177,7 @@ public class ModulesPage extends PreferencePage implements IWorkbenchPreferenceP
 		for (final ModuleDefinition definition : scriptService.getAvailableModules())
 			definition.resetVisible();
 
-		visibleTreeViewer.refresh();
-		invisibleTreeViewer.refresh();
+		fVisibleTreeViewer.refresh();
+		fInvisibleTreeViewer.refresh();
 	}
 }

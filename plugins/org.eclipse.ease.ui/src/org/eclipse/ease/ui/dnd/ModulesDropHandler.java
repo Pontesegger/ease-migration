@@ -40,17 +40,17 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 				scriptEngine.executeAsync(call);
 
 			} else if (element instanceof ModuleEntry) {
-				final ModuleDefinition declaringModule = ((ModuleEntry) element).getModuleDefinition();
+				final ModuleDefinition declaringModule = ((ModuleEntry<?>) element).getModuleDefinition();
 				loadModule(scriptEngine, declaringModule.getPath().toString(), false);
 
-				if (((ModuleEntry) element).getEntry() instanceof Method) {
+				if (((ModuleEntry<?>) element).getEntry() instanceof Method) {
 
 					// FIXME we need to find reasonable default values for mandatory parameters
-					final String call = codeFactory.createFunctionCall((Method) ((ModuleEntry) element).getEntry());
+					final String call = codeFactory.createFunctionCall((Method) ((ModuleEntry<?>) element).getEntry());
 					scriptEngine.executeAsync(call);
 
-				} else if (((ModuleEntry) element).getEntry() instanceof Field)
-					scriptEngine.executeAsync(((Field) ((ModuleEntry) element).getEntry()).getName());
+				} else if (((ModuleEntry<?>) element).getEntry() instanceof Field)
+					scriptEngine.executeAsync(((Field) ((ModuleEntry<?>) element).getEntry()).getName());
 
 			} else
 				// fallback solution

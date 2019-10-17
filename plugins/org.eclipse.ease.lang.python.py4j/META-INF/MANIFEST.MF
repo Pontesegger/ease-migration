@@ -19,3 +19,4 @@ Bundle-Activator: org.eclipse.ease.lang.python.py4j.internal.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Eclipse-BundleShape: dir
+Automatic-Module-Name: org.eclipse.ease.lang.python.py4j

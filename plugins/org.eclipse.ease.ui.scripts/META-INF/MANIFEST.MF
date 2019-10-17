@@ -46,3 +46,4 @@ Export-Package: org.eclipse.ease.ui.scripts,
  org.eclipse.ease.ui.scripts.preferences,
  org.eclipse.ease.ui.scripts.repository,
  org.eclipse.ease.ui.scripts.ui
+Automatic-Module-Name: org.eclipse.ease.ui.scripts

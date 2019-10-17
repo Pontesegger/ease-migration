@@ -58,7 +58,7 @@ public class ModulesDragListener implements DragSourceListener {
 
 			// unpack field/method
 			if (firstElement instanceof ModuleEntry)
-				firstElement = ((ModuleEntry) firstElement).getEntry();
+				firstElement = ((ModuleEntry<?>) firstElement).getEntry();
 
 			final StringBuilder data = new StringBuilder();
 

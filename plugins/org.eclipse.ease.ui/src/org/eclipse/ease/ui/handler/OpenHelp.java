@@ -42,17 +42,17 @@ public class OpenHelp extends AbstractHandler implements IHandler {
 				PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(module.getHelpLocation(null));
 
 			} else if (element instanceof ModuleEntry) {
-				if (((ModuleEntry) element).getEntry() instanceof Method) {
-					final ModuleDefinition module = ((ModuleEntry) element).getModuleDefinition();
+				if (((ModuleEntry<?>) element).getEntry() instanceof Method) {
+					final ModuleDefinition module = ((ModuleEntry<?>) element).getModuleDefinition();
 					if (module != null)
 						PlatformUI.getWorkbench().getHelpSystem()
-								.displayHelpResource(module.getHelpLocation(((Method) ((ModuleEntry) element).getEntry()).getName()));
+								.displayHelpResource(module.getHelpLocation(((Method) ((ModuleEntry<?>) element).getEntry()).getName()));
 
-				} else if (((ModuleEntry) element).getEntry() instanceof Field) {
-					final ModuleDefinition module = ((ModuleEntry) element).getModuleDefinition();
+				} else if (((ModuleEntry<?>) element).getEntry() instanceof Field) {
+					final ModuleDefinition module = ((ModuleEntry<?>) element).getModuleDefinition();
 					if (module != null)
 						PlatformUI.getWorkbench().getHelpSystem()
-								.displayHelpResource(module.getHelpLocation(((Field) ((ModuleEntry) element).getEntry()).getName()));
+								.displayHelpResource(module.getHelpLocation(((Field) ((ModuleEntry<?>) element).getEntry()).getName()));
 				}
 			}
 		}

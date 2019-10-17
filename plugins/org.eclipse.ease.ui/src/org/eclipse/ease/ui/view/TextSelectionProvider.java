@@ -62,7 +62,7 @@ public class TextSelectionProvider implements ISelectionProvider, SelectionListe
 		}
 	}
 
-	private final ListenerList fListeners = new ListenerList();
+	private final ListenerList<ISelectionChangedListener> fListeners = new ListenerList<>();
 	private ITextSelection fSelection = null;
 
 	@Override

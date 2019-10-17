@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.osgi,
  org.eclipse.core.jobs
 Export-Package: org.eclipse.ease.classloader
 Bundle-Vendor: Eclipse.org
+Automatic-Module-Name: org.eclipse.ease.classloader

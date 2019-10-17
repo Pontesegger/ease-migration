@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.ease,
  org.eclipse.ease.lang.javascript,
  org.eclipse.debug.core
 Export-Package: org.eclipse.ease.lang.javascript.nashorn
+Automatic-Module-Name: org.eclipse.ease.lang.javascript.nashorn

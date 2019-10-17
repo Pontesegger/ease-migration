@@ -39,3 +39,4 @@ Export-Package: org.eclipse.ease.ui,
  org.eclipse.ease.ui.propertytester;x-internal:=true,
  org.eclipse.ease.ui.tools,
  org.eclipse.ease.ui.view
+Automatic-Module-Name: org.eclipse.ease.ui

@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.jdt.ui;bundle-version="[3.7.2,4.0.0)",
 Export-Package: org.eclipse.ease.ui.completions.java.help.handlers;x-internal:=true,
  org.eclipse.ease.ui.completions.java.help.hovers.internal;x-internal:=true,
  org.eclipse.ease.ui.completions.java.provider;x-internal:=true
+Automatic-Module-Name: org.eclipse.ease.ui.completions.java

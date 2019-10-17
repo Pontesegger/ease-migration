@@ -62,7 +62,7 @@ public class ModulesComposite extends Composite implements BundleListener {
 
 				// unpack field/method
 				if (element instanceof ModuleEntry)
-					element = ((ModuleEntry) element).getEntry();
+					element = ((ModuleEntry<?>) element).getEntry();
 
 				if ((element instanceof IPath))
 					return 1;

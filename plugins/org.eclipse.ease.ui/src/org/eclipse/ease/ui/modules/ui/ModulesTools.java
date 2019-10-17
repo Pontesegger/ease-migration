@@ -57,7 +57,7 @@ public class ModulesTools {
 		@Override
 		public boolean equals(Object o) {
 			if (o instanceof ModuleEntry)
-				return fModuleDefinition.equals(((ModuleEntry) o).fModuleDefinition) && fEntry.equals(((ModuleEntry) o).fEntry);
+				return fModuleDefinition.equals(((ModuleEntry<?>) o).fModuleDefinition) && fEntry.equals(((ModuleEntry<?>) o).fEntry);
 
 			return false;
 		}

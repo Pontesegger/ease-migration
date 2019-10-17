@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.ease,
  org.eclipse.ease.lang.ruby,
  org.jruby;bundle-version="9.0.5",
  org.eclipse.debug.core
+Automatic-Module-Name: org.eclipse.ease.lang.ruby.jruby

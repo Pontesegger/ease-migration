@@ -14,3 +14,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Eclipse-BuddyPolicy: global
 Export-Package: org.eclipse.ease.lang.python.jython
+Automatic-Module-Name: org.eclipse.ease.lang.python.jython
