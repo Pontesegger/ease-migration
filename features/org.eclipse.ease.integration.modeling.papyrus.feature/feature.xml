@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.ease.integration.modeling.papyrus.feature"
-      label="EASE Papyrus intgration"
-      version="0.1.0.qualifier"
+      label="EASE Papyrus intgration (Incubation)"
+      version="0.8.0.qualifier"
+      provider-name="Eclipse.org"
       plugin="org.eclipse.ease">
 
    <description>
