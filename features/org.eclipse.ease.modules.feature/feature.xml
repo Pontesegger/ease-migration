@@ -3,7 +3,8 @@
       id="org.eclipse.ease.modules.feature"
       label="EASE Modules (Incubation)"
       version="0.8.0.qualifier"
-      provider-name="Eclipse.org">
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.ease">
 
    <description url="https://www.eclipse.org/ease/">
       EASE basic modules to interact with Eclipse Workbench

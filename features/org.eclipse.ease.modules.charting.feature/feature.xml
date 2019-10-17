@@ -3,7 +3,8 @@
       id="org.eclipse.ease.modules.charting.feature"
       label="EASE Charting Support (Incubation)"
       version="0.8.0.qualifier"
-      provider-name="Eclipse.org">
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.ease">
 
    <description url="https://www.eclipse.org/ease/">
       EASE module to draw nebula charts.
