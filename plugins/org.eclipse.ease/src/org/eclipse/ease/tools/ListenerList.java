@@ -25,11 +25,10 @@ public class ListenerList<E> extends org.eclipse.core.runtime.ListenerList<E> im
 	@Override
 	public Iterator<E> iterator() {
 		final Version equinoxBundleVersion = Platform.getBundle("org.eclipse.equinox.common").getVersion();
-		if (equinoxBundleVersion.compareTo(Version.valueOf("3.2.0")) < 0) {
+		if (equinoxBundleVersion.compareTo(Version.valueOf("3.8.0")) < 0) {
 			// old ListenerList does not support iterators
 			return new ListenerListIterator<>(getListeners());
 		}
-		System.out.println("====================================== > using new implementation, version is " + equinoxBundleVersion);
 
 		return super.iterator();
 	}
