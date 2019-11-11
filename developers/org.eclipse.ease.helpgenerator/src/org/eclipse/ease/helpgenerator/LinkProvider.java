@@ -145,9 +145,9 @@ public class LinkProvider {
 							for (String parameter : linkMatcher.group(3).split(",")) {
 								parameter = parameter.trim().replace(" ", "");
 								if (parameter.endsWith("]"))
-									link.append(findClass(parameter.substring(0, parameter.indexOf('[')), clazz));
+									link.append(removeGenericsTags(resolveClassName(parameter.substring(0, parameter.indexOf('[')), clazz)));
 								else
-									link.append(findClass(parameter, clazz));
+									link.append(removeGenericsTags(resolveClassName(parameter, clazz)));
 
 								while (parameter.endsWith("]")) {
 									link.append(":A");
@@ -213,6 +213,21 @@ public class LinkProvider {
 		output.append(text.substring(startPos));
 
 		return output.toString();
+	}
+
+	/**
+	 * Remove the generic tags from class name
+	 *
+	 * @param className
+	 *            The complete name of the class, including generic tags
+	 * @return the class name without the generic tags
+	 */
+	public static String removeGenericsTags(String className) {
+		if (className == null) {
+			return null;
+		}
+		final int indexOf = className.indexOf('<');
+		return indexOf < 0 ? className : className.substring(0, className.indexOf('<'));
 	}
 
 	private static String capitalizeFirst(final String content) {
