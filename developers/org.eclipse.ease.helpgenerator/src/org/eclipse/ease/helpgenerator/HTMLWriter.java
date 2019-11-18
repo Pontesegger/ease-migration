@@ -160,17 +160,6 @@ public class HTMLWriter {
 			addLine(buffer,
 					"\t\t<h3" + (isDeprecated(method) ? " class=\"deprecatedText\"" : "") + "><a id=\"" + method.name() + "\">" + method.name() + "</a></h3>");
 
-			final Parameter[] parameters = method.parameters();
-			if (parameters.length > 0) {
-				// Add a link anchor to method name + parameters
-				final StringBuilder anchorBuilder = new StringBuilder();
-				anchorBuilder.append(method.name()).append('-');
-				for (final Parameter parameter : parameters) {
-					anchorBuilder.append(LinkProvider.removeGenericsTags(parameter.typeName())).append('-');
-				}
-				addLine(buffer, "\t\t<a id=\"" + anchorBuilder.toString() + "\"></a>");
-			}
-
 			// synopsis
 			addLine(buffer, createSynopsis(method));
 
