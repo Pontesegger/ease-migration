@@ -19,7 +19,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -74,6 +76,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	/** Callbacks for wrapped method invocations. */
 	private final ListenerList<IModuleCallbackProvider> fModuleCallbacks = new ListenerList<>();
 
+	private final Collection<String> fPrintedErrors = new HashSet<>();
+
 	public EnvironmentModule() {
 		final ModuleDefinition moduleDefinition = ModuleHelper.resolveModuleName(MODULE_NAME);
 		final ModuleState state = fModuleTracker.addModule(moduleDefinition);
@@ -85,7 +89,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 		if (!moduleState.isLoaded()) {
 			if (definition.isDeprecated())
-				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.");
+				printError("Module \"" + definition.getName() + "\" is deprecated. Consider updating your code.", false);
 
 			createModuleDependencies(definition);
 			final Object instance = definition.createModuleInstance();
@@ -220,10 +224,17 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *
 	 * @param text
 	 *            message to write
+	 * @param printOnce
+	 *            If <code>true</code>, the text in parameter will be printed only once and ignored in other calls of this method. If <code>false</code>, it
+	 *            will be printed in all cases.
 	 */
 	@WrapToScript
-	public final void printError(final @ScriptParameter(defaultValue = "") Object text) {
-		getScriptEngine().getErrorStream().println(text);
+	public final void printError(final @ScriptParameter(defaultValue = "") Object text, final @ScriptParameter(defaultValue = "false") boolean printOnce) {
+		final String printedText = String.valueOf(text);
+		if (!(printOnce && fPrintedErrors.contains(printedText))) {
+			getScriptEngine().getErrorStream().println(printedText);
+			fPrintedErrors.add(printedText);
+		}
 	}
 
 	@Override
@@ -459,7 +470,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 		// sanity check to avoid blue screens for invalid calls, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=479762
 		if ((topic != null) && !VALID_TOPICS_PATTERN.matcher(topic).matches()) {
-			printError("Invalid help topic to look for: \"" + topic + "\"");
+			printError("Invalid help topic to look for: \"" + topic + "\"", false);
 			return;
 		}
 

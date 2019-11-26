@@ -280,7 +280,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		// insert deprecation warnings
 		if (ModuleHelper.isDeprecated(method))
-			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.');").append(StringTools.LINE_DELIMITER);
+			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.', true);").append(StringTools.LINE_DELIMITER);
 
 		final IEnvironment environment = IEnvironment.getEnvironment();
 		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
