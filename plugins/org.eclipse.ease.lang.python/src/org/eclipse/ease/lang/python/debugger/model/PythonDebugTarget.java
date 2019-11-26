@@ -21,7 +21,7 @@ import org.eclipse.ease.debugging.model.EaseDebugTarget;
  * ScriptDebugTarget for communication between Eclipse framework and Python debugger.
  */
 public class PythonDebugTarget extends EaseDebugTarget {
-	private static final String pyBreakpointType = PythonDebugModelPresentation.ID;
+	private static final String BREAKPOINT_TYPE = PythonDebugModelPresentation.ID;
 
 	public PythonDebugTarget(final ILaunch launch, final boolean suspendOnStartup, final boolean suspendOnScriptLoad, boolean showDynamicCode) {
 		super(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);
@@ -39,7 +39,7 @@ public class PythonDebugTarget extends EaseDebugTarget {
 	 */
 	@Override
 	protected IBreakpoint[] getBreakpoints(final Script script) {
-		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(pyBreakpointType);
+		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(BREAKPOINT_TYPE);
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.ease.Activator;
+import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
@@ -172,15 +173,17 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 					}
 				}
 
-			} else if (event instanceof TerminateRequest) {
-				fBreakpoints.clear();
-				getEngine().terminate();
-				fireDispatchEvent(new EngineTerminatedEvent());
-				setDispatcher(null);
-
 			} else if (event instanceof SuspendRequest) {
 				final ThreadState threadState = getThreadState(((AbstractEvent) event).getThread());
 				threadState.fResumeType = DebugEvent.STEP_INTO;
+
+			} else if (event instanceof TerminateRequest) {
+				fEvaluationRequests.add((AbstractEvent) event);
+				for (final ThreadState threadState : fThreadStates.values()) {
+					synchronized (threadState) {
+						threadState.notify();
+					}
+				}
 
 			} else if (event instanceof AbstractEvent) {
 				fEvaluationRequests.add((AbstractEvent) event);
@@ -259,6 +262,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		while (!requests.isEmpty()) {
 			final AbstractEvent request = requests.remove(0);
 			final ThreadState threadStateForRequest = getThreadState(request.getThread());
+
 			if (threadState.equals(threadStateForRequest)) {
 
 				// we handle this event, remove from queue
@@ -307,6 +311,9 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 					resume(((ResumeRequest) request).getType(), ((ResumeRequest) request).getThread());
 				}
 			}
+
+			if (request instanceof TerminateRequest)
+				throw new ExitException("Engine termination requested by user");
 		}
 	}
 

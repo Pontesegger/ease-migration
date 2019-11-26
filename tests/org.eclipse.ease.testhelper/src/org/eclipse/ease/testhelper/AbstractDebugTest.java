@@ -51,7 +51,6 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -122,13 +121,11 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		}
 	}
 
-	@Ignore
 	@Test
 	public void hasDebugTarget() throws CoreException {
 		assertNotNull(getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void breakpointLocation() throws CoreException {
 		setBreakpoint(fFile, getLineNumber("primitive-integer-definition-hook"));
@@ -146,8 +143,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	// ---------- step over tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- step over tests ---------------------------------------------------------------
 
 	public void stepOverTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
 		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
@@ -182,32 +178,27 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepOverOnDebugTarget() throws CoreException {
 		stepOverTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepOverOnProcess() throws CoreException {
 		stepOverTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepOverOnThread() throws CoreException {
 		stepOverTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepOverOnStackFrame() throws CoreException {
 		stepOverTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- step into tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- step into tests ---------------------------------------------------------------
 
 	public void stepIntoTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
 		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
@@ -242,32 +233,27 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepIntoOnDebugTarget() throws CoreException {
 		stepIntoTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepIntoOnProcess() throws CoreException {
 		stepIntoTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepIntoOnThread() throws CoreException {
 		stepIntoTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepIntoOnStackFrame() throws CoreException {
 		stepIntoTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- step return tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- step return tests -------------------------------------------------------------
 
 	public void stepReturnTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
 		setBreakpoint(fFile, getLineNumber("testMethod-result-hook"));
@@ -302,32 +288,27 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepReturnOnDebugTarget() throws CoreException {
 		stepReturnTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepReturnOnProcess() throws CoreException {
 		stepReturnTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepReturnOnThread() throws CoreException {
 		stepReturnTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void stepReturnOnStackFrame() throws CoreException {
 		stepReturnTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- resume tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- resume tests ------------------------------------------------------------------
 
 	public void resumeTestTemplate(IDebugElementProvider elementProvider) throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -341,32 +322,27 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void resumeOnDebugTarget() throws CoreException, IOException {
 		resumeTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void resumeOnProcess() throws CoreException, IOException {
 		resumeTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void resumeOnThread() throws CoreException, IOException {
 		resumeTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void resumeOnStackFrame() throws CoreException, IOException {
 		resumeTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- terminate tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- terminate tests ---------------------------------------------------------------
 
 	public void terminateTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
 		setBreakpoint(fFile, 1);
@@ -386,32 +362,27 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminateDebugTargetInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminateProcessInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminateThreadInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminateStackFrameInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- disconnect tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- disconnect tests --------------------------------------------------------------
 
 	public void disconnectTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
 		setBreakpoint(fFile, 1);
@@ -431,34 +402,28 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void disconnectDebugTargetInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getDebugTarget());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void disconnectProcessInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getProcess());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void disconnectThreadInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getThread());
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void disconnectStackFrameInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getTopmostStackFrame());
 	}
 
-	// ---------- watch expression tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- watch expression tests --------------------------------------------------------
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void evaluateWatchExpression() throws CoreException, IOException {
 		final IWatchExpressionListener expressionListener = mock(IWatchExpressionListener.class);
@@ -489,10 +454,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(0, variable.getValue().getVariables().length);
 	}
 
-	// ---------- state enablements tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- state enablements tests -------------------------------------------------------
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void suspendedState() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -562,7 +525,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminatedState() throws CoreException {
 
@@ -618,10 +580,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertFalse(getThread().canTerminate());
 	}
 
-	// ---------- variable tests
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- variable tests ----------------------------------------------------------------
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void primitiveDoubleVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -650,7 +610,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void primitiveStringVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -679,7 +638,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void nullVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -708,7 +666,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void nativeArrayVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -757,7 +714,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void arrayVariableSorting() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -787,7 +743,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void nativeObjectVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -828,7 +783,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void javaClassVariable() throws CoreException, IOException {
 		setBreakpoint(fFile, getLastLineNumber());
@@ -898,7 +852,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test(timeout = TEST_TIMEOUT)
 	public void innerScopeVariableBeforeOuterScopeVariable() throws CoreException {
 		setBreakpoint(fFile, getLineNumber("testMethod-result-hook"));
@@ -923,7 +876,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Ignore
 	@Test
 	public void modifyVariableKeepingType() throws CoreException, IOException {
 		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
@@ -969,8 +921,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	// ---------- helper methods
-	// ----------------------------------------------------------------------------------------------------
+	// ---------- helper methods ----------------------------------------------------------------
 
 	private EaseDebugVariable[] getVariables() {
 		final EaseDebugStackFrame stackFrame = getTopmostStackFrame();

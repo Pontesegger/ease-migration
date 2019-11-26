@@ -134,7 +134,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			// we do not need the scope any longer
 			fScope = null;
 
-			if (getScript() != null)
+			if ((!byThrow) && (getScript() != null))
 				processLine(getScript(), getLineNumber());
 		}
 
