@@ -46,12 +46,6 @@ Contributors:
          version="0.0.0"/>
 
    <plugin
-         id="org.eclipse.ease.lang.javascript.rhino.debugger"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
          id="org.eclipse.ease.lang.javascript.nashorn"
          download-size="0"
          install-size="0"

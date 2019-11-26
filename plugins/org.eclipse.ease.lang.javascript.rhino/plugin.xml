@@ -22,5 +22,85 @@
             engineID="org.eclipse.ease.javascript.rhino">
       </completionAnalyzer>
    </extension>
+   <extension
+         point="org.eclipse.ease.language">
+      <engine
+            class="org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebuggerEngine"
+            id="org.eclipse.ease.javascript.rhinoDebugger"
+            name="JavaScript (Rhino Debugger)"
+            priority="1">
+         <binding
+               scriptType="JavaScript">
+         </binding>
+      </engine>
+      <moduleWrapper
+            class="org.eclipse.ease.lang.javascript.JavaScriptModuleWrapper"
+            engineID="org.eclipse.ease.javascript.rhinoDebugger">
+      </moduleWrapper>
+      <launchExtension
+            class="org.eclipse.ease.modules.BootStrapper"
+            engineID="org.eclipse.ease.javascript.rhinoDebugger">
+      </launchExtension>
+      <completionAnalyzer
+            class="org.eclipse.ease.lang.javascript.JavaScriptCompletionAnalyzer"
+            engineID="org.eclipse.ease.javascript.rhinoDebugger">
+      </completionAnalyzer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="org.eclipse.ease.lang.javascript.rhino.debugger.model.RhinoDebugModelPresentation"
+            id="org.eclipse.ease.debugModelPresentation.rhino">
+      </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="variableViewActions"
+            targetID="org.eclipse.debug.ui.VariableView">
+         <menu
+               id="org.eclipse.ease.debug.ui.variableview.menu"
+               label="EASE">
+            <groupMarker
+                  name="ease">
+            </groupMarker>
+         </menu>
+         <action
+               class="org.eclipse.ease.lang.javascript.rhino.debugger.actions.FunctionFilterAction"
+               helpContextId="show_functions_variable_help_context"
+               id="org.eclipse.ease.ui.variableview.show.functions"
+               label="Show functions"
+               menubarPath="org.eclipse.ease.debug.ui.variableview.menu/ease"
+               state="false"
+               style="toggle"
+               tooltip="Tooltip text">
+         </action>
+         <action
+               class="org.eclipse.ease.lang.javascript.rhino.debugger.actions.ModuleFilterAction"
+               helpContextId="show_functions_variable_help_context"
+               id="org.eclipse.ease.ui.variableview.show.modules"
+               label="Show modules"
+               menubarPath="org.eclipse.ease.debug.ui.variableview.menu/ease"
+               state="false"
+               style="toggle"
+               tooltip="Tooltip text">
+         </action>
+      </viewContribution>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.watchExpressionDelegates">
+      <watchExpressionDelegate
+            debugModel="org.eclipse.ease.debugModelPresentation.rhino"
+            delegateClass="org.eclipse.ease.debugging.model.EaseWatchExpressionDelegate">
+      </watchExpressionDelegate>
+   </extension>
+   <extension
+         point="org.eclipse.wst.jsdt.ui.javaEditorTextHovers">
+      <hover
+            activate="false"
+            class="org.eclipse.ease.lang.javascript.rhino.debugger.editor.VariablesTextHover"
+            id="org.eclipse.ease.lang.javascript.rhino.debugger.hover">
+      </hover>
+   </extension>
 </plugin>
 

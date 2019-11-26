@@ -64,7 +64,6 @@
 		<module>../../tests/org.eclipse.ease.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.nashorn.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.rhino.test</module>
-		<module>../../tests/org.eclipse.ease.lang.javascript.rhino.debugger.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.jython.test</module>
