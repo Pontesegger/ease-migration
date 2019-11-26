@@ -21,7 +21,7 @@ import org.eclipse.ease.debugging.model.EaseDebugTarget;
  * ScriptDebugTarget for communication between Eclipse framework and Python debugger.
  */
 public class PythonDebugTarget extends EaseDebugTarget {
-	private static final String BREAKPOINT_TYPE = PythonDebugModelPresentation.ID;
+	private static final String BREAKPOINT_TYPE = "org.python.pydev.debug";
 
 	public PythonDebugTarget(final ILaunch launch, final boolean suspendOnStartup, final boolean suspendOnScriptLoad, boolean showDynamicCode) {
 		super(launch, suspendOnStartup, suspendOnScriptLoad, showDynamicCode);

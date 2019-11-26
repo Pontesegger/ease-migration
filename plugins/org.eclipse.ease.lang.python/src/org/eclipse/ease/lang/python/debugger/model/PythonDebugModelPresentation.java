@@ -23,7 +23,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
 
 public class PythonDebugModelPresentation extends AbstractEaseDebugModelPresentation implements IDebugModelPresentation {
-	public static String ID = "org.python.pydev.debug";
 
 	@Override
 	public String getEditorId(final IEditorInput input, final Object element) {
