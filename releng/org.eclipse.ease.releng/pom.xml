@@ -192,7 +192,6 @@
 		<module>../../plugins/org.eclipse.ease.lang.python</module>
 		<module>../../features/org.eclipse.ease.lang.python.feature</module>
 		<module>../../plugins/org.eclipse.ease.lang.python.jython</module>
-		<module>../../plugins/org.eclipse.ease.lang.python.jython.debugger</module>
 		<module>../../features/org.eclipse.ease.lang.python.jython.feature</module>
 		<module>../../plugins/org.eclipse.ease.lang.python.py4j</module>
 		<module>../../features/org.eclipse.ease.lang.python.py4j.feature</module>
@@ -233,7 +232,7 @@
 		<module>../../tests/org.eclipse.ease.lang.javascript.rhino.debugger.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.test</module>
-		<module>../../tests/org.eclipse.ease.lang.python.jython.debugger.test</module>
+		<module>../../tests/org.eclipse.ease.lang.python.jython.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.py4j.test</module>
 		<module>../../tests/org.eclipse.ease.lang.scriptarchive.test</module>
 		<module>../../tests/org.eclipse.ease.lang.unittest.test</module>

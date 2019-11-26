@@ -16,6 +16,20 @@
             class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
             engineID="org.eclipse.ease.python.jython">
       </launchExtension>
+            <engine
+                  class="org.eclipse.ease.lang.python.jython.debugger.JythonDebuggerEngine"
+                  debugger="true"
+                  id="org.eclipse.ease.python.jythonDebugger"
+                  name="Python (Jython Debugger)"
+                  priority="1">
+               <binding
+                     scriptType="Python">
+               </binding>
+            </engine>
+            <launchExtension
+                  class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
+                  engineID="org.eclipse.ease.python.jythonDebugger">
+            </launchExtension>
    </extension>
  <extension
        point="org.eclipse.ui.preferencePages">
