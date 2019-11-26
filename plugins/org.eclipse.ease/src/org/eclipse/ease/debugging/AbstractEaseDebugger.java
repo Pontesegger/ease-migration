@@ -48,6 +48,7 @@ import org.eclipse.ease.debugging.events.model.GetStackFramesRequest;
 import org.eclipse.ease.debugging.events.model.GetVariablesRequest;
 import org.eclipse.ease.debugging.events.model.ResumeRequest;
 import org.eclipse.ease.debugging.events.model.SetVariablesRequest;
+import org.eclipse.ease.debugging.events.model.SuspendRequest;
 import org.eclipse.ease.debugging.events.model.TerminateRequest;
 import org.eclipse.ease.debugging.model.EaseDebugStackFrame;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
@@ -176,6 +177,10 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 				getEngine().terminate();
 				fireDispatchEvent(new EngineTerminatedEvent());
 				setDispatcher(null);
+
+			} else if (event instanceof SuspendRequest) {
+				final ThreadState threadState = getThreadState(((AbstractEvent) event).getThread());
+				threadState.fResumeType = DebugEvent.STEP_INTO;
 
 			} else if (event instanceof AbstractEvent) {
 				fEvaluationRequests.add((AbstractEvent) event);
