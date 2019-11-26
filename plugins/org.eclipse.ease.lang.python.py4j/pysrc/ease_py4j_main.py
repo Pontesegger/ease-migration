@@ -184,7 +184,7 @@ class _pyease_EaseInteractiveConsole(_pyease_code.InteractiveConsole):
 
                 # Check if we have multiline statement
                 if len(tree.body) > 1:
-                    module = _pyease_ast.Module(tree.body[:-1])
+                    module = _pyease_ast.Module(tree.body[:-1], type_ignores=[])
                     compiled = compile(module, filename, 'exec')
                     exec(compiled, self.locals)
 
@@ -197,7 +197,7 @@ class _pyease_EaseInteractiveConsole(_pyease_code.InteractiveConsole):
                         result = eval(compiled, self.locals)
                         return result, False
                     else:
-                        module = _pyease_ast.Module([tree.body[-1]])
+                        module = _pyease_ast.Module([tree.body[-1]], type_ignores=[])
                         compiled = compile(module, filename, 'exec')
                         exec(compiled, self.locals)
             else:
