@@ -229,6 +229,10 @@ public class ModuleDoclet extends Doclet {
 					// update build.properties
 					updateBuildProperties(fRootFolder);
 				}
+
+			} catch (final ContentException e) {
+				return false;
+
 			} catch (final Exception e) {
 				e.printStackTrace();
 				return false;
@@ -449,10 +453,12 @@ public class ModuleDoclet extends Doclet {
 	 *
 	 * @param classes
 	 * @return <code>true</code> when at least 1 HTML file was created
+	 * @throws ContentException
+	 *             on error within the java comments
 	 * @throws Exception
 	 *             on file creation errors
 	 */
-	private boolean createHTMLFiles(final ClassDoc[] classes) throws IOException {
+	private boolean createHTMLFiles(final ClassDoc[] classes) throws IOException, ContentException {
 		boolean createdFiles = false;
 		boolean documentationErrors = false;
 		boolean invalidFileContent = false;
@@ -494,10 +500,10 @@ public class ModuleDoclet extends Doclet {
 		}
 
 		if ((fFailOnMissingDocs) && (documentationErrors))
-			throw new IOException("Documentation is not complete");
+			throw new ContentException("Documentation is not complete");
 
 		if ((fFailOnHTMLErrors) && (invalidFileContent))
-			throw new IOException("Documentation invalid");
+			throw new ContentException("Documentation invalid");
 
 		return createdFiles;
 	}

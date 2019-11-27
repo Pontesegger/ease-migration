@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.eclipse.ease.helpgenerator.testproject
+Bundle-SymbolicName: org.eclipse.ease.helpgenerator.testproject;singleton:=true
+Bundle-Name: Test Project for Help Generator Unit Tests
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.ease
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Eclipse.org
+
