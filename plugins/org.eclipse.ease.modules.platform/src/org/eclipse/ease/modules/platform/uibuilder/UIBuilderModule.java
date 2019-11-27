@@ -60,6 +60,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -216,7 +217,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             when the view cannot be created
 	 */
 	@WrapToScript
-	public MPart createView(String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String iconUri,
+	public MPart createView(@ScriptParameter(defaultValue = "Dynamic View") String title, @ScriptParameter(defaultValue = ScriptParameter.NULL) String iconUri,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String relativeTo, @ScriptParameter(defaultValue = "x") String position) throws Throwable {
 
 		final MPart part = createDynamicPart(title, iconUri);
@@ -359,7 +360,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Create a new composite. Further create commands will target this composite. To revert back to the parent use {@module #popComposite()}.
+	 * Create a new composite. To activate the composite (and create elements inside) use {@module #pushComposite(Composite)}.
 	 *
 	 * @param layout
 	 *            layout data (see module documentation)
@@ -368,13 +369,41 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public Composite createComposite(@ScriptParameter(defaultValue = "o o") String layout) throws Throwable {
+	public Composite createComposite(@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
 		return runInUIThread(new RunnableWithResult<Composite>() {
 			@Override
 			public Composite runWithTry() throws Throwable {
 				final Composite composite = new Composite(getUICompositor().getComposite(), SWT.NONE);
-
 				getUICompositor().insertElement(composite, new Location(layout));
+
+				return composite;
+			}
+		});
+	}
+
+	/**
+	 * Create a new composite inside of a scrolled composite. Scrollbars will be added dynamically in case the content does not fit into the composite area. To
+	 * activate the composite (and create elements inside) use {@module #pushComposite(Composite)}.
+	 *
+	 * @param layout
+	 *            layout data (see module documentation)
+	 * @return composite instance
+	 * @throws Throwable
+	 *             on any SWT error
+	 */
+	@WrapToScript
+	public Composite createScrolledComposite(@ScriptParameter(defaultValue = "o! o!") String layout) throws Throwable {
+		return runInUIThread(new RunnableWithResult<Composite>() {
+			@Override
+			public Composite runWithTry() throws Throwable {
+				final ScrolledComposite scrolledComposite = new ScrolledComposite(getUICompositor().getComposite(), SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+				scrolledComposite.setExpandHorizontal(true);
+				scrolledComposite.setExpandVertical(true);
+
+				final Composite composite = new Composite(scrolledComposite, SWT.NONE);
+				scrolledComposite.setContent(composite);
+
+				getUICompositor().insertElement(scrolledComposite, new Location(layout));
 
 				return composite;
 			}
@@ -1249,7 +1278,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 		}
 
 		public void update() {
-			fUICompositors.get(fUICompositors.size() - 1).fRenderer.update();
+			getUICompositor().fRenderer.update();
 		}
 
 		public ResourceManager getResourceManager() {

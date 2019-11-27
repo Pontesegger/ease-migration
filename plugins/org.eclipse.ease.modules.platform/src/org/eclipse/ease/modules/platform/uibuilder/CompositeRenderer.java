@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -67,6 +68,11 @@ public class CompositeRenderer implements IRenderer, PaintListener {
 		getLayout().numColumns = fViewModel.getColumnCount();
 
 		getParent().layout(true);
+
+		if (getParent().getParent() instanceof ScrolledComposite) {
+			((ScrolledComposite) getParent().getParent()).setMinSize(getParent().computeSize(SWT.DEFAULT, SWT.DEFAULT));
+			getParent().getParent().layout(true);
+		}
 	}
 
 	public void setShowGrid(boolean showGrid) {
