@@ -12,51 +12,35 @@
 package org.eclipse.ease.lang.python.jython.debugger;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.LineBreakpoint;
 import org.eclipse.ease.testhelper.AbstractDebugTest;
 
 public class JythonDebugTest extends AbstractDebugTest {
 
 	@Override
-	protected String getScriptSource() throws IOException {
-		return readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.py");
-	}
+	protected Map<String, String> getScriptSources() throws IOException {
+		final Map<String, String> sources = new HashMap<>();
 
-	@Override
-	protected LineBreakpoint setBreakpoint(IFile file, int lineNumber) throws CoreException {
-		final IMarker marker = file.createMarker("org.python.pydev.debug.pyStopBreakpointMarker");
-		marker.setAttribute("org.eclipse.debug.core.enabled", true);
-		marker.setAttribute("org.eclipse.debug.core.id", "org.python.pydev.debug");
-		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		sources.put(MAIN_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.py"));
+		sources.put(INCLUDE_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/include.py"));
 
-		final LineBreakpoint breakpoint = new LineBreakpoint() {
-
-			@Override
-			public String getModelIdentifier() {
-				return "org.python.pydev.debug";
-			}
-		};
-
-		breakpoint.setMarker(marker);
-
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
-
-		return breakpoint;
-	}
-
-	@Override
-	protected IBreakpoint[] getBreakpoints() throws CoreException {
-		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints("org.python.pydev.debug");
+		return sources;
 	}
 
 	@Override
 	protected String getEngineId() {
 		return JythonDebuggerEngine.ENGINE_ID;
+	}
+
+	@Override
+	protected String getDebugModelId() {
+		return "org.python.pydev.debug";
+	}
+
+	@Override
+	protected String getBreakpointId() {
+		return "org.python.pydev.debug.pyStopBreakpointMarker";
 	}
 }

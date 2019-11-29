@@ -12,13 +12,10 @@
 package org.eclipse.ease.lang.python.py4j;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.LineBreakpoint;
 import org.eclipse.ease.lang.python.py4j.internal.Py4jDebuggerEngine;
 import org.eclipse.ease.testhelper.AbstractDebugTest;
 import org.junit.Ignore;
@@ -27,40 +24,28 @@ import org.junit.Test;
 public class Py4jDebugTest extends AbstractDebugTest {
 
 	@Override
+	protected Map<String, String> getScriptSources() throws IOException {
+		final Map<String, String> sources = new HashMap<>();
+
+		sources.put(MAIN_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.py"));
+		sources.put(INCLUDE_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/include.py"));
+
+		return sources;
+	}
+
+	@Override
 	protected String getEngineId() {
 		return Py4jDebuggerEngine.ENGINE_ID;
 	}
 
 	@Override
-	protected String getScriptSource() throws IOException {
-		return readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.py");
+	protected String getDebugModelId() {
+		return "org.python.pydev.debug";
 	}
 
 	@Override
-	protected LineBreakpoint setBreakpoint(IFile file, int lineNumber) throws CoreException {
-		final IMarker marker = file.createMarker("org.python.pydev.debug.pyStopBreakpointMarker");
-		marker.setAttribute("org.eclipse.debug.core.enabled", true);
-		marker.setAttribute("org.eclipse.debug.core.id", "org.python.pydev.debug");
-		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-
-		final LineBreakpoint breakpoint = new LineBreakpoint() {
-
-			@Override
-			public String getModelIdentifier() {
-				return "org.python.pydev.debug";
-			}
-		};
-
-		breakpoint.setMarker(marker);
-
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
-
-		return breakpoint;
-	}
-
-	@Override
-	protected IBreakpoint[] getBreakpoints() throws CoreException {
-		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints("org.python.pydev.debug");
+	protected String getBreakpointId() {
+		return "org.python.pydev.debug.pyStopBreakpointMarker";
 	}
 
 	@Override
@@ -75,5 +60,12 @@ public class Py4jDebugTest extends AbstractDebugTest {
 	@Ignore
 	public void nativeArrayVariable() throws CoreException, IOException {
 		// TODO: Currently not possible to access native Python variables
+	}
+
+	@Override
+	@Test
+	@Ignore
+	public void stepIntoIncludeCommand() throws CoreException {
+		// TODO see https://bugs.eclipse.org/bugs/show_bug.cgi?id=553619
 	}
 }

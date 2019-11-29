@@ -36,7 +36,7 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 			return "BREAKPOINT";
 
 		default:
-			return "<unknown>";
+			return "<unknown>:" + type;
 		}
 	}
 
@@ -61,6 +61,7 @@ public class ResumeRequest extends AbstractEvent implements IModelRequest {
 		return fType;
 	}
 
+	@Override
 	public Object getThread() {
 		return fThread;
 	}

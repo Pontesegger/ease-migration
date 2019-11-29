@@ -219,8 +219,11 @@ public class EaseDebugThread extends EaseDebugElement implements IThread, IEvent
 
 	@Override
 	public void resume() {
-		getDebugTarget().fireDispatchEvent(new ResumeRequest(DebugEvent.CLIENT_REQUEST, getThread()));
+		resume(DebugEvent.CLIENT_REQUEST);
+	}
 
+	public void resume(int type) {
+		getDebugTarget().fireDispatchEvent(new ResumeRequest(type, getThread()));
 	}
 
 	@Override

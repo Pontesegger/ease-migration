@@ -12,6 +12,8 @@ function testMethod(a, b) {	// testMethod-def-hook
 	return a + b;	// testMethod-result-hook
 }
 
+include("include.js"); // include-command-hook
+print("line after include file");
 
 var result = testMethod(2, 3);	// testMethod-call-hook
 print("Result of testMethod = " + result);

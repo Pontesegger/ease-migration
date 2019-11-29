@@ -23,8 +23,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -56,15 +59,18 @@ import org.mockito.ArgumentCaptor;
 
 public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
+	public static final String MAIN_SCRIPT = "Main";
+	public static final String INCLUDE_SCRIPT = "include";
+
 	private static final int TEST_TIMEOUT = 7000;
 
 	private interface IDebugElementProvider {
 		EaseDebugElement getDebugElement();
 	}
 
-	private int getLineNumber(String text) {
+	private int getLineNumber(String script, String text) {
 		try {
-			final List<String> lines = Arrays.asList(getScriptSource().split("\r?\n"));
+			final List<String> lines = Arrays.asList(getScriptSources().get(script).split("\r?\n"));
 
 			for (int index = 0; index < lines.size(); index++) {
 				if (lines.get(index).contains(text))
@@ -90,7 +96,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 			DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(breakpoint, true);
 	}
 
-	private IFile fFile;
 	private ILaunch fLaunchMock;
 	private IDebugTarget fDebugTarget = null;
 	private IDebugEngine fScriptEngine;
@@ -107,7 +112,9 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		fScriptEngine.setupDebugger(fLaunchMock, false, false, false);
 
 		final IProject project = createProject("Debug Test");
-		fFile = createFile("DebugTest." + fScriptEngine.getDescription().getSupportedScriptTypes().get(0).getDefaultExtension(), getScriptSource(), project);
+		for (final Entry<String, String> entry : getScriptSources().entrySet())
+			createFile(entry.getKey() + "." + fScriptEngine.getDescription().getSupportedScriptTypes().get(0).getDefaultExtension(), entry.getValue(), project);
+
 		clearBreakpoints();
 	}
 
@@ -128,14 +135,14 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void breakpointLocation() throws CoreException {
-		setBreakpoint(fFile, getLineNumber("primitive-integer-definition-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "primitive-integer-definition-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final EaseDebugStackFrame stackFrame = getTopmostStackFrame();
 			if (stackFrame != null) {
-				assertEquals(getLineNumber("primitive-integer-definition-hook"), stackFrame.getLineNumber());
+				assertEquals(getLineNumber(MAIN_SCRIPT, "primitive-integer-definition-hook"), stackFrame.getLineNumber());
 				getDebugTarget().resume();
 			}
 		});
@@ -146,10 +153,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	// ---------- step over tests ---------------------------------------------------------------
 
 	public void stepOverTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
-		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -161,14 +168,14 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepOver();
 
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-call-hook") + 1, getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-call-hook") + 1, getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -201,10 +208,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	// ---------- step into tests ---------------------------------------------------------------
 
 	public void stepIntoTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
-		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -216,14 +223,14 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepInto();
 
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(2, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-def-hook"), getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-def-hook"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -256,10 +263,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	// ---------- step return tests -------------------------------------------------------------
 
 	public void stepReturnTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
-		setBreakpoint(fFile, getLineNumber("testMethod-result-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -271,14 +278,14 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(2, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-result-hook"), getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().stepReturn();
 
 				} else {
 					final IStackFrame[] stackFrames = getStackFrames();
 					assertEquals(1, stackFrames.length);
-					assertEquals(getLineNumber("testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
+					assertEquals(getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"), getTopmostStackFrame().getLineNumber());
 
 					elementProvider.getDebugElement().resume();
 				}
@@ -308,13 +315,100 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		stepReturnTestTemplate(() -> getTopmostStackFrame());
 	}
 
+	// ---------- step commands when suspended on include command -------------------------------
+
+	@Test
+	public void stepOverIncludeCommand() throws CoreException {
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
+		assertEquals(1, getBreakpoints().length);
+
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
+
+			private boolean fFirstSuspend = true;
+
+			@Override
+			public void run() {
+				if (fFirstSuspend) {
+					fFirstSuspend = false;
+
+					final IStackFrame[] stackFrames = getStackFrames();
+					assertEquals(1, stackFrames.length);
+					assertEquals(getLineNumber(MAIN_SCRIPT, "include-command-hook"), getTopmostStackFrame().getLineNumber());
+
+					getThread().stepOver();
+
+				} else {
+					final IStackFrame[] stackFrames = getStackFrames();
+					assertEquals(1, stackFrames.length);
+					assertEquals(getLineNumber(MAIN_SCRIPT, "include-command-hook") + 1, getTopmostStackFrame().getLineNumber());
+
+					getThread().resume();
+				}
+			}
+		});
+
+		assertEquals(2, suspendedEvents);
+	}
+
+	@Test
+	public void stepReturnIncludeCommand() throws CoreException {
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
+		assertEquals(1, getBreakpoints().length);
+
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
+			final IStackFrame[] stackFrames = getStackFrames();
+			assertEquals(1, stackFrames.length);
+			assertEquals(getLineNumber(MAIN_SCRIPT, "include-command-hook"), getTopmostStackFrame().getLineNumber());
+
+			getThread().stepReturn();
+		});
+
+		assertEquals(1, suspendedEvents);
+	}
+
+	@Test
+	public void stepIntoIncludeCommand() throws CoreException {
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
+		assertEquals(1, getBreakpoints().length);
+
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
+
+			private boolean fFirstSuspend = true;
+
+			@Override
+			public void run() {
+				if (fFirstSuspend) {
+					fFirstSuspend = false;
+
+					final IStackFrame[] stackFrames = getStackFrames();
+					assertEquals(1, stackFrames.length);
+					assertEquals(getLineNumber(MAIN_SCRIPT, "include-command-hook"), getTopmostStackFrame().getLineNumber());
+
+					getThread().stepInto();
+
+				} else {
+					final IStackFrame[] stackFrames = getStackFrames();
+					assertEquals(2, stackFrames.length);
+					assertEquals(1, getTopmostStackFrame().getLineNumber());
+
+					getThread().resume();
+				}
+			}
+		});
+
+		assertEquals(2, suspendedEvents);
+	}
+
 	// ---------- resume tests ------------------------------------------------------------------
 
 	public void resumeTestTemplate(IDebugElementProvider elementProvider) throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			elementProvider.getDebugElement().resume();
 		});
@@ -345,11 +439,11 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	// ---------- terminate tests ---------------------------------------------------------------
 
 	public void terminateTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
-		setBreakpoint(fFile, 1);
-		setBreakpoint(fFile, 2);
+		setBreakpoint(getFile(MAIN_SCRIPT), 1);
+		setBreakpoint(getFile(MAIN_SCRIPT), 2);
 		assertEquals(2, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			elementProvider.getDebugElement().terminate();
 		});
@@ -385,11 +479,11 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	// ---------- disconnect tests --------------------------------------------------------------
 
 	public void disconnectTestTemplate(IDebugElementProvider elementProvider) throws CoreException {
-		setBreakpoint(fFile, 1);
-		setBreakpoint(fFile, 2);
+		setBreakpoint(getFile(MAIN_SCRIPT), 1);
+		setBreakpoint(getFile(MAIN_SCRIPT), 2);
 		assertEquals(2, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			getDebugTarget().disconnect();
 
@@ -428,10 +522,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	public void evaluateWatchExpression() throws CoreException, IOException {
 		final IWatchExpressionListener expressionListener = mock(IWatchExpressionListener.class);
 
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 
 			final EaseWatchExpressionDelegate expressionDelegate = new EaseWatchExpressionDelegate();
@@ -458,10 +552,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void suspendedState() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 
 			assertFalse(getDebugTarget().isDisconnected());
@@ -528,7 +622,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	@Test(timeout = TEST_TIMEOUT)
 	public void terminatedState() throws CoreException {
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 		});
 
@@ -584,10 +678,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void primitiveDoubleVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -612,10 +706,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void primitiveStringVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -640,10 +734,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void nullVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -668,10 +762,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void nativeArrayVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame stackFrame = getTopmostStackFrame();
 			assertNotNull(stackFrame);
@@ -716,10 +810,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void arrayVariableSorting() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -745,10 +839,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void nativeObjectVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame stackFrame = getTopmostStackFrame();
 			assertNotNull(stackFrame);
@@ -785,10 +879,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void javaClassVariable() throws CoreException, IOException {
-		setBreakpoint(fFile, getLastLineNumber());
+		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -854,10 +948,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test(timeout = TEST_TIMEOUT)
 	public void innerScopeVariableBeforeOuterScopeVariable() throws CoreException {
-		setBreakpoint(fFile, getLineNumber("testMethod-result-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -878,10 +972,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	@Test
 	public void modifyVariableKeepingType() throws CoreException, IOException {
-		setBreakpoint(fFile, getLineNumber("testMethod-call-hook"));
+		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(fFile);
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
@@ -1001,12 +1095,46 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	}
 
 	private int getLastLineNumber() throws IOException {
-		return getScriptSource().trim().split("\r?\n").length;
+		return getScriptSources().get(MAIN_SCRIPT).trim().split("\r?\n").length;
 	}
 
-	protected abstract LineBreakpoint setBreakpoint(IFile file, int lineNumber) throws CoreException;
+	protected IFile getFile(String identifier) {
+		try {
+			final IProject project = createProject("Debug Test");
+			return project.getFile(identifier + "." + fScriptEngine.getDescription().getSupportedScriptTypes().get(0).getDefaultExtension());
+		} catch (final CoreException e) {
+			throw new RuntimeException("Cannot access test file: " + identifier);
+		}
+	}
 
-	protected abstract IBreakpoint[] getBreakpoints() throws CoreException;
+	private LineBreakpoint setBreakpoint(IFile file, int lineNumber) throws CoreException {
+		final IMarker marker = file.createMarker(getBreakpointId());
+		marker.setAttribute("org.eclipse.debug.core.enabled", true);
+		marker.setAttribute("org.eclipse.debug.core.id", getDebugModelId());
+		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 
-	protected abstract String getScriptSource() throws IOException;
+		final LineBreakpoint breakpoint = new LineBreakpoint() {
+
+			@Override
+			public String getModelIdentifier() {
+				return getDebugModelId();
+			}
+		};
+
+		breakpoint.setMarker(marker);
+
+		DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
+
+		return breakpoint;
+	}
+
+	private IBreakpoint[] getBreakpoints() throws CoreException {
+		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getDebugModelId());
+	}
+
+	protected abstract String getDebugModelId();
+
+	protected abstract String getBreakpointId();
+
+	protected abstract Map<String, String> getScriptSources() throws IOException;
 }

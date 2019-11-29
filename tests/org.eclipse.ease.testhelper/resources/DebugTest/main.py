@@ -17,6 +17,7 @@ def testMethod(a, b):   # testMethod-def-hook
     primitiveInteger = -42.0
     return a + b    # testMethod-result-hook
 
+include("include.py")  # include-command-hook
 result = testMethod(2, 3)   # testMethod-call-hook
 print("Result of testMethod = " + str(result))
 print("End of script")

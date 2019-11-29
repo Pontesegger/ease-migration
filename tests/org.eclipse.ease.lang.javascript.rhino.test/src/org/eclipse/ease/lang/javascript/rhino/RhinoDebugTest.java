@@ -12,52 +12,36 @@
 package org.eclipse.ease.lang.javascript.rhino;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.LineBreakpoint;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebuggerEngine;
 import org.eclipse.ease.testhelper.AbstractDebugTest;
 
 public class RhinoDebugTest extends AbstractDebugTest {
 
 	@Override
-	protected String getScriptSource() throws IOException {
-		return readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.js");
-	}
+	protected Map<String, String> getScriptSources() throws IOException {
+		final Map<String, String> sources = new HashMap<>();
 
-	@Override
-	protected LineBreakpoint setBreakpoint(IFile file, int lineNumber) throws CoreException {
-		final IMarker marker = file.createMarker("org.eclipse.wst.jsdt.debug.core.line.breakpoint.marker");
-		marker.setAttribute("org.eclipse.debug.core.enabled", true);
-		marker.setAttribute("org.eclipse.debug.core.id", "org.eclipse.wst.jsdt.debug.model");
-		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+		sources.put(MAIN_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/main.js"));
+		sources.put(INCLUDE_SCRIPT, readResource("org.eclipse.ease.testhelper", "/resources/DebugTest/include.js"));
 
-		final LineBreakpoint breakpoint = new LineBreakpoint() {
-
-			@Override
-			public String getModelIdentifier() {
-				return "org.eclipse.wst.jsdt.debug.model";
-			}
-		};
-
-		breakpoint.setMarker(marker);
-
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
-
-		return breakpoint;
-	}
-
-	@Override
-	protected IBreakpoint[] getBreakpoints() throws CoreException {
-		return DebugPlugin.getDefault().getBreakpointManager().getBreakpoints("org.eclipse.wst.jsdt.debug.model");
+		return sources;
 	}
 
 	@Override
 	protected String getEngineId() {
 		return RhinoDebuggerEngine.ENGINE_ID;
+	}
+
+	@Override
+	protected String getDebugModelId() {
+		return "org.eclipse.wst.jsdt.debug.model";
+	}
+
+	@Override
+	protected String getBreakpointId() {
+		return "org.eclipse.wst.jsdt.debug.core.line.breakpoint.marker";
 	}
 }

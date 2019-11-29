@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -44,6 +45,7 @@ import org.eclipse.ease.debugging.events.debugger.StackFramesEvent;
 import org.eclipse.ease.debugging.events.debugger.SuspendedEvent;
 import org.eclipse.ease.debugging.events.debugger.VariablesEvent;
 import org.eclipse.ease.debugging.events.model.BreakpointRequest;
+import org.eclipse.ease.debugging.events.model.DisconnectRequest;
 import org.eclipse.ease.debugging.events.model.EvaluateExpressionRequest;
 import org.eclipse.ease.debugging.events.model.GetStackFramesRequest;
 import org.eclipse.ease.debugging.events.model.GetVariablesRequest;
@@ -185,6 +187,19 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 					}
 				}
 
+			} else if (event instanceof DisconnectRequest) {
+				fBreakpoints.clear();
+
+				fDispatcher = null;
+
+				for (final Entry<Object, ThreadState> entry : fThreadStates.entrySet()) {
+					resume(DebugEvent.CLIENT_REQUEST, entry.getKey());
+					final ThreadState threadState = entry.getValue();
+					synchronized (threadState) {
+						threadState.notify();
+					}
+				}
+
 			} else if (event instanceof AbstractEvent) {
 				fEvaluationRequests.add((AbstractEvent) event);
 				final ThreadState threadState = getThreadState(((AbstractEvent) event).getThread());
@@ -206,7 +221,6 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	 *            Breakpoint information.
 	 */
 	protected void breakpointAdded(final Script script, final IBreakpoint breakpoint) {
-
 	}
 
 	/**
@@ -220,7 +234,6 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	 *            Breakpoint information.
 	 */
 	protected void breakpointRemoved(final Script script, final IBreakpoint breakpoint) {
-
 	}
 
 	protected void suspend(final IDebuggerEvent event) {

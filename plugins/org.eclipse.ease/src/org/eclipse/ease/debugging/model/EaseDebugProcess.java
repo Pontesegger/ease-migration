@@ -29,8 +29,7 @@ import org.eclipse.ease.debugging.events.debugger.ScriptReadyEvent;
 import org.eclipse.ease.debugging.events.debugger.ThreadCreatedEvent;
 import org.eclipse.ease.debugging.events.debugger.ThreadTerminatedEvent;
 import org.eclipse.ease.debugging.events.model.BreakpointRequest;
-import org.eclipse.ease.debugging.events.model.BreakpointRequest.Mode;
-import org.eclipse.ease.debugging.events.model.ResumeRequest;
+import org.eclipse.ease.debugging.events.model.DisconnectRequest;
 import org.eclipse.ease.debugging.events.model.TerminateRequest;
 
 public class EaseDebugProcess extends EaseDebugElement implements IProcess, IEventProcessor {
@@ -103,7 +102,7 @@ public class EaseDebugProcess extends EaseDebugElement implements IProcess, IEve
 
 			else {
 				if (!debugThread.getState().equals(State.STEPPING)) {
-					debugThread.resume();
+					debugThread.resume(DebugEvent.UNSPECIFIED);
 				}
 			}
 
@@ -196,17 +195,12 @@ public class EaseDebugProcess extends EaseDebugElement implements IProcess, IEve
 
 	@Override
 	public synchronized void disconnect() {
-		// remove all breakpoints
-		getDebugTarget().fireDispatchEvent(new BreakpointRequest(Mode.REMOVE));
-
-		// resume interpreter
-		for (final EaseDebugThread thread : getThreads()) {
-			if (thread.isSuspended())
-				getDebugTarget().fireDispatchEvent(new ResumeRequest(DebugEvent.CLIENT_REQUEST, thread.getThread()));
-		}
+		getDebugTarget().fireDispatchEvent(new DisconnectRequest());
 
 		// cleanup removes dispatcher instance. Needs to be called after all events have been sent
 		getDebugTarget().cleanupOnTermination();
+
+		setTerminated();
 	}
 
 	@Override
