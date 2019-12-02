@@ -38,4 +38,9 @@ public class EvaluateExpressionRequest extends AbstractEvent implements IModelRe
 	public IWatchExpressionListener getListener() {
 		return fListener;
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " " + getExpression();
+	}
 }

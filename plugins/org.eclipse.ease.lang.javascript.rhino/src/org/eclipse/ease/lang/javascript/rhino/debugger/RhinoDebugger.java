@@ -165,15 +165,29 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 
 		@Override
 		public Object inject(String expression) throws Throwable {
+			Context context = null;
+			Debugger debugger = null;
+			Object debuggerContextData = null;
+
 			try {
 				final StringReader reader = new StringReader(expression);
-				final Context context = RhinoScriptEngine.getContext();
+				context = RhinoScriptEngine.getContext();
+
+				// backup current debugger settings
+				debugger = context.getDebugger();
+				debuggerContextData = context.getDebuggerContextData();
+
 				context.setDebugger(null, null);
 				return context.evaluateReader(fScope, reader, null, 1, null);
 
 			} catch (final Throwable e) {
 				// FIXME: move to script engine to get correct error handling
 				throw e;
+
+			} finally {
+				// restore debugger on context
+				if (context != null)
+					context.setDebugger(debugger, debuggerContextData);
 			}
 		}
 	}
