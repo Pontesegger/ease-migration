@@ -68,4 +68,11 @@ public class Py4jDebugTest extends AbstractDebugTest {
 	public void stepIntoIncludeCommand() throws CoreException {
 		// TODO see https://bugs.eclipse.org/bugs/show_bug.cgi?id=553619
 	}
+
+	@Override
+	@Test
+	@Ignore
+	public void resumeOnLastIncludeLine() throws CoreException {
+		// TODO see https://bugs.eclipse.org/bugs/show_bug.cgi?id=553652
+	}
 }

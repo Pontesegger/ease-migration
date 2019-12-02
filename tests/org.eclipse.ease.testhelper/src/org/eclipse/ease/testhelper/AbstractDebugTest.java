@@ -402,6 +402,23 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
+	@Test(timeout = TEST_TIMEOUT)
+	public void resumeOnLastIncludeLine() throws CoreException {
+		setBreakpoint(getFile(INCLUDE_SCRIPT), getLineNumber(INCLUDE_SCRIPT, "include-last-line-hook"));
+		assertEquals(1, getBreakpoints().length);
+
+		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
+			final IStackFrame[] stackFrames = getStackFrames();
+			assertEquals(2, stackFrames.length);
+			assertEquals(getLineNumber(INCLUDE_SCRIPT, "include-last-line-hook"), getTopmostStackFrame().getLineNumber());
+
+			getThread().resume();
+		});
+
+		assertEquals(1, suspendedEvents);
+	}
+
 	// ---------- resume tests ------------------------------------------------------------------
 
 	public void resumeTestTemplate(IDebugElementProvider elementProvider) throws CoreException, IOException {

@@ -111,7 +111,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			fScope = activation;
 
 			if (getScript() != null)
-				processLine(getScript(), getLineNumber());
+				processLine(getScript(), getLineNumber(), true);
 		}
 
 		@Override
@@ -119,7 +119,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			setLineNumber(lineNumber);
 
 			if (getScript() != null)
-				processLine(getScript(), getLineNumber());
+				processLine(getScript(), getLineNumber(), true);
 		}
 
 		@Override
@@ -135,7 +135,7 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 			fScope = null;
 
 			if ((!byThrow) && (getScript() != null))
-				processLine(getScript(), getLineNumber());
+				processLine(getScript(), getLineNumber(), false);
 		}
 
 		@Override

@@ -3,4 +3,4 @@ print("include file start")
 def includedFoo():
     print("include function called")
 
-print("include file processed")
+print("include file processed")  # include-last-line-hook

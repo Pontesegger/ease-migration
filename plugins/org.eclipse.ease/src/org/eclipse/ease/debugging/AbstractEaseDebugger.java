@@ -469,7 +469,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	 * @param script
 	 * @param lineNumber
 	 */
-	protected void processLine(final Script script, final int lineNumber) {
+	protected void processLine(final Script script, final int lineNumber, boolean checkBreakpoints) {
 
 		if (!isTrackedScript(script))
 			return;
@@ -485,9 +485,11 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 		final Object thread = getThread();
 
 		// check breakpoints
-		if (isActiveBreakpoint(script, lineNumber)) {
-			suspend(new SuspendedEvent(DebugEvent.BREAKPOINT, thread, getStacktrace()));
-			return;
+		if (checkBreakpoints) {
+			if (isActiveBreakpoint(script, lineNumber)) {
+				suspend(new SuspendedEvent(DebugEvent.BREAKPOINT, thread, getStacktrace()));
+				return;
+			}
 		}
 
 		// no breakpoint, check for step events

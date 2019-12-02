@@ -175,7 +175,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 					// do not evaluate breakpoints when returning from a function call
 					fBreakpointsDisabled = "return".equals(type) || "call".equals(type);
 
-					processLine(script, frame.getLineNumber());
+					processLine(script, frame.getLineNumber(), true);
 				}
 			}
 		}
@@ -230,6 +230,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	 *
 	 * @return {@link IPythonScriptRegistry} or {@code null}.
 	 */
+	@Override
 	public IPythonScriptRegistry getScriptRegistry() {
 		final IScriptRegistry scriptRegistry = super.getScriptRegistry();
 		if (scriptRegistry instanceof IPythonScriptRegistry) {
