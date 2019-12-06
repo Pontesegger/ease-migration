@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-2.0/
+ * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
@@ -11,25 +11,28 @@
 
 package org.eclipse.ease.helpgenerator;
 
-public class ContentException extends Exception {
+public interface IReporter {
 
-	public ContentException() {
-		super();
-	}
+	static int INFO = 0;
+	static int WARNING = 1;
+	static int ERROR = 2;
 
-	public ContentException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+	/**
+	 * Report a message.
+	 *
+	 * @param status
+	 *            one of {@link #INFO}, {@link #WARNING}, {@link #ERROR}
+	 * @param message
+	 *            message to be reported
+	 */
+	void report(int status, String message);
 
-	public ContentException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	void reportMissingDocs(String message);
 
-	public ContentException(String message) {
-		super(message);
-	}
+	void reportInvalidHtml(String message);
 
-	public ContentException(Throwable cause) {
-		super(cause);
-	}
+	/**
+	 * @return
+	 */
+	boolean hasErrors();
 }

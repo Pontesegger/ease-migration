@@ -10,92 +10,257 @@
  *******************************************************************************/
 package org.eclipse.ease.helpgenerator;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import com.sun.javadoc.ClassDoc;
+import org.eclipse.ease.helpgenerator.model.AbstractClassModel;
 
 /**
  * Collects registered packages and converts classes & API links to http anchors.
  */
 public class LinkProvider {
 
-	/** Pattern to detect a link token. */
+	public static enum JavaDocApi {
+		JAVA_8, JAVA_10
+	};
+
+	/**
+	 * Pattern to detect a link token: group(1) ... link or module identifier group(2) ... the link target
+	 */
 	private static final Pattern PATTERN_LINK = Pattern.compile("\\{@(link|module)\\s+(.*?)\\}", Pattern.DOTALL);
 
-	/** Pattern to parse a link. */
-	private static final Pattern PATTERN_INNER_LINK = Pattern.compile("(\\w+(?:\\.\\w+)*)?(?:#(\\w+)(?:\\((.*?)\\))?)?");
+	/**
+	 * Pattern to parse a link: group(1) ... FQN of class group(2) ... method name without method signature group(3) ... method parameters
+	 */
+	private static final Pattern PATTERN_INNER_LINK = Pattern.compile("(\\w+(?:\\.\\w+)*)?(?:#(\\w+)(?:(\\(.*?\\)))?)?");
+
+	private static final Collection<String> CLASSES_IN_JAVA_LANG = List.of("Appendable", "AutoCloseable", "CharSequence", "Cloneable", "Comparable", "Iterable",
+			"Readable", "Runnable", "Thread.UncaughtExceptionHandler", "Boolean", "Byte", "Character", "Character.Subset", "Character.UnicodeBlock", "Class",
+			"ClassLoader", "ClassValue", "Compiler", "Double", "Enum", "Float", "InheritableThreadLocal", "Integer", "Long", "Math", "Number", "Object",
+			"Package", "Process", "ProcessBuilder", "ProcessBuilder.Redirect", "Runtime", "RuntimePermission", "SecurityManager", "Short", "StackTraceElement",
+			"StrictMath", "String", "StringBuffer", "StringBuilder", "System", "Thread", "ThreadGroup", "ThreadLocal", "Throwable", "Void",
+			"Character.UnicodeScript", "ProcessBuilder.Redirect.Type", "Thread.State", "ArithmeticException", "ArrayIndexOutOfBoundsException",
+			"ArrayStoreException", "ClassCastException", "ClassNotFoundException", "CloneNotSupportedException", "EnumConstantNotPresentException", "Exception",
+			"IllegalAccessException", "IllegalArgumentException", "IllegalMonitorStateException", "IllegalStateException", "IllegalThreadStateException",
+			"IndexOutOfBoundsException", "InstantiationException", "InterruptedException", "NegativeArraySizeException", "NoSuchFieldException",
+			"NoSuchMethodException", "NullPointerException", "NumberFormatException", "ReflectiveOperationException", "RuntimeException", "SecurityException",
+			"StringIndexOutOfBoundsException", "TypeNotPresentException", "UnsupportedOperationException", "AbstractMethodError", "AssertionError",
+			"BootstrapMethodError", "ClassCircularityError", "ClassFormatError", "Error", "ExceptionInInitializerError", "IllegalAccessError",
+			"IncompatibleClassChangeError", "InstantiationError", "InternalError", "LinkageError", "NoClassDefFoundError", "NoSuchFieldError",
+			"NoSuchMethodError", "OutOfMemoryError", "StackOverflowError", "ThreadDeath", "UnknownError", "UnsatisfiedLinkError",
+			"UnsupportedClassVersionError", "VerifyError", "VirtualMachineError", "Deprecated", "FunctionalInterface", "Override", "SafeVarargs",
+			"SuppressWarnings");
+
+	private static String removeGenerics(String text) {
+		String result = text;
+		while (result.contains("<")) {
+			final int start = result.lastIndexOf('<');
+			final int end = result.indexOf('>', start);
+
+			if (end > start)
+				result = result.substring(0, start) + result.substring(end + 1);
+			else
+				return result;
+		}
+
+		return result;
+	}
+
+	private static String getPackageName(String qualifiedName) {
+		return (qualifiedName.contains(".")) ? qualifiedName.substring(0, qualifiedName.lastIndexOf('.')) : "";
+	}
+
+	private static String getSimpleClassName(String qualifiedName) {
+		return (qualifiedName.contains(".")) ? qualifiedName.substring(qualifiedName.lastIndexOf('.') + 1) : qualifiedName;
+	}
+
+	private static String getPluginIdFromModuleId(String moduleId) {
+		return moduleId.substring(0, moduleId.lastIndexOf('.'));
+	}
+
+	private static String getModuleNameFromModuleId(String moduleId) {
+		return moduleId.substring(moduleId.lastIndexOf('.') + 1);
+	}
 
 	/** Maps (URL to use) -> Collection of package names. */
 	private final Map<String, Collection<String>> fExternalDocs = new HashMap<>();
+
+	private AbstractClassModel fClassModel;
+
+	private JavaDocApi fApiIdentifier = JavaDocApi.JAVA_8;
 
 	public void registerAddress(final String location, final Collection<String> packages) {
 		fExternalDocs.put(location, packages);
 	}
 
-	public static String resolveClassName(final String candidate, final ClassDoc clazz) {
-		final String foundCandidate = findClass(candidate, clazz);
-		return (foundCandidate != null) ? foundCandidate : candidate;
+	public void setClassModel(AbstractClassModel classModel) {
+		fClassModel = classModel;
 	}
 
-	public String createClassText(String qualifiedName) {
-		if (qualifiedName.contains(".")) {
+	public String insertLinks(final String text) {
 
-			final String urlLocation = findClassURL(qualifiedName);
-			if (urlLocation != null) {
-				final String packageName = qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));
+		if (text == null)
+			return null;
 
-				// first run, look for exact package match
-				for (final Entry<String, Collection<String>> entry : fExternalDocs.entrySet()) {
-					if (entry.getValue().contains(packageName))
-						return "<a href=\"" + urlLocation + "\" title=\"" + HTMLWriter.escapeText(qualifiedName) + "\">"
-								+ HTMLWriter.escapeText(qualifiedName.substring(packageName.length() + 1)) + "</a>";
-				}
+		final StringBuilder output = new StringBuilder();
+		int startPos = 0;
+		final Matcher matcher = PATTERN_LINK.matcher(text);
 
-				// not found; try to locate matching parent package and hope for
-				// the best
-				for (final Entry<String, Collection<String>> entry : fExternalDocs.entrySet()) {
-					for (final String entryPackage : entry.getValue()) {
-						if (packageName.startsWith(entryPackage))
-							return "<a href=\"" + urlLocation + "\" title=\"" + HTMLWriter.escapeText(qualifiedName) + "\">"
-									+ HTMLWriter.escapeText(qualifiedName.substring(packageName.length() + 1)) + "</a>";
+		while (matcher.find()) {
+			output.append(text.substring(startPos, matcher.start()));
+			startPos = matcher.end();
+
+			// remove generics
+			String linkTarget = matcher.group(2).replace('\r', ' ').replace('\n', ' ');
+			linkTarget = removeGenerics(linkTarget);
+
+			final Matcher linkMatcher = PATTERN_INNER_LINK.matcher(linkTarget);
+			if (linkMatcher.matches()) {
+				// group 1 = class
+				// group 2 = method name
+				// group 3 = params (with parenthesis)
+
+				final String fullClassName = resolveClassName(linkMatcher.group(1));
+				final String methodName = linkMatcher.group(2);
+				String methodParameters = linkMatcher.group(3);
+				if (methodParameters == null)
+					methodParameters = "()";
+
+				if ("link".equals(matcher.group(1))) {
+					// link to java API
+
+					final String link = createMethodLink(methodName, methodParameters);
+
+					if (fullClassName == null) {
+						// link to same document
+						output.append("<a href='" + link + "'>" + methodName + methodParameters + "</a>");
+
+					} else {
+						// external document
+						final String classURL = findClassURL(fullClassName);
+						if (classURL != null) {
+							output.append("<a href='" + classURL + link + "'>");
+							output.append(getSimpleClassName(fullClassName));
+
+							if (methodName != null) {
+								output.append('.');
+								output.append(methodName);
+								if (methodParameters != null)
+									output.append(methodParameters);
+							}
+
+							output.append("</a>");
+
+						} else
+							output.append(fullClassName);
+					}
+
+				} else if ("module".equals(matcher.group(1))) {
+					// link to a scripting module
+					if (fullClassName == null) {
+						// link to same document
+						output.append("<a href='#" + methodName + "'>" + methodName + methodParameters + "</a>");
+					} else {
+						// external document
+						final String moduleId = linkMatcher.group(1);
+						final String pluginId = getPluginIdFromModuleId(moduleId);
+						if (linkMatcher.group(2) != null) {
+							final List<String> parameters = extractParameters(methodParameters);
+							final String parameterString = parameters.stream().map(LinkProvider::getSimpleClassName).collect(Collectors.joining(", "));
+
+							output.append("<a href='../../" + pluginId + "/help/" + AbstractModuleDoclet.createHTMLFileName(linkMatcher.group(1)) + "#"
+									+ methodName + "'>" + getModuleNameFromModuleId(moduleId) + "." + methodName + "(" + parameterString + ")</a>");
+						} else
+							output.append("<a href='../../" + pluginId + "/help/" + AbstractModuleDoclet.createHTMLFileName(moduleId) + "'>"
+									+ getModuleNameFromModuleId(moduleId) + " module</a>");
 					}
 				}
-
-			} else
-				qualifiedName = HTMLWriter.escapeText(qualifiedName);
-
-		} else
-			qualifiedName = HTMLWriter.escapeText(qualifiedName);
-
-		return qualifiedName;
-	}
-
-	private static String findClass(final String name, final ClassDoc baseClass) {
-		try {
-			for (final ClassDoc doc : baseClass.importedClasses()) {
-				if (doc.toString().endsWith(name))
-					return doc.toString();
 			}
-		} catch (final NullPointerException e) {
-			// sometimes thrown by ClassDoc.importedClasses(). Nothing we can do here but ignore
 		}
 
-		final ClassDoc target = baseClass.findClass(name);
-		return (target != null) ? target.toString() : null;
+		if (startPos == 0)
+			return text;
+
+		output.append(text.substring(startPos));
+
+		return output.toString();
+	}
+
+	/**
+	 * Create the link for a javaDoc method documentation.
+	 *
+	 * @param methodName
+	 *            name of method
+	 * @param methodParameters
+	 *            method parameters
+	 * @return link
+	 */
+	private String createMethodLink(String methodName, String methodParameters) {
+		final StringBuilder result = new StringBuilder();
+
+		if (methodName != null) {
+			result.append("#");
+			result.append(methodName);
+
+			final List<String> parameters = extractParameters(methodParameters);
+
+			switch (getApiIdentifier()) {
+			case JAVA_8:
+				result.append('-');
+				result.append(parameters.stream().map(p -> p.replace("[]", ":A")).collect(Collectors.joining("-")));
+				result.append('-');
+				break;
+			// link += methodParameters.replaceAll(" ", "%20");
+			}
+		}
+
+		return result.toString();
+	}
+
+	/**
+	 * Extracts FQ class names for all parameters.
+	 *
+	 * @param parameterString
+	 *            parameter signature including brackets, eg "(int, byte[], Collection&lt;String&gt; data)"
+	 * @return list of FQ class names
+	 */
+	private List<String> extractParameters(String parameterString) {
+		final String[] tokens = parameterString.replaceAll("\\s", "").replaceAll("[()]", "").split(",");
+
+		return Arrays.asList(tokens).stream().map(p -> resolveClassName(p)).collect(Collectors.toList());
+	}
+
+	private String resolveClassName(final String candidate) {
+		if (candidate == null)
+			return null;
+
+		if (candidate.contains("."))
+			return candidate;
+
+		// check for classes in java.lang package
+		if (CLASSES_IN_JAVA_LANG.contains(candidate))
+			return "java.lang." + candidate;
+
+		// check for an import
+		for (final String importStatement : fClassModel.getImportedClasses()) {
+			if (importStatement.endsWith("." + candidate))
+				return importStatement;
+		}
+
+		return candidate;
 	}
 
 	private String findClassURL(String qualifiedName) {
-		if (qualifiedName.contains("<"))
-			qualifiedName = qualifiedName.substring(0, qualifiedName.indexOf("<"));
 
-		if (qualifiedName.contains(".")) {
-			final String packageName = qualifiedName.substring(0, qualifiedName.lastIndexOf('.'));
-
+		final String packageName = getPackageName(qualifiedName);
+		if (!packageName.isEmpty()) {
 			// first run, look for exact package match
 			for (final Entry<String, Collection<String>> entry : fExternalDocs.entrySet()) {
 				if (entry.getValue().contains(packageName))
@@ -115,125 +280,11 @@ public class LinkProvider {
 		return null;
 	}
 
-	public String insertLinks(final ClassDoc clazz, final String text) {
-
-		final StringBuilder output = new StringBuilder();
-		int startPos = 0;
-		final Matcher matcher = PATTERN_LINK.matcher(text);
-
-		while (matcher.find()) {
-			output.append(text.substring(startPos, matcher.start()));
-			startPos = matcher.end();
-
-			final Matcher linkMatcher = PATTERN_INNER_LINK.matcher(matcher.group(2).replace('\r', ' ').replace('\n', ' '));
-			if (linkMatcher.matches()) {
-				// group 1 = class
-				// group 2 = method (optional)
-				// group 3 = params (without parenthesis)
-
-				if ("link".equals(matcher.group(1))) {
-					// link to java API
-
-					final StringBuilder link = new StringBuilder();
-					if (linkMatcher.group(2) != null) {
-						link.append("#");
-
-						link.append(linkMatcher.group(2));
-						if (linkMatcher.group(3) != null) {
-							link.append("-");
-
-							for (String parameter : linkMatcher.group(3).split(",")) {
-								parameter = parameter.trim().replace(" ", "");
-								if (parameter.endsWith("]"))
-									link.append(removeGenericsTags(resolveClassName(parameter.substring(0, parameter.indexOf('[')), clazz)));
-								else
-									link.append(removeGenericsTags(resolveClassName(parameter, clazz)));
-
-								while (parameter.endsWith("]")) {
-									link.append(":A");
-									parameter = parameter.substring(0, parameter.lastIndexOf('[')).trim();
-								}
-								link.append("-");
-							}
-
-							if (link.charAt(link.length() - 1) != '-')
-								link.append("-");
-						}
-					}
-
-					if (linkMatcher.group(1) == null) {
-						// link to same document
-						output.append("<a href=\"" + link + "\">" + linkMatcher.group(2)
-								+ ((linkMatcher.group(3) != null) ? "(" + linkMatcher.group(3) + ")" : "") + "</a>");
-					} else {
-						// external document
-
-						final String classURL = findClassURL(resolveClassName(linkMatcher.group(1), clazz));
-						if (classURL != null)
-							output.append("<a href=\"" + classURL + link + "\">");
-
-						output.append(linkMatcher.group(1));
-
-						if (linkMatcher.group(2) != null) {
-							output.append(linkMatcher.group(2));
-							if (linkMatcher.group(3) != null) {
-								output.append('(');
-								output.append(linkMatcher.group(3));
-								output.append(')');
-							}
-						}
-
-						if (classURL != null)
-							output.append("</a>");
-					}
-
-				} else if ("module".equals(matcher.group(1))) {
-					// link to a scripting module
-					if (linkMatcher.group(1) == null) {
-						// link to same document
-						output.append(
-								"<a href=\"#" + linkMatcher.group(2) + "\">" + linkMatcher.group(2) + ((linkMatcher.group(3) != null) ? "()" : "") + "</a>");
-					} else {
-						// external document
-						final String plugin = linkMatcher.group(1).substring(0, linkMatcher.group(1).lastIndexOf('.'));
-						if (linkMatcher.group(2) != null)
-							output.append("<a href=\"../../" + plugin + "/help/" + ModuleDoclet.createHTMLFileName(linkMatcher.group(1)) + "#"
-									+ linkMatcher.group(2) + "\">" + linkMatcher.group(2) + ((linkMatcher.group(3) != null) ? "()" : "") + "</a>");
-						else
-							output.append("<a href=\"../../" + plugin + "/help/" + ModuleDoclet.createHTMLFileName(linkMatcher.group(1)) + "\">"
-									+ capitalizeFirst(linkMatcher.group(1).substring(linkMatcher.group(1).lastIndexOf('.') + 1)) + " module</a>");
-					}
-				}
-			}
-		}
-
-		if (startPos == 0)
-			return text;
-
-		output.append(text.substring(startPos));
-
-		return output.toString();
+	public void setApi(JavaDocApi apiIdentifier) {
+		fApiIdentifier = apiIdentifier;
 	}
 
-	/**
-	 * Remove the generic tags from class name
-	 *
-	 * @param className
-	 *            The complete name of the class, including generic tags
-	 * @return the class name without the generic tags
-	 */
-	public static String removeGenericsTags(String className) {
-		if (className == null) {
-			return null;
-		}
-		final int indexOf = className.indexOf('<');
-		return indexOf < 0 ? className : className.substring(0, className.indexOf('<'));
-	}
-
-	private static String capitalizeFirst(final String content) {
-		if (!content.isEmpty())
-			return content.substring(0, 1).toUpperCase() + content.substring(1);
-
-		return content;
+	public JavaDocApi getApiIdentifier() {
+		return fApiIdentifier;
 	}
 }

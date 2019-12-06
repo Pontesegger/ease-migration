@@ -3,17 +3,29 @@ package org.eclipse.ease.helpgenerator.testproject.valid;
 import java.io.IOException;
 import java.util.function.Function;
 
+import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 
 /**
  * This is a test module.
  */
-public class ValidModule {
+public class ValidModule extends AbstractClassA implements InterfaceB {
 
-	/** The answer to all your questions. */
+	/**
+	 * The answer to all your questions. This is really it.
+	 */
 	@WrapToScript
 	public static final int UNIVERSAL_TRUTH = 42;
-	
+
+	/**
+	 * Some old stuff.
+	 * 
+	 * @deprecated we do not need this anymore
+	 */
+	@Deprecated
+	@WrapToScript
+	public static final String OLD_VALUE = "not needed anymore";
+
 	/**
 	 * Simple method documentation.
 	 */
@@ -38,7 +50,11 @@ public class ValidModule {
 	}
 
 	/**
-	 * Method with method name alias.
+	 * Method with method name alias. The documentation to this method is long to make sure it is handled with a line break in the source file. Further it
+	 * contains some valid HTML tags that need to be processed correctly by the doclet.
+	 * <p>
+	 * This is a separate paragraph.
+	 * </p>
 	 * 
 	 * @return always <code>null</code>
 	 */
@@ -46,10 +62,12 @@ public class ValidModule {
 	public String thisIsAMethodWithALongName() {
 		return null;
 	}
-	
+
 	/**
 	 * Method that always throws.
-	 * @throws IOException in any case
+	 * 
+	 * @throws IOException
+	 *             in any case
 	 */
 	@WrapToScript
 	public void pleaseThrow() throws IOException {
@@ -57,19 +75,26 @@ public class ValidModule {
 	}
 
 	/**
-	 * Simple method that converts a long to string.
+	 * Method with optional parameters.
 	 *
-	 * @param myLongNumber
-	 *            A function to execute and whose return value will be returned
+	 * @param mandatory
+	 *            Mandatory parameter,
+	 * @param optionalDefaultsTo1
+	 *            simple integer parameter
+	 * @param optionalDefaultsToNull
+	 *            second optional parameter
 	 * @return result of the function
+	 * @scriptExample optionalParameters(new Thread(), 22, "nothing") first way to call this method
+	 * @scriptExample optionalParameters(new Thread()) ... using default values for parameter 2 and 3
 	 */
 	@WrapToScript
-	public String thisMethodHasNoParameters(long myLongNumber) {
-		return String.valueOf(myLongNumber);
+	public String optionalParameters(Thread mandatory, @ScriptParameter(defaultValue = "1") int optionalDefaultsTo1,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) String optionalDefaultsToNull) {
+		return null;
 	}
 
 	/**
-	 * Method that uses generic parameters. For a simpler case, use {@link #thisMethodHasNoParameters(long)}, just to link to it from this javadoc.
+	 * Method that uses generic parameters.
 	 *
 	 * @param myFunctionParameter
 	 *            A function to execute and whose return value will be returned
@@ -78,5 +103,17 @@ public class ValidModule {
 	@WrapToScript
 	public String thisMethodHasGenericParameters(Function<Long, String> myFunctionParameter) {
 		return myFunctionParameter.apply(100L);
+	}
+
+	@WrapToScript
+	public void methodToBeOverridden() {
+	}
+
+	@WrapToScript
+	public void abstractMethodToBeOverridden() {
+	}
+
+	@WrapToScript
+	public void interfaceBMethod() {
 	}
 }

@@ -14,10 +14,12 @@ package org.eclipse.ease.helpgenerator;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.Test;
 
-public class IntegrationTest {
+public class IntegrationTestJava5API {
 
 	private static int buildDocs(boolean failOnHtmlError, boolean failOnMissingDocs, String packageName) {
 		// @formatter:off
@@ -30,7 +32,7 @@ public class IntegrationTest {
 				"-failOnHTMLError", Boolean.toString(failOnHtmlError),
 				"-failOnMissingDocs", Boolean.toString(failOnMissingDocs),
 
-				"-link", "https://docs.oracle.com/javase/8/docs/api/",
+				"-link", "https://docs.oracle.com/javase/8/docs/api",
 
 				packageName
 		});
@@ -60,5 +62,19 @@ public class IntegrationTest {
 	@Test
 	public void missingDocsShouldFail() {
 		assertEquals(1, buildDocs(false, true, "org.eclipse.ease.helpgenerator.testproject.missingdocs"));
+	}
+
+	@Test
+	public void verifyContent() throws IOException {
+		buildDocs(true, true, "org.eclipse.ease.helpgenerator.testproject.valid");
+		String expected = new String(
+				Files.readAllBytes(new File("./resources/expected_module_org.eclipse.ease.helpgenerator.testproject.module1.html").toPath()));
+		expected = expected.replaceAll("\r", "");
+
+		final String actual = new String(Files.readAllBytes(
+				new File("./resources/org.eclipse.ease.helpgenerator.testproject/help/module_org.eclipse.ease.helpgenerator.testproject.module1.html")
+						.toPath()));
+
+		assertEquals(expected, actual);
 	}
 }
