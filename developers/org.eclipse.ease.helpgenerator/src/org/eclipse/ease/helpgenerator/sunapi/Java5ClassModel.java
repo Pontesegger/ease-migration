@@ -13,6 +13,7 @@ package org.eclipse.ease.helpgenerator.sunapi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -171,7 +172,13 @@ public class Java5ClassModel extends AbstractClassModel {
 	};
 
 	private List<String> fetchImportedClasses() {
-		return Arrays.asList(fClassDoc.importedClasses()).stream().map(f -> f.toString()).collect(Collectors.toList());
+		try {
+			return Arrays.asList(fClassDoc.importedClasses()).stream().map(f -> f.toString()).collect(Collectors.toList());
+		} catch (final NullPointerException e) {
+			// we might get an NPE @ com.sun.tools.javadoc.ClassDocImpl.importedClasses(ClassDocImpl.java:1111)
+			// nothing we can do about it, but skipping imports for this file
+			return Collections.emptyList();
+		}
 	}
 
 	private List<Field> fetchExportedFields() {
