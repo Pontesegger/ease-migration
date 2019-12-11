@@ -275,7 +275,7 @@
 						<version>${maven.javadoc.version}</version>
 						<configuration>
 							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
-							<doclet>org.eclipse.ease.helpgenerator.ModuleDoclet</doclet>
+							<doclet>org.eclipse.ease.helpgenerator.V8ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
 							<additionalparam>-root ${basedir} -failOnHTMLError true
 								-failOnMissingDocs true</additionalparam>
