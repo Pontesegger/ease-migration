@@ -30,7 +30,7 @@ public class IntegrationTestJava11API {
 		return documentationTool.run(System.in, System.out, System.err,
 
 				"-sourcepath", new File("./resources/org.eclipse.ease.helpgenerator.testproject/src").getAbsolutePath(), "-root",
-				new File("./resources/org.eclipse.ease.helpgenerator.testproject").getAbsolutePath(), "-doclet", ModuleDoclet.class.getName(), "-docletpath",
+				new File("./resources/org.eclipse.ease.helpgenerator.testproject").getAbsolutePath(), "-doclet", V9ModuleDoclet.class.getName(), "-docletpath",
 				new File("./target/classes").getAbsolutePath(),
 
 				"-failOnHTMLError", Boolean.toString(failOnHtmlError), "-failOnMissingDocs", Boolean.toString(failOnMissingDocs),

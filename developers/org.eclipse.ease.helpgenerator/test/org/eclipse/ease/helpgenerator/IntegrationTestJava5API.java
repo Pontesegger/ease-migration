@@ -26,7 +26,7 @@ public class IntegrationTestJava5API {
 		return com.sun.tools.javadoc.Main.execute(new String[] {
 				"-sourcepath", new File("./resources/org.eclipse.ease.helpgenerator.testproject/src").getAbsolutePath(),
 				"-root", new File("./resources/org.eclipse.ease.helpgenerator.testproject").getAbsolutePath(),
-				"-doclet", ModuleDoclet.class.getName(),
+				"-doclet", V8ModuleDoclet.class.getName(),
 				"-docletpath",  new File("./target/classes").getAbsolutePath(),
 
 				"-failOnHTMLError", Boolean.toString(failOnHtmlError),

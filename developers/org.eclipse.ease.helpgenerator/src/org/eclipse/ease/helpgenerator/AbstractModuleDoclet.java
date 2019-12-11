@@ -104,10 +104,10 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public void setParameter(String option, List<String> arguments) {
-		if (ModuleDoclet.OPTION_LINK.equals(option))
+		if (V8ModuleDoclet.OPTION_LINK.equals(option))
 			registerLinks(arguments.get(0));
 
-		else if (ModuleDoclet.OPTION_LINK_OFFLINE.equals(option))
+		else if (V8ModuleDoclet.OPTION_LINK_OFFLINE.equals(option))
 			registerOfflineLinks(arguments.get(0), arguments.get(1) + "/package-list");
 
 		else
@@ -189,9 +189,9 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public File getRootFolder() throws IOException {
-		final List<String> parameter = fParameters.get(ModuleDoclet.OPTION_PROJECT_ROOT);
+		final List<String> parameter = fParameters.get(V8ModuleDoclet.OPTION_PROJECT_ROOT);
 		if ((parameter == null) || (parameter.size() != 1))
-			throw new IOException("Root folder not found, use " + ModuleDoclet.OPTION_PROJECT_ROOT + " parameter");
+			throw new IOException("Root folder not found, use " + V8ModuleDoclet.OPTION_PROJECT_ROOT + " parameter");
 
 		final File rootFolder = new File(parameter.get(0));
 
@@ -205,7 +205,7 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public boolean failOnMissingDocs() {
-		final List<String> parameter = fParameters.get(ModuleDoclet.OPTION_FAIL_ON_MISSING_DOCS);
+		final List<String> parameter = fParameters.get(V8ModuleDoclet.OPTION_FAIL_ON_MISSING_DOCS);
 		if ((parameter == null) || (parameter.size() != 1))
 			return true;
 
@@ -213,7 +213,7 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public boolean failOnHtmlErrors() {
-		final List<String> parameter = fParameters.get(ModuleDoclet.OPTION_FAIL_ON_HTML_ERRORS);
+		final List<String> parameter = fParameters.get(V8ModuleDoclet.OPTION_FAIL_ON_HTML_ERRORS);
 		if ((parameter == null) || (parameter.size() != 1))
 			return true;
 
