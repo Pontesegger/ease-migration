@@ -122,13 +122,17 @@ public abstract class AbstractModuleDoclet {
 	public Set<ModuleDefinition> getModules() throws Exception {
 		final Set<ModuleDefinition> registeredModules = new HashSet<>();
 
-		final IMemento document = getPluginDefinition();
+		try {
+			final IMemento document = getPluginDefinition();
 
-		for (final IMemento extensionNode : document.getChildren("extension")) {
-			if ("org.eclipse.ease.modules".equals(extensionNode.getString("point"))) {
-				for (final IMemento instanceNode : extensionNode.getChildren("module"))
-					registeredModules.add(new ModuleDefinition(instanceNode));
+			for (final IMemento extensionNode : document.getChildren("extension")) {
+				if ("org.eclipse.ease.modules".equals(extensionNode.getString("point"))) {
+					for (final IMemento instanceNode : extensionNode.getChildren("module"))
+						registeredModules.add(new ModuleDefinition(instanceNode));
+				}
 			}
+		} catch (final Exception e) {
+			getReporter().report(IReporter.INFO, "No plugin definition found, skipping");
 		}
 
 		return registeredModules;
