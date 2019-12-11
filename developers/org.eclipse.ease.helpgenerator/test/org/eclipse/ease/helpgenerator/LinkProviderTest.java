@@ -14,8 +14,8 @@ package org.eclipse.ease.helpgenerator;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.ease.helpgenerator.model.AbstractClassModel;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class LinkProviderTest {
 	@Before
 	public void setup() {
 		fLinkProvider = new LinkProvider();
-		fLinkProvider.registerAddress(ROOT_URI, List.of("java.lang", "java.util", "java.io", "org.test.some"));
+		fLinkProvider.registerAddress(ROOT_URI, Arrays.asList("java.lang", "java.util", "java.io", "org.test.some"));
 		fLinkProvider.setClassModel(new AbstractClassModel() {
 
 			@Override
@@ -39,7 +39,7 @@ public class LinkProviderTest {
 
 			@Override
 			public Collection<String> getImportedClasses() {
-				return List.of("java.io.IOException", "java.util.Collection");
+				return Arrays.asList("java.io.IOException", "java.util.Collection");
 			}
 		});
 	}

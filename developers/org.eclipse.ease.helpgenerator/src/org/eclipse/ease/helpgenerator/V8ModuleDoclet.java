@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.helpgenerator;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.eclipse.ease.helpgenerator.sunapi.Java5ModuleDoclet;
 
@@ -36,7 +36,7 @@ public class V8ModuleDoclet extends Doclet {
 		for (final String[] option : options) {
 
 			if (OPTION_PROJECT_ROOT.equals(option[0]))
-				doclet.setParameter(OPTION_PROJECT_ROOT, List.of(option[1]));
+				doclet.setParameter(OPTION_PROJECT_ROOT, Arrays.asList(option[1]));
 
 			else if (OPTION_LINK.equals(option[0]))
 				doclet.registerLinks(option[1]);
@@ -45,10 +45,10 @@ public class V8ModuleDoclet extends Doclet {
 				doclet.registerOfflineLinks(option[1], option[2] + "/package-list");
 
 			else if (OPTION_FAIL_ON_HTML_ERRORS.equals(option[0]))
-				doclet.setParameter(OPTION_FAIL_ON_HTML_ERRORS, List.of(option[1]));
+				doclet.setParameter(OPTION_FAIL_ON_HTML_ERRORS, Arrays.asList(option[1]));
 
 			else if (OPTION_FAIL_ON_MISSING_DOCS.equals(option[0]))
-				doclet.setParameter(OPTION_FAIL_ON_MISSING_DOCS, List.of(option[1]));
+				doclet.setParameter(OPTION_FAIL_ON_MISSING_DOCS, Arrays.asList(option[1]));
 		}
 
 		return doclet.run();

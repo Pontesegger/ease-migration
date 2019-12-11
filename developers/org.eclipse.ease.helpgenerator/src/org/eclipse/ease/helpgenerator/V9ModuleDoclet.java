@@ -11,6 +11,7 @@
 package org.eclipse.ease.helpgenerator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -104,7 +105,7 @@ public class V9ModuleDoclet implements jdk.javadoc.doclet.Doclet {
 
 		@Override
 		public List<String> getNames() {
-			return List.of(fIdentifier);
+			return Arrays.asList(fIdentifier);
 		}
 
 		@Override
