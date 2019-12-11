@@ -65,8 +65,6 @@ public abstract class AbstractModuleDoclet {
 	private final LinkProvider fLinkProvider = new LinkProvider();
 
 	public boolean run() {
-		setReporter(createReporter());
-
 		try {
 			for (final ModuleDefinition module : getModules()) {
 				final AbstractClassModel classModel = getClassModel(module);
@@ -114,11 +112,10 @@ public abstract class AbstractModuleDoclet {
 			fParameters.put(option, arguments);
 	}
 
-	private void setReporter(IReporter reporter) {
-		fReporter = reporter;
-	}
-
 	public IReporter getReporter() {
+		if (fReporter == null)
+			fReporter = createReporter();
+
 		return fReporter;
 	}
 
