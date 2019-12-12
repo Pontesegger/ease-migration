@@ -27,8 +27,17 @@ public class Description {
 		if (isEmpty())
 			return null;
 
-		final int pos = getComment().indexOf('.');
-		return (pos > 0) ? getComment().substring(0, pos + 1) : getComment();
+		int pos = getComment().indexOf(".");
+		while (pos > 0) {
+			final String sentence = getComment().substring(0, pos + 1);
+
+			if (sentence.split("\\{@").length == sentence.split("\\}").length)
+				return sentence;
+
+			pos = getComment().indexOf(".", pos + 1);
+		}
+
+		return getComment();
 	}
 
 	@Override
