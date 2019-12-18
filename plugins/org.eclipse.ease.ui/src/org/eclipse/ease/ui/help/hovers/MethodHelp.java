@@ -72,7 +72,7 @@ public class MethodHelp implements IHoverHelp {
 
 		// extract method description node
 		for (final IMemento node : helpContent.getChildren()) {
-			if ((fMethod.getName().equals(node.getString("data-method"))) && ("command".equals(node.getString("class")))) {
+			if ((fMethod.getName().equals(node.getString("data-method"))) && (String.valueOf(node.getString("class")).startsWith("command"))) {
 				IHoverHelp.updateRelativeLinks(node, fHelpLocation);
 				fHelpContent = node;
 				break;
@@ -101,6 +101,15 @@ public class MethodHelp implements IHoverHelp {
 	private String getReturnValueDescription() {
 		for (final IMemento contentNode : fHelpContent.getChildren()) {
 			if ("return".equals(contentNode.getString("class")))
+				return IHoverHelp.getNodeContent(contentNode);
+		}
+
+		return null;
+	}
+
+	private String getWarning() {
+		for (final IMemento contentNode : fHelpContent.getChildren()) {
+			if ("warning".equals(contentNode.getString("class")))
 				return IHoverHelp.getNodeContent(contentNode);
 		}
 
@@ -220,6 +229,14 @@ public class MethodHelp implements IHoverHelp {
 		if (description != null) {
 			help.append("<p>");
 			help.append(description);
+			help.append("</p>");
+		}
+
+		// method warning
+		final String warning = getWarning();
+		if (warning != null) {
+			help.append("<p>");
+			help.append(warning);
 			help.append("</p>");
 		}
 
