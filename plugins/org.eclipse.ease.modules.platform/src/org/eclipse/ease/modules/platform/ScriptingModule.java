@@ -117,7 +117,9 @@ public class ScriptingModule extends AbstractScriptModule {
 	 * @param resource
 	 *            resource to execute (path, URI or file instance)
 	 * @param arguments
-	 *            optional script arguments delimited by commas ','
+	 *            optional script arguments delimited by commas ','. When the string arguments contains commas ',', or for arguments that are not string, the
+	 *            caller may set a shared object with {@module #setSharedObject(String, Object, boolean, boolean)} and pass the key here. The callee can then
+	 *            retrieve it with the {@module #getSharedObject(String)} method.
 	 * @param engineID
 	 *            engine ID to be used
 	 * @return execution result
