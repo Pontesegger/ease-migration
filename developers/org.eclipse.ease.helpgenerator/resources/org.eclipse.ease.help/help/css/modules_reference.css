@@ -37,7 +37,7 @@ ul.dependency		{ list-style-image:url(/help/topic/org.eclipse.ease.help/help/ima
 .command			{ margin-left: 50px; }
 .command h3			{ margin-left: -50px; }
 .deprecated			{ background-color: #fbfbd5;
-						padding: 0px  0px 20px 20px;
+						padding: 10px  0px 10px 20px;
  						border: 1px solid #f1d657; border-radius: 5px;
 					}
 .deprecatedText		{ text-decoration: line-through; }
@@ -79,7 +79,7 @@ dl.examples dd	{   margin: 3px 0px 10px 60px; }
 
 
 .warning			{ background-image:url("../images/warning.png"); background-repeat: no-repeat;
-						padding-left: 30px;
+						padding-left: 25px;
 					}
 					
 .example  			{ margin-left: 130px;  }

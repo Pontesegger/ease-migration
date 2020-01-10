@@ -31,7 +31,6 @@ import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.FieldDoc;
-import com.sun.javadoc.MemberDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.ProgramElementDoc;
@@ -129,7 +128,7 @@ public class Java5ClassModel extends AbstractClassModel {
 				|| (WRAP_TO_SCRIPT.equals(annotation.annotationType().qualifiedName()));
 	}
 
-	private static boolean isDeprecated(final MemberDoc field) {
+	private static boolean isDeprecated(final ProgramElementDoc field) {
 		final Tag[] tags = field.tags("deprecated");
 		return (tags != null) && (tags.length > 0);
 	}
@@ -164,6 +163,7 @@ public class Java5ClassModel extends AbstractClassModel {
 		setClassName(fClassDoc.name());
 
 		setClassDocumentation(new Description(fClassDoc.commentText()));
+		setDeprecationMessage(isDeprecated(fClassDoc) ? fClassDoc.tags("deprecated")[0].text() : null);
 
 		setExportedFields(fetchExportedFields());
 		setExportedMethods(fetchExportedMethods());

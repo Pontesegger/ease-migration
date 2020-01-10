@@ -72,7 +72,7 @@ public class MethodHelp implements IHoverHelp {
 
 		// extract method description node
 		for (final IMemento node : helpContent.getChildren()) {
-			if ((fMethod.getName().equals(node.getString("data-method"))) && (String.valueOf(node.getString("class")).startsWith("command"))) {
+			if ((fMethod.getName().equals(node.getString("data-method"))) && (String.valueOf(node.getString("class")).equals("command"))) {
 				IHoverHelp.updateRelativeLinks(node, fHelpLocation);
 				fHelpContent = node;
 				break;
@@ -107,10 +107,15 @@ public class MethodHelp implements IHoverHelp {
 		return null;
 	}
 
-	private String getWarning() {
+	private String getDeprecationMessage() {
 		for (final IMemento contentNode : fHelpContent.getChildren()) {
-			if ("warning".equals(contentNode.getString("class")))
-				return IHoverHelp.getNodeContent(contentNode);
+			if ("deprecated".equals(contentNode.getString("class"))) {
+				String content = IHoverHelp.getNodeContent(contentNode);
+				if (content.contains("<span class=\"warning\"></span>"))
+					content = content.substring(content.indexOf("<span class=\"warning\"></span>") + "<span class=\"warning\"></span>".length());
+
+				return content;
+			}
 		}
 
 		return null;
@@ -222,34 +227,33 @@ public class MethodHelp implements IHoverHelp {
 		help.append("<h5>"); //$NON-NLS-1$
 		help.append(IHoverHelp.getImageAndLabel(HelpHoverImageProvider.getImageLocation("icons/eobj16/function.png"), extractSynopsis()));
 		help.append("</h5>"); //$NON-NLS-1$
-		help.append("<br />"); //$NON-NLS-1$
+
+		// deprecation
+		final String deprecationMessage = getDeprecationMessage();
+		if (deprecationMessage != null) {
+			help.append("<p>"); //$NON-NLS-1$
+			help.append(deprecationMessage);
+			help.append("</p>"); //$NON-NLS-1$
+		}
 
 		// method description
 		final String description = getDescription();
 		if (description != null) {
-			help.append("<p>");
+			help.append("<p>"); //$NON-NLS-1$
 			help.append(description);
-			help.append("</p>");
-		}
-
-		// method warning
-		final String warning = getWarning();
-		if (warning != null) {
-			help.append("<p>");
-			help.append(warning);
-			help.append("</p>");
+			help.append("</p>"); //$NON-NLS-1$
 		}
 
 		// method parameters
 		final List<IHoverHelp> parameterDescriptions = getParameterDescriptions();
 		if (!parameterDescriptions.isEmpty()) {
-			help.append("<dl>");
-			help.append("<dt>Parameters:</dt>");
+			help.append("<dl>"); //$NON-NLS-1$
+			help.append("<dt>Parameters:</dt>"); //$NON-NLS-1$
 
 			for (final IHoverHelp parameter : parameterDescriptions)
 				help.append(parameter.getHoverContent());
 
-			help.append("</dl>");
+			help.append("</dl>"); //$NON-NLS-1$
 		}
 
 		// return value

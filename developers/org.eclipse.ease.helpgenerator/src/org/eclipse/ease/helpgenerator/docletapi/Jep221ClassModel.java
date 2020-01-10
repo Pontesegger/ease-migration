@@ -67,6 +67,13 @@ public class Jep221ClassModel extends AbstractClassModel {
 
 		setClassDocumentation(new Description(getCommentFor(fClassSymbol)));
 
+		final DocCommentTree tree = fEnvironment.getDocTrees().getDocCommentTree(fClassSymbol);
+		String deprecationText = new DeprecationMessageScanner().visit(tree, null);
+		if ((deprecationText == null) && (fClassSymbol.getAnnotation(Deprecated.class) != null))
+			deprecationText = "Module deprecated";
+
+		setDeprecationMessage(deprecationText);
+
 		final boolean hasAnnotation = hasWrapToScriptAnnotation();
 
 		setExportedFields(new FieldScanner().scan(fClassSymbol, hasAnnotation));

@@ -80,14 +80,20 @@ public class HtmlWriter {
 		addLine(buffer, " Module</h1>");
 
 		// class description
-		addText(buffer, "		<p class=\"description\">");
 		final Description classComment = fClassModel.getClassDocumentation();
-		if (!classComment.isEmpty())
+		if (!classComment.isEmpty()) {
+			addText(buffer, "		<p class=\"description\">");
 			addText(buffer, classComment);
-		else
-			getReporter().reportMissingDocs("Missing class comment for " + fClassModel.getClassName());
+			addLine(buffer, "</p>");
 
-		addLine(buffer, "</p>");
+			if (fClassModel.isDeprecated()) {
+				addText(buffer, "		<p class=\"deprecated\"><span class=\"warning\"></span><b>Deprecated:</b> <i>");
+				addText(buffer, fClassModel.getDeprecationMessage());
+				addLine(buffer, "</i></p>");
+			}
+
+		} else
+			getReporter().reportMissingDocs("Missing class comment for " + fClassModel.getClassName());
 
 		// dependencies
 		addLine(buffer, createDependenciesSection());
@@ -135,10 +141,7 @@ public class HtmlWriter {
 
 		for (final Method method : fClassModel.getExportedMethods()) {
 			// heading
-			addText(buffer, "\t<div class=\"command");
-			if (method.isDeprecated())
-				addText(buffer, " deprecated");
-			addText(buffer, "\" data-method=\"");
+			addText(buffer, "\t<div class=\"command\" data-method=\"");
 			addText(buffer, method.getName());
 			addLine(buffer, "\">");
 
@@ -158,7 +161,7 @@ public class HtmlWriter {
 				if (deprecationText.isEmpty())
 					deprecationText = "This method is deprecated and might be removed in future versions.";
 
-				addLine(buffer, "\t\t<p class=\"warning\"><b>Deprecation warning:</b> " + deprecationText + "</p>");
+				addLine(buffer, "\t\t<p class=\"deprecated\"><span class=\"warning\"></span><b>Deprecated:</b> <i>" + deprecationText + "</i></p>");
 			}
 
 			// aliases
@@ -400,12 +403,13 @@ public class HtmlWriter {
 
 				} else {
 					addLine(buffer, " <td><a id=\"" + field.getName() + "\" class=\"deprecatedText\">" + field.getName() + "</a></td>");
-					addText(buffer, " <td>" + field.getComment());
+					addLine(buffer, " <td class=\"description\" data-field=\"" + field.getName() + "\">");
+					addText(buffer, field.getComment());
 					String deprecationText = field.getDeprecationMessage();
 					if (deprecationText.isEmpty())
 						deprecationText = "This constant is deprecated and might be removed in future versions.";
 
-					addText(buffer, " <div class=\"warning\"><b>Deprecation warning:</b> " + deprecationText + "</div>");
+					addText(buffer, " <div class=\"warning\"><b>Deprecated:</b> <i>" + deprecationText + "</i></div>");
 					addLine(buffer, "</td>");
 				}
 

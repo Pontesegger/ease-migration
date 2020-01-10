@@ -43,6 +43,42 @@ public class ConstantHelp implements IHoverHelp {
 
 	@Override
 	public String getDescription() {
+		final IMemento descriptionNode = getDescriptionNode();
+		if (descriptionNode != null) {
+			String content = IHoverHelp.getNodeContent(descriptionNode);
+			final IMemento warningNode = getWarningNode(descriptionNode);
+			if (warningNode != null) {
+				content = content.replace(IHoverHelp.getNodeContent(warningNode), "");
+				content = content.replace("<div class=\"warning\"></div>", "");
+			}
+
+			return content;
+		}
+
+		return "";
+	}
+
+	private String getDeprecationMessage() {
+		final IMemento descriptionNode = getDescriptionNode();
+		if (descriptionNode != null) {
+			final IMemento warningNode = getWarningNode(descriptionNode);
+			return IHoverHelp.getNodeContent(warningNode);
+		}
+
+		return null;
+	}
+
+	private IMemento getWarningNode(IMemento descriptionNode) {
+		final IMemento warningNode = descriptionNode.getChild("div");
+		if (warningNode != null) {
+			if ("warning".equals(warningNode.getString("class")))
+				return warningNode;
+		}
+
+		return null;
+	}
+
+	private IMemento getDescriptionNode() {
 		for (final IMemento node : fHelpContent.getChildren()) {
 			if ("constants".equals(node.getString("class"))) {
 				final List<IMemento> candidates = new ArrayList<>();
@@ -53,8 +89,7 @@ public class ConstantHelp implements IHoverHelp {
 					if (fField.getName().equals(candidate.getString("data-field"))) {
 
 						IHoverHelp.updateRelativeLinks(candidate, fHelpLocation);
-
-						return IHoverHelp.getNodeContent(candidate);
+						return candidate;
 
 					} else
 						candidates.addAll(Arrays.asList(candidate.getChildren()));
@@ -64,23 +99,30 @@ public class ConstantHelp implements IHoverHelp {
 			}
 		}
 
-		return "";
+		return null;
 	}
 
 	@Override
 	public String getHoverContent() {
-		final String description = getDescription();
-		if (!description.isEmpty()) {
-			final StringBuffer help = new StringBuffer();
-			help.append("<h5>"); //$NON-NLS-1$
-			help.append(IHoverHelp.getImageAndLabel(HelpHoverImageProvider.getImageLocation("icons/eobj16/field.png"), getName()));
-			help.append("</h5>"); //$NON-NLS-1$
-			help.append("<br />"); //$NON-NLS-1$
-			help.append(description);
+		final StringBuffer help = new StringBuffer();
+		help.append("<h5>"); //$NON-NLS-1$
+		help.append(IHoverHelp.getImageAndLabel(HelpHoverImageProvider.getImageLocation("icons/eobj16/field.png"), getName()));
+		help.append("</h5>"); //$NON-NLS-1$
 
-			return help.toString();
+		final String deprecationMessage = getDeprecationMessage();
+		if (!deprecationMessage.isEmpty()) {
+			help.append("<p>"); //$NON-NLS-1$
+			help.append(deprecationMessage);
+			help.append("</p>"); //$NON-NLS-1$
 		}
 
-		return null;
+		final String description = getDescription();
+		if (!description.isEmpty()) {
+			help.append("<p>"); //$NON-NLS-1$
+			help.append(description);
+			help.append("</p>"); //$NON-NLS-1$
+		}
+
+		return help.toString();
 	}
 }

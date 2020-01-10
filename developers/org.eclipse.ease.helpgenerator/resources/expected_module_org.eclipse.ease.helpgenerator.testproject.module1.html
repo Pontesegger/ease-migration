@@ -7,6 +7,7 @@
 	<div class="module" title="Valid Test Module Module">
 		<h1>Valid Test Module Module</h1>
 		<p class="description">This is a test module.</p>
+		<p class="deprecated"><span class="warning"></span><b>Deprecated:</b> <i>dead class, do not use</i></p>
 
 	</div>
 
@@ -26,7 +27,8 @@
  </tr>
 		<tr>
  <td><a id="OLD_VALUE" class="deprecatedText">OLD_VALUE</a></td>
- <td>Some old stuff. <div class="warning"><b>Deprecation warning:</b> we do not need this anymore</div></td>
+ <td class="description" data-field="OLD_VALUE">
+Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this anymore</i></div></td>
  </tr>
 		<tr>
  <td><a id="UNIVERSAL_TRUTH">UNIVERSAL_TRUTH</a></td>
@@ -48,6 +50,10 @@
 		<tr>
 			<td><a href="#baseParameters">baseParameters</a>()</td>
 			<td>Method with parameters.</td>
+		</tr>
+		<tr>
+			<td class="deprecatedText"><a href="#deprecatedMethod">deprecatedMethod</a>()</td>
+			<td class="deprecatedDescription"><b>Deprecated:</b> This method is outdated.</td>
 		</tr>
 		<tr>
 			<td><a href="#interfaceAMethod">interfaceAMethod</a>()</td>
@@ -120,6 +126,18 @@
 		</dl>
 
 		<p class="return">always 0</p>
+
+
+
+	</div>
+	<div class="command" data-method="deprecatedMethod">
+		<h3 class="deprecatedText"><a id="deprecatedMethod">deprecatedMethod</a></h3>
+		<p class="synopsis">void deprecatedMethod()</p>
+
+		<p class="description">This method is outdated.</p>
+		<p class="deprecated"><span class="warning"></span><b>Deprecated:</b> <i>Please use another method. This one will be removed in future versions.</i></p>
+
+
 
 
 

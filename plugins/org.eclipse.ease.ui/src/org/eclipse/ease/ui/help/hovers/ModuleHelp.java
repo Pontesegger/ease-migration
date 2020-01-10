@@ -98,22 +98,49 @@ public class ModuleHelp implements IHoverHelp {
 		return "";
 	}
 
+	public String getDeprecationMessage() {
+		for (final IMemento node : fHelpContent.getChildren()) {
+			if ("module".equals(node.getString("class"))) {
+				for (final IMemento contentNode : node.getChildren()) {
+					if ("deprecated".equals(contentNode.getString("class"))) {
+						IHoverHelp.updateRelativeLinks(contentNode, fHelpLocation);
+
+						String content = IHoverHelp.getNodeContent(contentNode);
+						if (content.contains("<span class=\"warning\"></span>"))
+							content = content.substring(content.indexOf("<span class=\"warning\"></span>") + "<span class=\"warning\"></span>".length());
+
+						return content;
+					}
+				}
+			}
+		}
+
+		return "";
+	}
+
 	@Override
 	public String getHoverContent() {
 
-		final String description = getDescription();
-		if (!description.isEmpty()) {
-			final StringBuffer help = new StringBuffer();
-			help.append("<h5>"); //$NON-NLS-1$
-			help.append(IHoverHelp.getImageAndLabel(HelpHoverImageProvider.getImageLocation("icons/eobj16/module.png"), getName()));
-			help.append("</h5>"); //$NON-NLS-1$
-			help.append("<br />"); //$NON-NLS-1$
-			help.append(description);
+		final StringBuffer help = new StringBuffer();
+		help.append("<h5>"); //$NON-NLS-1$
+		help.append(IHoverHelp.getImageAndLabel(HelpHoverImageProvider.getImageLocation("icons/eobj16/module.png"), getName()));
+		help.append("</h5>"); //$NON-NLS-1$
 
-			return help.toString();
+		final String deprecationMessage = getDeprecationMessage();
+		if (!deprecationMessage.isEmpty()) {
+			help.append("<p>"); //$NON-NLS-1$
+			help.append(deprecationMessage);
+			help.append("</p>"); //$NON-NLS-1$
 		}
 
-		return null;
+		final String description = getDescription();
+		if (!description.isEmpty()) {
+			help.append("<p>"); //$NON-NLS-1$
+			help.append(description);
+			help.append("</p>"); //$NON-NLS-1$
+		}
+
+		return help.toString();
 	}
 
 	public IHoverHelp getConstantHelp(final Field field) {

@@ -21,6 +21,7 @@ public abstract class AbstractClassModel {
 	private List<Field> fExportedFields;
 	private List<Method> fExportedMethods;
 	private Collection<String> fImportedClasses;
+	private String fDeprecationMessage;
 
 	public String getClassName() {
 		return fClassName;
@@ -40,6 +41,14 @@ public abstract class AbstractClassModel {
 
 	public Collection<String> getImportedClasses() {
 		return fImportedClasses;
+	}
+
+	public String getDeprecationMessage() {
+		return fDeprecationMessage;
+	}
+
+	public boolean isDeprecated() {
+		return fDeprecationMessage != null;
 	}
 
 	protected void setClassName(String className) {
@@ -64,6 +73,9 @@ public abstract class AbstractClassModel {
 		fImportedClasses = importedClasses;
 	}
 
-	public abstract void populateModel();
+	public void setDeprecationMessage(String deprecationMessage) {
+		fDeprecationMessage = deprecationMessage;
+	}
 
+	public abstract void populateModel();
 }
