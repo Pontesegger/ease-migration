@@ -1,6 +1,6 @@
-target "2019-09" with source requirements
+target "2019-12" with source requirements
 
-location "http://download.eclipse.org/releases/2019-09/" eclipse-2019-09 {
+location "http://download.eclipse.org/releases/2019-12/" eclipse-2019-12 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -34,7 +34,7 @@ location "http://download.eclipse.org/releases/2019-09/" eclipse-2019-09 {
 	org.eclipse.osgi
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository" eclipse-orbit-2019-09 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository/" eclipse-orbit-2019-12 {
 // for java unit test of modules
 	org.mockito [1.9.5,2.0.0)
 	org.hamcrest [1.1.0,2.0.0)

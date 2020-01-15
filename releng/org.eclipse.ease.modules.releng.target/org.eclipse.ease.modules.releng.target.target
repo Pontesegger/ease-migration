@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2019-09" sequenceNumber="1571296347">
+<target name="2019-12" sequenceNumber="1579071944">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.13.0.v20190916-1323"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.13.0.v20190916-1045"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.100.v20190916-1045"/>
-      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.300.v20190716-0825"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.19.0.v20190824-1315"/>
-      <unit id="org.eclipse.papyrus.infra.feature.feature.group" version="3.0.0.201909110825"/>
-      <unit id="org.eclipse.papyrus.infra.gmfdiag.feature.feature.group" version="3.0.0.201909110825"/>
-      <unit id="org.eclipse.papyrus.uml.diagram.feature.feature.group" version="3.0.0.201909110825"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.14.0.v20191210-0610"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.14.0.v20191210-0610"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.200.v20191210-0610"/>
+      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.400.v20191014-1907"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.20.0.v20191028-0905"/>
+      <unit id="org.eclipse.papyrus.infra.feature.feature.group" version="3.0.0.201912110926"/>
+      <unit id="org.eclipse.papyrus.infra.gmfdiag.feature.feature.group" version="3.0.0.201912110926"/>
+      <unit id="org.eclipse.papyrus.uml.diagram.feature.feature.group" version="3.0.0.201912110926"/>
       <unit id="org.eclipse.uml2.uml" version="5.5.0.v20181203-1331"/>
-      <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.8.0.201905141505"/>
+      <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.8.0.201912020813"/>
       <unit id="org.eclipse.emf.emfstore.client.ui.feature.feature.group" version="1.9.0.v20170530-0703"/>
-      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.10.0.v20190910-0937"/>
-      <unit id="org.eclipse.ocl.examples.feature.group" version="6.9.0.v20190910-0937"/>
-      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.15.0.v201907091226"/>
-      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.15.0.v201907091226"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.100.v20190916-1045"/>
-      <unit id="org.eclipse.jdt" version="3.18.100.v20190916-1045"/>
-      <unit id="org.eclipse.egit.feature.group" version="5.5.0.201909110433-r"/>
-      <unit id="org.eclipse.jgit.feature.group" version="5.5.0.201909110433-r"/>
-      <unit id="org.eclipse.osgi" version="3.15.0.v20190830-1434"/>
-      <repository id="eclipse-2019-09" location="http://download.eclipse.org/releases/2019-09/"/>
+      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.10.1.v20191209-1145"/>
+      <unit id="org.eclipse.ocl.examples.feature.group" version="6.10.0.v20191209-1145"/>
+      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.16.0.v201911262147"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.16.0.v201911262138"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.200.v20191210-0610"/>
+      <unit id="org.eclipse.jdt" version="3.18.200.v20191210-0610"/>
+      <unit id="org.eclipse.egit.feature.group" version="5.6.0.201912101111-r"/>
+      <unit id="org.eclipse.jgit.feature.group" version="5.6.0.201912101111-r"/>
+      <unit id="org.eclipse.osgi" version="3.15.100.v20191114-1701"/>
+      <repository id="eclipse-2019-12" location="http://download.eclipse.org/releases/2019-12/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="1.9.5.v201605172210"/>
       <unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
-      <repository id="eclipse-orbit-2019-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository"/>
+      <repository id="eclipse-orbit-2019-12" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.team.svn.feature.group" version="4.0.5.I20170425-1700"/>
