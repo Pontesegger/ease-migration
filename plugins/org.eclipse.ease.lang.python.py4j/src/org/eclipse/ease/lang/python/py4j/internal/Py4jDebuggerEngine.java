@@ -72,10 +72,18 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	}
 
 	@Override
+	protected void teardownEngine() {
+		super.teardownEngine();
+
+		fPyDebugger = null;
+		fDebugger = null;
+	}
+
+	@Override
 	protected Object internalExecute(final Script script, final String fileName) throws Throwable {
-		if (fDebugger != null) {
+		if (fDebugger != null)
 			return fDebugger.execute(script);
-		}
+
 		return super.internalExecute(script, fileName);
 	}
 

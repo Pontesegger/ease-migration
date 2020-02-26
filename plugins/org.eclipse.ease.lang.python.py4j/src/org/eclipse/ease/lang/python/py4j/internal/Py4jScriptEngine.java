@@ -68,13 +68,6 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	 */
 	private static final String PY4J_PYTHON_BUNDLE_ID = "py4j-python";
 
-	private ClientServer fGatewayServer;
-	protected IPythonSideEngine fPythonSideEngine;
-	private Process fPythonProcess;
-	private Thread fInputGobbler, fErrorGobbler;
-
-	private CountDownLatch fPythonStartupComplete;
-
 	/**
 	 * Standard StreamGobbler.
 	 */
@@ -106,6 +99,13 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 			}
 		}
 	}
+
+	private ClientServer fGatewayServer;
+	protected IPythonSideEngine fPythonSideEngine;
+	private Process fPythonProcess;
+	private Thread fInputGobbler, fErrorGobbler;
+
+	private CountDownLatch fPythonStartupComplete;
 
 	public Py4jScriptEngine() {
 		super("Python (Py4J)");
@@ -289,9 +289,9 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 			}
 		}
 
-		if (fGatewayServer != null) {
+		if (fGatewayServer != null)
 			fGatewayServer.shutdown();
-		}
+
 		if (fPythonProcess != null) {
 			// The clean shutdown had a chance, now time for a force shutdown
 			fPythonProcess.destroyForcibly();
@@ -300,15 +300,22 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		try {
 			// Wait until the gobblers have shovelled all their
 			// inputs before allowing the engine to considered terminated
-			if (fInputGobbler != null) {
+			if (fInputGobbler != null)
 				fInputGobbler.join();
-			}
-			if (fErrorGobbler != null) {
+
+			if (fErrorGobbler != null)
 				fErrorGobbler.join();
-			}
+
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+
+		// allow for garbage collection
+		fGatewayServer = null;
+		fPythonSideEngine = null;
+		fPythonProcess = null;
+		fInputGobbler = null;
+		fErrorGobbler = null;
 	}
 
 	@Override
