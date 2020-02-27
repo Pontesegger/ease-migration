@@ -33,7 +33,7 @@ public class GroovyScriptEngine extends AbstractReplScriptEngine {
 	protected void setupEngine() {
 		fClassloader = new EaseClassLoader();
 		// we need both classloaders: the one from the current plugin and the global EASE loader
-		fEngine = new GroovyShell(new MultiClassLoader(GroovyScriptEngine.class.getClassLoader(), fClassloader));
+		fEngine = new GroovyShell(new MultiClassLoader(fClassloader, GroovyScriptEngine.class.getClassLoader()));
 
 		setOutputStream(getOutputStream());
 		setErrorStream(getErrorStream());
