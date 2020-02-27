@@ -102,11 +102,8 @@ public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLa
 		if (element instanceof ModuleDefinition)
 			return ((ModuleDefinition) element).isDeprecated();
 
-		if (element instanceof Method)
+		if (element instanceof AccessibleObject)
 			return ModuleHelper.isDeprecated((AccessibleObject) element) || (((Method) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
-
-		if (element instanceof Field)
-			return ModuleHelper.isDeprecated((AccessibleObject) element) || (((Field) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
 
 		return false;
 	}

@@ -246,6 +246,12 @@ public final class ModuleHelper {
 	 * @return <code>true</code> when deprecated
 	 */
 	public static boolean isDeprecated(final AccessibleObject element) {
+		if (element instanceof Method)
+			return (element.getAnnotation(Deprecated.class) != null) || (((Method) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
+
+		if (element instanceof Field)
+			return (element.getAnnotation(Deprecated.class) != null) || (((Field) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
+
 		return element.getAnnotation(Deprecated.class) != null;
 	}
 }
