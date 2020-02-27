@@ -114,4 +114,19 @@ public interface IScriptService {
 	 * @return module definition
 	 */
 	ModuleDefinition getModuleDefinition(String moduleId);
+
+	/**
+	 * Execute a given script and returns the execution result.
+	 *
+	 * @param scriptLocation
+	 *            script location to execute
+	 * @param engineID
+	 *            script engine ID or <code>null</code> to automatically select a matching engine
+	 * @param arguments
+	 *            script arguments
+	 * @return script result
+	 * @throws Throwable
+	 *             any exception thrown by the script
+	 */
+	Object executeScript(String scriptLocation, String engineID, String... arguments) throws Throwable;
 }

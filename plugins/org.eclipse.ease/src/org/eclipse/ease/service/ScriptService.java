@@ -32,6 +32,7 @@ import org.eclipse.ease.ICodeParser;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.modules.ModuleCategoryDefinition;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.tools.ResourceTools;
@@ -345,5 +346,44 @@ public class ScriptService implements IScriptService, BundleListener {
 				fAvailableModuleCategories = null;
 			}
 		}
+	}
+
+	@Override
+	public Object executeScript(String scriptLocation, String engineID, String... arguments) throws Throwable {
+		// find script engine
+		EngineDescription engineDescription = null;
+		final IScriptService scriptService = ScriptService.getInstance();
+
+		if (engineID != null)
+			// locate engine by ID
+			engineDescription = scriptService.getEngineByID(engineID);
+
+		else {
+			// locate engine by file extension
+			final ScriptType scriptType = scriptService.getScriptType(scriptLocation);
+			if (scriptType != null)
+				engineDescription = scriptService.getEngine(scriptType.getName());
+		}
+
+		if (engineDescription != null) {
+			// create engine
+			final IScriptEngine engine = engineDescription.createEngine();
+			engine.setVariable("argv", arguments);
+
+			// TODO implement better URI handling - eg create URI and pass to script engine
+			Object scriptObject = ResourceTools.resolve(scriptLocation);
+			if (scriptObject == null)
+				// no file available, try to include to resolve URIs
+				scriptObject = "include(\"" + scriptLocation + "\")";
+
+			final ScriptResult scriptResult = engine.executeSync(scriptObject);
+
+			if (scriptResult.hasException())
+				throw scriptResult.getException();
+
+			return scriptResult.getResult();
+		}
+
+		throw new IllegalArgumentException("Cannot locate a matching script engine");
 	}
 }

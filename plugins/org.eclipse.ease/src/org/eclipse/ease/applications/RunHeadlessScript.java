@@ -26,14 +26,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.Activator;
-import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ScriptResult;
-import org.eclipse.ease.service.EngineDescription;
-import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ease.service.ScriptType;
-import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -44,149 +39,6 @@ public class RunHeadlessScript implements IApplication {
 	/** List of classes that should not be loaded on early startup. */
 	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList("org.eclipse.team.svn.ui.startup.SVNCoreStartup",
 			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter", "org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler");
-
-	@Override
-	public Object start(final IApplicationContext context) throws Exception {
-		final Object object = context.getArguments().get(IApplicationContext.APPLICATION_ARGS);
-		if (object instanceof String[]) {
-			final Map<String, Object> parameters = extractInputParameters((String[]) object);
-
-			if (parameters != null) {
-
-				// create workspace
-				Location location = null;
-				if (parameters.containsKey("workspace")) {
-
-					location = Platform.getInstanceLocation();
-					// stick to the deprecated method as file.toURI().toURL() will not work on paths containing spaces
-					final URL workspaceURL = new File(parameters.get("workspace").toString()).toURL();
-
-					// check if workspace location has not been set yet (can be set only once!)
-					if (!location.isSet()) {
-						if (!location.set(workspaceURL, true)) {
-							// could not lock the workspace.
-							System.err.println("ERROR: Could not set the workspace to \"" + location.getURL() + "\"");
-							return -1;
-						}
-
-					} else if (!location.getURL().toString().equals(workspaceURL.toString())) {
-						System.err.println("ERROR: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
-						return -1;
-					}
-
-					if (parameters.containsKey("refreshWorkspace"))
-						ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-				}
-
-				loadEarlyStartupExtensions();
-
-				try {
-					// execute script
-					if (parameters.containsKey("script")) {
-						// find script engine
-						EngineDescription engineDescription = null;
-						final IScriptService scriptService = ScriptService.getInstance();
-
-						if (parameters.containsKey("engine"))
-							// locate engine by ID
-							engineDescription = scriptService.getEngineByID(parameters.get("engine").toString());
-
-						else {
-							// locate engine by file extension
-							final ScriptType scriptType = scriptService.getScriptType(parameters.get("script").toString());
-							if (scriptType != null)
-								engineDescription = scriptService.getEngine(scriptType.getName());
-						}
-
-						if (engineDescription != null) {
-							// create engine
-							final IScriptEngine engine = engineDescription.createEngine();
-							engine.setVariable("argv", ((List) parameters.get("args")).toArray(new String[0]));
-
-							// TODO implement better URI handling - eg create URI and pass to script engine
-							Object scriptObject = ResourceTools.resolve(parameters.get("script"));
-							if (scriptObject == null)
-								// no file available, try to include to resolve URIs
-								scriptObject = "include(\"" + parameters.get("script") + "\")";
-
-							final ScriptResult scriptResult = engine.executeSync(scriptObject);
-							if (scriptResult.hasException())
-								return -1;
-
-							final Object result = scriptResult.getResult();
-
-							if (result != null) {
-								if (ScriptResult.VOID.equals(result)) {
-									return 0;
-								}
-
-								try {
-									return Integer.parseInt(result.toString());
-								} catch (final Exception e) {
-									// no integer
-								}
-
-								try {
-									return new Double(Double.parseDouble(result.toString())).intValue();
-								} catch (final Exception e) {
-									// no double
-								}
-
-								try {
-									return Boolean.parseBoolean(result.toString()) ? 0 : -1;
-								} catch (final Exception e) {
-									// no boolean
-								}
-
-								// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
-							} else
-								return 0;
-						}
-					}
-				} finally {
-					// persist workspace
-					ResourcesPlugin.getWorkspace().save(true, null);
-
-					// make sure we do not lock the workspace permanently
-					if (location != null)
-						location.release();
-				}
-
-				System.err.println("ERROR: Could not access file \"" + parameters.get("script") + "\"");
-
-			} else
-				// could not extract parameters
-				printUsage();
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Load eclipse extensions for extension point: org.eclipse.ui.startup.
-	 */
-	private void loadEarlyStartupExtensions() {
-		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.startup");
-		for (final IConfigurationElement e : config) {
-			if (e.getName().equals("startup")) {
-				if (!EARLY_STARTUP_BLACKLIST.contains(e.getAttribute("class"))) {
-					try {
-						Logger.info(Activator.PLUGIN_ID, "Loading early startup extension: " + e.getAttribute("class"));
-						final Object earlyStartupParticipant = e.createExecutableExtension("class");
-						if (earlyStartupParticipant instanceof IStartup) {
-							try {
-								((IStartup) earlyStartupParticipant).earlyStartup();
-							} catch (final Throwable e1) {
-								System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
-							}
-						}
-					} catch (final CoreException e1) {
-						System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
-					}
-				}
-			}
-		}
-	}
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {
 		final Map<String, Object> parameters = new HashMap<>();
@@ -249,6 +101,129 @@ public class RunHeadlessScript implements IApplication {
 		System.out.println("\t\t\tif you provide a workspace you can use workspace:// identifiers in your scripts");
 		System.out.println("\t\t\tif you provide a workspace you may ask to refresh it first prior to script execution");
 		System.out.println("\t\t<script parameters> will be passed to the script as String[] in the variable 'argv'");
+	}
+
+	@Override
+	public Object start(final IApplicationContext context) throws Exception {
+		final Object object = context.getArguments().get(IApplicationContext.APPLICATION_ARGS);
+		if (object instanceof String[]) {
+			final Map<String, Object> parameters = extractInputParameters((String[]) object);
+
+			if (parameters != null) {
+
+				// create workspace
+				Location location = null;
+				if (parameters.containsKey("workspace")) {
+
+					location = Platform.getInstanceLocation();
+					// stick to the deprecated method as file.toURI().toURL() will not work on paths containing spaces
+					final URL workspaceURL = new File(parameters.get("workspace").toString()).toURL();
+
+					// check if workspace location has not been set yet (can be set only once!)
+					if (!location.isSet()) {
+						if (!location.set(workspaceURL, true)) {
+							// could not lock the workspace.
+							System.err.println("ERROR: Could not set the workspace to \"" + location.getURL() + "\"");
+							return -1;
+						}
+
+					} else if (!location.getURL().toString().equals(workspaceURL.toString())) {
+						System.err.println("ERROR: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
+						return -1;
+					}
+
+					if (parameters.containsKey("refreshWorkspace"))
+						ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+				}
+
+				loadEarlyStartupExtensions();
+
+				try {
+					// execute script
+					if (parameters.containsKey("script")) {
+
+						final String scriptLocation = parameters.get("script").toString();
+						final String engineID = (parameters.containsKey("engine")) ? parameters.get("engine").toString() : null;
+						final String[] arguments = ((List<String>) parameters.get("args")).toArray(new String[0]);
+
+						try {
+							final Object result = ScriptService.getInstance().executeScript(scriptLocation, engineID, arguments);
+
+							if (result != null) {
+								if (ScriptResult.VOID.equals(result)) {
+									return 0;
+								}
+
+								try {
+									return Integer.parseInt(result.toString());
+								} catch (final Exception e) {
+									// no integer
+								}
+
+								try {
+									return new Double(Double.parseDouble(result.toString())).intValue();
+								} catch (final Exception e) {
+									// no double
+								}
+
+								try {
+									return Boolean.parseBoolean(result.toString()) ? 0 : -1;
+								} catch (final Exception e) {
+									// no boolean
+								}
+
+								// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
+							} else
+								return 0;
+
+						} catch (final Throwable throwable) {
+							return -1;
+						}
+					}
+
+					System.err.println("ERROR: Could not access file \"" + parameters.get("script") + "\"");
+
+				} finally {
+					// persist workspace
+					ResourcesPlugin.getWorkspace().save(true, null);
+
+					// make sure we do not lock the workspace permanently
+					if (location != null)
+						location.release();
+				}
+
+			} else
+				// could not extract parameters
+				printUsage();
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Load eclipse extensions for extension point: org.eclipse.ui.startup.
+	 */
+	private void loadEarlyStartupExtensions() {
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.startup");
+		for (final IConfigurationElement e : config) {
+			if (e.getName().equals("startup")) {
+				if (!EARLY_STARTUP_BLACKLIST.contains(e.getAttribute("class"))) {
+					try {
+						Logger.info(Activator.PLUGIN_ID, "Loading early startup extension: " + e.getAttribute("class"));
+						final Object earlyStartupParticipant = e.createExecutableExtension("class");
+						if (earlyStartupParticipant instanceof IStartup) {
+							try {
+								((IStartup) earlyStartupParticipant).earlyStartup();
+							} catch (final Throwable e1) {
+								System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
+							}
+						}
+					} catch (final CoreException e1) {
+						System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
+					}
+				}
+			}
+		}
 	}
 
 	@Override
