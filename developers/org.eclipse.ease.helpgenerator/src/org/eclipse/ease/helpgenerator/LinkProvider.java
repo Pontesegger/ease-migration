@@ -131,7 +131,7 @@ public class LinkProvider {
 				final String methodName = linkMatcher.group(2);
 				String methodParameters = linkMatcher.group(3);
 				if (methodParameters == null)
-					methodParameters = "()";
+					methodParameters = "";
 
 				if ("link".equals(matcher.group(1))) {
 					// link to java API

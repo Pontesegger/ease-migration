@@ -75,14 +75,14 @@ public class ValidModule extends AbstractClassA implements InterfaceB {
 	}
 
 	/**
-	 * Method with optional parameters.
+	 * Method with optional parameters. Check out {@module #baseParameters(int, long, String)}
 	 *
 	 * @param mandatory
 	 *            Mandatory parameter,
 	 * @param optionalDefaultsTo1
 	 *            simple integer parameter
 	 * @param optionalDefaultsToNull
-	 *            second optional parameter
+	 *            second optional parameter, {@module #UNIVERSAL_TRUTH}
 	 * @return result of the function
 	 * @scriptExample optionalParameters(new Thread(), 22, "nothing") first way to call this method
 	 * @scriptExample optionalParameters(new Thread()) ... using default values for parameter 2 and 3

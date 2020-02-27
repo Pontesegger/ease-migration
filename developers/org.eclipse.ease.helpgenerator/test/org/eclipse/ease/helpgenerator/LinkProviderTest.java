@@ -156,8 +156,15 @@ public class LinkProviderTest {
 
 	@Test
 	public void resolveModuleMethodLinkInSameDocument() {
-		final String input = "{@module #openView}";
+		final String input = "{@module #openView()}";
 		final String expected = "<a href='#openView'>openView()</a>";
+		assertEquals(expected, fLinkProvider.insertLinks(input));
+	}
+
+	@Test
+	public void resolveModuleFieldLinkInSameDocument() {
+		final String input = "{@module #CONSTANT}";
+		final String expected = "<a href='#CONSTANT'>CONSTANT</a>";
 		assertEquals(expected, fLinkProvider.insertLinks(input));
 	}
 }
