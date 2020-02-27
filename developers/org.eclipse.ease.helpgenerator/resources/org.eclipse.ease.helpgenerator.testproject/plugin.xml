@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.ease.modules">
-      <module
-            class="org.eclipse.ease.helpgenerator.testproject.valid.ValidModule"
-            id="org.eclipse.ease.helpgenerator.testproject.module1"
-            name="Valid Test Module"
-            visible="true">
+   <extension point="org.eclipse.ease.modules">
+      <module class="org.eclipse.ease.helpgenerator.testproject.valid.ValidModule" id="org.eclipse.ease.helpgenerator.testproject.module1" name="Valid Test Module" visible="true">
+      </module>
+      <module class="org.eclipse.ease.helpgenerator.testproject.invalidxml.InvalidXmlModule" id="org.eclipse.ease.helpgenerator.testproject.module2" name="Invalid XML Module" visible="true">
+      </module>
+      <module class="org.eclipse.ease.helpgenerator.testproject.missingdocs.MissingDocsModule" id="org.eclipse.ease.helpgenerator.testproject.module3" name="Missing Documentation Module" visible="true">
       </module>
       <module
-            class="org.eclipse.ease.helpgenerator.testproject.invalidxml.InvalidXmlModule"
-            id="org.eclipse.ease.helpgenerator.testproject.module2"
-            name="Invalid XML Module"
-            visible="true">
-      </module>
-      <module
-            class="org.eclipse.ease.helpgenerator.testproject.missingdocs.MissingDocsModule"
-            id="org.eclipse.ease.helpgenerator.testproject.module3"
-            name="Missing Documentation Module"
+            class="org.eclipse.ease.helpgenerator.testproject.valid.DeprecatedModule"
+            id="org.eclipse.ease.helpgenerator.testproject.deprecatedModule"
+            name="Deprecated Module"
             visible="true">
       </module>
    </extension>
-
 </plugin>

@@ -21,7 +21,7 @@ public abstract class AbstractClassModel {
 	private List<Field> fExportedFields;
 	private List<Method> fExportedMethods;
 	private Collection<String> fImportedClasses;
-	private String fDeprecationMessage;
+	private String fDeprecationMessage = null;
 
 	public String getClassName() {
 		return fClassName;

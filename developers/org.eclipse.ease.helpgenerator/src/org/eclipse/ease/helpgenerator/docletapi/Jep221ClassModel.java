@@ -164,7 +164,7 @@ public class Jep221ClassModel extends AbstractClassModel {
 						&& (e.getModifiers().contains(Modifier.FINAL))) {
 
 					final DocCommentTree tree = fEnvironment.getDocTrees().getDocCommentTree(e);
-					String deprecationText = new DeprecationMessageScanner().visit(tree, null);
+					String deprecationText = new DeprecationMessageScanner().visit(tree, getDeprecationMessage());
 					if ((deprecationText == null) && (e.getAnnotation(Deprecated.class) != null))
 						deprecationText = "";
 
@@ -194,7 +194,7 @@ public class Jep221ClassModel extends AbstractClassModel {
 				if (e.getModifiers().contains(Modifier.PUBLIC)) {
 
 					final DocCommentTree tree = fEnvironment.getDocTrees().getDocCommentTree(e);
-					String deprecationText = new DeprecationMessageScanner().visit(tree, null);
+					String deprecationText = new DeprecationMessageScanner().visit(tree, getDeprecationMessage());
 					if ((deprecationText == null) && (e.getAnnotation(Deprecated.class) != null))
 						deprecationText = "";
 
@@ -331,18 +331,18 @@ public class Jep221ClassModel extends AbstractClassModel {
 		}
 	}
 
-	private class DeprecationMessageScanner extends SimpleDocTreeVisitor<String, Void> {
+	private class DeprecationMessageScanner extends SimpleDocTreeVisitor<String, String> {
 		String fDocumentation;
 
 		@Override
-		public String visitDocComment(DocCommentTree node, Void p) {
+		public String visitDocComment(DocCommentTree node, String p) {
 			visit(node.getBlockTags(), p);
 
-			return fDocumentation;
+			return (fDocumentation != null) ? fDocumentation : p;
 		}
 
 		@Override
-		public String visitDeprecated(DeprecatedTree node, Void p) {
+		public String visitDeprecated(DeprecatedTree node, String p) {
 			final List<? extends DocTree> body = node.getBody();
 			fDocumentation = body.stream().map(e -> e.toString()).collect(Collectors.joining());
 

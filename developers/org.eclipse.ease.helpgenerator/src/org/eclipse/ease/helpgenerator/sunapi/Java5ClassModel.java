@@ -207,7 +207,7 @@ public class Java5ClassModel extends AbstractClassModel {
 
 		// sort fields alphabetically
 		return fields.stream().map(doc -> {
-			final String deprecationMessage = isDeprecated(doc) ? doc.tags("deprecated")[0].text() : null;
+			final String deprecationMessage = isDeprecated(doc) ? doc.tags("deprecated")[0].text() : getDeprecationMessage();
 			return new Field(doc.name(), doc.commentText(), deprecationMessage);
 		}).collect(Collectors.toList());
 	}
@@ -275,7 +275,7 @@ public class Java5ClassModel extends AbstractClassModel {
 				final AnnotationDesc wrapAnnotation = getWrapAnnotation(doc);
 				if (!hasWrapToScriptAnnotation || (wrapAnnotation != null) || (registeredMethod != null)) {
 					if (doc.isPublic()) {
-						final String deprecationMessage = isDeprecated(doc) ? doc.tags("deprecated")[0].text() : null;
+						final String deprecationMessage = isDeprecated(doc) ? doc.tags("deprecated")[0].text() : getDeprecationMessage();
 
 						final String returnComment = (doc.tags("return").length > 0) ? doc.tags("return")[0].text() : null;
 						final ReturnValue returnValue = new ReturnValue(doc.returnType().qualifiedTypeName(), returnComment);

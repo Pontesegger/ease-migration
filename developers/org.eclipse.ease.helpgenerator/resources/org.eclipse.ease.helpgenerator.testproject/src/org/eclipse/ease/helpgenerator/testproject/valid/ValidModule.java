@@ -8,9 +8,7 @@ import org.eclipse.ease.modules.WrapToScript;
 
 /**
  * This is a test module.
- * @deprecated dead class, do not use
  */
-@Deprecated
 public class ValidModule extends AbstractClassA implements InterfaceB {
 
 	/**

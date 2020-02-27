@@ -11,20 +11,15 @@
 
 package org.eclipse.ease.helpgenerator;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.tools.DocumentationTool;
 import javax.tools.ToolProvider;
 
-import org.junit.Test;
+public class IntegrationTestJava11API extends AbstractIntegrationTest {
 
-public class IntegrationTestJava11API {
-
-	private static int buildDocs(boolean failOnHtmlError, boolean failOnMissingDocs, String packageName) {
+	@Override
+	protected int buildDocs(boolean failOnHtmlError, boolean failOnMissingDocs, String packageName) {
 
 		final DocumentationTool documentationTool = ToolProvider.getSystemDocumentationTool();
 		return documentationTool.run(System.in, System.out, System.err,
@@ -38,44 +33,5 @@ public class IntegrationTestJava11API {
 				"-link", "https://docs.oracle.com/javase/8/docs/api",
 
 				packageName);
-	}
-
-	@Test
-	public void validModule() {
-		assertEquals(0, buildDocs(true, true, "org.eclipse.ease.helpgenerator.testproject.valid"));
-	}
-
-	@Test
-	public void invalidXMLIgnoreErrors() {
-		assertEquals(0, buildDocs(false, false, "org.eclipse.ease.helpgenerator.testproject.invalidxml"));
-	}
-
-	@Test
-	public void invalidXMLShouldFail() {
-		assertEquals(1, buildDocs(true, false, "org.eclipse.ease.helpgenerator.testproject.invalidxml"));
-	}
-
-	@Test
-	public void missingDocsIgnoreErrors() {
-		assertEquals(0, buildDocs(false, false, "org.eclipse.ease.helpgenerator.testproject.missingdocs"));
-	}
-
-	@Test
-	public void missingDocsShouldFail() {
-		assertEquals(1, buildDocs(false, true, "org.eclipse.ease.helpgenerator.testproject.missingdocs"));
-	}
-
-	@Test
-	public void verifyContent() throws IOException {
-		buildDocs(true, true, "org.eclipse.ease.helpgenerator.testproject.valid");
-		String expected = new String(
-				Files.readAllBytes(new File("./resources/expected_module_org.eclipse.ease.helpgenerator.testproject.module1.html").toPath()));
-		expected = expected.replaceAll("\r", "");
-
-		final String actual = new String(Files.readAllBytes(
-				new File("./resources/org.eclipse.ease.helpgenerator.testproject/help/module_org.eclipse.ease.helpgenerator.testproject.module1.html")
-						.toPath()));
-
-		assertEquals(expected, actual);
 	}
 }
