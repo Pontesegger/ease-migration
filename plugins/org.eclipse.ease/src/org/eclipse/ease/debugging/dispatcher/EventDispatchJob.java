@@ -26,6 +26,7 @@ import org.eclipse.ease.debugging.DebugTracer;
 import org.eclipse.ease.debugging.IScriptRegistry;
 import org.eclipse.ease.debugging.ScriptRegistry;
 import org.eclipse.ease.debugging.events.IDebugEvent;
+import org.eclipse.ease.debugging.events.debugger.EngineTerminatedEvent;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
 import org.eclipse.ease.debugging.events.model.IModelRequest;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -123,7 +124,7 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 			if ((monitor.isCanceled()) || (!platformRunning))
 				terminate();
 
-			if (event != null) {
+			else if (event != null) {
 				try {
 					handleEvent(event);
 				} catch (final Throwable e) {
@@ -148,6 +149,9 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 		if (event instanceof IDebuggerEvent) {
 			DebugTracer.debug("Dispatcher", "debugger -> " + event + " -> model");
 			fModel.handleEvent(event);
+
+			if (event instanceof EngineTerminatedEvent)
+				terminate();
 
 		} else if (event instanceof IModelRequest) {
 			DebugTracer.debug("Dispatcher", "debugger <- " + event + " <- model");

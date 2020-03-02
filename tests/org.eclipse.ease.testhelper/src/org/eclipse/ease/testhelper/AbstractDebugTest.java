@@ -502,7 +502,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
-			getDebugTarget().disconnect();
+			elementProvider.getDebugElement().disconnect();
 
 			assertTrue(getDebugTarget().isDisconnected());
 			assertTrue(getProcess().isDisconnected());
