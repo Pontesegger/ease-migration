@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
@@ -26,7 +25,6 @@ import org.eclipse.ease.debugging.DebugTracer;
 import org.eclipse.ease.debugging.IScriptRegistry;
 import org.eclipse.ease.debugging.ScriptRegistry;
 import org.eclipse.ease.debugging.events.IDebugEvent;
-import org.eclipse.ease.debugging.events.debugger.EngineTerminatedEvent;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
 import org.eclipse.ease.debugging.events.model.IModelRequest;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -36,9 +34,6 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 
 	/** Cached events. */
 	private final List<IDebugEvent> fEvents = new ArrayList<>();
-
-	/** Flag indicating this job shall be terminated. */
-	private boolean fTerminated = false;
 
 	/** Debug host. */
 	private final IEventProcessor fModel;
@@ -83,7 +78,6 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 		fScriptRegistry = scriptRegistry;
 
 		setSystem(true);
-		schedule();
 	}
 
 	/**
@@ -94,37 +88,25 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 	}
 
 	public void addEvent(final IDebugEvent event) {
-		synchronized (fEvents) {
-			DebugTracer.debug("Dispatcher", "[+] " + event);
+		DebugTracer.debug("Dispatcher", "[+] " + event);
 
+		synchronized (fEvents) {
 			fEvents.add(event);
-			fEvents.notifyAll();
+			schedule();
 		}
 	}
 
 	@Override
 	protected IStatus run(final IProgressMonitor monitor) {
-		while (!fTerminated) {
-			IDebugEvent event = null;
 
-			// wait for new events
-			synchronized (fEvents) {
-				if (fEvents.isEmpty()) {
-					try {
-						fEvents.wait();
-					} catch (final InterruptedException e) {
-					}
-				}
+		final List<IDebugEvent> events = new ArrayList<>();
+		synchronized (fEvents) {
+			events.addAll(fEvents);
+			fEvents.clear();
+		}
 
-				if (!fEvents.isEmpty())
-					event = fEvents.remove(0);
-			}
-
-			final boolean platformRunning = DebugPlugin.getDefault() != null;
-			if ((monitor.isCanceled()) || (!platformRunning))
-				terminate();
-
-			else if (event != null) {
+		for (final IDebugEvent event : events) {
+			if (!monitor.isCanceled()) {
 				try {
 					handleEvent(event);
 				} catch (final Throwable e) {
@@ -150,24 +132,12 @@ public class EventDispatchJob extends Job implements IScriptRegistry {
 			DebugTracer.debug("Dispatcher", "debugger -> " + event + " -> model");
 			fModel.handleEvent(event);
 
-			if (event instanceof EngineTerminatedEvent)
-				terminate();
-
 		} else if (event instanceof IModelRequest) {
 			DebugTracer.debug("Dispatcher", "debugger <- " + event + " <- model");
 			fDebugger.handleEvent(event);
 
 		} else
 			throw new RuntimeException("Unknown event detected: " + event);
-	}
-
-	public void terminate() {
-		fTerminated = true;
-
-		// wake up job
-		synchronized (fEvents) {
-			fEvents.notifyAll();
-		}
 	}
 
 	@Override
