@@ -87,7 +87,7 @@ public class UnitTestModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Start a specific unit test. Started tests should be terminated by an {@link #endTest()}.
+	 * Start a specific unit test. Started tests should be terminated by an {module #endTest()}.
 	 *
 	 * @param title
 	 *            name of test
@@ -317,7 +317,7 @@ public class UnitTestModule extends AbstractScriptModule {
 	 * @param reason
 	 *            assertion to be checked
 	 * @throws AssertionException
-	 *             in case {@link #setThrowOnFailure(boolean)} is enabled
+	 *             in case {@module #setThrowOnFailure(boolean)} is enabled
 	 */
 	@WrapToScript
 	public final void assertion(final IAssertion reason) throws AssertionException {
