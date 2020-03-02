@@ -454,9 +454,6 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			}
 
 		} else if (scope instanceof NativeArray) {
-			final Object indexIds = ((NativeArray) scope).getIndexIds();
-			final ArrayList<Integer> transformedIndexIds = new ArrayList<>();
-
 			for (final int indexId : getArrayIndexIds(((NativeArray) scope))) {
 				final EaseDebugVariable variable = createVariable("[" + indexId + "]", ((NativeArray) scope).get(indexId));
 				result.add(variable);
