@@ -16,9 +16,12 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -451,7 +454,10 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			}
 
 		} else if (scope instanceof NativeArray) {
-			for (final int indexId : ((NativeArray) scope).getIndexIds()) {
+			final Object indexIds = ((NativeArray) scope).getIndexIds();
+			final ArrayList<Integer> transformedIndexIds = new ArrayList<>();
+
+			for (final int indexId : getArrayIndexIds(((NativeArray) scope))) {
 				final EaseDebugVariable variable = createVariable("[" + indexId + "]", ((NativeArray) scope).get(indexId));
 				result.add(variable);
 			}
@@ -492,6 +498,27 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			return null;
 
 		return result;
+	}
+
+	/**
+	 * Get array indices for a given native array. Rhino changed the interface of this method, therefore we need to take care of proper wrapping.
+	 *
+	 * @param nativeArray
+	 *            native array to get indices for
+	 * @return list of indices or empty lsit
+	 */
+	private static List<Integer> getArrayIndexIds(NativeArray nativeArray) {
+		final Object indexIds = nativeArray.getIndexIds();
+
+		List<Integer> transformedIndexIds;
+		if (indexIds instanceof List<?>)
+			transformedIndexIds = (List<Integer>) indexIds;
+		else if (indexIds instanceof Integer[])
+			transformedIndexIds = Arrays.asList((Integer[]) indexIds);
+		else
+			transformedIndexIds = Collections.emptyList();
+
+		return transformedIndexIds;
 	}
 
 	@Override
