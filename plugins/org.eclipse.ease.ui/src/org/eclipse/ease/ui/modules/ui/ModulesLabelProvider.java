@@ -14,7 +14,6 @@
 
 package org.eclipse.ease.ui.modules.ui;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -102,8 +101,11 @@ public class ModulesLabelProvider extends BaseLabelProvider implements IStyledLa
 		if (element instanceof ModuleDefinition)
 			return ((ModuleDefinition) element).isDeprecated();
 
-		if (element instanceof AccessibleObject)
-			return ModuleHelper.isDeprecated((AccessibleObject) element) || (((Method) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
+		if (element instanceof Method)
+			return ModuleHelper.isDeprecated((Method) element) || (((Method) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
+
+		if (element instanceof Field)
+			return ModuleHelper.isDeprecated((Field) element) || (((Field) element).getDeclaringClass().getAnnotation(Deprecated.class) != null);
 
 		return false;
 	}
