@@ -66,7 +66,7 @@ public class BuildModule extends AbstractScriptModule {
 	 * @param projectName
 	 *            the project name
 	 * @param buildKind
-	 *            one of {@link #FULL_BUILD}, {@link #CLEAN_BUILD}, {@link #INCREMENTAL_BUILD}
+	 *            one of {@module #FULL_BUILD}, {@module #CLEAN_BUILD}, {@module #INCREMENTAL_BUILD}
 	 * @throws CoreException
 	 *             if the build fails
 	 */
