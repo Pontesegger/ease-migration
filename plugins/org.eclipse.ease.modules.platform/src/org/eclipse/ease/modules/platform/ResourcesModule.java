@@ -22,6 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1077,5 +1080,51 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 		}
 
 		return targetDirectory;
+	}
+
+	/**
+	 * Get an MD5 checksum over a readable resource.
+	 *
+	 * @param location
+	 *            location of resource to create checksum for
+	 * @return file hash as hex encoded string
+	 * @throws NoSuchAlgorithmException
+	 *             when MD5 digest cannot be found
+	 * @throws IOException
+	 *             when resource cannot be read
+	 */
+	@WrapToScript
+	public String getChecksum(Object location) throws NoSuchAlgorithmException, IOException {
+		final Object resolvedLocation = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		try (InputStream input = ResourceTools.getInputStream(resolvedLocation)) {
+			if (input != null) {
+				final MessageDigest digest = MessageDigest.getInstance("MD5");
+				final DigestInputStream digestInputStream = new DigestInputStream(input, digest);
+
+				final byte[] buffer = new byte[8 * 1024];
+				int readBytes;
+				do {
+					readBytes = digestInputStream.read(buffer);
+				} while (readBytes > 0);
+
+				return byteArrayToHexString(digest.digest());
+			}
+
+			throw new IOException("Location \"" + location + "\" cannot be accessed.");
+		}
+	}
+
+	private String byteArrayToHexString(byte[] bytes) {
+		final StringBuilder builder = new StringBuilder();
+
+		for (final byte b : bytes) {
+			final String token = Integer.toHexString(b);
+			if (token.length() == 1)
+				builder.append('0');
+
+			builder.append(token.substring(Math.max(token.length() - 2, 0)));
+		}
+
+		return builder.toString();
 	}
 }
