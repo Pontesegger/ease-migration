@@ -537,6 +537,9 @@ public class UnitTestModule extends AbstractScriptModule {
 	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation, final String title, final String description,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object reportData) throws IOException, CoreException {
 
+		if (suite == null)
+			throw new IllegalArgumentException("Provided suite is null.");
+
 		final IReportGenerator report = ReportTools.getReport(reportType);
 		if (report != null) {
 			final String reportOutput = report.createReport(title, description, suite, reportData);
