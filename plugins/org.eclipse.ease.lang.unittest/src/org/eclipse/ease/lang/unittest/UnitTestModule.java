@@ -544,7 +544,7 @@ public class UnitTestModule extends AbstractScriptModule {
 			saveDataToFile(reportOutput.getBytes(), fileLocation);
 
 		} else
-			throw new IOException("Report does not contain any data");
+			throw new IllegalArgumentException("Report type \"" + reportType + "\" is unknown");
 	}
 
 	/**
