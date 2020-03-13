@@ -534,7 +534,8 @@ public class UnitTestModule extends AbstractScriptModule {
 	 *             when we could not write to the file system
 	 */
 	@WrapToScript
-	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation, final String title, final String description,
+	public void createReport(final String reportType, final ITestEntity suite, final Object fileLocation,
+			@ScriptParameter(defaultValue = "Test Report") final String title, @ScriptParameter(defaultValue = "") final String description,
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object reportData) throws IOException, CoreException {
 
 		if (suite == null)
