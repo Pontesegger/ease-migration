@@ -41,32 +41,34 @@ public class PasteTextToScriptShell extends AbstractHandler {
 			if (viewReference != null) {
 				final IViewPart view = viewReference.getView(true);
 
-				String selectedText = ((ITextSelection) selection).getText();
-				if (((ITextSelection) selection).getLength() == 0) {
-					final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-
-					final Control editorControl = editor.getAdapter(Control.class);
-					if (editorControl instanceof StyledText) {
-						if (editor instanceof ITextEditor) {
-							final IDocument document = ((ITextEditor) editor).getDocumentProvider().getDocument(editor.getEditorInput());
-							if (document != null) {
-								try {
-									final IRegion lineInformation = document.getLineInformationOfOffset(((StyledText) editorControl).getCaretOffset());
-									selectedText = document.get(lineInformation.getOffset(), lineInformation.getLength()).trim();
-								} catch (final BadLocationException e) {
-									// ignore gracefully;
-								}
-							}
-						}
-					}
-				}
-
-				if (view instanceof IScriptEngineProvider)
+				final String selectedText = (selection.isEmpty()) ? getCurrentLineFromActiveEditor() : ((ITextSelection) selection).getText();
+				if ((!selectedText.isEmpty()) && (view instanceof IScriptEngineProvider))
 					((IScriptEngineProvider) view).getScriptEngine().executeAsync(selectedText);
 			}
 		}
 
 		return null;
+	}
+
+	private String getCurrentLineFromActiveEditor() {
+		final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+
+		final Control editorControl = editor.getAdapter(Control.class);
+		if (editorControl instanceof StyledText) {
+			if (editor instanceof ITextEditor) {
+				final IDocument document = ((ITextEditor) editor).getDocumentProvider().getDocument(editor.getEditorInput());
+				if (document != null) {
+					try {
+						final IRegion lineInformation = document.getLineInformationOfOffset(((StyledText) editorControl).getCaretOffset());
+						return document.get(lineInformation.getOffset(), lineInformation.getLength()).trim();
+					} catch (final BadLocationException e) {
+						// ignore gracefully;
+					}
+				}
+			}
+		}
+
+		return "";
 	}
 
 	public static IViewReference findViewReference(String idOrTitle) {
@@ -81,5 +83,4 @@ public class PasteTextToScriptShell extends AbstractHandler {
 
 		return null;
 	}
-
 }
