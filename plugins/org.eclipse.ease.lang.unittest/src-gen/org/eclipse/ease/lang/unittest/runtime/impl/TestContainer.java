@@ -133,6 +133,7 @@ public abstract class TestContainer extends TestEntity implements ITestContainer
 		// no global scope available yet
 		final ITest test = IRuntimeFactory.eINSTANCE.createTest();
 		test.setName(name);
+		test.setEntityStatus(TestStatus.RUNNING);
 
 		synchronized (this) {
 			getChildren().add(test);

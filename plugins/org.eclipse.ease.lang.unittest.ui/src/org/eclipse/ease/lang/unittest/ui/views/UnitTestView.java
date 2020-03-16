@@ -684,8 +684,7 @@ public class UnitTestView extends ViewPart {
 					for (final Notification notification : fElements) {
 						if (notification.getNotifier() instanceof ITest) {
 							// check details view
-							if (((ITest) notification.getNotifier()).getParent().equals(selection))
-								testRefresh = true;
+							testRefresh = (selection != null) && (selection.equals(((ITest) notification.getNotifier()).getParent()));
 
 						} else if (notification.getNotifier() instanceof ITestContainer) {
 
