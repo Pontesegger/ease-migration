@@ -39,7 +39,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class StorageImpl extends MinimalEObjectImpl.Container implements IStorage {
 	/**
 	 * The cached value of the '{@link #getEntries() <em>Entries</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEntries()
 	 * @generated
 	 * @ordered
@@ -48,7 +48,7 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	protected StorageImpl() {
@@ -57,7 +57,7 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -67,20 +67,20 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public EList<IScriptLocation> getEntries() {
 		if (entries == null) {
-			entries = new EObjectContainmentEList<IScriptLocation>(IScriptLocation.class, this, IRepositoryPackage.STORAGE__ENTRIES);
+			entries = new EObjectContainmentEList<>(IScriptLocation.class, this, IRepositoryPackage.STORAGE__ENTRIES);
 		}
 		return entries;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -94,7 +94,7 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -108,7 +108,7 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -125,7 +125,7 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -140,23 +140,26 @@ public class StorageImpl extends MinimalEObjectImpl.Container implements IStorag
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 		case IRepositoryPackage.STORAGE__ENTRIES:
-			return entries != null && !entries.isEmpty();
+			return (entries != null) && !entries.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
+	/**
+	 * @generated NOT
+	 */
 	@Override
 	public Collection<IScript> getScripts() {
-		HashSet<IScript> scripts = new HashSet<IScript>();
+		final HashSet<IScript> scripts = new HashSet<>();
 
-		for (IScriptLocation entry : getEntries())
+		for (final IScriptLocation entry : new HashSet<>(getEntries()))
 			scripts.addAll(entry.getScripts());
 
 		return scripts;
