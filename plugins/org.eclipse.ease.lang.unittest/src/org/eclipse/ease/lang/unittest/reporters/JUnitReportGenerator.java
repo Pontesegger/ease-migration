@@ -68,7 +68,6 @@ public final class JUnitReportGenerator implements IReportGenerator {
 	public String createReport(final String title, final String description, final ITestEntity testEntity) {
 
 		final DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-
 		final IMemento suiteNode = XMLMemento.createWriteRoot("testsuite");
 		suiteNode.putString("name", title);
 		suiteNode.putString("hostname", "localhost");
@@ -112,7 +111,7 @@ public final class JUnitReportGenerator implements IReportGenerator {
 			// write result
 			final IMemento testcaseNode = suiteNode.createChild("testcase");
 			testcaseNode.putString("name", escape(testEntity.getName()));
-			testcaseNode.putString("classname", escape(getClassName(testEntity)));
+			testcaseNode.putString("classname", escape(getClassName(testEntity.getParent())));
 			testcaseNode.putFloat("time", (float) (testEntity.getDuration() / 1000.0));
 			if (TestStatus.DISABLED.equals(testEntity.getStatus())) {
 				final IMemento skippedNode = testcaseNode.createChild("skipped");
