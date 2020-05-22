@@ -14,6 +14,8 @@ package org.eclipse.ease.modules.platform.uibuilder;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
@@ -129,50 +131,6 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return "org.eclipse.ease.view.dynamic." + fCounter++;
 	}
 
-	public static MPart createDynamicPart(String title, String iconUri) throws Throwable {
-		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
-
-			@Override
-			public MPart runWithTry() throws Throwable {
-				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
-
-				// create part
-				final MPart part = MBasicFactory.INSTANCE.createPart();
-				part.setLabel(title);
-				if (iconUri != null)
-					part.setIconURI(iconUri);
-				else
-					part.setIconURI("platform:/plugin/" + PluginConstants.PLUGIN_ID + "/icons/eview16/scripted_view.png");
-
-				part.setElementId(getDynamicViewId());
-				part.setCloseable(true);
-				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
-
-				partService.showPart(part, PartState.VISIBLE);
-
-				// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
-				PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
-
-					@Override
-					public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
-						partService.hidePart(part, true);
-						return true;
-					}
-
-					@Override
-					public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
-					}
-				});
-
-				return part;
-			}
-		};
-
-		Display.getDefault().syncExec(runnable);
-
-		return runnable.getResultOrThrow();
-	}
-
 	/** Holds viewModel, renderer, and further elements for created composites. */
 	private final List<UICompositor> fUICompositors = new ArrayList<>();
 
@@ -183,6 +141,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 	private Object fProviderElement = null;
 
 	private ScriptableDialog fScriptableDialog;
+
+	private final LifecycleManager fLifecycleManager = new LifecycleManager();
 
 	@Override
 	public void initialize(IScriptEngine engine, IEnvironment environment) {
@@ -221,6 +181,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 			@ScriptParameter(defaultValue = ScriptParameter.NULL) String relativeTo, @ScriptParameter(defaultValue = "x") String position) throws Throwable {
 
 		final MPart part = createDynamicPart(title, iconUri);
+		fLifecycleManager.add(part);
 
 		if (relativeTo != null)
 			UIModule.moveView(part.getElementId(), relativeTo, position);
@@ -229,6 +190,54 @@ public class UIBuilderModule extends AbstractScriptModule {
 		pushComposite((Composite) part.getWidget());
 
 		return part;
+	}
+
+	private MPart createDynamicPart(String title, String iconUri) throws Throwable {
+		final RunnableWithResult<MPart> runnable = new RunnableWithResult<MPart>() {
+
+			@Override
+			public MPart runWithTry() throws Throwable {
+				final EPartService partService = PlatformUI.getWorkbench().getService(EPartService.class);
+
+				// create part
+				final MPart part = MBasicFactory.INSTANCE.createPart();
+				part.setLabel(title);
+				if (iconUri != null)
+					part.setIconURI(iconUri);
+				else
+					part.setIconURI("platform:/plugin/" + PluginConstants.PLUGIN_ID + "/icons/eview16/scripted_view.png");
+
+				part.setElementId(getDynamicViewId());
+				part.setCloseable(true);
+				part.getPersistedState().put(IWorkbench.PERSIST_STATE, Boolean.FALSE.toString());
+
+				partService.showPart(part, PartState.VISIBLE);
+
+				// make sure to close this window before we terminate. Eclipse would store it in its layout actually destroying all layout data.
+				PlatformUI.getWorkbench().addWorkbenchListener(new IWorkbenchListener() {
+
+					@Override
+					public boolean preShutdown(org.eclipse.ui.IWorkbench workbench, boolean forced) {
+						partService.hidePart(part, true);
+						return true;
+					}
+
+					@Override
+					public void postShutdown(org.eclipse.ui.IWorkbench workbench) {
+					}
+				});
+
+				final Object widget = part.getWidget();
+				if (widget instanceof Composite)
+					((Composite) widget).addDisposeListener(l -> fLifecycleManager.remove(part));
+
+				return part;
+			}
+		};
+
+		Display.getDefault().syncExec(runnable);
+
+		return runnable.getResultOrThrow();
 	}
 
 	/**
@@ -255,12 +264,16 @@ public class UIBuilderModule extends AbstractScriptModule {
 
 					@Override
 					public void run() {
+						fLifecycleManager.add(getDialog());
+
 						fUICompositors.clear();
 						pushComposite(getComposite());
 
 						fScriptableDialog = getDialog();
 						getScriptEngine().inject(layoutCode);
 						fScriptableDialog = null;
+
+						getComposite().addDisposeListener(l -> fLifecycleManager.remove(getDialog()));
 					}
 				});
 
@@ -1228,8 +1241,10 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 * Make sure that script engine does not get terminated. This is necessary whenever callbacks are registered.
 	 */
 	private void keepScriptEngineAlive() {
-		if (getScriptEngine() instanceof IReplEngine)
+		if (getScriptEngine() instanceof IReplEngine) {
+			fLifecycleManager.setScriptEngineTerminateState(((IReplEngine) getScriptEngine()).getTerminateOnIdle());
 			((IReplEngine) getScriptEngine()).setTerminateOnIdle(false);
+		}
 	}
 
 	private <T> T runInUIThread(RunnableWithResult<T> runnable) throws Throwable {
@@ -1324,6 +1339,34 @@ public class UIBuilderModule extends AbstractScriptModule {
 			}
 
 			return null;
+		}
+	}
+
+	/**
+	 * Manages script termination when last created object gets destroyed.
+	 */
+	private class LifecycleManager {
+
+		private final Collection<Object> fCreatedElements = new HashSet<>();
+		private Boolean fInitialTerminateOnIdle = null;
+
+		public void add(Object element) {
+			fCreatedElements.add(element);
+		}
+
+		public void remove(Object element) {
+			fCreatedElements.remove(element);
+
+			if (fCreatedElements.isEmpty()) {
+				if (fInitialTerminateOnIdle != null) {
+					if (getScriptEngine() instanceof IReplEngine)
+						((IReplEngine) getScriptEngine()).setTerminateOnIdle(fInitialTerminateOnIdle);
+				}
+			}
+		}
+
+		public void setScriptEngineTerminateState(boolean terminateOnIdle) {
+			fInitialTerminateOnIdle = terminateOnIdle;
 		}
 	}
 }
