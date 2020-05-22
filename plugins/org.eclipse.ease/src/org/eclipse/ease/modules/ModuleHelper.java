@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ease.Activator;
 import org.eclipse.ease.ICodeFactory.Parameter;
 import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.Logger;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 
@@ -44,8 +46,14 @@ public final class ModuleHelper {
 	 */
 	public static List<Method> getMethods(final Class<?> clazz) {
 
-		if ((clazz == null) || (clazz.getMethods().length == 0))
+		try {
+			if ((clazz == null) || (clazz.getMethods().length == 0))
+				return Collections.emptyList();
+
+		} catch (final NoClassDefFoundError e) {
+			Logger.warning(Activator.PLUGIN_ID, "The class " + clazz.getName() + " is broken", e);
 			return Collections.emptyList();
+		}
 
 		final List<Method> methods = new ArrayList<>();
 		final boolean wrapping = ModuleHelper.hasWrapToScript(clazz);
