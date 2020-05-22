@@ -995,6 +995,8 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *
 	 * @param elements
 	 *            combo elements to display.
+	 * @param editable
+	 *            set to <code>true</code> to allow users to enter custom entries
 	 * @param callback
 	 *            callback code when selection changes. Use {module #getUiEvent()} to access the {@link SelectionChangedEvent}.
 	 * @param layout
@@ -1004,8 +1006,9 @@ public class UIBuilderModule extends AbstractScriptModule {
 	 *             on any SWT error
 	 */
 	@WrapToScript
-	public ComboViewer createComboViewer(Object[] elements, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) String layout) throws Throwable {
+	public ComboViewer createComboViewer(Object[] elements, @ScriptParameter(defaultValue = "false") boolean editable,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) Object callback, @ScriptParameter(defaultValue = ScriptParameter.NULL) String layout)
+			throws Throwable {
 
 		if (callback != null)
 			keepScriptEngineAlive();
@@ -1013,7 +1016,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 		return runInUIThread(new RunnableWithResult<ComboViewer>() {
 			@Override
 			public ComboViewer runWithTry() throws Throwable {
-				final ComboViewer comboViewer = new ComboViewer(getUICompositor().getComposite());
+				final ComboViewer comboViewer = new ComboViewer(getUICompositor().getComposite(), SWT.BORDER | (editable ? 0 : SWT.READ_ONLY));
 				comboViewer.setLabelProvider(new GenericLabelProvider());
 				comboViewer.setContentProvider(ArrayContentProvider.getInstance());
 				comboViewer.setInput(elements);
