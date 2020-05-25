@@ -1,23 +1,9 @@
-This project requires tools.jar from a Java JDK in its build path. Due to licensing issues we do not deliver this.
+This project builds the javadoc doclet for module documentation generation.
+It is an add-on to EASE typically used in automated builds.
 
-How to fix:
+To use it locally you need to use Java 9 or newer.
 
-	1) Window -> Preferences -> Java -> Installed JREs
-	2) Edit on Default JRE
-	3) Add External Jars
-	4) Select <your JDK folder>/lib/tools.jar
+In case this project is broken in your workspace you may safely close the project.
 
-This works because the project's JRE is the default JRE set in Eclipse.
-It will not work if the project is set to an Execution Environment because
-that prevents the com.sun.javadoc packages from being visible.
-
-The advantage of the above method is that the tracked files (e.g. .classpath) does
-not need to be modified. However, If it is not possible to modify the default
-JRE for the current Eclipse workspace, the alternatives are:
-
-    - Add tools.jar as an external jar on a non-default JRE and
-        edit the project settings (Java -> Build Path -> Libraries ->
-        JRE System Library -> Edit -> Select the correct JRE)
-    - Add tools.jar as an external jar on this project (Java ->
-        Build Path -> Libraries -> Add External JARs -> select
-        <your JDK folder>/lib/tools.jar)
+A current build of the doclet can directly be downloaded from:
+	https://www.eclipse.org/ease/download/
