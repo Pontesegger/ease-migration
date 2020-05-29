@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
@@ -199,6 +200,9 @@ public class TestFile extends TestContainer implements ITestFile {
 
 			// execute resource
 			try {
+				if (fScriptEngine instanceof AbstractScriptEngine)
+					((AbstractScriptEngine) fScriptEngine).setExecutionRootFile(getResource());
+
 				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_FILE_VARIABLE, this);
 				fScriptEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, getTestSuite());
 				if (fScriptEngine instanceof IReplEngine)
@@ -259,12 +263,29 @@ public class TestFile extends TestContainer implements ITestFile {
 						}
 					}
 
-					// TODO check if we can have a smarter binding than a string constant
-					if (scriptType.getName().equals("JavaScript")) {
-						if (!fScriptEngine.hasVariable("__EASE_UnitTest_TestRunner")) {
+					// script engine may have died during the tests
+					if (!fScriptEngine.isFinished()) {
+
+						// TODO check if we can have a smarter binding than a string constant
+						if (scriptType.getName().equals("JavaScript")) {
+							if (!fScriptEngine.hasVariable("__EASE_UnitTest_TestRunner")) {
+								// load the unittest runner
+								try {
+									final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.js");
+									executionResult = fScriptEngine.executeSync(url);
+									if (executionResult.hasException())
+										getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
+
+								} catch (final MalformedURLException e) {
+									getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
+								}
+							}
+						}
+
+						if (children.isEmpty() && scriptType.getName().equals("Python")) {
 							// load the unittest runner
 							try {
-								final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.js");
+								final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.py");
 								executionResult = fScriptEngine.executeSync(url);
 								if (executionResult.hasException())
 									getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
@@ -272,19 +293,6 @@ public class TestFile extends TestContainer implements ITestFile {
 							} catch (final MalformedURLException e) {
 								getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 							}
-						}
-					}
-
-					if (children.isEmpty() && scriptType.getName().equals("Python")) {
-						// load the unittest runner
-						try {
-							final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.py");
-							executionResult = fScriptEngine.executeSync(url);
-							if (executionResult.hasException())
-								getTest("[EASE Testrunner]").addError(executionResult.getException().getMessage(), fScriptEngine);
-
-						} catch (final MalformedURLException e) {
-							getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 						}
 					}
 				}
