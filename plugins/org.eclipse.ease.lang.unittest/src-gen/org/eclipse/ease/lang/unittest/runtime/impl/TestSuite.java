@@ -312,6 +312,12 @@ public class TestSuite extends TestContainer implements ITestSuite {
 				fSetupEngine = null;
 			}
 
+			// make sure all tests are marked as finished
+			for (final ITestEntity test : getCopyOfChildren()) {
+				if (TestStatus.RUNNING.equals(test.getStatus()))
+					test.setEntityStatus(TestStatus.PASS);
+			}
+
 			setEntityStatus(TestStatus.FINISHED);
 		}
 	}
