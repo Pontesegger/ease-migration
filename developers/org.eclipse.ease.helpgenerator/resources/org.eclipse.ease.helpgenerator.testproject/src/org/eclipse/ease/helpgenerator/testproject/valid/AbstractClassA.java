@@ -1,12 +1,6 @@
 package org.eclipse.ease.helpgenerator.testproject.valid;
 
-import java.io.IOException;
-import java.util.function.Function;
-
-import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
-
-import com.sun.jdi.InterfaceType;
 
 /**
  * This is a test module.
@@ -15,7 +9,7 @@ public abstract class AbstractClassA implements InterfaceA {
 
 	/** Constant defined in the base class. */
 	@WrapToScript
-	public static final String DEFINED_IN_BASE_CLASS = 1;
+	public static final String DEFINED_IN_BASE_CLASS = "1";
 
 	/**
 	 * This method is only defined in the base class.

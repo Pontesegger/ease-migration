@@ -390,6 +390,12 @@
             <operand
                 xsi:type="predicates:NamePredicate"
                 pattern="org.eclipse.ease.integration.modeling.*examples"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org.eclipse.ease.helpgenerator.testproject"/>
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="UnitTest"/>
           </operand>
         </predicate>
       </sourceLocator>
