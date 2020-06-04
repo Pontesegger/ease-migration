@@ -116,6 +116,12 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 			} catch (final NumberFormatException e1) {
 			}
 		}
+		if ((Byte.class.equals(clazz)) || (byte.class.equals(clazz))) {
+			try {
+				return Integer.toString(Integer.parseInt(defaultStringValue));
+			} catch (final NumberFormatException e1) {
+			}
+		}
 		if ((Float.class.equals(clazz)) || (float.class.equals(clazz))) {
 			try {
 				return Float.toString(Float.parseFloat(defaultStringValue));
@@ -130,6 +136,9 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		}
 		if ((Boolean.class.equals(clazz)) || (boolean.class.equals(clazz))) {
 			return Boolean.parseBoolean(defaultStringValue) ? getTrueString() : getFalseString();
+		}
+		if ((Character.class.equals(clazz)) || (char.class.equals(clazz))) {
+			return "'" + defaultStringValue.charAt(0) + "'";
 		}
 		if (String.class.equals(clazz))
 			return "\"" + defaultStringValue + "\"";
