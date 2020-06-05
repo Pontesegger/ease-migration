@@ -29,6 +29,13 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 	public static List<String> RESERVED_KEYWORDS = new ArrayList<>();
 
+	/**
+	 * List of Java primitive types as they need to be handled differently from normal classes when getting their py4j representation.
+	 *
+	 * bytes are handled differently as Python has native bytearray type.
+	 */
+	private static final List<Class<?>> PRIMITIVES = Arrays.asList(short.class, int.class, long.class, float.class, double.class, boolean.class, char.class);
+
 	static {
 		RESERVED_KEYWORDS.add("and");
 		RESERVED_KEYWORDS.add("as");
@@ -133,11 +140,99 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		RESERVED_KEYWORDS.add("zip");
 	}
 
+	/**
+	 * Returns the Python (py4j) identifier for the given class.
+	 *
+	 * @param cls
+	 *            Class to get py4j identifier for.
+	 * @return py4j class identifier.
+	 */
+	protected static String getPythonClassIdentifier(Class<?> cls) {
+		if (PRIMITIVES.contains(cls)) {
+			return String.format("gateway.jvm.%s", cls.getName());
+		} else {
+			return cls.getName();
+		}
+	}
+
 	private static String toSafeNameStatic(String name) {
 		while (RESERVED_KEYWORDS.contains(name))
 			name = name + "_";
 
 		return name;
+	}
+
+	private static String indent(String code, String indentation) {
+		if (code.isEmpty())
+			return code;
+
+		return indentation + code.replaceAll("\n", "\n" + indentation).trim() + "\n";
+	}
+
+	/**
+	 * Create wrapper code to convert all array parameters to actual Java arrays.
+	 *
+	 * @param parameters
+	 *            List of parameters to create array conversion for.
+	 * @return Wrapper code for performing array conversion.
+	 */
+	protected static String buildArrayConversions(List<Parameter> parameters) {
+		return parameters.stream().map(PythonCodeFactory::buildArrayConversion).collect(Collectors.joining(StringTools.LINE_DELIMITER));
+	}
+
+	/**
+	 * Create wrapper code to convert an array parameter to actual Java array.
+	 *
+	 * Generated code will have the following look: {@code
+	 * 	try:
+	 * 		tmp = gateway.new_array([array type], len([value to be converted]))
+	 *      for index, value in enumerate([value to be converted]):
+	 *          tmp[index] = value
+	 *      [value to be converted] = tmp
+	 *  except NameError:
+	 *      pass
+	 *  }
+	 *
+	 * @param parameter
+	 *            Parameter to create conversion code for.
+	 * @return Wrapper code for performing array conversion.
+	 */
+	protected static String buildArrayConversion(Parameter parameter) {
+		final StringBuilder builder = new StringBuilder();
+		if (parameter.getClazz().isArray()) {
+			final String arrayType = getPythonClassIdentifier(parameter.getClazz().getComponentType());
+			final String variableName = toSafeNameStatic(parameter.getName());
+			builder.append(String.format("if %s is not None:", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("    try:").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("            tmp[index] = value").append(StringTools.LINE_DELIMITER);
+			builder.append(String.format("        %s =  tmp", variableName)).append(StringTools.LINE_DELIMITER);
+			builder.append("    except NameError:").append(StringTools.LINE_DELIMITER);
+			builder.append("        pass").append(StringTools.LINE_DELIMITER);
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * Convert integer parameters to double when the Java interface requires double/float. When integers are passed in python, Py4J does not automatically
+	 * convert these numbers to double/float if required. Therefore we have to do this in the wrapper code.
+	 *
+	 * @param parameters
+	 *            method parameters
+	 * @return number conversion code
+	 */
+	private static String buildNumberConversions(List<Parameter> parameters) {
+		final StringBuilder builder = new StringBuilder();
+		for (final Parameter parameter : parameters) {
+			if ((double.class.equals(parameter.getClazz())) || (Double.class.equals(parameter.getClazz())) || (float.class.equals(parameter.getClazz()))
+					|| (Float.class.equals(parameter.getClazz()))) {
+				builder.append(parameter.getName()).append(" = (").append(parameter.getName()).append(" * 1.0) if ").append(parameter.getName())
+						.append(" else ").append(parameter.getName()).append(StringTools.LINE_DELIMITER);
+			}
+		}
+
+		return builder.toString();
 	}
 
 	@Override
@@ -229,6 +324,9 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		// Convert Lists to Java arrays
 		body.append(buildArrayConversions(parameters)).append(StringTools.LINE_DELIMITER);
 
+		// convert numbers to double/float where needed
+		body.append(buildNumberConversions(parameters)).append(StringTools.LINE_DELIMITER);
+
 		// check for callbacks
 		body.append("if not ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\"):")
 				.append(StringTools.LINE_DELIMITER);
@@ -268,13 +366,6 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		body.append("    return ").append(RESULT_NAME).append(StringTools.LINE_DELIMITER);
 
 		return body.toString();
-	}
-
-	private static String indent(String code, String indentation) {
-		if (code.isEmpty())
-			return code;
-
-		return indentation + code.replaceAll("\n", "\n" + indentation).trim() + "\n";
 	}
 
 	@Override
@@ -354,72 +445,5 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	 */
 	public String createPep302WrapperCode(EnvironmentModule environment, Object instance, String identifier) {
 		return createWrapper(environment, instance, identifier, false, environment.getScriptEngine());
-	}
-
-	/**
-	 * Create wrapper code to convert all array parameters to actual Java arrays.
-	 *
-	 * @param parameters
-	 *            List of parameters to create array conversion for.
-	 * @return Wrapper code for performing array conversion.
-	 */
-	protected static String buildArrayConversions(List<Parameter> parameters) {
-		return parameters.stream().map(PythonCodeFactory::buildArrayConversion).collect(Collectors.joining(StringTools.LINE_DELIMITER));
-	}
-
-	/**
-	 * Create wrapper code to convert an array parameter to actual Java array.
-	 *
-	 * Generated code will have the following look: {@code
-	 * 	try:
-	 * 		tmp = gateway.new_array([array type], len([value to be converted]))
-	 *      for index, value in enumerate([value to be converted]):
-	 *          tmp[index] = value
-	 *      [value to be converted] = tmp
-	 *  except NameError:
-	 *      pass
-	 *  }
-	 *
-	 * @param parameter
-	 *            Parameter to create conversion code for.
-	 * @return Wrapper code for performing array conversion.
-	 */
-	protected static String buildArrayConversion(Parameter parameter) {
-		final StringBuilder builder = new StringBuilder();
-		if (parameter.getClazz().isArray()) {
-			final String arrayType = getPythonClassIdentifier(parameter.getClazz().getComponentType());
-			final String variableName = toSafeNameStatic(parameter.getName());
-			builder.append(String.format("if %s is not None:", variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append("    try:").append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("        tmp = gateway.new_array(%s, len(%s))", arrayType, variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("        for index, value in enumerate(%s):", variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append("            tmp[index] = value").append(StringTools.LINE_DELIMITER);
-			builder.append(String.format("        %s =  tmp", variableName)).append(StringTools.LINE_DELIMITER);
-			builder.append("    except NameError:").append(StringTools.LINE_DELIMITER);
-			builder.append("        pass").append(StringTools.LINE_DELIMITER);
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * List of Java primitive types as they need to be handled differently from normal classes when getting their py4j representation.
-	 *
-	 * bytes are handled differently as Python has native bytearray type.
-	 */
-	private static final List<Class<?>> PRIMITIVES = Arrays.asList(short.class, int.class, long.class, float.class, double.class, boolean.class, char.class);
-
-	/**
-	 * Returns the Python (py4j) identifier for the given class.
-	 *
-	 * @param cls
-	 *            Class to get py4j identifier for.
-	 * @return py4j class identifier.
-	 */
-	protected static String getPythonClassIdentifier(Class<?> cls) {
-		if (PRIMITIVES.contains(cls)) {
-			return String.format("gateway.jvm.%s", cls.getName());
-		} else {
-			return cls.getName();
-		}
 	}
 }
