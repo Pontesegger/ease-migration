@@ -235,7 +235,10 @@ public class ScriptService implements IScriptService, BundleListener {
 		if (location != null) {
 			final int pos = location.lastIndexOf('.');
 			if (pos != -1) {
-				final String extension = location.substring(pos + 1);
+				String extension = location.substring(pos + 1);
+
+				if (extension.contains("?"))
+					extension = extension.substring(0, extension.indexOf('?'));
 
 				for (final ScriptType scriptType : getAvailableScriptTypes().values()) {
 					if (scriptType.getDefaultExtension().equalsIgnoreCase(extension))
