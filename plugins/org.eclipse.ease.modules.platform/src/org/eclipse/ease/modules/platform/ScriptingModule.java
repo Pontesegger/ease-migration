@@ -120,13 +120,13 @@ public class ScriptingModule extends AbstractScriptModule {
 	 *            optional script arguments delimited by commas ','. When the string arguments contains commas ',', or for arguments that are not string, the
 	 *            caller may set a shared object with {@module #setSharedObject(String, Object, boolean, boolean)} and pass the key here. The callee can then
 	 *            retrieve it with the {@module #getSharedObject(String)} method.
-	 * @param engineID
-	 *            engine ID to be used
+	 * @param engineIdOrExtension
+	 *            engine ID to be used or a file extension to look for engines (eg: js)
 	 * @return execution result
 	 */
 	@WrapToScript
 	public ScriptResult fork(final Object resource, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String arguments,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineID) {
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) String engineIdOrExtension) {
 
 		final ILaunch currentLaunch = getScriptEngine().getLaunch();
 		final boolean useDebugger = (currentLaunch != null) && (currentLaunch.getDebugTarget() != null);
@@ -140,11 +140,22 @@ public class ScriptingModule extends AbstractScriptModule {
 		}
 
 		EngineDescription description = null;
-		if (engineID != null) {
-			description = scriptService.getEngineByID(engineID);
+		if (engineIdOrExtension != null) {
+			description = scriptService.getEngineByID(engineIdOrExtension);
+
+			if (description == null) {
+				final ScriptType scriptType = scriptService.getScriptType("." + engineIdOrExtension);
+				if (scriptType != null) {
+					if (useDebugger)
+						description = scriptType.getDebugEngine();
+
+					if (description == null)
+						description = scriptType.getEngine();
+				}
+			}
 
 			if (description == null)
-				throw new RuntimeException("No script engine found for ID = \"" + engineID + "\"");
+				throw new RuntimeException("No script engine found for ID = \"" + engineIdOrExtension + "\"");
 		}
 
 		if (description == null) {
