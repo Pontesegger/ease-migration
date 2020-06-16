@@ -401,8 +401,13 @@ public final class ResourceTools {
 	 * @throws URISyntaxException
 	 */
 	public static URI createURI(String address) throws MalformedURLException, URISyntaxException {
-		final URL url = new URL(address);
-		return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+		try {
+			return new URI(address);
+
+		} catch (final Exception e) {
+			final URL url = new URL(address);
+			return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+		}
 	}
 
 	/**
