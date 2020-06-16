@@ -101,6 +101,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 			if (instance instanceof IScriptModule)
 				((IScriptModule) instance).initialize(getScriptEngine(), this);
+
+			fireModuleEvent(instance, IModuleListener.LOADED);
 		}
 
 		return moduleState.getInstance();
@@ -311,7 +313,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		}
 
 		// notify listeners
-		fireModuleEvent(toBeWrapped, reloaded ? IModuleListener.RELOADED : IModuleListener.LOADED);
+		if (reloaded)
+			fireModuleEvent(toBeWrapped, IModuleListener.RELOADED);
 
 		return result;
 	}
