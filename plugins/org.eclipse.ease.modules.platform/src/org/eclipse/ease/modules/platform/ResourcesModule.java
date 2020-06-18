@@ -474,7 +474,11 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 
 	private IFileHandle getFileHandle(final Object location, final int mode, boolean autoClose) throws Exception {
 		IFileHandle handle = null;
-		if (location instanceof IFileHandle)
+
+		if ((location instanceof String) && (((String) location).isEmpty()))
+			handle = null;
+
+		else if (location instanceof IFileHandle)
 			handle = (IFileHandle) location;
 
 		else if (location instanceof File)
@@ -497,7 +501,10 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 			getScriptEngine().addExecutionListener(this);
 		}
 
-		return handle;
+		if (handle != null)
+			return handle;
+
+		throw new IOException("Could not locate file \"" + location + "\"");
 	}
 
 	/**
