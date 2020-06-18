@@ -149,10 +149,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			// automatically schedule engine as it is not started yet
 			schedule();
 
-		synchronized (result) {
-			while (!result.isReady())
-				result.wait();
-		}
+		result.waitForResult();
 
 		return result;
 	}
@@ -201,50 +198,48 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 */
 	private ScriptResult inject(final Script script, final boolean notifyListeners, final boolean uiThread) {
 
-		synchronized (script.getResult()) {
-			try {
-				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Executing script (" + script.getTitle() + "):", script.getCode());
-				final String filename = getFilename(script.getFile());
-				fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE, filename));
-				updateJobName(filename);
+		try {
+			Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Executing script (" + script.getTitle() + "):", script.getCode());
+			final String filename = getFilename(script.getFile());
+			fStackTrace.add(0, new EaseDebugFrame(script, 0, IScriptDebugFrame.TYPE_FILE, filename));
+			updateJobName(filename);
 
-				// apply security checks
-				final List<ISecurityCheck> securityChecks = fSecurityChecks.get(ActionType.INJECT_CODE);
-				if (securityChecks != null) {
-					for (final ISecurityCheck check : securityChecks) {
-						if (!check.doIt(ActionType.INJECT_CODE, script, uiThread))
-							throw new ScriptEngineException("Security check failed: " + check.toString());
-					}
+			// apply security checks
+			final List<ISecurityCheck> securityChecks = fSecurityChecks.get(ActionType.INJECT_CODE);
+			if (securityChecks != null) {
+				for (final ISecurityCheck check : securityChecks) {
+					if (!check.doIt(ActionType.INJECT_CODE, script, uiThread))
+						throw new ScriptEngineException("Security check failed: " + check.toString());
 				}
-
-				// execution
-				if (notifyListeners)
-					notifyExecutionListeners(script, IExecutionListener.SCRIPT_START);
-				else
-					notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_START);
-
-				script.setResult(execute(script, script.getFile(), fStackTrace.get(0).getName(), uiThread));
-
-			} catch (final BreakException e) {
-				script.setResult(e.getCondition());
-
-			} catch (final Throwable e) {
-				script.setException(e);
-
-				// only do the printing if this is the last script on the stack
-				// otherwise we will print multiple times for each rethrow
-				if (fStackTrace.size() <= 1)
-					e.printStackTrace(getErrorStream());
-
-			} finally {
-				if (notifyListeners)
-					notifyExecutionListeners(script, IExecutionListener.SCRIPT_END);
-				else
-					notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_END);
-
-				if (!fStackTrace.isEmpty())
-					fStackTrace.remove(0);
 			}
+
+			// execution
+			if (notifyListeners)
+				notifyExecutionListeners(script, IExecutionListener.SCRIPT_START);
+			else
+				notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_START);
+
+			script.setResult(execute(script, script.getFile(), fStackTrace.get(0).getName(), uiThread));
+
+		} catch (final BreakException e) {
+			script.setResult(e.getCondition());
+
+		} catch (final Throwable e) {
+			// only do the printing if this is the last script on the stack
+			// otherwise we will print multiple times for each rethrow
+			if (fStackTrace.size() <= 1)
+				e.printStackTrace(getErrorStream());
+
+			script.setException(e);
+
+		} finally {
+			if (notifyListeners)
+				notifyExecutionListeners(script, IExecutionListener.SCRIPT_END);
+			else
+				notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_END);
+
+			if (!fStackTrace.isEmpty())
+				fStackTrace.remove(0);
 		}
 
 		return script.getResult();

@@ -142,7 +142,7 @@ public class ScriptResult {
 	 *
 	 * @return true when this result contains an exception
 	 */
-	public final boolean hasException() {
+	public final synchronized boolean hasException() {
 		return (fException != null);
 	}
 }
