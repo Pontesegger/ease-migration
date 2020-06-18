@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.modules.AbstractScriptModule;
 import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
@@ -38,12 +40,34 @@ import org.eclipse.jgit.util.RawParseUtils;
 public class GitModule extends AbstractScriptModule {
 
 	/**
+	 * Try to extract the project name from a given location. Effectively searches for the last slash and extracts the name afterwards, eventually removing
+	 * '.git' from the name.
+	 *
+	 * @param remoteLocation
+	 *            location name to parse
+	 * @return extracted project name
+	 */
+	private static String getGitProjectName(String remoteLocation) {
+		final int lastSlashPosition = remoteLocation.lastIndexOf('/');
+		if (lastSlashPosition >= 0) {
+			final int lastDotPosition = remoteLocation.indexOf('.', lastSlashPosition);
+
+			if (lastDotPosition >= 0)
+				return remoteLocation.substring(lastSlashPosition + 1, lastDotPosition);
+
+			return remoteLocation.substring(lastSlashPosition + 1);
+		}
+
+		return remoteLocation;
+	}
+
+	/**
 	 * Clone a git repository.
 	 *
 	 * @param remoteLocation
 	 *            location to fetch repository from
 	 * @param localLocation
-	 *            local path to be used
+	 *            local path to be used (<code>null</code> for workspace folder)
 	 * @param user
 	 *            username for the remote repository
 	 * @param pass
@@ -59,12 +83,20 @@ public class GitModule extends AbstractScriptModule {
 	 *             on a general error during git execution
 	 */
 	@WrapToScript
-	public Git clone(final String remoteLocation, final Object localLocation, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String user,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String pass, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String branch)
-			throws InvalidRemoteException, TransportException, GitAPIException {
+	public Git clone(final String remoteLocation, @ScriptParameter(defaultValue = ScriptParameter.NULL) Object localLocation,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String user, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String pass,
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String branch) throws InvalidRemoteException, TransportException, GitAPIException {
+
+		if (localLocation == null) {
+			final IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
+			localLocation = workspacePath.append(getGitProjectName(remoteLocation));
+		}
 
 		final Object resource = ResourceTools.resolve(localLocation, getScriptEngine().getExecutedFile());
 		final File folder = ResourceTools.toFile(resource);
+
+		if (!folder.exists())
+			folder.mkdirs();
 
 		if (ResourceTools.isFolder(folder)) {
 			final CloneCommand cloneCommand = Git.cloneRepository();
