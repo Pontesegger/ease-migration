@@ -319,7 +319,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 		// insert deprecation warnings
 		if (ModuleHelper.isDeprecated(method))
-			body.append("printError(\"" + method.getName() + "() is deprecated. Consider updating your code.\", True)").append(StringTools.LINE_DELIMITER);
+			body.append(EnvironmentModule.getWrappedVariableName(environment))
+					.append(".printError(\"" + method.getName() + "() is deprecated. Consider updating your code.\", True)").append(StringTools.LINE_DELIMITER);
 
 		// Convert Lists to Java arrays
 		body.append(buildArrayConversions(parameters)).append(StringTools.LINE_DELIMITER);
