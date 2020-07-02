@@ -118,14 +118,14 @@ public class PlatformModule {
 	}
 
 	/**
-	 * Run an external process. The process is started in the background and a {@link FutureX} object is returned. Query the result for finished state, output
+	 * Run an external process. The process is started in the background and a {@link Process} object is returned. Query the result for finished state, output
 	 * and error streams of the executed process.
 	 *
 	 * @param name
 	 *            program to run (with full path if necessary)
 	 * @param args
 	 *            program arguments
-	 * @return process object to track proces execution
+	 * @return process object to track process execution
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
