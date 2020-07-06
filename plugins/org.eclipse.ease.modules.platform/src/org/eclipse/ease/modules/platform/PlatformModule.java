@@ -1,6 +1,8 @@
 package org.eclipse.ease.modules.platform;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,12 +121,28 @@ public class PlatformModule {
 
 	/**
 	 * Run an external process. The process is started in the background and a {@link Process} object is returned. Query the result for finished state, output
-	 * and error streams of the executed process.
+	 * and error streams of the executed process. Output and error streams need to be consumed, otherwise the running process may stall (or even die) in case
+	 * that the buffers are full. Setting parameters <i>output</i> and <i>error</i> to <code>null</code> will automatically discard the produced data.
 	 *
 	 * @param name
 	 *            program to run (with full path if necessary)
 	 * @param args
 	 *            program arguments
+	 * @return process object to track process execution
+	 * @param output
+	 *            output file location to redirect output to.
+	 *            <ul>
+	 *            <li>"system.out": use the default output of the application</li>
+	 *            <li>"keep": do nothing, let the script deal with it</li>
+	 *            <li>any other: absolute file location to redirect to</li>
+	 *            </ul>
+	 * @param error
+	 *            error stream to redirect output to.
+	 *            <ul>
+	 *            <li>"system.err": use the default output of the application</li>
+	 *            <li>"keep": do nothing, let the script deal with it</li>
+	 *            <li>any other: absolute file location to redirect to</li>
+	 *            </ul>
 	 * @return process object to track process execution
 	 * @throws IOException
 	 *             if an I/O error occurs
