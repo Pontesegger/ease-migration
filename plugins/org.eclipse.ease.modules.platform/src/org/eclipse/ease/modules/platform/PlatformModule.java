@@ -128,7 +128,6 @@ public class PlatformModule {
 	 *            program to run (with full path if necessary)
 	 * @param args
 	 *            program arguments
-	 * @return process object to track process execution
 	 * @param output
 	 *            output file location to redirect output to.
 	 *            <ul>
@@ -148,7 +147,8 @@ public class PlatformModule {
 	 *             if an I/O error occurs
 	 */
 	@WrapToScript
-	public static Process runProcess(final String name, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] args) throws IOException {
+	public static Process runProcess(final String name, @ScriptParameter(defaultValue = ScriptParameter.NULL) final String[] args,
+			@ScriptParameter(defaultValue = "system.out") String output, @ScriptParameter(defaultValue = "system.err") String error) throws IOException {
 		final List<String> arguments = new ArrayList<>();
 		arguments.add(name);
 		if (args != null) {
@@ -157,6 +157,29 @@ public class PlatformModule {
 		}
 
 		final ProcessBuilder builder = new ProcessBuilder(arguments);
+
+		if (output == null) {
+			// TODO discard is supported in Java 9 and newer. Our current compile target is still Java 8, so keep this commented until the time comes
+			// builder.redirectOutput(Redirect.DISCARD);
+			builder.redirectOutput(Redirect.INHERIT);
+
+		} else if ("system.out".equalsIgnoreCase(output))
+			builder.redirectOutput(Redirect.INHERIT);
+
+		else if (!"keep".equalsIgnoreCase(output))
+			builder.redirectOutput(new File(output));
+
+		if (error == null) {
+			// TODO discard is supported in Java 9 and newer. Our current compile target is still Java 8, so keep this commented until the time comes
+			// builder.redirectOutput(Redirect.DISCARD);
+			builder.redirectError(Redirect.INHERIT);
+
+		} else if ("system.err".equalsIgnoreCase(error))
+			builder.redirectError(Redirect.INHERIT);
+
+		else if (!"keep".equalsIgnoreCase(error))
+			builder.redirectError(new File(error));
+
 		return builder.start();
 	}
 

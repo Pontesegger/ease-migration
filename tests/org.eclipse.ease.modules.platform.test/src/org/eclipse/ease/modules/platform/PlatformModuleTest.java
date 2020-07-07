@@ -11,6 +11,7 @@
 
 package org.eclipse.ease.modules.platform;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -59,9 +60,10 @@ public class PlatformModuleTest extends AbstractModuleTest {
 
 	@Test(timeout = 3000)
 	public void runProcess() throws IOException, InterruptedException {
-		final Process process = PlatformModule.runProcess("ls", new String[] { "-la" });
+		final Process process = PlatformModule.runProcess("ls", new String[] { "-la" }, "keep", null);
 		process.waitFor();
 
 		assertTrue(process.getInputStream().available() > 0);
+		assertEquals(0, process.getErrorStream().available());
 	}
 }
