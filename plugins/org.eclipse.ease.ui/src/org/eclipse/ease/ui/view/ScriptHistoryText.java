@@ -258,11 +258,10 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 			final String out = message.replaceAll("\\r?\\n", "\n\t");
 
 			if (!isDisposed()) {
-				append("\n\t");
 
 				// append image
 				if (image != null) {
-					append(" "); // dummy character to be replaced by image
+					append("\n   "); // dummy character to be replaced by image
 
 					final StyleRange styleRange = new StyleRange();
 					styleRange.start = getText().length() - 1;
@@ -272,7 +271,8 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 					styleRange.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 
 					setStyleRange(styleRange);
-				}
+				} else
+					append("\n\t");
 
 				// append message
 				final StyleRange styleRange = getStyle(result.hasException() ? STYLE_ERROR : STYLE_RESULT, getText().length(), out.length());
