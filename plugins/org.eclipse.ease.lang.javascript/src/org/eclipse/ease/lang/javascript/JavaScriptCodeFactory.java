@@ -126,7 +126,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		return JavaScriptHelper.getSaveName(variableName);
 	}
 
-	private StringBuilder verifyParameters(final List<Parameter> parameters, String indent) {
+	private StringBuilder verifyParameters(Method method, final List<Parameter> parameters, String indent) {
 		final StringBuilder data = new StringBuilder();
 
 		if (!parameters.isEmpty()) {
@@ -135,10 +135,11 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 			if (parameter.isOptional()) {
 				data.append(indent).append("\t" + parameter.getName() + " = " + getDefaultValue(parameter) + ';').append(StringTools.LINE_DELIMITER);
 			} else {
-				data.append(indent).append("\tthrow 'Parameter <" + parameter.getName() + "> is not optional';").append(StringTools.LINE_DELIMITER);
+				data.append(indent).append("\tthrow 'Parameter <" + parameter.getName() + "> from " + method.getName() + "() is not optional';")
+						.append(StringTools.LINE_DELIMITER);
 
 			}
-			data.append(verifyParameters(parameters.subList(0, parameters.size() - 1), indent + "\t"));
+			data.append(verifyParameters(method, parameters.subList(0, parameters.size() - 1), indent + "\t"));
 			data.append(indent).append('}').append(StringTools.LINE_DELIMITER);
 		}
 
@@ -276,7 +277,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		final StringBuilder body = new StringBuilder();
 		// insert parameter checks
 		body.append("// verify mandatory and optional parameters").append(StringTools.LINE_DELIMITER);
-		body.append(verifyParameters(parameters, "")).append(StringTools.LINE_DELIMITER);
+		body.append(verifyParameters(method, parameters, "")).append(StringTools.LINE_DELIMITER);
 
 		// insert deprecation warnings
 		if (ModuleHelper.isDeprecated(method))
