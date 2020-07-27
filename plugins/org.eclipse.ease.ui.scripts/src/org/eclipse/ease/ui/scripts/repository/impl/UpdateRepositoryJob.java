@@ -41,7 +41,7 @@ public class UpdateRepositoryJob extends Job {
 	@Override
 	protected IStatus run(final IProgressMonitor monitor) {
 
-		final Collection<IScriptLocation> locations = fRepositoryService.getLocations();
+		final Collection<IScriptLocation> locations = new HashSet<>(fRepositoryService.getLocations());
 
 		for (final IScriptLocation location : locations) {
 			if (location.isUpdatePending()) {
@@ -85,7 +85,7 @@ public class UpdateRepositoryJob extends Job {
 				}
 
 				// remove scripts that were not verified
-				for (final IScript script : new HashSet<IScript>(location.getScripts())) {
+				for (final IScript script : new HashSet<>(location.getScripts())) {
 					if (script.isUpdatePending())
 						fRepositoryService.removeScript(script);
 				}
@@ -96,12 +96,7 @@ public class UpdateRepositoryJob extends Job {
 		fRepositoryService.save();
 
 		// update decorators
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				PlatformUI.getWorkbench().getDecoratorManager().update(Decorator.SIGN_DECORATOR_ID);
-			}
-		});
+		Display.getDefault().asyncExec(() -> PlatformUI.getWorkbench().getDecoratorManager().update(Decorator.SIGN_DECORATOR_ID));
 
 		// re schedule job
 		// TODO make this editable by preferences
