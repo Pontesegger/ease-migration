@@ -2,10 +2,10 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Concepts" link_to="help/main.xml#concepts"> 
-	<topic label="Main Topic"  href="html/concepts/maintopic.html"> 
-		<topic label="Sub Topic" href="html/concepts/subtopic.html" /> 
+	<topic href="help/html/concepts/how_script_engines_work.html" label="How script engines work">
 	</topic>
-	<topic label="Main Topic 2">
-		<topic label="Sub Topic 2" href="html/concepts/subtopic2.html" /> 
-	</topic> 
+ <topic href="help/html/concepts/script_modules.html" label="Script Modules">
+ </topic>
+ <topic href="help/html/concepts/user_scripts.html" label="User Scripts">
+ </topic> 
 </toc>

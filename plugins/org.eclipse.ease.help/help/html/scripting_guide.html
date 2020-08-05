@@ -5,10 +5,22 @@
 <title>Scripting Guide</title>
 </head>
 <body>
+	<h2>Eclipse Advanced Scripting Environment (EASE)</h2>
 
-	<h2>Eclipse Scripting Project</h2>
-	<p>EASE is the eclipse scripting project, allowing to interact with
-		the IDE using scripts in various languages.</p>
-	<img src="../images/eclipse1024.png" width="304" height="228" />
+	<p>EASE provides scripting support, allowing to interact with the IDE using scripts in various languages.</p>
+	<p>Scripts do have access to their native language features, eg python scripts do have access to all available python libraries.
+	Further scripts do have access to the Java runtime, allowing to access and manipulate Java objects.
+	Therefore scripts operate on the same level as normal Eclipse plug-ins.</p>
+	
+	<p>Currently following script engines are supported:
+	<ul>
+		<li>JavaScript (Rhino)</li>
+		<li>JavaScript (Nashorn)</li>
+		<li>Jython</li>
+		<li>Python via Py4J</li>
+		<li>Ruby</li>
+		<li>Groovy</li>
+	</ul>
+	</p>
 </body>
 </html>

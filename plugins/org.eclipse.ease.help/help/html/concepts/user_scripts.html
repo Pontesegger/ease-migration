@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>User Scripts</title>
+</head>
+<body>
+	<h2>User Scripts</h2>
+	
+	<p>While technically every source file is a user script, EASE provides a mechanism to treat some of them in a special way. In <i>Preferences/Scripting/Script Locations</i> you may register locations with special scripts that will be displayed more prominently.
+	Further such scripts might also augment the UI and react on events within your Application.
+	</p>
+	
+	<p>When registering locations you typically might stick to projects in your workspace. But you may also define file locations on your local machine or in the network. You even may fetch and integrate scripts from a webserver of github.
+	However make sure that all sources are trustworthy as scripts might do havoc and even might install a virus to your local system!</p>
+
+	<p>Registered locations will automatically be scanned on a regular basis for script files. Any found script will be added to the <a href="../gettingstarted/script_explorer.html">Script Explorer</a> view.
+	</p>
+
+	<h3>Keywords</h3>
+	<p>Script keywords can be added to such scripts directly in the source by adding a special file header. When the file starts with a comment section, all lines matching <code>keyword: some data</code> will be scanned.
+	In case the keyword matches one of the special keywords known by EASE, a special behavior will be triggered. a Simple one is <i>name</i> and allows to alter the display name of the script in the <a href="../gettingstarted/script_explorer.html">Script Explorer</a>.
+	</p>
+
+	<p>The <i>toolbar</i> keyword allows to dynamically create a new entry on a view toolbar. When selected it will execute the script. Other keywords will dynamically create views or bind a script to a keyboard shortcut.
+	Further scripts may be triggered automatically on certain events in your application, eg run a script when a file gets changed in your workspace.  
+	</p>
+	
+	<h4>Keywords for script display</h4>
+	<p>
+		<dl>
+			<dt>name</dt>
+			<dd>Script name displayed. May use / to create folder structures. Defaults to the filename.</dd>
+
+			<dt>description</dt>
+			<dd>Script description. Used as a tooltip on the script.</dd>
+		</dl>
+	</p>
+	
+	<h4>Keywords for UI integration</h4>
+	<p>
+		<dl>
+			<dt>view</dt>
+			<dd>Adds a dynamic view to your application. The script needs to utilize the /System/UI Builder module without calling createView() anymore.</dd>
+
+			<dt>toolbar</dt>
+			<dd>Bind a script to a view toolbar. Provide either view ID or view title (eg Project Explorer).</dd>
+
+			<dt>menu</dt>
+			<dd>Bind a script to a view menu. Provide either view ID or view title (eg Project Explorer).</dd>
+
+			<dt>popup</dt>
+			<dd>Bind a script to a popup menu. Add an expression like enableFor(full.qualified.class.name). If the selection is an instance from that type or adaptable to it, the popup menu will be added.</dd>
+
+			<dt>image</dt>
+			<dd>Add a dedicated toolbar/menu image. Accepts local file paths, relative paths (according to the script file) or URIs. Accepted URI schemes are http;//, platform:/plugin, workspace://, file://</dd>
+
+			<dt>keyboard</dt>
+			<dd>Binds a script to a keyboard shortcut. Syntax for keyboard mappings is the same as in the 'Keys' preferences page.</dd>
+		</dl>
+	</p>
+	
+	<h4>Keywords for event registration</h4>
+	<p>
+		<dl>
+			<dt>onStartup</dt>
+			<dd>Run a script on application startup. If an integer parameter is provided, it denotes the script startup delay in seconds.</dd>
+			
+			<dt>onShutdown</dt>
+			<dd>Run a script on application shutdown. If an integer parameter is provided, it denotes the maximum script execution time in seconds (defaults to 10s).</dd>
+			
+			<dt>onSave</dt>
+			<dd>Run a script on an editor save action. A wildcard pattern may be used to denote on which files the script should trigger (eg: '*.js'). Parameter argv[0] holds the resource description of the saved file.</dd>
+			
+			<dt>onResourceChange</dt>
+			<dd>Run a script on a resource change in the workspace. A wildcard pattern may be used to denote on which files a the script should trigger (eg: '*.js'). Parameter argv[0] holds the resource description of the changed file, argv[1] the type of the change.</dd>
+			
+			<dt>onEventBus</dt>
+			<dd>Run scripts when a specific event is posted on the OSGI message bus. Accepts a channel identifier for broker subscription (* wildcards may be used). The event will be passed to the script as variable 'event'.</dd>
+		</dl>
+	</p>
+
+	<h4>other Keywords</h4>
+	<p>
+		<dl>
+			<dt>script-type</dt>
+			<dd>Script type of this source. Typically the type is denoted from the file extension. This keyword explicitely sets the type in case a resource has no correct file extension.</dd>
+			
+			<dt>script-engine</dt>
+			<dd>Comma separated list of engine IDs of valid engines for this script. Preceeding an engine with ! explicitely disables an engine ID.</dd>
+			
+			<dt>io</dt>
+			<dd>Define where IO comes from/goes to: 'system' uses System.out/err/in; 'none' no IO at all; any other uses a console</dd>
+		</dl>
+	</p>
+
+	<h4>Example script</h4>
+	<p><code>/**
+ * This is a simple example script that shows the usage of keywords.
+ *
+ * name: /Examples/Hello world
+ * toolbar: Project Explorer
+ * keyboard: Ctrl+Shift+P
+ * onSave: *.js
+ * onShutdown:
+ */
+
+// this script will run on each editor save of *.js files and on shutdown. Further you may trigger it with Ctrl-Shift-P
+print("Hello world");</code>
+	</p>
+	
+	
+	<p>In case your scripts are located on a read only location you may also alter keywords locally: Select the script in the <a href="../gettingstarted/script_explorer.html">Script Explorer</a> view and open the <a href="/help/topic/org.eclipse.platform.doc.user/reference/ref-29.htm?cp=0_4_4_1_6">Properties</a> view.
+	All keywords can be altered there directly without changing the source file. This allows to adapt scripts to your local needs without the need to change them in shared environments.
+	</p>
+	
+</body>
+</html>

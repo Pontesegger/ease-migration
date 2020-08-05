@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scripting Perspective</title>
+</head>
+<body>
+	<h2>EASE Scripting Perspective</h2>
+	<p>The scripting perspective arranges the workspace to display the most required features for script development.</p>
+	<img src="../../images/scripting_perspective.png" />
+	
+	<h3><img src="../../images/icons/script_shell.png" /> Script Shell</h3>
+	<p>The <a href="script_shell.html">Shell</a> is the core component, allowing to enter commands for immediate execution. Its history displays commands along with their return values.
+	Any output is redirected to a console view. On the righthand side of the view additional information for the current shell may be inspected, like assigned variables or loaded modules.
+	</p>
+	<p>Multiple shells may be spawned, each of them running in a sandbox, isolated from other shells. As a consequence, scripting engines do not share the same scope.</p>
+	
+	<h3><img src="../../images/icons/modules_explorer.png" /> Modules Explorer</h3>
+	<p>EASE provides some libraries that help to access typical java feature from scripting. The <a href="modules_explorer.html">Modules Explorer</a> lists available libraries along with their functions. For detailed help hover over an element or use the context menu. To load a module, use drag it into the Script Shell.</p>
+	
+	<h3><img src="../../images/icons/script_explorer.png" /> Script Explorer</h3>
+	<p>Script locations can be registered via preferences and allow to display common scripts more prominently in the <a href="script_explorer.html">Script Explorer</a>. Registered scripts also allow to augment the UI or add behavior on special events.</p>
+	
+	<h3>Editors</h3>
+	<p>Editors are not provided directly by EASE. Instead they ship as part of the development tools for a specific script language. When installing EASE JavaScript support, we automatically install <a href="https://www.eclipse.org/webtools/jsdt/">JSDT</a> which will provide editing support for JavaScript files. For Python the <a href="https://www.pydev.org/">PyDev project</a> provides editing support (to be installed separately).</p> 
+</body>
+</html>

@@ -3,10 +3,10 @@
 
 <toc label="Scripting User Guide" topic="help/html/scripting_guide.html">
    <topic label="Getting Started">
-      <anchor id="gettingstartedX"/>
+      <anchor id="gettingstarted"/>
    </topic>
    <topic label="Concepts">
-      <anchor id="conceptsX"/>
+      <anchor id="concepts"/>
    </topic>
    <topic label="Tasks">
       <anchor id="tasks"/>
@@ -15,6 +15,6 @@
       <anchor id="reference"/>
    </topic>
    <topic label="Tips and tricks">
-      <anchor id="tipsX"/>
+      <anchor id="tips"/>
    </topic>
 </toc>

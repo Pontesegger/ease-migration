@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Script Modules</title>
+</head>
+<body>
+	<h2>Script Modules</h2>
+	
+	<p>Script languages like JavaScript or Python do not have integrated support for Eclipse and its functionality. To interact with your application you would have to know the full classpath of each Java class you want to use.
+	Your code would be cumbersome and complicated to write. EASE tries to help by providing libraries, so called modules, for common functions. These modules are written in Java and get wrapped to script code when a user loads them.
+	The <a href="../gettingstarted/modules_explorer.html">Modules Explorer</a> view helps in browsing available functions.
+	</p>
+
+	<h3>Loading Modules</h3>
+	<p>Modules are loaded via the built-in loadModule() command.  
+	During loading the script engine creates new methods in the target script language that access the Java code of the module. These methods are pushed to the global namespace by default.
+	In case two modules provide a function with the exact same name, the script definitions for them will collide. Effectively the module that was loaded last will win while the methods from other modules will be overridden.
+	Therefore module loading order counts.
+	</p>
+	
+	<h4>Python</h4>
+	<p>In python libraries are usually loaded using import statements. While loadModule() still works in Python, you may also use imports as they feel more Python-like. To convert a module name to an import target:
+	<ol>
+	<li>prefix with 'eclipse.'</li>
+	<li>replace '/' by '.'</li>
+	<li>replace special characters (everything except letters, numbers or '_') by '_'</li>
+	<li>convert everything to lower case</li>
+	</ol>
+	As an example instead of
+	<code>loadModule("/System/UI Builder")</code>
+	you may use
+	<code>import eclipse.system.ui_builder as ui</code>
+	</p> 
+</body>
+</html>

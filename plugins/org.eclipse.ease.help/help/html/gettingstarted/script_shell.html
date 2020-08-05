@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Script Shell View</title>
+</head>
+<body>
+	<h2>Script Shell View</h2>
+	<p>A script shell provides interactive access to a <a href="../concepts/how_script_engines_work.html">script engine</a>, allowing to try out commands and to interactively explore the script API.</p>
+	<img src="../../images/script_shell.png" />
+	
+	<h3>Basic Concept</h3>
+	<p>A shell view hosts an isolated instance of a script engine. Isolated means, that the engine does not share variables, functions or objects with other script engines that may be launched in your IDE.
+	When commands are entered in the command field at the bottom, they get executed immediately and command and execution result are written to the command history area. The icon next to the response indicates the response type, which might be a script object, a native Java object, an exception or a void type.
+	Executed commands will be stored in the history, which can be accessed via the dropdown to the right.</p>
+	
+	<div class="hint">To redo a command you may double click on the line in the command history to copy it to the input area.</div>
+	
+	<p>The input box supports code completion, which allows to browse through the available functions of data structures. To launch code completion type "ctrl-space". Code completion includes the command history, methods on the current object, available variables, loaded modules, and the whole available Java stack.
+	Most script languages are untyped, making type detection really hard. However in the shell we do know the exact type of a variable. To explore hierarchies you may store intermediate results to new variables or you may use the Variables tab on the righthand side to dig deeper.
+	</p> 
+
+	<p>The dropins section to the right displays additional runtime information for the script shell.
+	<dl>
+		<dd>The <i>Variables</i> tab</dd>
+		<dt>shows all assigned variables as well as the last execution result. You may have noticed the '_' variable, which temporarily stores the last execution result and may be used in the next command. Be aware that this variable only exists in the interactive shell, not in script files.</dt>
+
+		<dd>The <i>Module Stack</i> tab</dd>
+		<dt>shows currently loaded script modules. The topmost module got loaded last and has priority over other modules. DnD to the shell will reload a module and therefore reorder the module stack.</dt>
+
+		<dd>The <i>Scripts</i> tab</dd>
+		<dt>shows available scripts for easy access. You May drag them directly in script shell for execution.</dt>
+	</dl>
+	
+	<h3>Toolbar</h3>
+	
+	<p><img src="../../images/icons/modules.png" /> Allows to select a module to be loaded in the script shell.<br />
+	<img src="../../images/icons/erase.png" /> Clear the command history.<br />
+	<img src="../../images/icons/dropins_pane.png" /> Toggle visibility of the dropins pane.<br />
+	<img src="../../images/icons/engines.png" /> Switch the scripting engine. Will also reset the engine.<br />
+	<img src="../../images/icons/reset.png" /> Reset the current script engine.<br />
+	<img src="../../images/icons/new_shell.png" /> Spawn another script shell with its own engine.<br />
+	<img src="../../images/icons/help.png" /> Open the scripting help.<br />
+	</p>
+
+	<h3>Preferences</h3>
+	<p>Shell preferences are available in <i>Preferences/Scripting/Shell</i>. There you may set your preferred engine or startup commands that will be executed when a shell is spawned/resetted.
+	</p>
+
+	<h3>Drag &amp; Drop</h3>
+	<p>The shell quickly becomes a prominent place for daily work. Therefore we try to optimize it for drag &amp; drop operations. Generally the shell tries to adapt anything thrown in to an IScriptable. An extension point is available to add custom drop actions for specific object types.</p>
+</body>
+</html>

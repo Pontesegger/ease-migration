@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How do script engines work</title>
+</head>
+<body>
+	<h2>How do script engines work?</h2>
+	
+	<h3>Scope</h3>
+	<p>Script engines are executed in the scope of the Java runtime. That means, they have the same privileges as all other plug-ins running in your Eclipse application.
+	At the same time they also have access to the Java runtime along with its class library and all the other Java classes that come along with your Eclipse plug-ins. Script engines therefore can interact with Java code, allowing to interact with your application.<br />
+	Memory acquired by your script typically persists until you terminate the script engine. So you need to keep track of your memory consumption. A good way to do this is to enable <i>Preferences/General: Show heap status</i>, which displays the current memory consumption in the status bar.
+	</p>
+
+	<h3>Threading</h3>
+	<p>Each engine is executed in its own thread, isolated from other engines. This means that a variable created in engine A is not automatically available in engine B. For sharing and synchronization you need to use the <i>/System/Scripting</i> module, which provides helper functions for that purpose.</p>
+	<p>An engine is also single threaded by design. If multiple threads are required, consider using the fork() and join() methods from the /System/Scripting module. Some languages also provide special means to create new threads, however these threads might not be connected to you Eclipse runtime anymore as EASE does not know about them.</p>
+	<p>In Eclipse each UI access (like querying a text box) need to be executed in the UI thread. Engines do run in a separate thread which means they do not have direct access to UI elements. The /System/UI module provides some methods that interact with UI elements from the Java layer. To generically execute UI code, use executeUI() from the same module.<br />
+	As executing code in the UI thread is potentially dangerous (you might freeze your UI), you need to explicitely enable it in <i>Preferences/Scripting: Allow scripts to run code in UI thread</i>.
+	</p>
+	 
+	<h3>Output</h3>
+	<p>Default output (stdout &amp; stderr) is printed to the <a href="/help/topic/org.eclipse.jdt.doc.user/reference/views/console/ref-console_view.htm">Console view</a>.
+	Depending on what you do in your application, you might have multiple consoles, which stack above each other in the same view. Only one of them is visible. If you are looking for output, use the toolbar item <i>Display Selected Console</i>, to switch between available consoles.
+	There are also toolbar items that help to cleanup terminated consoles or to push the latest active console to the top. Each script engine (unless spawned with fork()) will get its own console.
+	</p>
+
+	<h3>Termination</h3>
+	<p>Script engines launched via Run Configuration are visible in the <i>Progress</i> view. There you can hit the stop button to terminate them.<br />
+	In Java, threads cannot be terminated directly, instead we have to ask them to gracefully terminate. Script engines therefore check frequently if a termination was requested by the user. In some special cases (eg when a script is waiting for a network response) these checks cannot be executed and script termination is delayed or not executed at all.<br />Once a script engine has a console (which is created on the first output) you may also hit the stop button in the console view to terminate the engine or the currently running script block in case of a <a href="../gettingstarted/script_shell.html">Script Shell</a>.
+	</p>
+	
+	<h3>External Engines</h3>
+	<p>Engines typically run directly as part of your Java runtime, but htere are exceptions to this rule. The Py4J Python engine utilizes an external python interpreter for its work. This means that all data that is transferred between the Java runtime and Python needs to be serialized and shared between processes. This is typically an expensive operation, both in time and memory. When using such engines, try to keep the interaction between the two world small to avoid a serious performance penalty. To give you an impression, a script just calling module methods all the time might easily be 10.000 times slower in Py4J than in Jython or JavaScript.</p>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Custom URI Schemes</title>
+</head>
+<body>
+	<h2>Custom URI Schemes</h2>
+	EASE provides a set of custom <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">URI</a> schemes. These help to resolve special locations when dealing with file resources and scripts.
+
+	<h3>workspace://</h3>
+	<p>Resolves absolute against your Eclipse workspace:
+	<code>include("workspace://ScriptProject/helloWorld.js")</code>
+	... includes the file <i>helloWorld.js</i> from the workspace project named <i>ScriptProject</i>.
+	</p>
+
+	<h3>project://</h3>
+	<p>Resolves relative against the current project. Relative links always need a reference to compare against. By default the currently running script location will be used as reference.
+	<code>include("project://ScriptProject/helloWorld.js")</code>
+	... expects that <i>helloWorld.js</i> exists in the same project as the script that calls include().
+	</p>
+
+	<h3>script://</h3>
+	<p>Resolves absolute against the repository of registered scripts. The path to be used is the same as displayed in the <a href="../gettingstarted/script_explorer.html">Script Explorer</a> view.
+	</p>
+</body>
+</html>

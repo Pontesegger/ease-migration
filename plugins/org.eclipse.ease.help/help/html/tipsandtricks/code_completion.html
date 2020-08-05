@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Code Completion</title>
+</head>
+<body>
+	<h2>Code Completion</h2>
+	
+	Code completion in Eclipse is triggered by hitting ctrl-space in an editor. It provides suggestions, how to continue a line of code and can save you lots of typing. You may safely trigger code completion anytime to improve your productivity.
+	
+	<h3>JavaScript</h3>
+	<p>The JSDT editor comes with built-in completion support for your used variables and functions. Additionally EASE comes with addtional suggestions for methods of loaded modules. Therefore it parses the script code to detect loaded modules.
+	The parser is quite limited and simply scans for loadModule() lines. It does not detect conditional loads or module names stored in variables or similar complex code constructs. Code completion is also available for several parameters (typically of string type),
+	eg you may trigger code completion after typing <code>loadModule("</code> to get a list of available modules.
+	</p>
+	
+	<p>To activate code completion for java types, you need to tell the editor which java object you are working on:
+	<code>// @type java.io.File
+	var logFile = ...
+	</code>
+	This will treat <i>logFile</i> as java.io.File and furtheron displays completion proposals for that variable.
+	</p>
+		
+	<h3>Shell</h3>
+	<p>Ctrl-space works in the <a href="../gettingstarted/script_shell.html">Script Shell</a> input box, too. Here we have live information for all variables and can automatically denote their type. This makes code completions much more powerful.
+	</p>
+</body>
+</html>

@@ -2,10 +2,12 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Getting Started" link_to="help/main.xml#gettingstarted"> 
-	<topic label="Main Topic"  href="html/gettingstarted/maintopic.html"> 
-		<topic label="Sub Topic" href="html/gettingstarted/subtopic.html" /> 
+	<topic label="Scripting Perspective"  href="help/html/gettingstarted/scripting_perspective.html"> 
 	</topic>
-	<topic label="Main Topic 2">
-		<topic label="Sub Topic 2" href="html/gettingstarted/subtopic2.html" />
-	</topic> 
+ <topic href="help/html/gettingstarted/script_shell.html" label="Script Shell">
+ </topic>
+ <topic href="help/html/gettingstarted/modules_explorer.html" label="Modules Explorer">
+ </topic>
+ <topic href="help/html/gettingstarted/script_explorer.html" label="Script Explorer">
+ </topic>
 </toc>
