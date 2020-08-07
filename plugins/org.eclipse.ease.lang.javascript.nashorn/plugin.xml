@@ -22,5 +22,12 @@
             engineID="org.eclipse.ease.javascript.nashorn">
       </completionAnalyzer>
    </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/engines.xml"
+            primary="false">
+      </toc>
+   </extension>
 
 </plugin>

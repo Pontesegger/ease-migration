@@ -40,4 +40,11 @@
           name="Jython external library">
     </page>
  </extension>
+ <extension
+       point="org.eclipse.help.toc">
+    <toc
+          file="help/engines.xml"
+          primary="false">
+    </toc>
+ </extension>
 </plugin>

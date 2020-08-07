@@ -54,5 +54,12 @@
             class="org.eclipse.ease.lang.python.py4j.internal.ui.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/engines.xml"
+            primary="false">
+      </toc>
+   </extension>
 
 </plugin>

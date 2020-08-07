@@ -7,6 +7,7 @@ Eclipse-BuddyPolicy: global
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.ease,
  org.eclipse.ease.lang.javascript,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ org.eclipse.help
 Export-Package: org.eclipse.ease.lang.javascript.nashorn
 Automatic-Module-Name: org.eclipse.ease.lang.javascript.nashorn

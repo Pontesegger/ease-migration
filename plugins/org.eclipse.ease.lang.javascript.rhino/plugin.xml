@@ -102,5 +102,12 @@
             id="org.eclipse.ease.lang.javascript.rhino.debugger.hover">
       </hover>
    </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/engines.xml"
+            primary="false">
+      </toc>
+   </extension>
 </plugin>
 

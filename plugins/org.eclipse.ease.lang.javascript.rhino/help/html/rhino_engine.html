@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JavaScript: Rhino</title>
+</head>
+<body>
+	<h2>JavaScript: Rhino</h2>
+	
+	<p><a href="https://github.com/mozilla/rhino">Mozilla Rhino</a> is a JavaScript interpreter implemented in Java. The script code is translated into byte code for the JVM which allows for the same optimizations as native Java code.
+	</p>
+	
+	<h3>JavaScript Compatibility</h3>
+	
+	<p>The Rhino runtime is provided as a separate plug-in and loaded by EASE. Depending on the installed version of the Rhino runtime, different levels of JavaScript support are available.
+	By default we try to enable ECMAScript 6 support, which is not fully implemented in Rhino yet. Check out the <a href="http://mozilla.github.io/rhino/compat/engines.html">compatibility table</a> for details.<br />
+	If not available EASE will gracefully fall back to JavaScript 1.8 support and finally drop to 1.7.
+	</p>
+	
+	<h3>Special language features</h3>
+	
+	<h4>Built-in libraries</h4>
+	
+	<p>Rhino comes with some standard libraries:
+	<ul>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a></li>
+	<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON">JSON</a></li>
+	</ul>
+	</p>
+
+	<h4>String class ambiguity</h4>
+	<p>JavaScript provides a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String class</a> that differs from the <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/lang/String.html">Java String class</a>. As a script might have instances of both, this often leads to confusion. The variables drop-in in the <a href="script_shell.html">Script Shell</a> view shows the actual type by using different icons.
+	<code>var javaScriptString = "I am a javaScript string";
+var javaString = new java.lang.String("I am a Java string");</code>
+	</p>
+
+	<p>To convert any string type to JavaScript use:
+	<code>var javaScriptString = someString + "";</code> 
+	</p>
+	
+	<p>To convert any string to Java use:
+	<code>var javaString = new java.lang.String(someString);</code> 
+	</p> 
+		
+	<h4>Java class interaction</h4>
+	
+	<p>Java classes on the classpath can directly be used when accessed with their full qualified name (eg. <i>java.io.File</i>). Typical top level package names will be detected automatically, eg com.*, org.*, java.*. In case your package is not detected as it may start with an unusual top level name, you may access it via the <i>Packages.&lt;full qualified name&gt;</i> syntax.</p>
+
+	<p>When accessing Java classes you always have to use full qualified class names. To simplify script code you may load classes or packages directly to the global namespace:
+	<code>importClass(java.io.File);
+new File(...)	
+	</code>
+
+	<code>importPackage(java.net);
+new ServerSocket(...)	
+	</code>
+	</p>
+	
+</body>
+</html>
