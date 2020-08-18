@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.modules.ModuleCategoryDefinition;
 import org.eclipse.ease.modules.ModuleDefinition;
@@ -129,4 +130,36 @@ public interface IScriptService {
 	 *             any exception thrown by the script
 	 */
 	Object executeScript(String scriptLocation, String engineID, String... arguments) throws Throwable;
+
+	/**
+	 * Create an engine from a given description.
+	 *
+	 * @param description
+	 *            engine description
+	 * @return script engine instance
+	 */
+	IScriptEngine createEngine(EngineDescription description);
+
+	/**
+	 * Get all running script engines.
+	 *
+	 * @return running engines
+	 */
+	Collection<IScriptEngine> getRunningEngines();
+
+	/**
+	 * Add a listener for engine creations. If already added, nothing will happen.
+	 *
+	 * @param listener
+	 *            listener to add.
+	 */
+	void addEngineListener(IScriptEngineLaunchExtension listener);
+
+	/**
+	 * Remove a listener for engine creations.
+	 *
+	 * @param listener
+	 *            listener to remove
+	 */
+	void removeEngineListener(IScriptEngineLaunchExtension listener);
 }

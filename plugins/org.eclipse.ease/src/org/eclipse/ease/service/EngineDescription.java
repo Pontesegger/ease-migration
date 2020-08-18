@@ -16,13 +16,13 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.classloader.EaseClassLoader;
 
@@ -48,10 +48,6 @@ public class EngineDescription {
 		fConfigurationElement = configurationElement;
 	}
 
-	// public Collection<String> getSupportedScriptTypesNames() {
-	// return Collections2.transform(getSupportedScriptTypes(), new ScriptType.ToScriptType());
-	// }
-	//
 	public List<ScriptType> getSupportedScriptTypes() {
 		if (fTypes == null) {
 			fTypes = new ArrayList<>();
@@ -84,31 +80,22 @@ public class EngineDescription {
 	}
 
 	/**
-	 * Create a dedicated script engine.
+	 * Create an instance of the script engine.
 	 *
-	 * @return script engine or <code>null</code>
+	 * @return script engine instance
+	 * @throws CoreException
+	 *             when engine is of wrong type or cannot be instantiated
 	 */
+	public IScriptEngine createInstance() throws CoreException {
+		final Object object = fConfigurationElement.createExecutableExtension(CLASS);
+		if (object instanceof IScriptEngine)
+			return (IScriptEngine) object;
+
+		throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Engine implementation is corrupt: " + getID()));
+	}
+
 	public IScriptEngine createEngine() {
-		try {
-			final Object object = fConfigurationElement.createExecutableExtension(CLASS);
-			if (object instanceof IScriptEngine) {
-				// configure engine
-				if (object instanceof AbstractScriptEngine)
-					((AbstractScriptEngine) object).setEngineDescription(this);
-
-				// engine loaded, now load launch extensions
-				final IScriptService scriptService = ScriptService.getService();
-				for (final IScriptEngineLaunchExtension extension : scriptService.getLaunchExtensions(this))
-					extension.createEngine((IScriptEngine) object);
-
-				return (IScriptEngine) object;
-			}
-
-		} catch (final CoreException e) {
-			Logger.error(Activator.PLUGIN_ID, "Could not create script engine: " + getID(), e);
-		}
-
-		return null;
+		return ScriptService.getService().createEngine(this);
 	}
 
 	public String getID() {
@@ -165,11 +152,12 @@ public class EngineDescription {
 	}
 
 	private Class<?> getEngineClass() {
-		final String className = fConfigurationElement.getAttribute(CLASS);
 		try {
+			final String className = fConfigurationElement.getAttribute(CLASS);
 			return new EaseClassLoader().loadClass(className);
+
 		} catch (final ClassNotFoundException e) {
-			return createEngine().getClass();
+			return ScriptService.getService().createEngine(this).getClass();
 		}
 	}
 }

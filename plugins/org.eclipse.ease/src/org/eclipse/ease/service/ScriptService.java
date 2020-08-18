@@ -22,16 +22,20 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.ICodeParser;
+import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.modules.ModuleCategoryDefinition;
 import org.eclipse.ease.modules.ModuleDefinition;
@@ -40,7 +44,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
-public class ScriptService implements IScriptService, BundleListener {
+public class ScriptService implements IScriptService, BundleListener, IExecutionListener {
 
 	private static final String ENGINE = "engine";
 
@@ -86,8 +90,23 @@ public class ScriptService implements IScriptService, BundleListener {
 
 	private Map<String, ModuleCategoryDefinition> fAvailableModuleCategories = null;
 
+	private final Collection<IScriptEngine> fRunningEngines = new ArrayList<>();
+
+	private final ListenerList<IScriptEngineLaunchExtension> fEngineListeners = new ListenerList<>();
+
 	private ScriptService() {
 		Activator.getDefault().getContext().addBundleListener(this);
+	}
+
+	@Override
+	public void addEngineListener(IScriptEngineLaunchExtension listener) {
+		if (listener != null)
+			fEngineListeners.add(listener);
+	}
+
+	@Override
+	public void removeEngineListener(IScriptEngineLaunchExtension listener) {
+		fEngineListeners.remove(listener);
 	}
 
 	@Override
@@ -370,7 +389,7 @@ public class ScriptService implements IScriptService, BundleListener {
 
 		if (engineDescription != null) {
 			// create engine
-			final IScriptEngine engine = engineDescription.createEngine();
+			final IScriptEngine engine = createEngine(engineDescription);
 			engine.setVariable("argv", arguments);
 
 			// TODO implement better URI handling - eg create URI and pass to script engine
@@ -388,5 +407,47 @@ public class ScriptService implements IScriptService, BundleListener {
 		}
 
 		throw new IllegalArgumentException("Cannot locate a matching script engine");
+	}
+
+	@Override
+	public IScriptEngine createEngine(EngineDescription description) {
+		IScriptEngine engine;
+		try {
+			engine = description.createInstance();
+
+			// configure engine
+			if (engine instanceof AbstractScriptEngine)
+				((AbstractScriptEngine) engine).setEngineDescription(description);
+
+			// register engine locally
+			fRunningEngines.add(engine);
+			engine.addExecutionListener(this);
+
+			// inform listeners
+			for (final IScriptEngineLaunchExtension listener : fEngineListeners)
+				listener.createEngine(engine);
+
+			// engine loaded, now load launch extensions
+			for (final IScriptEngineLaunchExtension extension : getLaunchExtensions(description))
+				extension.createEngine(engine);
+
+			return engine;
+
+		} catch (final CoreException e) {
+			Logger.error(Activator.PLUGIN_ID, "Could not create script engine: " + description.getID(), e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public Collection<IScriptEngine> getRunningEngines() {
+		return fRunningEngines;
+	}
+
+	@Override
+	public void notify(IScriptEngine engine, Script script, int status) {
+		if (status == IExecutionListener.ENGINE_END)
+			fRunningEngines.remove(engine);
 	}
 }
