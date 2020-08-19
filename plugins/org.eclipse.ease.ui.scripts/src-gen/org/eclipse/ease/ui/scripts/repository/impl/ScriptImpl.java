@@ -541,6 +541,13 @@ public class ScriptImpl extends RawLocationImpl implements IScript {
 		if (engine != null) {
 			engine.setVariable("argv", parameters);
 			engine.schedule();
+
+			final IEventBroker fEventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+			if (fEventBroker != null) {
+				final HashMap<String, Object> eventData = new HashMap<>();
+				eventData.put("script", this);
+				fEventBroker.post(IRepositoryService.BROKER_CHANNEL_SCRIPTS_RUN, eventData);
+			}
 		}
 
 		return engine;

@@ -30,6 +30,9 @@ public interface IRepositoryService {
 	/** Channel to promote new detected user scripts. */
 	String BROKER_CHANNEL_SCRIPTS_NEW = BROKER_CHANNEL_SCRIPTS_BASE + "new";
 
+	/** Channel to promote script executions on. */
+	String BROKER_CHANNEL_SCRIPTS_RUN = BROKER_CHANNEL_SCRIPTS_BASE + "run";
+
 	/** Channel to promote when user scripts are removed. */
 	String BROKER_CHANNEL_SCRIPTS_REMOVED = BROKER_CHANNEL_SCRIPTS_BASE + "removed";
 
