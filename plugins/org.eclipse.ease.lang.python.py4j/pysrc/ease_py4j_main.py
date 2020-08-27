@@ -395,7 +395,7 @@ def _pyease_main(argv):
     port = int(argv[1])
     engine = _pyease_ScriptEngineExecute()
     # Bug 517528: Disable memory management until Py4J #275 is resolved
-    enable_memory_management = False
+    enable_memory_management = True
     java_params = _pyease_JavaParameters(auto_convert=True, port=port,
                                  enable_memory_management=enable_memory_management)
     gateway = _pyease_ClientServer(java_parameters=java_params,
