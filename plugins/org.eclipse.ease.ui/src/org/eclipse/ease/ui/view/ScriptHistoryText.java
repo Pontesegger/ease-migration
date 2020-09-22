@@ -218,8 +218,8 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	/**
 	 * Print the script command.
 	 *
-	 * @param text
-	 *            text to print
+	 * @param message
+	 *            message to print
 	 */
 	public void printCommand(final String message) {
 		if (message != null) {

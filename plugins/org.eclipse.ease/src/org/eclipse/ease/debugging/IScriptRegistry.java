@@ -40,7 +40,7 @@ public interface IScriptRegistry {
 	/**
 	 * Get the {@link IResource} identified by this {@link Script}.
 	 *
-	 * @param resource
+	 * @param script
 	 *            {@link Script} to get {@link IResource} for.
 	 * @return {@link IResource} identified by {@link Script} or {@code null} if no mapping found.
 	 */

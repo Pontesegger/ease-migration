@@ -130,7 +130,7 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 	}
 
 	/**
-	 * Sets the given script engine for all registered completion providers. Calls {@link ICompletionProvider#setScriptEngine(IScriptEngine)}.
+	 * Sets the given script engine for all registered completion providers.
 	 *
 	 * @param scriptEngine
 	 *            {@link IScriptEngine} to be set.

@@ -23,9 +23,8 @@ public interface ISecurityCheck {
 	/**
 	 * Verification to be performed before a certain engine action is executed.
 	 * <p>
-	 * For {@value ActionType#INJECT_CODE} following parameters are provided:<br/>
-	 * data[0] ... {@link Script} instance<br/>
-	 * data[1] ... boolean indicator if script should be run in the UI thread
+	 * For {@link ActionType#INJECT_CODE} following parameters are provided: data[0] ... {@link Script} instance data[1] ... boolean indicator if script should
+	 * be run in the UI thread
 	 * </p>
 	 * When <code>false</code> is returned the action will be silently skipped if possible. On {@link SecurityException}s the exception message will be provided
 	 * as user feedback.

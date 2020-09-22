@@ -54,7 +54,7 @@ public interface IPyFrame {
 	/**
 	 * Get variables visible from current frame.
 	 *
-	 * @return variableName -> variableContent
+	 * @return variableName -&gt; variableContent
 	 */
 	Map<String, Object> getVariables();
 

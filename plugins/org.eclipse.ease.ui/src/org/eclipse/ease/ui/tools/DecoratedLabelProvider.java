@@ -55,7 +55,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getImage(java.lang.Object)
 		 */
 		@Override
@@ -65,7 +65,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
 		 */
 		@Override
@@ -81,7 +81,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
 		@Override
@@ -91,7 +91,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 		 */
 		@Override
@@ -101,7 +101,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
 		 */
 		@Override
@@ -111,7 +111,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
 		@Override
@@ -121,7 +121,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
 		 */
 		@Override
@@ -134,7 +134,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
 		 */
 		@Override
@@ -147,7 +147,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
 		 */
 		@Override
@@ -168,8 +168,8 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 	}
 
 	/**
-	 * Creates a {@link NavigatorDecoratingLabelProvider}
-	 * 
+	 * Creates a NavigatorDecoratingLabelProvider.
+	 *
 	 * @param commonLabelProvider
 	 *            the label provider to use
 	 */
@@ -179,7 +179,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.StyledCellLabelProvider#initialize(org.eclipse.jface.viewers.ColumnViewer, org.eclipse.jface.viewers.ViewerColumn)
 	 */
 	@Override
@@ -194,7 +194,7 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider#dispose()
 	 */
 	@Override
@@ -205,11 +205,11 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 	}
 
 	private void refresh() {
-		ColumnViewer viewer = getViewer();
+		final ColumnViewer viewer = getViewer();
 		if (viewer == null) {
 			return;
 		}
-		boolean showColoredLabels = showColoredLabels();
+		final boolean showColoredLabels = showColoredLabels();
 		if (showColoredLabels != isOwnerDrawEnabled()) {
 			setOwnerDrawEnabled(showColoredLabels);
 			viewer.refresh();
@@ -224,26 +224,21 @@ public class DecoratedLabelProvider extends DecoratingStyledCellLabelProvider im
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		String property = event.getProperty();
+		final String property = event.getProperty();
 		if (property.equals(JFacePreferences.QUALIFIER_COLOR) || property.equals(JFacePreferences.COUNTER_COLOR)
 				|| property.equals(JFacePreferences.DECORATIONS_COLOR) || property.equals(IWorkbenchPreferenceConstants.USE_COLORED_LABELS)) {
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					refresh();
-				}
-			});
+			Display.getDefault().asyncExec(() -> refresh());
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
 	@Override

@@ -18,7 +18,7 @@ import org.eclipse.ease.ui.tools.AbstractPopupMenu;
 
 public class ScriptPopupMenu extends AbstractPopupMenu {
 
-	private final List<AbstractPopupItem> mItems = new ArrayList<AbstractPopupItem>();
+	private final List<AbstractPopupItem> mItems = new ArrayList<>();
 
 	public ScriptPopupMenu(final String name) {
 		super(name);
@@ -34,10 +34,6 @@ public class ScriptPopupMenu extends AbstractPopupMenu {
 			addPopup(item);
 	}
 
-	/**
-	 * @param segment
-	 * @return
-	 */
 	public boolean hasSubMenu(final String name) {
 		for (final AbstractPopupItem item : mItems) {
 			if (item.getDisplayName().equals(name))
@@ -47,10 +43,6 @@ public class ScriptPopupMenu extends AbstractPopupMenu {
 		return false;
 	}
 
-	/**
-	 * @param segment
-	 * @return
-	 */
 	public ScriptPopupMenu getSubMenu(final String name) {
 		for (final AbstractPopupItem item : mItems) {
 			if ((item.getDisplayName().equals(name)) && (item instanceof ScriptPopupMenu))

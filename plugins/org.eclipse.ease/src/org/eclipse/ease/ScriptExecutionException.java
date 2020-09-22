@@ -58,8 +58,6 @@ public class ScriptExecutionException extends RuntimeException {
 	 *
 	 * @param message
 	 *            error message
-	 * @param lineNumber
-	 *            number of the line where the error happened
 	 * @param columnNumber
 	 *            number of the column where the error happened
 	 * @param lineSource

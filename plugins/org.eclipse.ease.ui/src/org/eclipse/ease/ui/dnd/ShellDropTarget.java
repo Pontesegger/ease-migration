@@ -96,8 +96,8 @@ public final class ShellDropTarget extends DropTargetAdapter {
 	 *
 	 * @param parent
 	 *            control accepting drops
-	 * @param javaScriptShell
-	 *            shell for DND action execution
+	 * @param engineProvider
+	 *            container providing a script engine
 	 */
 	public static void addDropSupport(final Control parent, final IScriptEngineProvider engineProvider) {
 		final DropTarget target = new DropTarget(parent, DND.DROP_COPY | DND.DROP_MOVE);

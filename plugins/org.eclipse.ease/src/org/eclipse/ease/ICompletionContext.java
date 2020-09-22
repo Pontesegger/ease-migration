@@ -61,7 +61,7 @@ public interface ICompletionContext {
 	Collection<ModuleDefinition> getLoadedModules();
 
 	/**
-	 * Get a list of included resource. Returns a map of resource objects -> resource content.
+	 * Get a list of included resource. Returns a map of resource objects -&gt; resource content.
 	 *
 	 * @return map of included resources
 	 */

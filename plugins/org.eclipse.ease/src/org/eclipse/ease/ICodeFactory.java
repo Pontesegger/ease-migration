@@ -94,8 +94,7 @@ public interface ICodeFactory {
 	String classInstantiation(Class<?> clazz, String[] parameters);
 
 	/**
-	 * Create code to call a wrapped function. Create code to call a script function that was wrapped using
-	 * {@link #createFunctionWrapper(IEnvironment, String, Method)} before.
+	 * Create code to call a wrapped function.
 	 *
 	 * @param method
 	 *            method to be called

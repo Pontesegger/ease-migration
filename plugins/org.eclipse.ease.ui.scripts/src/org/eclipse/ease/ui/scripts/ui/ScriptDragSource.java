@@ -19,7 +19,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TreeDragSourceEffect;
 
 /**
- * Source for a script D&D event.
+ * Source for a script D&amp;D event.
  */
 public class ScriptDragSource extends TreeDragSourceEffect {
 
@@ -27,7 +27,7 @@ public class ScriptDragSource extends TreeDragSourceEffect {
 
 	/**
 	 * Constructor. Gets its macros from a tree selection.
-	 * 
+	 *
 	 * @param tree
 	 *            tree to read from
 	 */
@@ -38,7 +38,7 @@ public class ScriptDragSource extends TreeDragSourceEffect {
 
 	/**
 	 * Does everything to add drag support to a given tree.
-	 * 
+	 *
 	 * @param treeViewer
 	 *            tree to add drag support to
 	 */

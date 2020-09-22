@@ -81,20 +81,20 @@ public class VerifySignature {
 	public static VerifySignature getInstance(final ScriptType scriptType, final InputStream inputStream, final InputStream signatureInputStream)
 			throws ScriptSignatureException {
 
-		if (scriptType == null || inputStream == null)
+		if ((scriptType == null) || (inputStream == null))
 			throw new ScriptSignatureException("One or more parameters are not provided");
 
-		ICodeParser iCodeParser = scriptType.getCodeParser();
-		
+		final ICodeParser iCodeParser = scriptType.getCodeParser();
+
 		if (iCodeParser == null) {
 			return null;
 		}
-		
+
 		if (signatureInputStream == null) {
-			SignatureInfo signatureInfo = iCodeParser.getSignatureInfo(inputStream);
+			final SignatureInfo signatureInfo = iCodeParser.getSignatureInfo(inputStream);
 			if (signatureInfo != null) {
-				if (signatureInfo.getSignature() == null || signatureInfo.getProvider() == null || signatureInfo.getMessageDigestAlgo() == null
-						|| signatureInfo.getCertificateChain() == null || signatureInfo.getContentOnly() == null)
+				if ((signatureInfo.getSignature() == null) || (signatureInfo.getProvider() == null) || (signatureInfo.getMessageDigestAlgo() == null)
+						|| (signatureInfo.getCertificateChain() == null) || (signatureInfo.getContentOnly() == null))
 					throw new ScriptSignatureException("Error while parsing script. Try again.");
 
 				return new VerifySignature(signatureInfo);
@@ -103,14 +103,14 @@ public class VerifySignature {
 				return null;
 
 		} else {
-			SignatureInfo signatureInfo = iCodeParser.getSignatureInfo(signatureInputStream);
+			final SignatureInfo signatureInfo = iCodeParser.getSignatureInfo(signatureInputStream);
 			if (signatureInfo != null) {
-				if (signatureInfo.getSignature() == null || signatureInfo.getProvider() == null || signatureInfo.getMessageDigestAlgo() == null
-						|| signatureInfo.getCertificateChain() == null)
+				if ((signatureInfo.getSignature() == null) || (signatureInfo.getProvider() == null) || (signatureInfo.getMessageDigestAlgo() == null)
+						|| (signatureInfo.getCertificateChain() == null))
 					throw new ScriptSignatureException("Error while parsing script. Try again.");
 
-				BufferedInputStream bInput = new BufferedInputStream(inputStream);
-				StringBuffer sBuf = new StringBuffer();
+				final BufferedInputStream bInput = new BufferedInputStream(inputStream);
+				final StringBuffer sBuf = new StringBuffer();
 
 				int cur;
 				try {
@@ -121,7 +121,7 @@ public class VerifySignature {
 
 					return new VerifySignature(signatureInfo);
 
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					Logger.error(Activator.PLUGIN_ID, e.getMessage(), e);
 					throw new ScriptSignatureException("An IO error occurred while reading file.", e);
 
@@ -129,7 +129,7 @@ public class VerifySignature {
 					try {
 						if (bInput != null)
 							bInput.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Logger.error(Activator.PLUGIN_ID, e.getMessage(), e);
 					}
 
@@ -166,7 +166,7 @@ public class VerifySignature {
 			certificateFactory = CertificateFactory.getInstance("X.509");
 			return certificateFactory.generateCertificate(new ByteArrayInputStream(bytesCert));
 
-		} catch (CertificateException e) {
+		} catch (final CertificateException e) {
 			throw new ScriptSignatureException("Error while retrieving certificate.", e);
 		}
 	}
@@ -180,15 +180,15 @@ public class VerifySignature {
 	 */
 	private List<Certificate> getCertificateChain() throws ScriptSignatureException {
 
-		String certChainString[] = fSignatureInfo.getCertificateChain();
-		int noOfCert = certChainString.length;
-		byte[][] certChainByte = new byte[noOfCert][];
+		final String certChainString[] = fSignatureInfo.getCertificateChain();
+		final int noOfCert = certChainString.length;
+		final byte[][] certChainByte = new byte[noOfCert][];
 
 		for (int i = 0; i < noOfCert; i++)
 			certChainByte[i] = SignatureHelper.convertBase64ToBytes(certChainString[i]);
 
-		ArrayList<Certificate> certificateList = new ArrayList<>();
-		for (byte cert[] : certChainByte)
+		final ArrayList<Certificate> certificateList = new ArrayList<>();
+		for (final byte cert[] : certChainByte)
 			certificateList.add(getCertificate(cert));
 
 		return certificateList;
@@ -204,8 +204,8 @@ public class VerifySignature {
 	public boolean isSelfSignedCertificate() throws ScriptSignatureException {
 
 		if (fSignatureInfo != null) {
-			ArrayList<Certificate> certificateList = (ArrayList<Certificate>) getCertificateChain();
-			Certificate certificate = certificateList.get(0);
+			final ArrayList<Certificate> certificateList = (ArrayList<Certificate>) getCertificateChain();
+			final Certificate certificate = certificateList.get(0);
 
 			return SignatureHelper.isSelfSignedCertificate(certificate);
 		}
@@ -227,35 +227,35 @@ public class VerifySignature {
 	 */
 	public boolean isCertChainValid(InputStream trustStoreLocation, char[] trustStorePassword) throws ScriptSignatureException {
 
-		if ((trustStoreLocation == null && trustStorePassword != null) || (trustStoreLocation != null && trustStorePassword == null))
+		if (((trustStoreLocation == null) && (trustStorePassword != null)) || ((trustStoreLocation != null) && (trustStorePassword == null)))
 			throw new ScriptSignatureException("Either both or none of the parameters should be null");
 
 		if (fSignatureInfo != null) {
 			InputStream iStream = null;
 			try {
-				if (trustStoreLocation == null && trustStorePassword == null) {
+				if ((trustStoreLocation == null) && (trustStorePassword == null)) {
 					// TODO check following command for windows
 					iStream = new FileInputStream(System.getProperty("java.home") + "/lib/security/" + "cacerts");
 					trustStorePassword = "changeit".toCharArray();
 				} else
 					iStream = ResourceTools.getInputStream(trustStoreLocation);
 
-				CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+				final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
 
-				ArrayList<Certificate> certificateList = (ArrayList<Certificate>) getCertificateChain();
+				final ArrayList<Certificate> certificateList = (ArrayList<Certificate>) getCertificateChain();
 
-				int certLength = certificateList.size();
+				final int certLength = certificateList.size();
 				if (SignatureHelper.isSelfSignedCertificate(certificateList.get(certLength - 1)))
 					certificateList.remove(certLength - 1);
 
-				CertPath certPath = certificateFactory.generateCertPath(certificateList);
+				final CertPath certPath = certificateFactory.generateCertPath(certificateList);
 
-				CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+				final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
 
-				KeyStore keystore = KeyStore.getInstance("JKS");
+				final KeyStore keystore = KeyStore.getInstance("JKS");
 				keystore.load(iStream, trustStorePassword);
 
-				PKIXParameters params = new PKIXParameters(keystore);
+				final PKIXParameters params = new PKIXParameters(keystore);
 				params.setRevocationEnabled(true);
 
 				// If certificate does not contain OSCP or CRL responder than that certificate will be considered invalid
@@ -267,29 +267,29 @@ public class VerifySignature {
 				validator.validate(certPath, params);
 				return true;
 
-			} catch (CertificateException e) {
+			} catch (final CertificateException e) {
 				throw new ScriptSignatureException("One or more certificates can't be loaded.", e);
 
-			} catch (NoSuchAlgorithmException e) {
+			} catch (final NoSuchAlgorithmException e) {
 				throw new ScriptSignatureException("Algorithm used for securing truststore can't be found. Chose another Truststore.", e);
 
-			} catch (KeyStoreException e) {
+			} catch (final KeyStoreException e) {
 				throw new ScriptSignatureException("Truststore can't be loaded.");
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				if (e.getCause() instanceof UnrecoverableKeyException)
 					throw new ScriptSignatureException("Invalid Truststore Password.", e);
-				else if (e.getCause() instanceof FileNotFoundException || e.getCause() instanceof SecurityException)
+				else if ((e.getCause() instanceof FileNotFoundException) || (e.getCause() instanceof SecurityException))
 					throw new ScriptSignatureException("File can't be read. Chose another Truststore or try again.", e);
 
 				Logger.error(Activator.PLUGIN_ID, Arrays.toString(e.getStackTrace()), e);
 				throw new ScriptSignatureException("Error loading Truststore. Try again.", e);
 
-			} catch (InvalidAlgorithmParameterException e) {
+			} catch (final InvalidAlgorithmParameterException e) {
 				Logger.error(Activator.PLUGIN_ID, Arrays.toString(e.getStackTrace()), e);
 				throw new ScriptSignatureException("Can't perform validation.", e);
 
-			} catch (CertPathValidatorException e) {
+			} catch (final CertPathValidatorException e) {
 				// if any invalidation occurs, exception will be caught here
 				throw new ScriptSignatureException(e.getMessage());
 
@@ -297,7 +297,7 @@ public class VerifySignature {
 				try {
 					if (iStream != null)
 						iStream.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					Logger.error(Activator.PLUGIN_ID, Arrays.toString(e.getStackTrace()), e);
 				}
 			}
@@ -307,7 +307,7 @@ public class VerifySignature {
 
 	/**
 	 * Checks the validity of certificate. If certificate is CA signed, then it checks the validity of CA with trust-store. It uses default truststore present
-	 * at JRE_PATH/lib/security/cacerts and "changeit" as password. If password has been modified, use {@link #isCertChainValid(String, char[])}.
+	 * at JRE_PATH/lib/security/cacerts and "changeit" as password. If password has been modified, use {@link #isCertChainValid(InputStream, char[])}.
 	 *
 	 * @return <code>true</code> if certificate is valid and trusted or <code>false</code> if certificate is invalid or not trusted
 	 * @throws ScriptSignatureException
@@ -328,15 +328,16 @@ public class VerifySignature {
 	public boolean verify() throws ScriptSignatureException {
 
 		if (fSignatureInfo != null) {
-			byte[] signByte = SignatureHelper.convertBase64ToBytes(fSignatureInfo.getSignature());
-			byte[] certByte = SignatureHelper.convertBase64ToBytes(fSignatureInfo.getCertificateChain()[0]);
-			Certificate userCert = getCertificate(certByte);
+			final byte[] signByte = SignatureHelper.convertBase64ToBytes(fSignatureInfo.getSignature());
+			final byte[] certByte = SignatureHelper.convertBase64ToBytes(fSignatureInfo.getCertificateChain()[0]);
+			final Certificate userCert = getCertificate(certByte);
 
 			try {
-				PublicKey publicKey = userCert.getPublicKey();
-				String encryptionAlgo = publicKey.getAlgorithm();
+				final PublicKey publicKey = userCert.getPublicKey();
+				final String encryptionAlgo = publicKey.getAlgorithm();
 
-				Signature signature = Signature.getInstance(fSignatureInfo.getMessageDigestAlgo() + "with" + encryptionAlgo, fSignatureInfo.getProvider());
+				final Signature signature = Signature.getInstance(fSignatureInfo.getMessageDigestAlgo() + "with" + encryptionAlgo,
+						fSignatureInfo.getProvider());
 
 				// initialize signature instance with public key
 				signature.initVerify(publicKey);
@@ -346,17 +347,17 @@ public class VerifySignature {
 
 				return signature.verify(signByte);
 
-			} catch (SignatureException e) {
+			} catch (final SignatureException e) {
 				Logger.error(Activator.PLUGIN_ID, "Signature object not initialized properly or signature is not readable.", e);
 				throw new ScriptSignatureException("Signature is not readable.", e);
 
-			} catch (NoSuchAlgorithmException e) {
+			} catch (final NoSuchAlgorithmException e) {
 				throw new ScriptSignatureException("Algorithm used by signature is not recognized by provider.", e);
 
-			} catch (InvalidKeyException e) {
+			} catch (final InvalidKeyException e) {
 				throw new ScriptSignatureException("Public key is invalid.", e);
 
-			} catch (NoSuchProviderException e) {
+			} catch (final NoSuchProviderException e) {
 				throw new ScriptSignatureException("No such provider is registered in Security Providers' list.", e);
 
 			}

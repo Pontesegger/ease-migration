@@ -19,7 +19,6 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
-import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.debugging.AbstractEaseDebugger;
 import org.eclipse.ease.debugging.EaseDebugFrame;
@@ -44,7 +43,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 		private final IPyFrame fFrame;
 
 		/**
-		 * Constructor parses information from {@link IPyFrame} to correct parameters for {@link EaseDebugFrame#ScriptDebugFrame(Script, int, int)}.
+		 * Constructor parses information from {@link IPyFrame} to correct parameters for {@link EaseDebugFrame#EaseDebugFrame(Script, int, int)}.
 		 *
 		 * @param frame
 		 *            {@link IPyFrame} with information about the current execution frame.
@@ -102,7 +101,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 	private boolean fBreakpointsDisabled = false;
 
 	/**
-	 * @see AbstractEaseDebugger#AbstractScriptDebugger(IScriptEngine, boolean)
+	 * @see AbstractEaseDebugger#AbstractEaseDebugger(IDebugEngine, boolean)
 	 */
 	public PythonDebugger(final IDebugEngine engine, final boolean showDynamicCode) {
 		super(engine, showDynamicCode);

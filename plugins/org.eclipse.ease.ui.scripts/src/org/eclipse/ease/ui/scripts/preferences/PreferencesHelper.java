@@ -73,7 +73,7 @@ public final class PreferencesHelper {
 	}
 
 	/**
-	 * Returns a collection of script locations as stored in the preferences. Converts preference data to {@link IEntry} elements.
+	 * Returns a collection of script locations as stored in the preferences. Converts preference data to {@link IScriptLocation} elements.
 	 *
 	 * @return all configured script locations
 	 */
