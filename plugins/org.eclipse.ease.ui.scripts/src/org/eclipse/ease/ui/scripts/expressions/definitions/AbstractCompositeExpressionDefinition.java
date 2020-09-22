@@ -13,7 +13,9 @@ package org.eclipse.ease.ui.scripts.expressions.definitions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.eclipse.core.expressions.Expression;
 import org.eclipse.ease.ui.scripts.expressions.ICompositeExpressionDefinition;
 import org.eclipse.ease.ui.scripts.expressions.IExpressionDefinition;
 
@@ -51,6 +53,10 @@ public abstract class AbstractCompositeExpressionDefinition extends AbstractExpr
 	@Override
 	public List<IExpressionDefinition> getChildren() {
 		return (fChildren != null) ? fChildren : Collections.emptyList();
+	}
+
+	protected List<Expression> getChildrenAsExpressions() {
+		return getChildren().stream().map(e -> e.toCoreExpression()).collect(Collectors.toList());
 	}
 
 	@Override

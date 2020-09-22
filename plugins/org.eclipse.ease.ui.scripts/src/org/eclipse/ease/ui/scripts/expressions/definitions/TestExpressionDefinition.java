@@ -11,8 +11,8 @@
 package org.eclipse.ease.ui.scripts.expressions.definitions;
 
 import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.TestExpression;
 import org.eclipse.core.internal.expressions.Expressions;
-import org.eclipse.core.internal.expressions.TestExpression;
 import org.eclipse.core.runtime.CoreException;
 
 @SuppressWarnings("restriction")
@@ -41,6 +41,7 @@ public class TestExpressionDefinition extends SystemTestExpressionDefinition {
 			return Expression.FALSE;
 		}
 
-		return new TestExpression(namespace, property, arguments, getParameter(VALUE), Boolean.parseBoolean(getParameter(FORCE_PLUGIN_ACTIVATION)));
+		return ExpressionFactory.getInstance().createTestExpression(namespace, property, arguments, getParameter(VALUE),
+				Boolean.parseBoolean(getParameter(FORCE_PLUGIN_ACTIVATION)));
 	}
 }

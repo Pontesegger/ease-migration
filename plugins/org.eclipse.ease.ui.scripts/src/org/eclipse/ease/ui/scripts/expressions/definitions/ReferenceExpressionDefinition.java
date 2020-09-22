@@ -13,16 +13,14 @@ package org.eclipse.ease.ui.scripts.expressions.definitions;
 import java.util.Collection;
 
 import org.eclipse.core.expressions.Expression;
-import org.eclipse.core.internal.expressions.ReferenceExpression;
 
-@SuppressWarnings("restriction")
 public class ReferenceExpressionDefinition extends AbstractExpressionDefinition {
 
 	@Override
 	public Expression toCoreExpression() {
 		final Collection<Parameter> parameters = getParameters();
 		if (parameters.size() == 1)
-			return new ReferenceExpression(getParameters().iterator().next().getValue());
+			return ExpressionFactory.getInstance().createWithExpression(getParameters().iterator().next().getValue());
 
 		// an empty reference should resolve to true
 		return Expression.TRUE;

@@ -261,6 +261,17 @@
           <repository
               url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
         </repositoryList>
+        <repositoryList
+            name="2020-09">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository"/>
+          <repository
+              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-09"/>
+          <repository
+              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -579,6 +590,19 @@
           <repository
               url="http://download.eclipse.org/ease/integration/nightly"/>
         </repositoryList>
+        <repositoryList
+            name="2020-09">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-09"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -651,7 +675,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2020-06"
+        defaultValue="2020-09"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>

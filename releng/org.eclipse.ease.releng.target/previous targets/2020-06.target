@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2020-09" sequenceNumber="1600702762">
+<target name="2020-06" sequenceNumber="1594193791">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.17.0.v20200902-1800"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.17.0.v20200902-1800"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.500.v20200902-1800"/>
-      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.700.v20200705-1016"/>
-      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.3.100.v202008161908"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.23.0.v20200822-0801"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.500.v20200902-1800"/>
-      <unit id="org.eclipse.jdt" version="3.18.500.v20200902-1800"/>
-      <repository id="eclipse-2020-09" location="http://download.eclipse.org/releases/2020-09/"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.16.0.v20200604-0951"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.16.0.v20200604-0951"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.400.v20200604-0540"/>
+      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.600.v20200521-1852"/>
+      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.2.0.v202005251709"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.22.0.v20200519-1135"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.400.v20200604-0540"/>
+      <unit id="org.eclipse.jdt" version="3.18.400.v20200604-0540"/>
+      <repository id="eclipse-2020-06" location="http://download.eclipse.org/releases/2020-06/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="1.9.5.v201605172210"/>
       <unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
       <unit id="org.mozilla.javascript" version="1.7.10.v20190430-1943"/>
-      <repository id="eclipse-orbit-2020-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository/"/>
+      <repository id="eclipse-orbit-2020-06" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.engine.jython.feature.feature.group" version="0.0.0"/>

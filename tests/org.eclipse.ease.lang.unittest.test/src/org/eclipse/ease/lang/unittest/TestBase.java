@@ -33,9 +33,6 @@ import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ui.dialogs.IOverwriteQuery;
-import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
-import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 
@@ -49,19 +46,15 @@ public class TestBase {
 		final URL fileURL = bundle.getEntry("resources/UnitTest");
 		final File sourceFolder = new File(FileLocator.resolve(fileURL).toURI());
 
-		// copy files
+		// create project that links to /this/resources/UnitTest
 		final Path projectPath = new Path(sourceFolder.getAbsoluteFile() + File.separator + ".project");
 		final IProjectDescription projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(projectPath);
+		projectDescription.setLocation(new Path(sourceFolder.getAbsolutePath()));
 
 		TEST_PROJECT = ResourcesPlugin.getWorkspace().getRoot().getProject(projectDescription.getName());
 		if (!TEST_PROJECT.exists()) {
-			TEST_PROJECT.create(new NullProgressMonitor());
+			TEST_PROJECT.create(projectDescription, new NullProgressMonitor());
 			TEST_PROJECT.open(new NullProgressMonitor());
-
-			final ImportOperation importOperation = new ImportOperation(TEST_PROJECT.getFullPath(), sourceFolder, FileSystemStructureProvider.INSTANCE,
-					file -> IOverwriteQuery.ALL);
-			importOperation.setCreateContainerStructure(false);
-			importOperation.run(new NullProgressMonitor());
 		}
 	}
 

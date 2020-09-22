@@ -236,6 +236,7 @@
 		 -->
 		<module>../../tests/org.eclipse.ease.lang.scriptarchive.test</module>
 		<module>../../tests/org.eclipse.ease.lang.unittest.test</module>
+		<module>../../tests/org.eclipse.ease.ui.scripts.test</module>
 		<module>../../tests/org.eclipse.ease.ui.test</module>
 	</modules>
 

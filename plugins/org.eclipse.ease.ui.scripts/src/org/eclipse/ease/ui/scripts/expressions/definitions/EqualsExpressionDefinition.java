@@ -13,16 +13,14 @@ package org.eclipse.ease.ui.scripts.expressions.definitions;
 import java.util.Collection;
 
 import org.eclipse.core.expressions.Expression;
-import org.eclipse.core.internal.expressions.EqualsExpression;
 
-@SuppressWarnings("restriction")
 public class EqualsExpressionDefinition extends AbstractExpressionDefinition {
 
 	@Override
 	public Expression toCoreExpression() {
 		final Collection<Parameter> parameters = getParameters();
 		if (parameters.size() == 1)
-			return new EqualsExpression(getParameters().iterator().next().getValue());
+			return ExpressionFactory.getInstance().createEqualsExpression(getParameters().iterator().next().getValue());
 
 		return Expression.FALSE;
 	}

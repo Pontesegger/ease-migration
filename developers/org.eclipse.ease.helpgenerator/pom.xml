@@ -2,14 +2,38 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.eclipse.ease</groupId>
 	<artifactId>org.eclipse.ease.helpgenerator</artifactId>
+	<version>0.8.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<parent>
-		<groupId>org.eclipse.ease</groupId>
-		<artifactId>org.eclipse.ease.releng</artifactId>
-		<version>0.8.0-SNAPSHOT</version>
-		<relativePath>../../releng/org.eclipse.ease.releng</relativePath>
-	</parent>
+
+	<prerequisites>
+		<!-- Maven 3.1.0 is the earliest version using Eclipse Aether, Maven 3.0.x 
+			uses the incompatible predecessor Sonatype Aether -->
+		<maven>3.1</maven>
+	</prerequisites>
+
+	<properties>
+		<!-- used plugin versions -->
+		<tycho.version>1.3.0</tycho.version>
+		<tycho.extras.version>${tycho.version}</tycho.extras.version>
+		<maven.compiler.version>3.6.1</maven.compiler.version>
+		<maven.javadoc.version>2.9.1</maven.javadoc.version>
+		<jacoco.version>0.7.9</jacoco.version>
+		<eclipse.jarsigner.version>1.1.3</eclipse.jarsigner.version>
+		<maven.buildhelper.version>1.9.1</maven.buildhelper.version>
+
+		<!-- build parameters -->
+		<compiler.compliance>1.8</compiler.compliance>
+		<jacoco.report.path>../../coverage-report/jacoco.exec</jacoco.report.path>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- help links to integrated help APIs -->
+		<platform.api>org.eclipse.platform.doc.isv/reference/api</platform.api>
+		<ease.api>org.eclipse.ease.help/help/api-docs/javadoc</ease.api>
+		<doclet.path>${user.dir}/ease.module.doclet.jar</doclet.path>
+	</properties>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -17,6 +41,17 @@
 		<finalName>ease.module.doclet</finalName>
 
 		<plugins>
+			<!-- set compiler options -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.version}</version>
+				<configuration>
+					<source>${compiler.compliance}</source>
+					<target>${compiler.compliance}</target>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>

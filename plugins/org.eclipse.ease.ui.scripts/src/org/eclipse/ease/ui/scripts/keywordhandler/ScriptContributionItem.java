@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.scripts.keywordhandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,9 +22,9 @@ import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.internal.expressions.AdaptExpression;
 import org.eclipse.core.internal.expressions.IterateExpression;
-import org.eclipse.core.internal.expressions.WithExpression;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.tools.ResourceTools;
+import org.eclipse.ease.ui.scripts.expressions.definitions.ExpressionFactory;
 import org.eclipse.ease.ui.scripts.handler.RunScript;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.ease.ui.tools.LocationImageDescriptor;
@@ -36,7 +38,7 @@ public class ScriptContributionItem extends CommandContributionItem {
 	protected static final Pattern ENABLE_PATTERN = Pattern.compile("enableFor\\((.*)\\)");
 
 	private static ImageDescriptor getImageDescriptor(final IScript script) {
-		String location = script.getKeywords().get("image");
+		final String location = script.getKeywords().get("image");
 		if (location != null) {
 			String imageLocation = ResourceTools.toAbsoluteLocation(location, script.getLocation());
 			if (imageLocation == null)
@@ -49,7 +51,7 @@ public class ScriptContributionItem extends CommandContributionItem {
 	}
 
 	private static Map<String, String> getParameters(final IScript script) {
-		HashMap<String, String> parameters = new HashMap<String, String>();
+		final HashMap<String, String> parameters = new HashMap<>();
 		parameters.put(RunScript.PARAMETER_NAME, script.getPath().toString());
 
 		return parameters;
@@ -68,18 +70,21 @@ public class ScriptContributionItem extends CommandContributionItem {
 	public ScriptContributionItem(final IScript script, final String enablement) {
 		this(script);
 
-		Matcher matcher = ENABLE_PATTERN.matcher(enablement);
+		final Matcher matcher = ENABLE_PATTERN.matcher(enablement);
 		if (matcher.matches()) {
 			try {
-				WithExpression withExpression = new WithExpression("selection");
-				IterateExpression iteratorExpression = new IterateExpression(null, Boolean.FALSE.toString());
-				AdaptExpression adaptExpression = new AdaptExpression(matcher.group(1));
+				final Expression withExpression = ExpressionFactory.getInstance().createWithExpression("selection");
+				final IterateExpression iteratorExpression = new IterateExpression(null, Boolean.FALSE.toString());
+				final AdaptExpression adaptExpression = new AdaptExpression(matcher.group(1));
 
-				withExpression.add(iteratorExpression);
+				final List<Expression> children = new ArrayList<>();
+				children.add(iteratorExpression);
+				ExpressionFactory.getInstance().addChildren(withExpression, children);
+
 				iteratorExpression.add(adaptExpression);
 
 				fVisibleExpression = withExpression;
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				// TODO provide log message to user
 
 				fVisibleExpression = Expression.FALSE;
@@ -90,7 +95,7 @@ public class ScriptContributionItem extends CommandContributionItem {
 	@Override
 	public void update() {
 		setLabel(fScript.getKeywords().get("name"));
-		ParameterizedCommand command = getCommand();
+		final ParameterizedCommand command = getCommand();
 		command.getParameterMap().putAll(getParameters(fScript));
 
 		super.update();
@@ -111,12 +116,12 @@ public class ScriptContributionItem extends CommandContributionItem {
 
 		if (fVisibleExpression != null) {
 			try {
-				final IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-				EvaluationResult evaluate = fVisibleExpression.evaluate(handlerService.getCurrentState());
+				final IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
+				final EvaluationResult evaluate = fVisibleExpression.evaluate(handlerService.getCurrentState());
 
 				return Boolean.parseBoolean(evaluate.toString());
 
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				// TODO provide log message to user
 				return false;
 			}
