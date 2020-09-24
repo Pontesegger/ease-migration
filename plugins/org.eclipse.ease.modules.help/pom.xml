@@ -15,6 +15,19 @@
 		<ease.api>org.eclipse.ease.help/help/api-docs/javadoc</ease.api>
 	</properties>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<timestampProvider>default</timestampProvider>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<profile>
 			<!-- Do the javadoc generation in a profile to keep standard builds (e.g. 
@@ -47,7 +60,6 @@
 											<jvmOption>-DhttpnonProxyHosts=*.eclipse.org</jvmOption>
 										</jvmOptions>
 										<additionalArguments>
-											<additionalArgument>${javadoc-args}</additionalArgument>
 											<additionalArgument>
 												-link
 												http://docs.oracle.com/javase/8/docs/api/
@@ -60,7 +72,7 @@
 											<additionalArgument>
 												-linkoffline
 												../../${ease.api}
-												https://hudson.eclipse.org/ease/job/ease-build-core/javadoc/
+												https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc/
 											</additionalArgument>
 											<additionalArgument>-public</additionalArgument>
 										</additionalArguments>

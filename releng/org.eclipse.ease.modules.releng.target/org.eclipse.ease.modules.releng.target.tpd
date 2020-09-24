@@ -1,6 +1,6 @@
-target "2020-06" with source requirements
+target "2020-09" with source requirements
 
-location "http://download.eclipse.org/releases/2020-06/" eclipse-2020-06 {
+location "http://download.eclipse.org/releases/2020-09/" eclipse-2020-09 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -16,7 +16,6 @@ location "http://download.eclipse.org/releases/2020-06/" eclipse-2020-06 {
 	org.eclipse.papyrus.uml.diagram.feature.feature.group
 	org.eclipse.uml2.uml
 	org.eclipse.gmf.runtime.diagram.ui
-	org.eclipse.emf.emfstore.client.ui.feature.feature.group
 	org.eclipse.ocl.examples.classic.feature.group
 	org.eclipse.ocl.examples.feature.group
 
@@ -34,7 +33,7 @@ location "http://download.eclipse.org/releases/2020-06/" eclipse-2020-06 {
 	org.eclipse.osgi
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/" eclipse-orbit-2020-06 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository/" eclipse-orbit-2020-09 {
 // for java unit test of modules
 	org.mockito [1.9.5,2.0.0)
 	org.hamcrest [1.1.0,2.0.0)
