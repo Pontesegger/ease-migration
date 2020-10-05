@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -354,24 +356,38 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	}
 
 	/**
-	 * Add monitor to detect clicks on the stop button in the Progress view.
+	 * Add monitor to detect clicks on the stop button in the Progress view. This functionality improves usability, but is not essential to scripting.
 	 */
 	private void addStopButtonMonitor() {
-		final Version workbenchBundleVersion = Platform.getBundle("org.eclipse.ui.workbench").getVersion();
-		if (workbenchBundleVersion.compareTo(Version.valueOf("3.120.0")) >= 0) {
-			// JobMonitor changed its API from
-			// 		addProgressListener(IProgressMonitor)
-			// to
-			// 		addProgressListener(IProgressMonitorWithBlocking)
-			// in 2020.09
-			if (fMonitor instanceof JobMonitor)
-				((JobMonitor) fMonitor).addProgressListener((IProgressMonitor) new ScriptEngineMonitor());
-		} else if (workbenchBundleVersion.compareTo(Version.valueOf("3.110.1")) >= 0) {
-			// JobMonitor is a private class up to 3.110.1 (Eclipse Oxygen)
-			// this functionality improves usability, but is not essential to scripting
-			if (fMonitor instanceof JobMonitor)
-				((JobMonitor) fMonitor).addProgressListener((IProgressMonitorWithBlocking) new ScriptEngineMonitor());
+		if (fMonitor instanceof JobMonitor) {
+			final Version workbenchBundleVersion = Platform.getBundle("org.eclipse.ui.workbench").getVersion();
+			if (workbenchBundleVersion.compareTo(Version.valueOf("3.120.0")) >= 0) {
+				addStopButtonMonitorForEclipse2020v09();
+
+			} else if (workbenchBundleVersion.compareTo(Version.valueOf("3.110.1")) >= 0) {
+				addStopButtonMonitorForEclipseOxygenTo2020v06();
+			} else {
+				// JobMonitor is a private class up to 3.110.1 (Eclipse Oxygen)
+			}
 		}
+	}
+
+	private void addStopButtonMonitorForEclipseOxygenTo2020v06() {
+		// JobMonitor changed its API from
+		// addProgressListener(IProgressMonitor)
+		// to
+		// addProgressListener(IProgressMonitorWithBlocking)
+		// in 2020.09
+		try {
+			final Method addProgressListener = JobMonitor.class.getDeclaredMethod("addProgressListener", new Class[] { IProgressMonitorWithBlocking.class });
+			addProgressListener.invoke(fMonitor, new ScriptEngineMonitor());
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			// silently ignore
+		}
+	}
+
+	private void addStopButtonMonitorForEclipse2020v09() {
+		((JobMonitor) fMonitor).addProgressListener(new ScriptEngineMonitor());
 	}
 
 	/**
