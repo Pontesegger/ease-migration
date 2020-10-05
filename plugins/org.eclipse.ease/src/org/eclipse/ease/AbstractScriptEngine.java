@@ -358,11 +358,19 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 */
 	private void addStopButtonMonitor() {
 		final Version workbenchBundleVersion = Platform.getBundle("org.eclipse.ui.workbench").getVersion();
-		if (workbenchBundleVersion.compareTo(Version.valueOf("3.110.1")) >= 0) {
+		if (workbenchBundleVersion.compareTo(Version.valueOf("3.120.0")) >= 0) {
+			// JobMonitor changed its API from
+			// 		addProgressListener(IProgressMonitor)
+			// to
+			// 		addProgressListener(IProgressMonitorWithBlocking)
+			// in 2020.09
+			if (fMonitor instanceof JobMonitor)
+				((JobMonitor) fMonitor).addProgressListener((IProgressMonitor) new ScriptEngineMonitor());
+		} else if (workbenchBundleVersion.compareTo(Version.valueOf("3.110.1")) >= 0) {
 			// JobMonitor is a private class up to 3.110.1 (Eclipse Oxygen)
 			// this functionality improves usability, but is not essential to scripting
 			if (fMonitor instanceof JobMonitor)
-				((JobMonitor) fMonitor).addProgressListener(new ScriptEngineMonitor());
+				((JobMonitor) fMonitor).addProgressListener((IProgressMonitorWithBlocking) new ScriptEngineMonitor());
 		}
 	}
 
