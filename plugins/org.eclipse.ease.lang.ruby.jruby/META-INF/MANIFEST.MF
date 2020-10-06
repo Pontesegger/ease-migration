@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JRuby Interpreter
+Bundle-Name: EASE JRuby Interpreter (Incubation)
 Bundle-SymbolicName: org.eclipse.ease.lang.ruby.jruby;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Bundle-Vendor: Eclipse.org

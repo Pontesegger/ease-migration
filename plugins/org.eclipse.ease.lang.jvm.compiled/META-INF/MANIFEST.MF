@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: EASE Class File Engine (Incubation)
+Bundle-Name: EASE Java Interpreter (Incubation)
 Bundle-SymbolicName: org.eclipse.ease.lang.jvm.compiled;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Require-Bundle: org.eclipse.ease,
