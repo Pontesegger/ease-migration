@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: EASE Charting
+Bundle-Name: EASE Charting Module (Incubation)
 Bundle-SymbolicName: org.eclipse.ease.modules.charting;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SVN Module (Incubation)
+Bundle-Name: EASE SVN Module (Incubation)
 Bundle-SymbolicName: org.eclipse.ease.modules.team.svn;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Require-Bundle: org.eclipse.ui;bundle-version="[3.106.1,4.0.0)",
