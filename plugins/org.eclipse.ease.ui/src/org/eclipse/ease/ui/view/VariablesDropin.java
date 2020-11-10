@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License-Identifier: EPL-2.0
+ *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
@@ -25,6 +27,7 @@ import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.debugging.model.AbstractEaseDebugModelPresentation;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -34,6 +37,9 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -193,6 +199,9 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		});
 
 		fVariablesTree.setInput(fEngine);
+
+		fVariablesTree.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY, new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() },
+				new VariablesDragListener(fVariablesTree));
 
 		return composite;
 	}

@@ -485,6 +485,9 @@
             class="org.eclipse.ease.ui.view.ModuleStackDropin"
             priority="-1">
       </dropin>
+      <dropHandler
+            class="org.eclipse.ease.ui.dnd.VariablesDropHandler">
+      </dropHandler>
    </extension>
    <extension
          point="org.eclipse.ease.ui.codeCompletionProvider">
