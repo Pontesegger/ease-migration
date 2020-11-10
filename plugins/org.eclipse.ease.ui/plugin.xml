@@ -189,7 +189,7 @@
          </separator>
          <command
                commandId="org.eclipse.ease.commands.scriptShell.openScriptHelp"
-               icon="icons/eobj16/help.png"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/help_contents.png"
                label="%openHelp"
                style="push">
          </command>
@@ -218,7 +218,7 @@
          </separator>
          <command
                commandId="org.eclipse.ease.commands.ModulesExplorer.openHelp"
-               icon="icons/eobj16/help.png"
+               icon="platform:/plugin/org.eclipse.ui/icons/full/etool16/help_contents.png"
                label="%openHelp"
                style="push">
             <visibleWhen
