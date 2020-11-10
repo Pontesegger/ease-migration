@@ -441,7 +441,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2020-06"
+        defaultValue="2020-09"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
