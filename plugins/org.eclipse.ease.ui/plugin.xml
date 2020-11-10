@@ -85,6 +85,10 @@
             defaultHandler="org.eclipse.ease.ui.handler.ToggleDropinsSection"
             id="org.eclipse.ease.commands.script.toggleDropinsSection"
             name="%toggleDropins">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.scriptShell"
@@ -156,7 +160,7 @@
                commandId="org.eclipse.ease.commands.script.toggleDropinsSection"
                icon="icons/elcl16/dropins_pane.png"
                label="%toggleDropins"
-               style="push">
+               style="toggle">
          </command>
          <separator
                name="separator1"

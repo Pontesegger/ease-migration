@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License-Identifier: EPL-2.0
+ *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *     Martin Kloesch - extensions
@@ -17,6 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -43,6 +47,7 @@ import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.ease.ui.dnd.ShellDropTarget;
+import org.eclipse.ease.ui.handler.ToggleDropinsSection;
 import org.eclipse.ease.ui.help.hovers.ContentProposalModifier;
 import org.eclipse.ease.ui.preferences.IPreferenceConstants;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -72,6 +77,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.service.prefs.Preferences;
 
@@ -83,6 +90,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 	public static final String VIEW_ID = "org.eclipse.ease.ui.views.scriptShell";
 
 	private static final String XML_HISTORY_NODE = "history";
+
+	private static final int[] DEFAULT_SASH_WEIGHTS = new int[] { 70, 30 };
 
 	private class AutoFocus implements KeyListener {
 
@@ -116,7 +125,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private ScriptHistoryText fOutputText;
 
-	private int[] fSashWeights = new int[] { 70, 30 };
+	private int[] fSashWeights = DEFAULT_SASH_WEIGHTS;
 
 	private IReplEngine fScriptEngine;
 
@@ -200,7 +209,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			tab.setControl(dropin.createPartControl(getSite(), tabFolder));
 		}
 
-		fSashForm.setWeights(fSashWeights);
+		showDropinsPane(shallDisplayDropins());
+
 		fInputCombo = new Combo(parent, SWT.NONE);
 		fInputCombo.addSelectionListener(new SelectionAdapter() {
 
@@ -284,6 +294,19 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			invalidEngine.setException(new RuntimeException("No script engines available"));
 			fOutputText.printResult(invalidEngine);
 		}
+	}
+
+	private boolean shallDisplayDropins() {
+		final ICommandService service = PlatformUI.getWorkbench().getService(ICommandService.class);
+		final Command command = service.getCommand(ToggleDropinsSection.COMMAND_ID);
+
+		final State state = command.getState(RegistryToggleState.STATE_ID);
+		if (state == null)
+			return true;
+		if (!(state.getValue() instanceof Boolean))
+			return true;
+
+		return ((Boolean) state.getValue()).booleanValue();
 	}
 
 	private void addAutoCompletion() {
@@ -395,11 +418,13 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		fOutputText.clear();
 	}
 
-	public final void toggleDropinsPane() {
-		if (fSashForm.getWeights()[1] == 0)
+	public final void showDropinsPane(boolean show) {
+		if (show) {
 			fSashForm.setWeights(fSashWeights);
+			if (fSashWeights[1] == 0)
+				fSashForm.setWeights(DEFAULT_SASH_WEIGHTS);
 
-		else {
+		} else {
 			fSashWeights = fSashForm.getWeights();
 			fSashForm.setWeights(new int[] { 100, 0 });
 		}
