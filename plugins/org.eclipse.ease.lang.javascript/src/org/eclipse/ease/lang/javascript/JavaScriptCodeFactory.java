@@ -168,13 +168,13 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		if (customNamespace)
 			// create object wrapper
-			return createObjectWrapper(instance, identifier);
+			return createObjectWrapper(environment, instance, identifier);
 
 		else
 			return super.createWrapper(environment, instance, identifier, customNamespace, engine);
 	}
 
-	private String createObjectWrapper(Object instance, String identifier) {
+	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
 		final StringBuilder scriptCode = new StringBuilder();
 
 		scriptCode.append(EnvironmentModule.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
@@ -195,7 +195,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 				// parse parameters
 				final List<Parameter> parameters = ModuleHelper.getParameters(method);
 
-				final String body = "\t\t" + buildMethodBody(parameters, method, identifier).replaceAll("\n", "\n\t\t");
+				final String body = "\t\t" + buildMethodBody(environment, parameters, method, identifier).replaceAll("\n", "\n\t\t");
 
 				// method header
 				scriptCode.append('\t').append(method.getName()).append(": function(");
@@ -240,7 +240,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		// build parameter string
 		final String parameterList = buildParameterList(parameters);
 
-		final String body = "\t" + buildMethodBody(parameters, method, moduleVariable).replaceAll("\n", "\n\t");
+		final String body = "\t" + buildMethodBody(environment, parameters, method, moduleVariable).replaceAll("\n", "\n\t");
 
 		// build function declarations
 		for (final String name : getMethodNames(method)) {
@@ -273,7 +273,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		return javaScriptCode.toString();
 	}
 
-	private String buildMethodBody(List<Parameter> parameters, Method method, String classIdentifier) {
+	private String buildMethodBody(IEnvironment environment, List<Parameter> parameters, Method method, String classIdentifier) {
 		final StringBuilder body = new StringBuilder();
 		// insert parameter checks
 		body.append("// verify mandatory and optional parameters").append(StringTools.LINE_DELIMITER);
@@ -283,7 +283,6 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		if (ModuleHelper.isDeprecated(method))
 			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.', true);").append(StringTools.LINE_DELIMITER);
 
-		final IEnvironment environment = IEnvironment.getEnvironment();
 		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
 
 		// body.append("var hasCallback = false;").append(StringTools.LINE_DELIMITER);
