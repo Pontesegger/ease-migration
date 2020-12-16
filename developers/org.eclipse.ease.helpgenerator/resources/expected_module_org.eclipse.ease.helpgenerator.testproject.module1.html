@@ -101,7 +101,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="abstractMethodToBeOverridden">
 		<h3><a id="abstractMethodToBeOverridden">abstractMethodToBeOverridden</a></h3>
 		<p class="synopsis">void abstractMethodToBeOverridden()</p>
-
 		<p class="description">Abstract method with documentation in base class.</p>
 
 
@@ -112,7 +111,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="baseParameters">
 		<h3><a id="baseParameters">baseParameters</a></h3>
 		<p class="synopsis">int baseParameters(int a, long b, <a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> data)</p>
-
 		<p class="description">Method with parameters.</p>
 
 		<dl class="parameters">
@@ -132,7 +130,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="deprecatedMethod">
 		<h3 class="deprecatedText"><a id="deprecatedMethod">deprecatedMethod</a></h3>
 		<p class="synopsis">void deprecatedMethod()</p>
-
 		<p class="description">This method is outdated.</p>
 		<p class="deprecated"><span class="warning"></span><b>Deprecated:</b> <i>Please use another method. This one will be removed in future versions.</i></p>
 
@@ -144,7 +141,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="interfaceAMethod">
 		<h3><a id="interfaceAMethod">interfaceAMethod</a></h3>
 		<p class="synopsis">void interfaceAMethod()</p>
-
 		<p class="description">Method documented in InterfaceA only.</p>
 
 
@@ -155,7 +151,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="interfaceBMethod">
 		<h3><a id="interfaceBMethod">interfaceBMethod</a></h3>
 		<p class="synopsis">void interfaceBMethod()</p>
-
 		<p class="description">Method B documented in the interface only.</p>
 
 
@@ -166,7 +161,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="methodFromBaseClass">
 		<h3><a id="methodFromBaseClass">methodFromBaseClass</a></h3>
 		<p class="synopsis"><a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> methodFromBaseClass()</p>
-
 		<p class="description">This method is only defined in the base class.</p>
 
 
@@ -178,7 +172,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="methodToBeOverridden">
 		<h3><a id="methodToBeOverridden">methodToBeOverridden</a></h3>
 		<p class="synopsis">void methodToBeOverridden()</p>
-
 		<p class="description">Method with documentation in base class. Method body is implemented in the derived class.</p>
 
 
@@ -189,8 +182,7 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="optionalParameters">
 		<h3><a id="optionalParameters">optionalParameters</a></h3>
 		<p class="synopsis"><a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> optionalParameters(<a href='https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html'>Thread</a> mandatory, <i>[int optionalDefaultsTo1]</i>, <i>[<a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> optionalDefaultsToNull]</i>)</p>
-
-		<p class="description">Method with optional parameters. Check out <a href='#baseParameters'>baseParameters(int, long, String)</a></p>
+		<p class="description">Method with optional parameters. Check out <a href='#baseParameters'>baseParameters()</a></p>
 
 		<dl class="parameters">
 			<dt>mandatory</dt>
@@ -214,8 +206,7 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	</div>
 	<div class="command" data-method="pleaseThrow">
 		<h3><a id="pleaseThrow">pleaseThrow</a></h3>
-		<p class="synopsis">void pleaseThrow() <a href='https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html'>IOException</a></p>
-
+		<p class="synopsis">void pleaseThrow() throws <a href='https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html'>IOException</a></p>
 		<p class="description">Method that always throws.</p>
 
 
@@ -230,7 +221,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="simple">
 		<h3><a id="simple">simple</a></h3>
 		<p class="synopsis">void simple()</p>
-
 		<p class="description">Simple method documentation.</p>
 
 
@@ -241,7 +231,6 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	<div class="command" data-method="thisIsAMethodWithALongName">
 		<h3><a id="thisIsAMethodWithALongName">thisIsAMethodWithALongName</a></h3>
 		<p class="synopsis"><a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> thisIsAMethodWithALongName()</p>
-
 		<p class="description">Method with method name alias. The documentation to this method is long to make sure it is handled with a line break in the source file. Further it
  contains some valid HTML tags that need to be processed correctly by the doclet.
  <p>
@@ -258,8 +247,7 @@ Some old stuff. <div class="warning"><b>Deprecated:</b> <i>we do not need this a
 	</div>
 	<div class="command" data-method="thisMethodHasGenericParameters">
 		<h3><a id="thisMethodHasGenericParameters">thisMethodHasGenericParameters</a></h3>
-		<p class="synopsis"><a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> thisMethodHasGenericParameters(<a href='https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html'>Function</a> myFunctionParameter)</p>
-
+		<p class="synopsis"><a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a> thisMethodHasGenericParameters(<a href='https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html'>Function</a>&lt;<a href='https://docs.oracle.com/javase/8/docs/api/java/lang/Long.html'>Long</a>, <a href='https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'>String</a>&gt; myFunctionParameter)</p>
 		<p class="description">Method that uses generic parameters.</p>
 
 		<dl class="parameters">

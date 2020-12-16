@@ -46,4 +46,8 @@ public class Parameter {
 	public void setComment(Description comment) {
 		fComment = comment;
 	}
+
+	public boolean isOptional() {
+		return getDefaultValue() != null;
+	}
 }

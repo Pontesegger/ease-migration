@@ -11,13 +11,13 @@
 
 package org.eclipse.ease.helpgenerator;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractIntegrationTest {
 

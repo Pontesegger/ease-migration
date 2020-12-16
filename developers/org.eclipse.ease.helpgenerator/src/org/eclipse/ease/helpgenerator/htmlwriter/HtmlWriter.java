@@ -8,17 +8,16 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.helpgenerator;
+package org.eclipse.ease.helpgenerator.htmlwriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.eclipse.ease.helpgenerator.IReporter;
 import org.eclipse.ease.helpgenerator.model.AbstractClassModel;
 import org.eclipse.ease.helpgenerator.model.Description;
-import org.eclipse.ease.helpgenerator.model.ExceptionValue;
 import org.eclipse.ease.helpgenerator.model.Field;
 import org.eclipse.ease.helpgenerator.model.Method;
 import org.eclipse.ease.helpgenerator.model.ModuleDefinition;
@@ -44,12 +43,10 @@ public class HtmlWriter {
 	private final IReporter fReporter;
 	private final ModuleDefinition fModule;
 	private final AbstractClassModel fClassModel;
-	private final LinkProvider fLinkProvider;
 
-	public HtmlWriter(ModuleDefinition module, AbstractClassModel classModel, LinkProvider linkProvider, IReporter reporter) {
+	public HtmlWriter(ModuleDefinition module, AbstractClassModel classModel, IReporter reporter) {
 		fModule = module;
 		fClassModel = classModel;
-		fLinkProvider = linkProvider;
 		fReporter = reporter;
 	}
 
@@ -113,7 +110,7 @@ public class HtmlWriter {
 		addLine(buffer, "</body>");
 		addLine(buffer, "</html>");
 
-		return fLinkProvider.insertLinks(buffer.toString());
+		return buffer.toString();
 	}
 
 	private StringBuffer createDependenciesSection() {
@@ -299,41 +296,8 @@ public class HtmlWriter {
 		return buffer;
 	}
 
-	private StringBuffer createSynopsis(final Method method) {
-		final StringBuffer buffer = new StringBuffer();
-
-		addText(buffer, "		<p class=\"synopsis\">");
-		addText(buffer, "{@link " + method.getReturnType().getTypeName() + "}");
-		addText(buffer, " ");
-		addText(buffer, method.getName());
-		addText(buffer, "(");
-		for (final Parameter parameter : method.getParameters()) {
-			final String defaultValue = parameter.getDefaultValue();
-			if (defaultValue != null)
-				addText(buffer, "<i>[");
-
-			addText(buffer, "{@link " + parameter.getTypeName() + "}");
-			addText(buffer, " ");
-			addText(buffer, parameter.getName());
-			if (defaultValue != null)
-				addText(buffer, "]</i>");
-
-			addText(buffer, ", ");
-		}
-		if (!method.getParameters().isEmpty())
-			buffer.delete(buffer.length() - 2, buffer.length());
-
-		addText(buffer, ")");
-
-		final List<ExceptionValue> exceptions = method.getExceptions();
-		if (!exceptions.isEmpty()) {
-			addText(buffer, " ");
-			addText(buffer, exceptions.stream().map(e -> "{@link " + e.getTypeName() + "}").collect(Collectors.joining(", ")));
-		}
-
-		addLine(buffer, "</p>");
-
-		return buffer;
+	private String createSynopsis(final Method method) {
+		return String.format("\t\t<p class=\"synopsis\">%s</p>", SynopsisBuilder.getInstance().build(method));
 	}
 
 	private StringBuffer createOverviewSection() {

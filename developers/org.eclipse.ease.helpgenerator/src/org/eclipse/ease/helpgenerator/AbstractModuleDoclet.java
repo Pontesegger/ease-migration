@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +35,12 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
+import org.eclipse.ease.helpgenerator.documentation.ClassNameResolver;
+import org.eclipse.ease.helpgenerator.documentation.ReferenceReplacer;
+import org.eclipse.ease.helpgenerator.documentation.linkcreators.JavaDoc11LinkCreator;
+import org.eclipse.ease.helpgenerator.documentation.linkcreators.JavaDoc8LinkCreator;
+import org.eclipse.ease.helpgenerator.documentation.linkcreators.ModuleLinkCreator;
+import org.eclipse.ease.helpgenerator.htmlwriter.HtmlWriter;
 import org.eclipse.ease.helpgenerator.model.AbstractClassModel;
 import org.eclipse.ease.helpgenerator.model.Category;
 import org.eclipse.ease.helpgenerator.model.ModuleDefinition;
@@ -62,7 +67,11 @@ public abstract class AbstractModuleDoclet {
 	private final Map<String, List<String>> fParameters = new HashMap<>();
 	private IReporter fReporter;
 
-	private final LinkProvider fLinkProvider = new LinkProvider();
+	private final ReferenceReplacer fReferenceReplacer = new ReferenceReplacer();
+
+	public AbstractModuleDoclet() {
+		fReferenceReplacer.addLinkCreator(new ModuleLinkCreator());
+	}
 
 	public boolean run() {
 		try {
@@ -238,10 +247,12 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public void createHTMLFile(ModuleDefinition module, final AbstractClassModel classModel) throws IOException {
-		fLinkProvider.setClassModel(classModel);
 
-		final HtmlWriter htmlWriter = new HtmlWriter(module, classModel, fLinkProvider, getReporter());
-		final String content = htmlWriter.createContents();
+		final HtmlWriter htmlWriter = new HtmlWriter(module, classModel, getReporter());
+		String content = htmlWriter.createContents();
+
+		fReferenceReplacer.setClassNameResolver(new ClassNameResolver(classModel.getImportedClasses()));
+		content = fReferenceReplacer.replaceReferences(content);
 
 		verifyXmlContent(content, classModel.getClassName());
 
@@ -373,25 +384,51 @@ public abstract class AbstractModuleDoclet {
 		}
 	}
 
-	public LinkProvider getLinkProvider() {
-		return fLinkProvider;
-	}
-
 	protected void registerLinks(String url) {
-		registerOfflineLinks(url, url + "/package-list");
+		registerOfflineLinks(url, url);
 	}
 
-	protected void registerOfflineLinks(String remoteUrl, String packageContentUrl) {
+	protected void registerOfflineLinks(String remoteUrl, String packageLocation) {
+
 		try {
-			try (InputStream packageData = new URL(packageContentUrl).openStream()) {
-				final List<String> packages = new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
-				getLinkProvider().registerAddress(remoteUrl, packages);
+			final List<String> packageContent = loadPackages(packageLocation);
+			if (!packageContent.isEmpty()) {
+				if (JavaDoc11LinkCreator.isModuleEntry(packageContent.get(0)))
+					fReferenceReplacer.addLinkCreator(new JavaDoc11LinkCreator(remoteUrl, packageContent, fReferenceReplacer));
+
+				else
+					fReferenceReplacer.addLinkCreator(new JavaDoc8LinkCreator(remoteUrl, packageContent, fReferenceReplacer));
 			}
 
-		} catch (final MalformedURLException e) {
-			getReporter().report(IReporter.WARNING, "Cannot open location \"" + packageContentUrl + "\"");
-		} catch (final IOException e) {
-			getReporter().report(IReporter.WARNING, "Cannot read package data from \"" + packageContentUrl + "\"");
+		} catch (final IOException e1) {
+			getReporter().report(IReporter.WARNING, "Cannot read package data from \"" + packageLocation + "\"");
+		}
+	}
+
+	private List<String> loadPackages(String contentDescriptionFile) throws IOException {
+
+		if (contentDescriptionFile.endsWith("element-list")) {
+			// Java 11 API
+			return readContent(contentDescriptionFile);
+
+		} else if (contentDescriptionFile.endsWith("package-list")) {
+			// Java 8 API
+			return readContent(contentDescriptionFile);
+
+		} else {
+			// unknown, lets find out
+			try {
+				return readContent(contentDescriptionFile + "/element-list");
+			} catch (final IOException e) {
+
+				return readContent(contentDescriptionFile + "/package-list");
+			}
+		}
+	}
+
+	private List<String> readContent(String location) throws IOException {
+		try (InputStream packageData = new URL(location).openStream()) {
+			return new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
 		}
 	}
 

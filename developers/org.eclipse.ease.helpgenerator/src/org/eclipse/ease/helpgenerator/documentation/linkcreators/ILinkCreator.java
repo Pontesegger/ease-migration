@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Christian Pontesegger and others.
+ * Copyright (c) 2020 Christian Pontesegger and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -9,17 +9,11 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.helpgenerator.model;
+package org.eclipse.ease.helpgenerator.documentation.linkcreators;
 
-public class ReturnValue extends Parameter {
+import java.io.IOException;
 
-	public static final String VOID = "void";
-
-	public ReturnValue(String typeName, String comment) {
-		super(null, typeName, comment, null);
-	}
-
-	public boolean isVoid() {
-		return VOID.equals(getTypeName());
-	}
+@FunctionalInterface
+public interface ILinkCreator {
+	String createLink(String reference) throws IOException;
 }
