@@ -27,15 +27,15 @@ public class ReferenceReplacer extends ContainmentLinkCreator implements IClassN
 	}
 
 	public String replaceReferences(String content) {
-		final StringBuilder builder = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer(); // require StringBuffer as Matcher.appendReplacement() does not support StringBuilder in Java 8
 
 		final Matcher matcher = REFERENCE.matcher(content);
 		while (matcher.find())
-			matcher.appendReplacement(builder, getReplacement(matcher));
+			matcher.appendReplacement(buffer, getReplacement(matcher));
 
-		matcher.appendTail(builder);
+		matcher.appendTail(buffer);
 
-		return builder.toString();
+		return buffer.toString();
 	}
 
 	private String getReplacement(final Matcher matcher) {
