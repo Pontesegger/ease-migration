@@ -30,7 +30,7 @@ public class IntegrationTestJava11API extends AbstractIntegrationTest {
 
 				"-failOnHTMLError", Boolean.toString(failOnHtmlError), "-failOnMissingDocs", Boolean.toString(failOnMissingDocs),
 
-				"-link", "https://docs.oracle.com/javase/8/docs/api",
+				"-linkoffline", "https://docs.oracle.com/javase/8/docs/api", "./resources/api-docs/java8/package-list",
 
 				packageName);
 	}

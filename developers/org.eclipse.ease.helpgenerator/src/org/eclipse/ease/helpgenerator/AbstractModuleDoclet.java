@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,7 +116,7 @@ public abstract class AbstractModuleDoclet {
 			registerLinks(arguments.get(0));
 
 		else if (V8ModuleDoclet.OPTION_LINK_OFFLINE.equals(option))
-			registerOfflineLinks(arguments.get(0), arguments.get(1) + "/package-list");
+			registerOfflineLinks(arguments.get(0), arguments.get(1));
 
 		else
 			fParameters.put(option, arguments);
@@ -401,7 +402,7 @@ public abstract class AbstractModuleDoclet {
 			}
 
 		} catch (final IOException e1) {
-			getReporter().report(IReporter.WARNING, "Cannot read package data from \"" + packageLocation + "\"");
+			getReporter().report(IReporter.WARNING, "Cannot read package data from '" + packageLocation + "': " + e1.getMessage());
 		}
 	}
 
@@ -409,26 +410,45 @@ public abstract class AbstractModuleDoclet {
 
 		if (contentDescriptionFile.endsWith("element-list")) {
 			// Java 11 API
-			return readContent(contentDescriptionFile);
+			return validateContent(readContent(contentDescriptionFile));
 
 		} else if (contentDescriptionFile.endsWith("package-list")) {
 			// Java 8 API
-			return readContent(contentDescriptionFile);
+			return validateContent(readContent(contentDescriptionFile));
 
 		} else {
 			// unknown, lets find out
 			try {
-				return readContent(contentDescriptionFile + "/element-list");
+				return validateContent(readContent(contentDescriptionFile + "/element-list"));
 			} catch (final IOException e) {
 
-				return readContent(contentDescriptionFile + "/package-list");
+				return validateContent(readContent(contentDescriptionFile + "/package-list"));
 			}
 		}
+	}
+
+	private List<String> validateContent(List<String> content) throws IOException {
+		if (content.isEmpty())
+			throw new IOException("Empty content detected");
+
+		// make sure the first 10 lines do not contain any HTML tag (starting with '<')
+		for (int index = 0; index < Math.min(10, content.size()); index++) {
+			if (content.get(index).contains("<"))
+				throw new IOException("Invalid package content detected in line " + (index + 1));
+		}
+
+		return content;
 	}
 
 	private List<String> readContent(String location) throws IOException {
 		try (InputStream packageData = new URL(location).openStream()) {
 			return new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
+
+		} catch (final MalformedURLException e) {
+			// try to open a local file
+			try (InputStream packageData = new FileInputStream(location)) {
+				return new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
+			}
 		}
 	}
 

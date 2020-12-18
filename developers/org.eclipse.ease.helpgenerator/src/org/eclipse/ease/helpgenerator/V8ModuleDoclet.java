@@ -42,7 +42,7 @@ public class V8ModuleDoclet extends Doclet {
 				doclet.registerLinks(option[1]);
 
 			else if (OPTION_LINK_OFFLINE.equals(option[0]))
-				doclet.registerOfflineLinks(option[1], option[2] + "/package-list");
+				doclet.registerOfflineLinks(option[1], option[2]);
 
 			else if (OPTION_FAIL_ON_HTML_ERRORS.equals(option[0]))
 				doclet.setParameter(OPTION_FAIL_ON_HTML_ERRORS, Arrays.asList(option[1]));
