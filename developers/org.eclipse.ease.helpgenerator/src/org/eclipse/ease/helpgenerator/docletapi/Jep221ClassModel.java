@@ -107,11 +107,15 @@ public class Jep221ClassModel extends AbstractClassModel {
 
 	private abstract class RecursiveScanner<R, P> extends ElementScanner9<R, P> {
 
+		private final List<Object> fScannedElementsCache = new ArrayList<>();
+
 		@Override
 		public R scan(Element e, P p) {
 			super.scan(e, p);
 
-			if (e instanceof ClassSymbol) {
+			if (needsScanning(e)) {
+				addToScanCache((ClassSymbol) e);
+
 				for (final Type iface : ((ClassSymbol) e).getInterfaces())
 					scan(iface.asElement(), p);
 
@@ -121,6 +125,18 @@ public class Jep221ClassModel extends AbstractClassModel {
 			}
 
 			return getResult();
+		}
+
+		private boolean needsScanning(Element e) {
+			return (e instanceof ClassSymbol) && (!isContainedInScanCache((ClassSymbol) e));
+		}
+
+		private void addToScanCache(ClassSymbol classSymbol) {
+			fScannedElementsCache.add(classSymbol.getQualifiedName());
+		}
+
+		private boolean isContainedInScanCache(ClassSymbol classSymbol) {
+			return fScannedElementsCache.contains(classSymbol.getQualifiedName());
 		}
 
 		protected abstract R getResult();
