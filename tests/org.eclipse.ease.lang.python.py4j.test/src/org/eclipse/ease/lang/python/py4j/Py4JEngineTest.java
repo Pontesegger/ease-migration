@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.eclipse.ease.ScriptResult;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class Py4JEngineTest extends Py4JEngineTestBase {
 
-	@Ignore
+	@Disabled
 	@Test
 	public void mixedMode() throws Exception {
 		// define a function in shell mode
@@ -57,7 +57,7 @@ public class Py4JEngineTest extends Py4JEngineTestBase {
 	 * condition is to cleanly shutdown the engined and then check the output.
 	 */
 	@Test
-	@Ignore("Clean shutdown not reliable yet, See Bug 494034")
+	@Disabled("Clean shutdown not reliable yet, See Bug 494034")
 	public void print() throws Exception {
 		assertResultIsNone(executeCode("from __future__ import print_function\nprint('text on python stdout', end='')\n", false));
 
@@ -72,7 +72,7 @@ public class Py4JEngineTest extends Py4JEngineTestBase {
 	 * Test that the Python process is being shutdown properly.
 	 */
 	@Test
-	@Ignore("Clean shutdown not reliable yet, See Bug 494034")
+	@Disabled("Clean shutdown not reliable yet, See Bug 494034")
 	public void cleanShutdown() throws Exception {
 		assertResultIsNone(executeCode("import atexit\n" + "import sys\n" + "atexit.register(lambda: sys.stdout.write('in atexit'))\n", false));
 

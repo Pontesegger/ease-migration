@@ -11,17 +11,16 @@
 
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.ease.ScriptExecutionException;
+import javax.script.ScriptException;
+
 import org.eclipse.ease.ScriptResult;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ScriptModeEngineTest extends ModeTestBase {
 
@@ -40,7 +39,7 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void callExit() throws Exception {
 		final ScriptResult result = executeCode("print_('this should be output', False)\nexit()\nprint_('this should not appear')");
 		assertResultIsNone(result);
@@ -55,21 +54,21 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	@Test
 	public void incompleteStatement() throws Exception {
 		final ScriptResult result = executeCode("def a():");
-		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
-		assertThat(fErrorStream.getAndClearOutput(), containsString("SyntaxError"));
+		assertTrue(result.getException() instanceof ScriptException);
+		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.getResult());
 	}
 
 	@Test
 	public void invalidSyntax() throws Exception {
 		executeCode("1++");
-		assertThat(fErrorStream.getAndClearOutput(), containsString("SyntaxError"));
+		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 	}
 
 	@Test
 	public void runtimeError() throws Exception {
 		executeCode("a");
-		assertThat(fErrorStream.getAndClearOutput(), containsString("NameError"));
+		assertTrue(fErrorStream.getAndClearOutput().contains("NameError"));
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void multiLinesOfCode() throws Exception {
 		assertResultIsNone(executeCode("print_(1)\nprint_(2)"));
 		assertEquals(String.format("1%n2%n"), fOutputStream.getAndClearOutput());

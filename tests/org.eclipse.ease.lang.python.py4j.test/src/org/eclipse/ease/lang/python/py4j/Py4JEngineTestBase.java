@@ -10,16 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptResult;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class Py4JEngineTestBase extends EaseTestBase {
 
@@ -27,7 +25,7 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	protected ByteArrayPrintStream fErrorStream;
 	protected ByteArrayPrintStream fOutputStream;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		fEngine = createEngine();
 		fEngine.setTerminateOnIdle(false);
@@ -35,7 +33,7 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 		fOutputStream = ((ByteArrayPrintStream) fEngine.getOutputStream());
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		fEngine.setTerminateOnIdle(true);
 		assertEngineTerminated(fEngine);
@@ -47,8 +45,8 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 		final ScriptResult result = executeCode(line, true);
 		if (expectMore) {
 			assertNull(result.getException());
-			assertThat(result.getResult(), instanceOf(String.class));
-			assertThat((String) result.getResult(), startsWith("..."));
+			assertTrue(result.getResult() instanceof String);
+			assertTrue(result.getResult().toString().startsWith("..."));
 		}
 		return result;
 	}

@@ -10,25 +10,14 @@
 	<prerequisites>
 		<!-- Maven 3.1.0 is the earliest version using Eclipse Aether, Maven 3.0.x 
 			uses the incompatible predecessor Sonatype Aether -->
-		<maven>3.1</maven>
+		<maven>3.6.3</maven>
 	</prerequisites>
 
 	<properties>
 		<!-- used plugin versions -->
-		<tycho.version>1.5.0</tycho.version>
+		<tycho.version>2.2.0</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 	</properties>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>cbi</id>
-			<url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>nexus</id>
-			<url>https://repo.eclipse.org/content/repositories/maven_central/</url>
-		</pluginRepository>
-	</pluginRepositories>
 
 	<build>
 		<plugins>
@@ -53,6 +42,14 @@
 							<version>0.8.0-SNAPSHOT</version>
 						</artifact>
 					</target>
+
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -62,12 +59,12 @@
 		<module>../org.eclipse.ease.releng.target</module>
 
 		<module>../../tests/org.eclipse.ease.test</module>
-		<module>../../tests/org.eclipse.ease.lang.javascript.nashorn.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.rhino.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.jython.test</module>
-		<module>../../tests/org.eclipse.ease.lang.python.py4j.test</module>
+		<!-- Disabled, see Bug 567308 - [Py4J] Tests are broken as they cause build 
+			timeouts <module>../../tests/org.eclipse.ease.lang.python.py4j.test</module> -->
 		<module>../../tests/org.eclipse.ease.lang.scriptarchive.test</module>
 		<module>../../tests/org.eclipse.ease.ui.test</module>
 	</modules>

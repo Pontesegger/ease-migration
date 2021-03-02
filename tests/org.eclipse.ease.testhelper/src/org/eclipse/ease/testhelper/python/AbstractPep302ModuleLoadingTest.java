@@ -11,15 +11,15 @@
 
 package org.eclipse.ease.testhelper.python;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.ScriptResult;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractPep302ModuleLoadingTest {
 
@@ -27,13 +27,13 @@ public abstract class AbstractPep302ModuleLoadingTest {
 
 	abstract protected IReplEngine createEngine();
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		fEngine = createEngine();
 		fEngine.setTerminateOnIdle(false);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		fEngine.terminate();
 	}

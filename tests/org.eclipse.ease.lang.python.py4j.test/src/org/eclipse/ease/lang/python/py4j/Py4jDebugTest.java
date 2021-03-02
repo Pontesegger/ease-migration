@@ -18,8 +18,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.lang.python.py4j.internal.Py4jDebuggerEngine;
 import org.eclipse.ease.testhelper.AbstractDebugTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class Py4jDebugTest extends AbstractDebugTest {
 
@@ -50,28 +50,28 @@ public class Py4jDebugTest extends AbstractDebugTest {
 
 	@Override
 	@Test
-	@Ignore
+	@Disabled
 	public void nativeObjectVariable() throws CoreException, IOException {
 		// TODO: Currently not possible to access native Python variables
 	}
 
 	@Override
 	@Test
-	@Ignore
+	@Disabled
 	public void nativeArrayVariable() throws CoreException, IOException {
 		// TODO: Currently not possible to access native Python variables
 	}
 
 	@Override
 	@Test
-	@Ignore
+	@Disabled
 	public void stepIntoIncludeCommand() throws CoreException {
 		// TODO see https://bugs.eclipse.org/bugs/show_bug.cgi?id=553619
 	}
 
 	@Override
 	@Test
-	@Ignore
+	@Disabled
 	public void resumeOnLastIncludeLine() throws CoreException {
 		// TODO see https://bugs.eclipse.org/bugs/show_bug.cgi?id=553652
 	}

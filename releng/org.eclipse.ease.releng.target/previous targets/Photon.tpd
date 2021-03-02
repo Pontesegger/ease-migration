@@ -1,5 +1,7 @@
 target "Oxygen" with source requirements
 
+environment JavaSE-11
+
 location "http://download.eclipse.org/releases/photon/" eclipse-photon {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
@@ -19,8 +21,7 @@ location "http://download.eclipse.org/releases/photon/" eclipse-photon {
 
 location "http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository" eclipse-orbit-photon {
 	// needed for unit tests
-	org.mockito [1.9.5,2.0.0)
-	org.hamcrest [1.1.0,2.0.0)
+	org.mockito [2.13.0,3.0.0)
 }
 
 location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {

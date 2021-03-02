@@ -11,10 +11,10 @@
 
 package org.eclipse.ease.testhelper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,9 +30,9 @@ import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.IModuleCallbackProvider;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests basic environment loading and functionality.
@@ -40,7 +40,7 @@ import org.junit.Test;
 public abstract class AbstractEnvironmentTest {
 	private IReplEngine fEngine;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		// we need to retrieve the service singleton as the workspace is not available in headless tests
 		fEngine = createScriptEngine();
@@ -54,7 +54,7 @@ public abstract class AbstractEnvironmentTest {
 		return codeFactory.createCommentedString(text, false);
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() {
 		fEngine.terminate();
 	}

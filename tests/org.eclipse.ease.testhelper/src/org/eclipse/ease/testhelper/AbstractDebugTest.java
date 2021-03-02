@@ -11,11 +11,11 @@
 
 package org.eclipse.ease.testhelper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -52,9 +53,10 @@ import org.eclipse.ease.debugging.model.EaseWatchExpressionDelegate;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
 
 public abstract class AbstractDebugTest extends WorkspaceTestHelper {
@@ -100,7 +102,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	private IDebugTarget fDebugTarget = null;
 	private IDebugEngine fScriptEngine;
 
-	@Before
+	@BeforeEach
 	public void setup() throws UnsupportedEncodingException, CoreException, IOException {
 
 		fLaunchMock = mock(ILaunch.class);
@@ -118,7 +120,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		clearBreakpoints();
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		if (!fScriptEngine.isFinished()) {
 			fScriptEngine.schedule();
@@ -133,7 +135,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertNotNull(getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void breakpointLocation() throws CoreException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "primitive-integer-definition-hook"));
 		assertEquals(1, getBreakpoints().length);
@@ -185,22 +188,26 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepOverOnDebugTarget() throws CoreException {
 		stepOverTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepOverOnProcess() throws CoreException {
 		stepOverTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepOverOnThread() throws CoreException {
 		stepOverTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepOverOnStackFrame() throws CoreException {
 		stepOverTestTemplate(() -> getTopmostStackFrame());
 	}
@@ -240,22 +247,26 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepIntoOnDebugTarget() throws CoreException {
 		stepIntoTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepIntoOnProcess() throws CoreException {
 		stepIntoTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepIntoOnThread() throws CoreException {
 		stepIntoTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepIntoOnStackFrame() throws CoreException {
 		stepIntoTestTemplate(() -> getTopmostStackFrame());
 	}
@@ -295,22 +306,26 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepReturnOnDebugTarget() throws CoreException {
 		stepReturnTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepReturnOnProcess() throws CoreException {
 		stepReturnTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepReturnOnThread() throws CoreException {
 		stepReturnTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void stepReturnOnStackFrame() throws CoreException {
 		stepReturnTestTemplate(() -> getTopmostStackFrame());
 	}
@@ -402,7 +417,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(2, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void resumeOnLastIncludeLine() throws CoreException {
 		setBreakpoint(getFile(INCLUDE_SCRIPT), getLineNumber(INCLUDE_SCRIPT, "include-last-line-hook"));
 		assertEquals(1, getBreakpoints().length);
@@ -433,22 +449,26 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void resumeOnDebugTarget() throws CoreException, IOException {
 		resumeTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void resumeOnProcess() throws CoreException, IOException {
 		resumeTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void resumeOnThread() throws CoreException, IOException {
 		resumeTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void resumeOnStackFrame() throws CoreException, IOException {
 		resumeTestTemplate(() -> getTopmostStackFrame());
 	}
@@ -473,22 +493,26 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateDebugTargetInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateProcessInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateThreadInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateStackFrameInSuspendedState() throws CoreException {
 		terminateTestTemplate(() -> getTopmostStackFrame());
 	}
@@ -513,29 +537,34 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void disconnectDebugTargetInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getDebugTarget());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void disconnectProcessInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getProcess());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void disconnectThreadInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getThread());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void disconnectStackFrameInSuspendedState() throws CoreException {
 		disconnectTestTemplate(() -> getTopmostStackFrame());
 	}
 
 	// ---------- watch expression tests --------------------------------------------------------
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void evaluateWatchExpression() throws CoreException, IOException {
 		final IWatchExpressionListener expressionListener = mock(IWatchExpressionListener.class);
 
@@ -567,7 +596,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	// ---------- state enablements tests -------------------------------------------------------
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void suspendedState() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -636,7 +666,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminatedState() throws CoreException {
 
 		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
@@ -693,7 +724,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 	// ---------- variable tests ----------------------------------------------------------------
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void primitiveDoubleVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -721,7 +753,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void primitiveStringVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -749,7 +782,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void nullVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -777,7 +811,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void nativeArrayVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -825,7 +860,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void arrayVariableSorting() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -854,7 +890,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void nativeObjectVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -894,7 +931,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void javaClassVariable() throws CoreException, IOException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
@@ -963,7 +1001,8 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		assertEquals(1, suspendedEvents);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void innerScopeVariableBeforeOuterScopeVariable() throws CoreException {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"));
 		assertEquals(1, getBreakpoints().length);

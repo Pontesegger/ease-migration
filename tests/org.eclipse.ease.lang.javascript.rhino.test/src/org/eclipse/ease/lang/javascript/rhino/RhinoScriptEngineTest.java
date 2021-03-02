@@ -10,19 +10,19 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RhinoScriptEngineTest {
 	private static final String SCRIPT_SNIPPET_1 = "foo = 40 + 2;";
@@ -38,16 +38,16 @@ public class RhinoScriptEngineTest {
 
 	private RhinoScriptEngine fEngine;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void beforeEach() throws Exception {
 		// we need to retrieve the service singleton as the workspace is not available in headless tests
 		final IScriptService scriptService = ScriptService.getService();
 		fEngine = (RhinoScriptEngine) scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID).createEngine();
 		fEngine.setTerminateOnIdle(false);
 	}
 
-	@After
-	public void tearDown() {
+	@AfterEach
+	public void afterEach() {
 		fEngine.terminate();
 	}
 

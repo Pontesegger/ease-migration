@@ -1,5 +1,7 @@
 target "Neon" with source requirements
 
+environment JavaSE-11
+
 location "http://download.eclipse.org/releases/neon/" eclipse-neon {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
@@ -26,9 +28,9 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 	org.eclipse.ease.engine.jruby.feature.feature.group lazy
 }
 
-location "http://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository" eclipse-orbit-neon {
-	org.mockito [1.9.5,2.0.0)
-	org.hamcrest [1.1.0,2.0.0)
+location "http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository" eclipse-orbit-photon {
+	// needed for unit tests
+	org.mockito [2.13.0,3.0.0)
 }
 
 location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {

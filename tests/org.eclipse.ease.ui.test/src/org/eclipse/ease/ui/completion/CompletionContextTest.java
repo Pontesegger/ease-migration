@@ -11,19 +11,19 @@
 
 package org.eclipse.ease.ui.completion;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 
 import org.eclipse.ease.ICompletionContext.Type;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CompletionContextTest {
 
 	private CompletionContext fContext;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		fContext = new CompletionContext(null, null) {
 

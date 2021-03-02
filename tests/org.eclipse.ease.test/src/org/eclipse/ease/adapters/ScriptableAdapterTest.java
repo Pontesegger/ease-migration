@@ -1,7 +1,7 @@
 package org.eclipse.ease.adapters;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,8 +17,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ease.IScriptable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ScriptableAdapterTest {
 
@@ -35,7 +35,7 @@ public class ScriptableAdapterTest {
 	private File fFsFile;
 	private File fFsFolder;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		// create workspace sample project

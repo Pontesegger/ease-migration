@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -34,9 +34,9 @@ import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebuggerEngine;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RhinoDebuggerEngineTest {
 	private static final String SCRIPT_SNIPPET_1 = "foo = 40 + 2;";
@@ -84,8 +84,8 @@ public class RhinoDebuggerEngineTest {
 	private IFile fIncludeFile;
 	private RhinoDebuggerEngine fEngine;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void beforeEach() throws Exception {
 
 		// create workspace sample project
 		fWorkspace = ResourcesPlugin.getWorkspace().getRoot();
@@ -115,8 +115,8 @@ public class RhinoDebuggerEngineTest {
 		fEngine.setTerminateOnIdle(false);
 	}
 
-	@After
-	public void tearDown() throws CoreException {
+	@AfterEach
+	public void afterEach() throws CoreException {
 		fEngine.terminate();
 
 		if (fProject.exists())

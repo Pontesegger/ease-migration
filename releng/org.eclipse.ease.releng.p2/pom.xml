@@ -12,6 +12,7 @@
 		<relativePath>../org.eclipse.ease.releng</relativePath>
 	</parent>
 
+		<!--
 	<pluginRepositories>
 		<pluginRepository>
 			<id>jboss-public-repository-group</id>
@@ -19,13 +20,16 @@
 			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
+		--> 
 
 	<build>
 		<plugins>
+		<!-- 
+	
 			<plugin>
 				<groupId>org.jboss.tools.tycho-plugins</groupId>
 				<artifactId>repository-utils</artifactId>
-				<version>0.23.2</version>
+				<version>${org.jboss.tools.tycho-plugins.version}</version>
 				<executions>
 					<execution>
 						<id>generate-facade</id>
@@ -44,6 +48,7 @@
 					<skipBuildInfo>true</skipBuildInfo>
 				</configuration>
 			</plugin>
+		 -->
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>

@@ -10,18 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.help.hovers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.eclipse.ease.modules.ModuleDefinition;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ModuleHelpTest {
 
@@ -30,7 +30,7 @@ public class ModuleHelpTest {
 	private Method fSampleMethod;
 	private Field fSampleField;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		fSampleModule = new org.eclipse.ease.ui.help.hovers.SampleModule();
 		fSampleModuleDefinition = ModuleDefinition.getDefinition(fSampleModule);
@@ -39,13 +39,13 @@ public class ModuleHelpTest {
 		fSampleField = fSampleModule.getClass().getField("PI");
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void getModuleHelpLocation() {
 		assertNotNull(ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition));
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void getModuleHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
@@ -59,7 +59,7 @@ public class ModuleHelpTest {
 		assertTrue(moduleHelp.getHoverContent().length() > moduleHelp.getDescription().length());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void getMethodHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);
@@ -74,7 +74,7 @@ public class ModuleHelpTest {
 		assertTrue(moduleHelp.getHoverContent().length() > methodHelp.getDescription().length());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void getConstantHelp() throws Exception {
 		final URL helpLocation = ModuleHelp.getModuleHelpLocation(fSampleModuleDefinition);

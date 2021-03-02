@@ -11,12 +11,10 @@
 
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,15 +25,15 @@ import java.util.Set;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.IScriptable;
 import org.eclipse.ease.ScriptResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class ModeTestBase extends Py4JEngineTestBase {
 	abstract protected ScriptResult executeCode(String code) throws Exception;
 
 	abstract protected void executeCode(String code, Object result) throws Exception;
 
-	@Before
+	@BeforeEach
 	public void loadModules() throws Exception {
 		executeCode("loadModule('/Py4jTests')");
 	}
@@ -98,7 +96,7 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		assertNull(result.getException());
 		assertNotNull(result.getResult());
 		assertTrue(result.getResult() instanceof String);
-		assertThat((String) result.getResult(), startsWith("<object object at "));
+		assertTrue(result.getResult().toString().startsWith("<object object at "));
 	}
 
 	@Test

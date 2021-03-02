@@ -11,14 +11,14 @@
 
 package org.eclipse.ease.sign;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SignatureHelperTest {
 

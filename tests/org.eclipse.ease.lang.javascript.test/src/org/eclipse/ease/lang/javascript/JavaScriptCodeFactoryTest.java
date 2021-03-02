@@ -11,16 +11,16 @@
 
 package org.eclipse.ease.lang.javascript;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JavaScriptCodeFactoryTest {
 	private JavaScriptCodeFactory fFactory;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	public void beforeEach() {
 		fFactory = new JavaScriptCodeFactory();
 	}
 

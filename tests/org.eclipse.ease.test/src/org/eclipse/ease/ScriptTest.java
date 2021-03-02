@@ -1,9 +1,9 @@
 package org.eclipse.ease;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,15 +15,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ease.tools.ResourceTools;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ScriptTest {
 
 	private static final String SAMPLE_CODE = "print('Hello world');";
 	private IFile fFile;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 

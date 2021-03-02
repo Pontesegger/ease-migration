@@ -1,10 +1,10 @@
 package org.eclipse.ease.tools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -23,9 +23,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ResourceToolsTest {
 
@@ -58,7 +58,7 @@ public class ResourceToolsTest {
 		return System.getProperty("os.name").toLowerCase().startsWith("linux");
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		// create workspace sample project
@@ -89,7 +89,7 @@ public class ResourceToolsTest {
 		fFsWorkspace = fWorkspace.getRawLocation().toFile();
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDown() throws CoreException {
 		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 		if (workspace != null) {
@@ -101,7 +101,7 @@ public class ResourceToolsTest {
 
 	@Test
 	public void checkOperatingSystem() {
-		assertTrue("Operating system is: " + System.getProperty("os.name"), isLinux() || isWindows());
+		assertTrue(isLinux() || isWindows(), "Operating system is: " + System.getProperty("os.name"));
 	}
 
 	// --------------------------------------------------------------------------------

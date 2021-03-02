@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ease.IReplEngine;
@@ -30,32 +31,10 @@ import org.eclipse.ease.lang.python.py4j.internal.Py4jScriptEngine;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.rules.Timeout;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.Timeout;
 
+@Timeout(value = 30, unit = TimeUnit.SECONDS)
 public abstract class EaseTestBase {
-
-	@Rule
-	public Timeout fGlobalTimeout = new Timeout(30000);
-
-	@Rule
-	public TestRule fPrintTestName = new TestWatcher() {
-		@Override
-		protected void starting(Description description) {
-			System.out.println("----------------------------------------------");
-			System.out.println("Starting test: " + description.getDisplayName());
-		}
-
-		@Override
-		protected void finished(Description description) {
-			System.out.println();
-			System.out.println("Finished test: " + description.getDisplayName());
-			System.out.println("----------------------------------------------");
-		};
-	};
 
 	protected static class TeeOutput extends OutputStream {
 

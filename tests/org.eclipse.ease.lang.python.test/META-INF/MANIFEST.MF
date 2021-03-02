@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.eclipse.ease.lang.python Unit Test
 Bundle-SymbolicName: org.eclipse.ease.lang.python.test
 Bundle-Version: 0.8.0.qualifier
-Fragment-Host: org.eclipse.ease.lang.python;bundle-version="0.7.0"
+Fragment-Host: org.eclipse.ease.lang.python
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit
+Require-Bundle: org.junit.jupiter.api
 Automatic-Module-Name: org.eclipse.ease.lang.python.test

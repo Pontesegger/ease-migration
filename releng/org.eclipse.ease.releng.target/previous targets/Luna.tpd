@@ -1,5 +1,7 @@
 target "Luna" with source requirements
 
+environment JavaSE-11
+
 location "http://download.eclipse.org/releases/luna/" eclipse-luna {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
@@ -26,10 +28,9 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 	org.eclipse.ease.engine.jruby.feature.feature.group lazy
 }
 
-location "http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/" eclipse-orbit-luna {
+location "http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository" eclipse-orbit-photon {
 	// needed for unit tests
-	org.mockito [1.9.5,2.0.0)
-	org.hamcrest [1.1.0,2.0.0)
+	org.mockito [2.13.0,3.0.0)
 }
 
 location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {

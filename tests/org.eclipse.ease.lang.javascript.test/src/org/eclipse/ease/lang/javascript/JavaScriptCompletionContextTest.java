@@ -1,21 +1,21 @@
 package org.eclipse.ease.lang.javascript;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.ui.completion.CompletionContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JavaScriptCompletionContextTest {
 
 	private static JavaScriptCompletionContext fContext;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		fContext = new JavaScriptCompletionContext(null);
 	}
@@ -85,7 +85,7 @@ public class JavaScriptCompletionContextTest {
 		// we need to retrieve the service singleton as the workspace is not available in headless tests
 		final IScriptService scriptService = ScriptService.getService();
 		final EngineDescription engineDescription = scriptService.getEngine(JavaScriptHelper.SCRIPT_TYPE_JAVASCRIPT);
-		assertNotNull("No JavaScript engine available", engineDescription);
+		assertNotNull(engineDescription, "No JavaScript engine available");
 
 		final IScriptEngine engine = engineDescription.createEngine();
 		engine.setVariable("test", "Hello world");

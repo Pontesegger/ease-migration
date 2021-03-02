@@ -11,13 +11,13 @@
 
 package org.eclipse.ease.sign;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
 
 import org.eclipse.ease.service.ScriptType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VerifySignatureTest {
 

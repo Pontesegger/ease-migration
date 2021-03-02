@@ -11,18 +11,17 @@
 
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.ease.ScriptExecutionException;
+import javax.script.ScriptException;
+
 import org.eclipse.ease.ScriptResult;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ShellModeEngineTest extends ModeTestBase {
 
@@ -60,28 +59,28 @@ public class ShellModeEngineTest extends ModeTestBase {
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void print_() throws Exception {
 		assertResultIsNone(executeCode("print_()"));
 		assertEquals(String.format("%n"), fOutputStream.getAndClearOutput());
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void print_NoNewline() throws Exception {
 		assertResultIsNone(executeCode("print_('', False)"));
 		assertEquals("", fOutputStream.getAndClearOutput());
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void print_Text() throws Exception {
 		assertResultIsNone(executeCode("print_('text')"));
 		assertEquals(String.format("text%n"), fOutputStream.getAndClearOutput());
 	}
 
 	@Test
-	@Ignore("Disabled until Bug 493677 is resolved")
+	@Disabled("Disabled until Bug 493677 is resolved")
 	public void print_TextNoNewline() throws Exception {
 		assertResultIsNone(executeCode("print_('text', False)"));
 		assertEquals("text", fOutputStream.getAndClearOutput());
@@ -106,17 +105,16 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void invalidSyntax() throws Exception {
 		final ScriptResult result = executeCode("1++");
-		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
-		assertThat(fErrorStream.getAndClearOutput(), containsString("SyntaxError"));
+		assertTrue(result.getException() instanceof ScriptException);
+		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.getResult());
 	}
 
 	@Test
 	public void runtimeError() throws Exception {
 		final ScriptResult result = executeCode("x");
-		assertThat(result.getException(), instanceOf(ScriptExecutionException.class));
-		assertThat(fErrorStream.getAndClearOutput(), containsString("NameError"));
+		assertTrue(result.getException() instanceof ScriptException);
+		assertTrue(fErrorStream.getAndClearOutput().contains("NameError"));
 		assertNull(result.getResult());
 	}
-
 }

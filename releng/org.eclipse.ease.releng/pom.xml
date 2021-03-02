@@ -10,16 +10,16 @@
 	<prerequisites>
 		<!-- Maven 3.1.0 is the earliest version using Eclipse Aether, Maven 3.0.x 
 			uses the incompatible predecessor Sonatype Aether -->
-		<maven>3.1</maven>
+		<maven>3.6.3</maven>
 	</prerequisites>
 
 	<properties>
 		<!-- used plugin versions -->
-		<tycho.version>1.5.0</tycho.version>
+		<tycho.version>2.2.0</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<maven.compiler.version>3.6.1</maven.compiler.version>
-		<maven.javadoc.version>2.9.1</maven.javadoc.version>
-		<jacoco.version>0.7.9</jacoco.version>
+		<maven.javadoc.version>3.1.0</maven.javadoc.version>
+		<jacoco.version>0.8.6</jacoco.version>
 		<eclipse.jarsigner.version>1.1.3</eclipse.jarsigner.version>
 		<maven.buildhelper.version>1.9.1</maven.buildhelper.version>
 
@@ -70,6 +70,14 @@
 							<version>0.8.0-SNAPSHOT</version>
 						</artifact>
 					</target>
+
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 
@@ -165,6 +173,15 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<providerHint>junit5</providerHint>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -226,14 +243,12 @@
 		<!-- tests -->
 		<module>../../tests/org.eclipse.ease.testhelper</module>
 		<module>../../tests/org.eclipse.ease.test</module>
-		<module>../../tests/org.eclipse.ease.lang.javascript.nashorn.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.rhino.test</module>
 		<module>../../tests/org.eclipse.ease.lang.javascript.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.test</module>
 		<module>../../tests/org.eclipse.ease.lang.python.jython.test</module>
-		<!-- Disabled, see Bug 567308 - [Py4J] Tests are broken as they cause build timeouts
-		<module>../../tests/org.eclipse.ease.lang.python.py4j.test</module>
-		 -->
+		<!-- Disabled, see Bug 567308 - [Py4J] Tests are broken as they cause build 
+			timeouts <module>../../tests/org.eclipse.ease.lang.python.py4j.test</module> -->
 		<module>../../tests/org.eclipse.ease.lang.scriptarchive.test</module>
 		<module>../../tests/org.eclipse.ease.lang.unittest.test</module>
 		<module>../../tests/org.eclipse.ease.ui.scripts.test</module>
@@ -278,22 +293,21 @@
 						<version>${maven.javadoc.version}</version>
 						<configuration>
 							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
-							<doclet>org.eclipse.ease.helpgenerator.V8ModuleDoclet</doclet>
+							<doclet>org.eclipse.ease.helpgenerator.V9ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
-							<additionalparam>-root ${basedir} -failOnHTMLError true
-								-failOnMissingDocs true</additionalparam>
+							<additionalparam>-root ${basedir}
+								-encoding 'UTF-8'
+								-failOnHTMLError true
+								-failOnMissingDocs true
+								-linkoffline
+									../../org.eclipse.platform.doc.isv/reference/api/
+									http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api
+								-linkoffline
+									../../org.eclipse.ease.help/help/api-docs/javadoc/
+									https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc
+							</additionalparam>
 
-							<useStandardDocletOptions>true</useStandardDocletOptions>
-							<offlineLinks>
-								<offlineLink>
-									<url>../../org.eclipse.platform.doc.isv/reference/api/</url>
-									<location>http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api</location>
-								</offlineLink>
-								<offlineLink>
-									<url>../../org.eclipse.ease.help/help/api-docs/javadoc/</url>
-									<location>https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc</location>
-								</offlineLink>
-							</offlineLinks>
+							<useStandardDocletOptions>false</useStandardDocletOptions>
 						</configuration>
 						<executions>
 							<execution>
@@ -334,37 +348,6 @@
 
 		<profile>
 			<id>api-docs</id>
-		</profile>
-
-		<profile>
-			<id>sonar</id>
-
-			<build>
-				<plugins>
-					<!-- enable JaCoCo code coverage -->
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco.version}</version>
-
-						<configuration>
-							<include>org.eclipse.ease.*</include>
-							<destFile>${jacoco.report.path}</destFile>
-							<output>file</output>
-							<append>true</append>
-						</configuration>
-
-						<executions>
-							<execution>
-								<id>jacoco-initialize</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 
 		<profile>

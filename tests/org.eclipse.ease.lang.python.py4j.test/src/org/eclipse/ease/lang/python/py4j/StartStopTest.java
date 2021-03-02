@@ -12,7 +12,7 @@
 package org.eclipse.ease.lang.python.py4j;
 
 import org.eclipse.ease.IReplEngine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StartStopTest extends EaseTestBase {
 

@@ -1,22 +1,24 @@
 package org.eclipse.ease;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 public class AbstractScriptEngineTest {
 	protected static final int TEST_TIMEOUT = 3000;
@@ -80,12 +82,12 @@ public class AbstractScriptEngineTest {
 
 	protected AbstractScriptEngine fTestEngine;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		fTestEngine = new MockedScriptEngine();
 	}
 
-	@After
+	@AfterEach
 	public void teardown() throws InterruptedException {
 		if (fTestEngine.getState() != Job.NONE) {
 			fTestEngine.terminate();
@@ -139,7 +141,8 @@ public class AbstractScriptEngineTest {
 		assertTrue(fTestEngine instanceof Job);
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void executeValidCodeAndTerminate() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
@@ -164,7 +167,8 @@ public class AbstractScriptEngineTest {
 		assertNull(result2.getException());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void executeErrorCodeAndTerminate() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
@@ -189,7 +193,8 @@ public class AbstractScriptEngineTest {
 		assertEquals(RuntimeException.class, result2.getException().getClass());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void executeSync() throws InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
@@ -207,18 +212,21 @@ public class AbstractScriptEngineTest {
 		assertNull(result1.getException());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void inject() throws InterruptedException {
 		assertEquals(VALID_SAMPLE_CODE, fTestEngine.inject(VALID_SAMPLE_CODE));
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void engineTerminatesWhenIdle() throws InterruptedException {
 		fTestEngine.schedule();
 		fTestEngine.joinEngine();
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateViaTerminateMethod() throws InterruptedException {
 		final MockedScriptEngine engine = new MockedScriptEngine() {
 			@Override
@@ -252,7 +260,8 @@ public class AbstractScriptEngineTest {
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateViaMonitorCancellation() throws InterruptedException {
 		final MockedScriptEngine engine = new MockedScriptEngine() {
 			@Override
@@ -280,13 +289,14 @@ public class AbstractScriptEngineTest {
 
 		assertFalse(bos.toString().contains("Loop 100"));
 
-		assertTrue("result " + scriptResult.hashCode() + " is not ready", scriptResult.isReady());
+		assertTrue(scriptResult.isReady(), "result " + scriptResult.hashCode() + " is not ready");
 		assertNull(scriptResult.getResult());
 		assertTrue(scriptResult.hasException());
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateViaMethodCallback() throws InterruptedException {
 		final MockedScriptEngine engine = new MockedScriptEngine() {
 			@Override
@@ -313,7 +323,8 @@ public class AbstractScriptEngineTest {
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateMultipleTimes() {
 		final MockedScriptEngine engine = new MockedScriptEngine() {
 			@Override

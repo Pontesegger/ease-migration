@@ -11,9 +11,9 @@
 
 package org.eclipse.ease.ui.completion.provider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,10 +30,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class AbstractFileLocationCompletionProviderTest {
 
@@ -70,7 +70,7 @@ public class AbstractFileLocationCompletionProviderTest {
 		return System.getProperty("os.name").toLowerCase().startsWith("linux");
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		// create workspace sample project
@@ -105,7 +105,7 @@ public class AbstractFileLocationCompletionProviderTest {
 		};
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDown() throws CoreException {
 		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 		if (workspace != null) {
@@ -115,13 +115,13 @@ public class AbstractFileLocationCompletionProviderTest {
 		}
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void checkOperatingSystem() {
-		assertTrue("Operating system is: " + System.getProperty("os.name"), isLinux() || isWindows());
+		assertTrue(isLinux() || isWindows(), "Operating system is: " + System.getProperty("os.name"));
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void absoluteRootWorkspaceProposals() {
 
@@ -133,12 +133,12 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<workspace://> proposal missing", content.contains("workspace://"));
-		assertTrue("<file:///> proposal missing", content.contains("file:///"));
+		assertTrue(content.contains("workspace://"), "<workspace://> proposal missing");
+		assertTrue(content.contains("file:///"), "<file:///> proposal missing");
 		assertEquals(2, proposals.size());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void workspaceProposals() {
 
@@ -150,11 +150,11 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<" + PROJECT_NAME + "> proposal missing", content.contains(PROJECT_NAME));
+		assertTrue(content.contains(PROJECT_NAME), "<" + PROJECT_NAME + "> proposal missing");
 		assertEquals(1, proposals.size());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void workspaceProjectProposals() {
 
@@ -166,13 +166,13 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<..> proposal missing", content.contains(".."));
-		assertTrue("<" + FOLDER_NAME + "> proposal missing", content.contains(FOLDER_NAME));
-		assertTrue("<.project> proposal missing", content.contains(".project"));
+		assertTrue(content.contains(".."), "<..> proposal missing");
+		assertTrue(content.contains(FOLDER_NAME), "<" + FOLDER_NAME + "> proposal missing");
+		assertTrue(content.contains(".project"), "<.project> proposal missing");
 		assertEquals(3, proposals.size());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void workspaceFolderProposals() {
 
@@ -184,13 +184,13 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<..> proposal missing", content.contains(".."));
-		assertTrue("<" + FILE1_NAME + "> proposal missing", content.contains(FILE1_NAME));
-		assertTrue("<" + FILE2_NAME + "> proposal missing", content.contains(FILE2_NAME));
+		assertTrue(content.contains(".."), "<..> proposal missing");
+		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
+		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
 		assertEquals(3, proposals.size());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void relativeRootWorkspaceProposals() {
 
@@ -202,16 +202,16 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<workspace://> proposal missing", content.contains("workspace://"));
-		assertTrue("<file:///> proposal missing", content.contains("file:///"));
-		assertTrue("<project://> proposal missing", content.contains("project://"));
-		assertTrue("<..> proposal missing", content.contains(".."));
-		assertTrue("<" + FILE1_NAME + "> proposal missing", content.contains(FILE1_NAME));
-		assertTrue("<" + FILE2_NAME + "> proposal missing", content.contains(FILE2_NAME));
+		assertTrue(content.contains("workspace://"), "<workspace://> proposal missing");
+		assertTrue(content.contains("file:///"), "<file:///> proposal missing");
+		assertTrue(content.contains("project://"), "<project://> proposal missing");
+		assertTrue(content.contains(".."), "<..> proposal missing");
+		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
+		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
 		assertEquals(6, proposals.size());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void fileSystemRootProposals() {
 		final ICompletionContext context = mock(ICompletionContext.class);
@@ -222,11 +222,11 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertFalse("<..> proposal exists", content.contains(".."));
+		assertFalse(content.contains(".."), "<..> proposal exists");
 		assertFalse(proposals.isEmpty());
 	}
 
-	@Ignore
+	@Disabled
 	@Test
 	public void fileSystemFolderProposals() {
 		final ICompletionContext context = mock(ICompletionContext.class);
@@ -237,9 +237,9 @@ public class AbstractFileLocationCompletionProviderTest {
 		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
 		final Collection<String> content = extractDisplayedContent(proposals);
 
-		assertTrue("<..> proposal missing", content.contains(".."));
-		assertTrue("<" + FILE1_NAME + "> proposal missing", content.contains(FILE1_NAME));
-		assertTrue("<" + FILE2_NAME + "> proposal missing", content.contains(FILE2_NAME));
+		assertTrue(content.contains(".."), "<..> proposal missing");
+		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
+		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
 		assertEquals(3, proposals.size());
 	}
 

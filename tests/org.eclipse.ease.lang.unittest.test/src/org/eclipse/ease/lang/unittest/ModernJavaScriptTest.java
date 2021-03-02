@@ -11,8 +11,8 @@
 
 package org.eclipse.ease.lang.unittest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -20,8 +20,8 @@ import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.runtime.TestStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ModernJavaScriptTest extends TestBase {
 
@@ -32,7 +32,7 @@ public class ModernJavaScriptTest extends TestBase {
 		return getTestEntity(fTestSuite, path);
 	}
 
-	@Before
+	@BeforeEach
 	public void runTestSuite() {
 		fTestSuite = runSuite(TEST_PROJECT.getFile(JAVASCRIPT_MODERN_SUITE_FILENAME));
 	}

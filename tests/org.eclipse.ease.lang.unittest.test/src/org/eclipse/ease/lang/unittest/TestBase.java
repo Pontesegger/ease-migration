@@ -33,14 +33,14 @@ import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.osgi.framework.Bundle;
 
 public class TestBase {
 
 	public static IProject TEST_PROJECT;
 
-	@BeforeClass
+	@BeforeAll
 	public static void importTestProject() throws URISyntaxException, IOException, CoreException, InvocationTargetException, InterruptedException {
 		final Bundle bundle = Platform.getBundle("org.eclipse.ease.lang.unittest.test");
 		final URL fileURL = bundle.getEntry("resources/UnitTest");

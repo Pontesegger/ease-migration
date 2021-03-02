@@ -1,18 +1,17 @@
 package org.eclipse.ease;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 
 	private static final String SAMPLE_CODE = "Hello world";
@@ -67,7 +66,7 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 	}
 
 	@Override
-	@Before
+	@BeforeEach
 	public void setup() {
 		fTestEngine = new MockedScriptEngine();
 	}
@@ -76,7 +75,8 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 		return (AbstractReplScriptEngine) fTestEngine;
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateOnIdleAfterSchedule() throws InterruptedException {
 		getTestEngine().setTerminateOnIdle(false);
 		getTestEngine().schedule();
@@ -98,7 +98,8 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 		// test valid if it terminates within the timeout period
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void keepRunningOnIdle() throws InterruptedException {
 		getTestEngine().setTerminateOnIdle(false);
 		getTestEngine().executeAsync(SAMPLE_CODE);
@@ -108,7 +109,8 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 		assertTrue(result.isReady());
 	}
 
-	@Test(timeout = TEST_TIMEOUT)
+	@Test
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminateEngine() throws InterruptedException {
 		getTestEngine().setTerminateOnIdle(false);
 		getTestEngine().schedule();
