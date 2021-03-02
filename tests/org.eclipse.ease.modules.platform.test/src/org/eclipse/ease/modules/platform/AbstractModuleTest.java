@@ -11,8 +11,8 @@
 
 package org.eclipse.ease.modules.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.reflect.Method;
 
@@ -22,14 +22,14 @@ import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractModuleTest {
 
 	private RhinoScriptEngine fEngine;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		// we need to retrieve the service singleton as the workspace is not available in headless tests
 		final IScriptService scriptService = ScriptService.getService();

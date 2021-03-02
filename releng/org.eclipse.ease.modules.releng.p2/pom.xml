@@ -23,27 +23,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.jboss.tools.tycho-plugins</groupId>
-				<artifactId>repository-utils</artifactId>
-				<version>0.23.2</version>
-				<executions>
-					<execution>
-						<id>generate-facade</id>
-						<phase>package</phase>
-						<goals>
-							<goal>generate-repository-facade</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<associateSites>
-						<site>http://download.eclipse.org/nebula/releases/2.2.0</site>
-					</associateSites>
-					<skipBuildInfo>true</skipBuildInfo>
-				</configuration>
-			</plugin>
-
-			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-p2-repository-plugin</artifactId>
 				<version>${tycho.version}</version>

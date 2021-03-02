@@ -11,14 +11,15 @@
 
 package org.eclipse.ease.modules.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
@@ -27,12 +28,13 @@ import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.ArgumentCaptor;
 
 public class ScriptingModuleTest {
 
-	@Test(timeout = 2000)
+	@Timeout(value = 2, unit = TimeUnit.SECONDS)
 	public void forkWithoutDebugMode() throws Exception {
 		final IScriptService scriptService = ScriptService.getService();
 		final EngineDescription description = scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID);
@@ -48,7 +50,7 @@ public class ScriptingModuleTest {
 	}
 
 	@Test
-	public void storeTemporaryObject() {
+	public void storeTemporaryObject() throws IllegalAccessException {
 		final Object testObject = new Object();
 
 		// mocked script engine
@@ -59,11 +61,7 @@ public class ScriptingModuleTest {
 		module.initialize(mockEngine, null);
 
 		// set the object
-		try {
-			module.setSharedObject("temp", testObject, false, false);
-		} catch (final IllegalAccessException e) {
-			fail(e.getMessage());
-		}
+		module.setSharedObject("temp", testObject, false, false);
 
 		// retrieve the object
 		assertEquals(testObject, module.getSharedObject("temp"));
@@ -80,7 +78,7 @@ public class ScriptingModuleTest {
 	}
 
 	@Test
-	public void storePermanentObject() {
+	public void storePermanentObject() throws IllegalAccessException {
 		final Object testObject = new Object();
 
 		// mocked script engine
@@ -91,14 +89,10 @@ public class ScriptingModuleTest {
 		module.initialize(mockEngine, null);
 
 		// set the object
-		try {
-			module.setSharedObject("perm", testObject, true, false);
+		module.setSharedObject("perm", testObject, true, false);
 
-			// set another temp object to make sure the execution listener gets installed
-			module.setSharedObject("anotherTemp", testObject, false, false);
-		} catch (final IllegalAccessException e) {
-			fail(e.getMessage());
-		}
+		// set another temp object to make sure the execution listener gets installed
+		module.setSharedObject("anotherTemp", testObject, false, false);
 
 		// retrieve the object
 		assertEquals(testObject, module.getSharedObject("perm"));
@@ -114,7 +108,7 @@ public class ScriptingModuleTest {
 		assertEquals(testObject, module.getSharedObject("perm"));
 	}
 
-	@Test(expected = IllegalAccessException.class)
+	@Test
 	public void overwriteForeignObject() throws IllegalAccessException {
 		final Object testObject = new Object();
 
@@ -130,13 +124,10 @@ public class ScriptingModuleTest {
 		modifierModule.initialize(modifierEngine, null);
 
 		// set the object
-		try {
-			creatorModule.setSharedObject("foreign", testObject, false, false);
-		} catch (final IllegalAccessException e) {
-			fail(e.getMessage());
-		}
+		creatorModule.setSharedObject("foreign", testObject, false, false);
 
-		modifierModule.setSharedObject("foreign", testObject, false, false);
+		// try to overwrite
+		assertThrows(IllegalAccessException.class, () -> modifierModule.setSharedObject("foreign", testObject, false, false));
 	}
 
 	@Test

@@ -11,16 +11,18 @@
 
 package org.eclipse.ease.modules.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.ease.service.IScriptService;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 public class PlatformModuleTest extends AbstractModuleTest {
 
@@ -35,14 +37,14 @@ public class PlatformModuleTest extends AbstractModuleTest {
 	}
 
 	// test does not run on hudson as no UI is available => no service registry
-	@Ignore
+	@Disabled
 	@Test
 	public void getExistingService() {
 		assertTrue(IScriptService.class.isAssignableFrom(PlatformModule.getService(IScriptService.class).getClass()));
 	}
 
 	// test does not run on hudson as no UI is available => no service registry
-	@Ignore
+	@Disabled
 	@Test
 	public void getNonExistingService() {
 		assertNull(PlatformModule.getService(PlatformModuleTest.class));
@@ -58,7 +60,7 @@ public class PlatformModuleTest extends AbstractModuleTest {
 		assertNull(PlatformModule.getSystemProperty("java.home.undefined"));
 	}
 
-	@Test(timeout = 3000)
+	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void runProcess() throws IOException, InterruptedException {
 		final Process process = PlatformModule.runProcess("ls", new String[] { "-la" }, "keep", null);
 		process.waitFor();

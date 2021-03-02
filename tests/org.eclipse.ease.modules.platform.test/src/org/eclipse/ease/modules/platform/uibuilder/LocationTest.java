@@ -11,12 +11,13 @@
 
 package org.eclipse.ease.modules.platform.uibuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.swt.SWT;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LocationTest {
 
@@ -180,8 +181,8 @@ public class LocationTest {
 		assertTrue(location.getLayoutData().grabExcessVerticalSpace);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void invalidColumn() {
-		new Location("0");
+		assertThrows(IllegalArgumentException.class, () -> new Location("0"));
 	}
 }

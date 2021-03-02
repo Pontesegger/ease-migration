@@ -24,8 +24,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test Class for the {@link BuildModule}
@@ -36,7 +36,7 @@ public class BuildModuleTest {
 	private IWorkspaceRoot fRoot;
 	private IProject fProject;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		fProject = mock(IProject.class);
 		fRoot = mock(IWorkspaceRoot.class);

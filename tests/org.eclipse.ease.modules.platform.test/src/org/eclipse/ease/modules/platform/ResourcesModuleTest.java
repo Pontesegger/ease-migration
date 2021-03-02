@@ -11,8 +11,8 @@
 
 package org.eclipse.ease.modules.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,9 +28,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ease.IScriptEngine;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ResourcesModuleTest extends AbstractModuleTest {
 
@@ -47,7 +47,7 @@ public class ResourcesModuleTest extends AbstractModuleTest {
 		return ResourcesModule.MODULE_ID;
 	}
 
-	@Before
+	@BeforeEach
 	public void createTempFile() throws IOException {
 		tempFile = File.createTempFile("ease_unittest_", "");
 		tempFile.deleteOnExit(); // ensure cleanup
@@ -61,7 +61,7 @@ public class ResourcesModuleTest extends AbstractModuleTest {
 		module.initialize(mockEngine, null);
 	}
 
-	@After
+	@AfterEach
 	public void cleanUp() {
 		tempFile.delete();
 	}
@@ -98,7 +98,7 @@ public class ResourcesModuleTest extends AbstractModuleTest {
 			final byte[] read = new byte[data.length];
 			in.read(read, 0, data.length);
 
-			assertTrue("The content of the copied file is not the same", Arrays.equals(data, read));
+			assertTrue(Arrays.equals(data, read), "The content of the copied file is not the same");
 		}
 
 		targetFile.delete();
@@ -130,7 +130,7 @@ public class ResourcesModuleTest extends AbstractModuleTest {
 			final byte[] read = new byte[data.length];
 			in.read(read, 0, data.length);
 
-			assertTrue("The content of the copied file is not the same", Arrays.equals(data, read));
+			assertTrue(Arrays.equals(data, read), "The content of the copied file is not the same");
 		}
 	}
 }
