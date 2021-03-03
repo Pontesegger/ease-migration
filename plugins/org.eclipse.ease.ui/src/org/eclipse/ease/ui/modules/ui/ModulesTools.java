@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.ui.PlatformUI;
 
-public class ModulesTools {
+public final class ModulesTools {
 
 	public static class ModuleEntry<T> {
 
@@ -67,7 +67,7 @@ public class ModulesTools {
 		private final Font italic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DEFAULT_FONT);
 
 		@Override
-		public void applyStyles(final TextStyle textStyle) {
+		public void applyStyles(TextStyle textStyle) {
 			textStyle.font = italic;
 			textStyle.foreground = JFaceResources.getColorRegistry().get("QUALIFIER_COLOR");
 		}

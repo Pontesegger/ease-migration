@@ -147,7 +147,7 @@ public class ModuleHelp implements IHoverHelp {
 		return new ConstantHelp(fHelpLocation, fHelpContent, field);
 	}
 
-	public IHoverHelp getMethodHelp(final Method method) throws Exception {
+	public MethodHelp getMethodHelp(final Method method) throws Exception {
 		return new MethodHelp(fHelpLocation, fHelpContent, method);
 	}
 }

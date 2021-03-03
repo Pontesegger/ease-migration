@@ -117,18 +117,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 	}
 
 	@Override
-	public void dragEnter(final DropTargetEvent event) {
-		if ((event.detail == DND.DROP_MOVE) || (event.detail == DND.DROP_DEFAULT)) {
-			if ((event.operations & DND.DROP_COPY) != 0)
-				event.detail = DND.DROP_COPY;
-			else
-				event.detail = DND.DROP_NONE;
-		}
-	}
-
-	@Override
 	public void drop(final DropTargetEvent event) {
-
 		Object element = unpackElement(event.data);
 
 		// first ask registered drop handlers
@@ -138,14 +127,14 @@ public final class ShellDropTarget extends DropTargetAdapter {
 			for (final IShellDropHandler listener : listeners) {
 				// 1st pass: try to drop unpacked dropped element and pass it to drop handler
 				if (listener.accepts(fScriptEngineProvider.getScriptEngine(), element)) {
-					listener.performDrop(fScriptEngineProvider.getScriptEngine(), element);
+					listener.performDrop(fScriptEngineProvider.getScriptEngine(), element, event.detail);
 					return;
 				}
 
 				if (!event.data.equals(element)) {
 					// 2nd pass: no listener found for unwrapped object, try with original object
 					if (listener.accepts(fScriptEngineProvider.getScriptEngine(), event.data)) {
-						listener.performDrop(fScriptEngineProvider.getScriptEngine(), event.data);
+						listener.performDrop(fScriptEngineProvider.getScriptEngine(), event.data, event.detail);
 						return;
 					}
 				}

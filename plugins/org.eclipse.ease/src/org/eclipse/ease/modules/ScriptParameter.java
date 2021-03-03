@@ -16,6 +16,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.PARAMETER })
@@ -67,6 +68,15 @@ public @interface ScriptParameter {
 	public static class Helper {
 		public static boolean isOptional(final ScriptParameter parameter) {
 			return !parameter.defaultValue().equals(ScriptParameter.UNDEFINED);
+		}
+
+		public static boolean isOptional(Parameter parameter) {
+			final ScriptParameter annotation = parameter.getAnnotation(ScriptParameter.class);
+			return (annotation != null) && isOptional(annotation);
+		}
+
+		public static String getDefaultValue(Parameter parameter) {
+			return isOptional(parameter) ? OptionalParameterHelper.getDefaultValue(parameter.getAnnotation(ScriptParameter.class)) : null;
 		}
 	}
 }

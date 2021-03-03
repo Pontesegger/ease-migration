@@ -12,6 +12,7 @@
 package org.eclipse.ease.ui.dnd;
 
 import org.eclipse.ease.IScriptEngine;
+import org.eclipse.swt.dnd.DND;
 
 /**
  * Handler interface for custom drop events for the script shell view.
@@ -38,4 +39,19 @@ public interface IShellDropHandler {
 	 *            element to be dropped
 	 */
 	void performDrop(IScriptEngine scriptEngine, Object element);
+
+	/**
+	 * Perform the drop action.
+	 *
+	 * @param scriptEngine
+	 *            script engine to execute drop action
+	 * @param element
+	 *            element to be dropped
+	 * @param detail
+	 *            the operation being performed, see {@link DND#DROP_NONE}, {@link DND#DROP_MOVE},
+	 *            {@link DND#DROP_COPY},{@link DND#DROP_LINK},{@link DND#DROP_DEFAULT}
+	 */
+	default void performDrop(IScriptEngine scriptEngine, Object element, int detail) {
+		performDrop(scriptEngine, element);
+	}
 }
