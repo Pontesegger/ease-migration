@@ -25,7 +25,7 @@
 
 		<!-- build parameters -->
 		<compiler.compliance>1.8</compiler.compliance>
-		<jacoco.report.path>../../coverage-report/jacoco.exec</jacoco.report.path>
+		<jacoco.report.path>../../../coverage-report/jacoco.exec</jacoco.report.path>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -92,13 +92,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- enable pom version updates: to update execute goal "tycho.versions:update-pom" -->
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-versions-plugin</artifactId>
-				<version>${tycho.version}</version>
-			</plugin>
-
 			<!-- timestamps based on the latest git commit -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -119,59 +112,6 @@
 					</jgit.ignore>
 					<format>${build-prefix}yyyyMMddHHmm</format>
 				</configuration>
-			</plugin>
-
-			<!-- enable source feature generation -->
-			<plugin>
-				<groupId>org.eclipse.tycho.extras</groupId>
-				<artifactId>tycho-source-feature-plugin</artifactId>
-				<version>${tycho.extras.version}</version>
-
-				<executions>
-					<execution>
-						<id>source-feature</id>
-						<phase>package</phase>
-						<goals>
-							<goal>source-feature</goal>
-						</goals>
-					</execution>
-				</executions>
-
-				<configuration>
-					<excludes>
-						<plugin id="org.eclipse.ease.help" />
-					</excludes>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-source-plugin</artifactId>
-				<version>${tycho.version}</version>
-
-				<executions>
-					<execution>
-						<id>plugin-source</id>
-						<goals>
-							<goal>plugin-source</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<executions>
-					<execution>
-						<id>attached-p2-metadata</id>
-						<phase>package</phase>
-						<goals>
-							<goal>p2-metadata</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>
@@ -239,6 +179,7 @@
 		<!-- releng -->
 		<module>../org.eclipse.ease.releng.target</module>
 		<module>../org.eclipse.ease.releng.p2</module>
+		<module>../org.eclipse.ease.releng.coverage</module>
 
 		<!-- tests -->
 		<module>../../tests/org.eclipse.ease.testhelper</module>
@@ -276,78 +217,7 @@
 		</profile>
 
 		<profile>
-			<!-- build help pages for modules using javadoc. Needs variable doclet.path 
-				to be set to the location of the ModuleDoclet jar. The jar can be built with: 
-				mvn clean package -f org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/pom.xml 
-				in which case the doclet.path would be: org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar 
-				or the pre-built jar can downloaded from: https://hudson.eclipse.org/ease/job/ease-build-module-doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar -->
 			<id>module-docs</id>
-
-			<build>
-				<plugins>
-
-					<!-- enable module documentation builder -->
-					<plugin>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<groupId>org.apache.maven.plugins</groupId>
-						<version>${maven.javadoc.version}</version>
-						<configuration>
-							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
-							<doclet>org.eclipse.ease.helpgenerator.V9ModuleDoclet</doclet>
-							<docletPath>${doclet.path}</docletPath>
-							<additionalparam>-root ${basedir}
-								-encoding 'UTF-8'
-								-failOnHTMLError true
-								-failOnMissingDocs true
-								-linkoffline
-									../../org.eclipse.platform.doc.isv/reference/api/
-									http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api
-								-linkoffline
-									../../org.eclipse.ease.help/help/api-docs/javadoc/
-									https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc
-							</additionalparam>
-
-							<useStandardDocletOptions>false</useStandardDocletOptions>
-						</configuration>
-						<executions>
-							<execution>
-								<id>build-docs</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<groupId>org.codehaus.mojo</groupId>
-						<version>${maven.buildhelper.version}</version>
-						<executions>
-							<execution>
-								<id>add_help</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>add-resource</goal>
-								</goals>
-								<configuration>
-									<resources>
-										<resource>
-											<directory>${basedir}/help</directory>
-											<targetPath>help</targetPath>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>api-docs</id>
 		</profile>
 
 		<profile>

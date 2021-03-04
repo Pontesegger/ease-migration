@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<name>EASE Plug-ins</name>
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.eclipse.ease.core.plugins</artifactId>
+	<version>0.8.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<parent>
+		<groupId>org.eclipse.ease</groupId>
+		<version>0.8.0-SNAPSHOT</version>
+		<artifactId>org.eclipse.ease.releng</artifactId>
+		<relativePath>../releng/org.eclipse.ease.releng</relativePath>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho.version}</version>
+
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<!-- build help pages for modules using javadoc. Needs variable doclet.path 
+				to be set to the location of the ModuleDoclet jar. The jar can be built with: 
+				mvn clean package -f org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/pom.xml 
+				in which case the doclet.path would be: org.eclipse.ease.core/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar 
+				or the pre-built jar can downloaded from: https://hudson.eclipse.org/ease/job/ease-build-module-doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar -->
+			<id>module-docs</id>
+
+			<build>
+				<plugins>
+
+					<!-- enable module documentation builder -->
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<groupId>org.apache.maven.plugins</groupId>
+						<version>${maven.javadoc.version}</version>
+						<configuration>
+							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
+							<doclet>org.eclipse.ease.helpgenerator.V9ModuleDoclet</doclet>
+							<docletPath>${doclet.path}</docletPath>
+							<additionalparam>-root ${basedir}
+								-encoding 'UTF-8'
+								-failOnHTMLError true
+								-failOnMissingDocs true
+								-link
+									https://docs.oracle.com/en/java/javase/11/docs/api
+								-linkoffline
+									../../org.eclipse.platform.doc.isv/reference/api/
+									http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api
+								-linkoffline
+									../../org.eclipse.ease.help/help/api-docs/javadoc/
+									https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc
+							</additionalparam>
+
+							<useStandardDocletOptions>false</useStandardDocletOptions>
+						</configuration>
+						<executions>
+							<execution>
+								<id>build-docs</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>javadoc</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<groupId>org.codehaus.mojo</groupId>
+						<version>${maven.buildhelper.version}</version>
+						<executions>
+							<execution>
+								<id>add_help</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>add-resource</goal>
+								</goals>
+								<configuration>
+									<resources>
+										<resource>
+											<directory>${basedir}/help</directory>
+											<targetPath>help</targetPath>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>  

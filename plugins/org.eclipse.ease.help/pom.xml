@@ -25,59 +25,48 @@
 					<timestampProvider>default</timestampProvider>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho.extras</groupId>
+				<artifactId>tycho-document-bundle-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>eclipse-javadoc</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>javadoc</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}/help/api-docs/javadoc</outputDirectory>
+							<tocFile>${project.basedir}/help/api_docs.xml</tocFile>
+							<tocOptions>
+								<mainLabel>EASE Core API</mainLabel>
+							</tocOptions>
+							<javadocOptions>
+								<jvmOptions>
+									<jvmOption>-Dhttp.proxySet=true</jvmOption>
+									<jvmOption>-Dhttp.proxyHost=proxy.eclipse.org</jvmOption>
+									<jvmOption>-Dhttp.proxyPort=9898</jvmOption>
+									<jvmOption>-DhttpnonProxyHosts=*.eclipse.org</jvmOption>
+								</jvmOptions>
+								<additionalArguments>
+									<additionalArgument>
+										-link
+											https://docs.oracle.com/en/java/javase/11/docs/api
+									</additionalArgument>
+									<additionalArgument>
+										-linkoffline
+											../../${platform.api}
+											http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api
+									</additionalArgument>
+									<additionalArgument>-public</additionalArgument>
+								</additionalArguments>
+							</javadocOptions>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<!-- Do the javadoc generation in a profile to keep standard builds (e.g. 
-				gerrit) fast. -->
-			<id>api-docs</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.tycho.extras</groupId>
-						<artifactId>tycho-document-bundle-plugin</artifactId>
-						<version>${tycho.version}</version>
-						<executions>
-							<execution>
-								<id>eclipse-javadoc</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>javadoc</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.basedir}/help/api-docs/javadoc</outputDirectory>
-									<tocFile>${project.basedir}/help/api_docs.xml</tocFile>
-									<tocOptions>
-										<mainLabel>EASE Core API</mainLabel>
-									</tocOptions>
-									<javadocOptions>
-										<jvmOptions>
-											<jvmOption>-Dhttp.proxySet=true</jvmOption>
-											<jvmOption>-Dhttp.proxyHost=proxy.eclipse.org</jvmOption>
-											<jvmOption>-Dhttp.proxyPort=9898</jvmOption>
-											<jvmOption>-DhttpnonProxyHosts=*.eclipse.org</jvmOption>
-										</jvmOptions>
-										<additionalArguments>
-											<additionalArgument>
-												-link
-												http://docs.oracle.com/javase/8/docs/api/
-											</additionalArgument>
-											<additionalArgument>
-												-linkoffline
-												../../${platform.api}
-												http://help.eclipse.org/luna/topic/org.eclipse.platform.doc.isv/reference/api/
-											</additionalArgument>
-											<additionalArgument>-public</additionalArgument>
-										</additionalArguments>
-									</javadocOptions>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
