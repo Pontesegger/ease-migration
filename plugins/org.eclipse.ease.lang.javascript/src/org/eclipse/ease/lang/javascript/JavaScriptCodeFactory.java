@@ -262,12 +262,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	protected String createFieldWrapper(IEnvironment environment, String identifier, Field field) {
 		final StringBuilder javaScriptCode = new StringBuilder();
 
-		javaScriptCode.append(field.getName());
-		javaScriptCode.append(" = ");
-		javaScriptCode.append(identifier);
-		javaScriptCode.append('.');
-		javaScriptCode.append(field.getName());
-		javaScriptCode.append(';');
+		javaScriptCode.append(String.format("var %s = %s.%s;", field.getName(), identifier, field.getName()));
 		javaScriptCode.append(StringTools.LINE_DELIMITER);
 
 		return javaScriptCode.toString();
