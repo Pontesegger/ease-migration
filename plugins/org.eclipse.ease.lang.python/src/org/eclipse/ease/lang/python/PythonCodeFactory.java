@@ -227,8 +227,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		for (final Parameter parameter : parameters) {
 			if ((double.class.equals(parameter.getClazz())) || (Double.class.equals(parameter.getClazz())) || (float.class.equals(parameter.getClazz()))
 					|| (Float.class.equals(parameter.getClazz()))) {
-				builder.append(parameter.getName()).append(" = (").append(parameter.getName()).append(" * 1.0) if ").append(parameter.getName())
-						.append(" else ").append(parameter.getName()).append(StringTools.LINE_DELIMITER);
+				builder.append(String.format("%s = float(%s)", parameter.getName(), parameter.getName()));
+				builder.append(StringTools.LINE_DELIMITER);
 			}
 		}
 
