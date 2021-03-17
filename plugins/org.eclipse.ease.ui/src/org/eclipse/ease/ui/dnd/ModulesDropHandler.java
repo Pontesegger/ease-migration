@@ -107,16 +107,16 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 		if ((String.class.equals(targetClass)) || (Object.class.equals(targetClass)))
 			return input;
 
-		if (Integer.class.equals(targetClass))
+		if ((Integer.class.equals(targetClass)) || (int.class.equals(targetClass)))
 			return Integer.valueOf(input);
 
-		if (Long.class.equals(targetClass))
+		if ((Long.class.equals(targetClass)) || (long.class.equals(targetClass)))
 			return Long.valueOf(input);
 
-		if (Double.class.equals(targetClass))
+		if ((Double.class.equals(targetClass)) || (double.class.equals(targetClass)))
 			return Double.valueOf(input);
 
-		if (Float.class.equals(targetClass))
+		if ((Float.class.equals(targetClass)) || (float.class.equals(targetClass)))
 			return Float.valueOf(input);
 
 		if ((Boolean.class.equals(targetClass)) || (boolean.class.equals(targetClass)))
