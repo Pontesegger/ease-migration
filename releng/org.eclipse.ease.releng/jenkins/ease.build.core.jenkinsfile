@@ -17,35 +17,30 @@ pipeline {
                 scm: [$class: 'GitSCM',
                         branches: [[name: '*/master']],
                         doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'CleanCheckout']],
+                        extensions: [
+                        	[$class: 'CleanCheckout'],
+                        ],
                         submoduleCfg: [],
                         userRemoteConfigs: [[url: 'git://git.eclipse.org/gitroot/ease/org.eclipse.ease.core.git']]
                     ]
             }
         }
 
-		stage('Info') {
-			steps {
-				sh "java -version"	    
-			}
-		}
+        stage('Build Doclet') {
+            steps {
+            	build job: 'ease.build.module.doclet', quietPeriod: 0
+            	copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.'
+            }
+        }
 
-		stage('Fetch Doclet') {
-			steps {
-				sh "curl ${JENKINS_URL}job/ease.build.module.doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar --output ease.module.doclet.jar"	    
-			}
-		}
-
-        
         stage('Build') {
             steps {
-            
 	            withMaven(
-	            	jdk: 'oracle-jdk8-latest',
+	            	jdk: 'openjdk-jdk15-latest',
 	            	maven: 'apache-maven-latest',
-	            	options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
+	            	options: [artifactsPublisher(disabled: true)])
 	            {
-					sh 'mvn clean verify -Psource -Pmodule-docs -Papi-docs -Psign'
+					sh 'mvn clean verify -Pmodule-docs -Psign'
                 }
             }
         }
@@ -58,7 +53,8 @@ pipeline {
         }
 
         success {
-            archiveArtifacts artifacts: 'releng/org.eclipse.ease.releng.p2.source/target/repository/', fingerprint: true            
+			archiveArtifacts artifacts: '**', fingerprint: false
+//            archiveArtifacts artifacts: 'releng/org.eclipse.ease.releng.p2.source/target/repository/', fingerprint: true            
 			junit '**/target/surefire-reports/*.xml'    	    
         }
     }

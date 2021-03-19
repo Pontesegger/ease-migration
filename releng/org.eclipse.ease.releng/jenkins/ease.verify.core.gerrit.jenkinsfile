@@ -1,0 +1,102 @@
+pipeline {
+
+	agent {
+		label 'migration'
+	}
+
+    options {
+        timestamps()
+        timeout(time: 60, unit: 'MINUTES')
+    }
+              
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout poll: false,
+                scm: [$class: 'GitSCM',
+                        branches: [[name: "${GERRIT_BRANCH}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'BuildChooserSetting', buildChooser: [$class: 'GerritTriggerBuildChooser']], [$class: 'CleanCheckout']],
+                            submoduleCfg: [],
+                            userRemoteConfigs: [[refspec: '$GERRIT_REFSPEC', url: 'git://git.eclipse.org/gitroot/ease/org.eclipse.ease.core.git']]
+                    ]
+            }
+        }
+
+		stage('Fetch Doclet') {
+			steps {
+            	 copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.', flatten: true
+
+				// copyArtifacts does not work
+				// sh "curl ${JENKINS_URL}job/ease.build.module.doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar --output ease.module.doclet.jar"
+			}
+		}
+
+        
+        stage('Build') {
+            parallel {
+                stage('EASE Core') {
+                    steps {
+        	            withMaven(
+	                    	jdk: 'openjdk-jdk15-latest',
+	                    	maven: 'apache-maven-latest',
+        	            	options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
+	                    {
+	                            sh 'mvn clean verify -P module-docs -P sign'
+                        }
+                    }
+                }
+
+                stage('Module Doclet') {
+                    steps {
+        	            withMaven(
+	                    	jdk: 'oracle-jdk9-latest',
+	                    	maven: 'apache-maven-latest',
+        	            	options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
+	                    {
+	                            sh 'mvn clean verify -f developers/org.eclipse.ease.helpgenerator/pom.xml'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Publish') {
+	        steps {
+				junit '**/target/surefire-reports/*.xml'    	    
+        	    archiveArtifacts artifacts: '**', fingerprint: true
+            
+	            sshagent(['git.eclipse.org-bot-ssh']) {
+    	            sh "ssh -o StrictHostKeyChecking=no genie.ease@git.eclipse.org -p 29418 gerrit set-reviewers -a christian.pontesegger@web.de ${GERRIT_CHANGE_NUMBER}"
+        	    }
+        	}
+        }
+    }
+    
+    post {
+        failure {
+			archiveArtifacts artifacts: '**', fingerprint: false
+            emailext body: """
+Your verification build failed.
+
+Change:\t\t${GERRIT_CHANGE_SUBJECT}
+Gerrit:\t\t${GERRIT_CHANGE_URL}
+
+Build Log:\t${BUILD_URL}/console
+Workspace:\t${BUILD_URL}/artifact/
+            """, subject: "=?utf-8?Q?=E2=9C=98__=5BEASE=5D_${JOB_NAME}_failed?=", to: "${GERRIT_CHANGE_OWNER_EMAIL}"
+        }
+
+        success {
+            emailext body: """
+Your verification build succeeded.
+
+Change:\t\t${GERRIT_CHANGE_SUBJECT}
+Gerrit:\t\t${GERRIT_CHANGE_URL}
+
+Build Log:\t${BUILD_URL}/console
+            """, subject: "=?utf-8?Q?=E2=9C=94__=5BEASE=5D_${JOB_NAME}_succeeded?=", to: "${GERRIT_CHANGE_OWNER_EMAIL}"
+        }
+    }
+}
