@@ -17,36 +17,37 @@ pipeline {
                 scm: [$class: 'GitSCM',
                         branches: [[name: '*/master']],
                         doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'CleanCheckout']],
+                        extensions: [
+                        	[$class: 'CleanCheckout'],
+                        ],
                         submoduleCfg: [],
                         userRemoteConfigs: [[url: 'git://git.eclipse.org/gitroot/ease/org.eclipse.ease.modules.git']]
                     ]
             }
         }
 
-		stage('Info') {
-			steps {
-				sh "java -version"	    
-			}
-		}
-
 		stage('Fetch Doclet') {
 			steps {
-				sh "curl ${JENKINS_URL}job/ease.build.module.doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar --output ease.module.doclet.jar"	    
+				copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.', flatten: true
 			}
 		}
-
         
         stage('Build') {
+			steps {
+				withMaven(
+					jdk: 'openjdk-jdk15-latest',
+					maven: 'apache-maven-latest',
+					options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
+				{
+					sh 'mvn clean verify -P module-docs -P sign'
+				}
+			}
+        }
+
+        stage('Reporting') {
             steps {
-            
-	            withMaven(
-	            	jdk: 'oracle-jdk8-latest',
-	            	maven: 'apache-maven-latest',
-	            	options: [artifactsPublisher(disabled: true), findbugsPublisher(), openTasksPublisher(disabled: true)])
-	            {
-					sh 'mvn clean verify -Psource -Pmodule-docs -Papi-docs -Psign'
-                }
+                recordIssues aggregatingResults: true, tools: [mavenConsole(), cpd(), pmdParser(), checkStyle(), spotBugs(useRankAsPriority: true)]
+                publishCoverage adapters: [jacocoAdapter(path: 'releng/org.eclipse.ease.modules.releng.coverage/target/site/jacoco-aggregate/jacoco.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
             }
         }
     }
@@ -58,8 +59,9 @@ pipeline {
         }
 
         success {
-            archiveArtifacts artifacts: 'releng/org.eclipse.ease.modules.releng.p2.source/target/repository/', fingerprint: true            
+            archiveArtifacts artifacts: 'releng/org.eclipse.ease.modules.releng.p2/target/repository/', fingerprint: true            
 			junit '**/target/surefire-reports/*.xml'    	    
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'plugins/org.eclipse.ease.modules.help/help/api-docs/javadoc', reportFiles: 'index.html', reportName: 'JavaDoc', reportTitles: ''])
         }
     }
 }
