@@ -1760,7 +1760,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 	 * will not open and a beep will be sounded.
 	 */
 	@Override
-	protected void openProposalPopup() {
+	public void openProposalPopup() {
 		openProposalPopup(false);
 	}
 
@@ -1771,7 +1771,7 @@ public class ContentProposalModifier extends ContentProposalAdapter {
 	 * @since 3.3
 	 */
 	@Override
-	protected void closeProposalPopup() {
+	public void closeProposalPopup() {
 		if (popup != null) {
 			popup.close();
 		}
