@@ -18,6 +18,75 @@
 
 	<build>
 		<plugins>
+			<!-- enable PMD code analysis -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${maven.pmd.version}</version>
+				<configuration>
+					<linkXRef>false</linkXRef>
+					<rulesets>../../releng/org.eclipse.ease.modules.releng/pmd/pmd_rules.xml</rulesets>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>pmd-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>pmd</goal>
+							<goal>cpd</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- enable spotbugs code analysis -->
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${maven.spotbugs.version}</version>
+
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<fork>false</fork>
+
+					<excludeFilterFile>../../releng/org.eclipse.ease.modules.releng/spotbugs/spotbugs_filter.xml</excludeFilterFile>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>spotbugs-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>spotbugs</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- enable checkstyle code analysis -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven.checkstyle.version}</version>
+				<configuration>
+					<configLocation>../../releng/org.eclipse.ease.modules.releng/checkstyle/checkstyle_rules.xml</configLocation>
+					<linkXRef>false</linkXRef>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>checkstyle-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- enable source feature generation -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
@@ -28,6 +97,21 @@
 						<id>plugin-source</id>
 						<goals>
 							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>attached-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
 						</goals>
 					</execution>
 				</executions>

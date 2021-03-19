@@ -1,0 +1,22 @@
+<FindBugsFilter>
+
+    <!-- Ignore generated code -->
+    <Match>
+        <Or>
+        <!-- 
+        	<Class name="com.infineon.tools.configuration.IConfigurationFactory"/>
+            <Package name="com.infineon.tools.configuration.impl"/>
+         -->
+        </Or>
+    </Match>
+
+    <!-- Ignore spotbugs reports from incomplete detectors -->
+    <Match>
+        <Bug pattern="TESTING"/>
+    </Match>
+
+    <!-- Ignore initalization warnings in Unit Tests. We typically initialize in beforeEach() -->
+    <Match>
+        <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+    </Match>
+</FindBugsFilter>

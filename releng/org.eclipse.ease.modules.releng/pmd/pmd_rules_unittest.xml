@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+
+<ruleset name="Custom Rules"
+	xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+	<description>
+        SysBox Unittest PMD rules
+    </description>
+
+	<!-- see https://pmd.github.io/latest/pmd_rules_java.html for available 
+		rules -->
+
+	<!-- exclude pattern work on the target folder, so only packages can be 
+		used -->
+
+	<rule ref="category/java/bestpractices.xml">
+		<!-- Skills logger takes care of guarding -->
+		<exclude name="GuardLogStatement" />
+
+		<!-- Not each assert requires a message -->
+		<exclude name="JUnitAssertionsShouldIncludeMessage" />
+
+		<!-- More than 1 assert allowed in tests -->
+		<exclude name="JUnitTestContainsTooManyAsserts" />
+	</rule>
+
+	<rule ref="category/java/codestyle.xml">
+		<!-- Allow non final method arguments -->
+		<exclude name="MethodArgumentCouldBeFinal" />
+
+		<!-- Fields can be defined after static methods -->
+		<exclude name="FieldDeclarationsShouldBeAtStartOfClass" />
+
+		<!-- Allow to use single line blocks without {} -->
+		<exclude name="IfStmtsMustUseBraces" />
+		<exclude name="IfElseStmtsMustUseBraces" />
+		<exclude name="ForLoopsMustUseBraces" />
+		<exclude name="WhileLoopsMustUseBraces" />
+		<exclude name="ControlStatementBraces" />
+
+		<!-- Allow additional () for readability -->
+		<exclude name="UselessParentheses" />
+
+		<!-- Allow more than one return statement in a method -->
+		<exclude name="OnlyOneReturn" />
+
+		<!-- Do not require to call super() in constructor -->
+		<exclude name="CallSuperInConstructor" />
+
+		<!-- Do not require a default constructor -->
+		<exclude name="AtLeastOneConstructor" />
+
+		<!-- Allow variable names -->
+		<exclude name="ShortVariable" />
+		<exclude name="LongVariable" />
+
+		<!-- Allow class names shorter than 5 characters -->
+		<exclude name="ShortClassName" />
+
+		<!-- Allow static imports for JUnit and mocking -->
+		<exclude name="TooManyStaticImports" />
+	</rule>
+
+	<rule ref="category/java/codestyle.xml/ClassNamingConventions">
+		<properties>
+			<property name="utilityClassPattern"
+				value="[A-Z][a-zA-Z0-9]+" />
+		</properties>
+	</rule>
+
+	<!-- test methods typically start with the method name they check. This 
+		does not state anything about the test methods return value -->
+	<rule ref="category/java/codestyle.xml/LinguisticNaming">
+		<properties>
+			<property name="ignoredAnnotations"
+				value="java.lang.Override" />
+			<property name="checkBooleanMethod" value="false" />
+			<property name="checkGetters" value="false" />
+			<property name="checkSetters" value="false" />
+			<property name="checkPrefixedTransformMethods" value="false" />
+			<property name="checkTransformMethods" value="false" />
+			<property name="booleanMethodPrefixes" value="false" />
+			<property name="transformMethodNames" value="false" />
+		</properties>
+	</rule>
+
+	<rule ref="category/java/codestyle.xml/MethodNamingConventions">
+    	<properties>
+	        <property name="methodPattern" value="[a-z][a-zA-Z0-9]*" />
+    	    <property name="staticPattern" value="[a-z][a-zA-Z0-9]*" />
+        	<property name="nativePattern" value="[a-z][a-zA-Z0-9]*" />
+	        <property name="junit3TestPattern" value="test[A-Z0-9][a-zA-Z0-9_]*" />
+    	    <property name="junit4TestPattern" value="[a-z][a-zA-Z0-9_]*" />
+        	<property name="junit5TestPattern" value="[a-z][a-zA-Z0-9_]*" />
+    	</properties>
+	</rule>
+
+	<rule ref="category/java/design.xml">
+		<exclude name="LawOfDemeter" />
+
+		<!-- needs detailed configuration to work, otherwise fails in maven -->
+		<exclude name="LoosePackageCoupling" />
+	</rule>
+
+	<rule ref="category/java/documentation.xml">
+		<exclude name="CommentRequired" />
+		<exclude name="CommentSize" />
+
+		<!-- Allow empty constructors without documentation -->
+		<exclude name="UncommentedEmptyConstructor" />
+	</rule>
+
+	<rule ref="category/java/errorprone.xml">
+		<exclude name="BeanMembersShouldSerialize" />
+
+		<!-- fails in maven build, see https://github.com/pmd/pmd/issues/873 -->
+		<exclude name="DataflowAnomalyAnalysis" />
+	</rule>
+
+	<rule ref="category/java/errorprone.xml/EmptyCatchBlock">
+		<properties>
+			<property name="allowCommentedBlocks" value="true" />
+		</properties>
+	</rule>
+
+	<rule ref="category/java/multithreading.xml">
+		<!-- ConcurrentHashMap is slower. Use only where needed -->
+		<exclude name="UseConcurrentHashMap" />
+
+		<!-- only makes sense in the context of JavaEE -->
+		<exclude name="DoNotUseThreads" />
+	</rule>
+
+	<rule ref="category/java/performance.xml">
+		<!-- prefer having initializers for explicit code readability -->
+		<exclude name="RedundantFieldInitializer" />
+
+		<!-- sacrifice performance for improved code readability -->
+		<exclude name="ConsecutiveAppendsShouldReuse" />
+
+		<!-- instantiating objects in loops is actually fine, see https://stackoverflow.com/questions/17340421/pmd-avoid-instantiating-new-objects-inside-loops -->
+		<exclude name="AvoidInstantiatingObjectsInLoops" />
+	</rule>
+
+	<rule ref="category/java/security.xml" />
+
+</ruleset>
