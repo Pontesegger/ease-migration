@@ -26,10 +26,7 @@ pipeline {
 
 		stage('Fetch Doclet') {
 			steps {
-            	 copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.', flatten: true
-
-				// copyArtifacts does not work
-				// sh "curl ${JENKINS_URL}job/ease.build.module.doclet/lastSuccessfulBuild/artifact/developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar --output ease.module.doclet.jar"
+				copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.', flatten: true
 			}
 		}
 
@@ -59,6 +56,13 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+
+        stage('Reporting') {
+            steps {
+                publishCoverage adapters: [jacocoAdapter(path: 'releng/org.eclipse.ease.releng.coverage/target/site/jacoco-aggregate/jacoco.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                recordIssues aggregatingResults: true, ignoreQualityGate: true, qualityGates: [[threshold: 1, type: 'DELTA', unstable: false]], referenceJobName: 'ease.build.core', tools: [mavenConsole(), cpd(), pmdParser(), spotBugs(useRankAsPriority: true), checkStyle()]
             }
         }
         

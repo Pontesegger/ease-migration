@@ -29,7 +29,7 @@ pipeline {
         stage('Build Doclet') {
             steps {
             	build job: 'ease.build.module.doclet', quietPeriod: 0
-            	copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.'
+				copyArtifacts filter: 'developers/org.eclipse.ease.helpgenerator/target/ease.module.doclet.jar', fingerprintArtifacts: true, projectName: 'ease.build.module.doclet', selector: lastSuccessful(), target: '.', flatten: true
             }
         }
 
@@ -44,6 +44,13 @@ pipeline {
                 }
             }
         }
+        
+        stage('Reporting') {
+            steps {
+                recordIssues aggregatingResults: true, tools: [mavenConsole(), cpd(), pmdParser(), checkStyle(), spotBugs(useRankAsPriority: true)]
+                publishCoverage adapters: [jacocoAdapter(path: 'releng/org.eclipse.ease.releng.coverage/target/site/jacoco-aggregate/jacoco.xml')], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+            }
+        }        
     }
     
     post {
@@ -53,9 +60,9 @@ pipeline {
         }
 
         success {
-			archiveArtifacts artifacts: '**', fingerprint: false
-//            archiveArtifacts artifacts: 'releng/org.eclipse.ease.releng.p2.source/target/repository/', fingerprint: true            
+            archiveArtifacts artifacts: 'releng/org.eclipse.ease.releng.p2/target/repository/', fingerprint: true            
 			junit '**/target/surefire-reports/*.xml'    	    
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'plugins/org.eclipse.ease.help/help/api-docs/javadoc', reportFiles: 'index.html', reportName: 'JavaDoc', reportTitles: ''])
         }
     }
 }
