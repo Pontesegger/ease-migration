@@ -381,9 +381,6 @@
                 xsi:type="predicates:OrPredicate">
               <operand
                   xsi:type="predicates:NamePredicate"
-                  pattern=".*feature"/>
-              <operand
-                  xsi:type="predicates:NamePredicate"
                   pattern=".*releng.*"/>
               <operand
                   xsi:type="predicates:NamePredicate"
@@ -399,6 +396,18 @@
           <operand
               xsi:type="predicates:NamePredicate"
               pattern="org.eclipse.ease.releng.website"/>
+        </predicate>
+      </workingSet>
+      <workingSet
+          name="EASE Features">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease"/>
+          <operand
+              xsi:type="predicates:NamePredicate"
+              pattern=".*feature"/>
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
@@ -692,6 +701,18 @@
           <operand
               xsi:type="predicates:RepositoryPredicate"
               project="org.eclipse.ease.modules.platform"/>
+        </predicate>
+      </workingSet>
+      <workingSet
+          name="EASE Features">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:RepositoryPredicate"
+              project="org.eclipse.ease.modules.platform"/>
+          <operand
+              xsi:type="predicates:NamePredicate"
+              pattern=".*feature"/>
         </predicate>
       </workingSet>
       <description>The dynamic working sets for ${scope.project.label}</description>
