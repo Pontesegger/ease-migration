@@ -19,11 +19,6 @@ location "http://download.eclipse.org/releases/oxygen/" eclipse-oxygen {
 	org.eclipse.jdt
 }
 
-location "http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository" eclipse-orbit-photon {
-	// needed for unit tests
-	org.mockito [2.13.0,3.0.0)
-}
-
 location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
 	// jython interpreter
 	org.eclipse.ease.engine.jython.feature.feature.group lazy
@@ -42,4 +37,9 @@ location "http://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
 	org.junit.jupiter.api [5.5.0,6.0.0)
 	org.junit.jupiter.engine [5.5.0,6.0.0)
 	org.junit.jupiter.params [5.5.0,6.0.0)
+}
+
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository/" eclipse-orbit-2020-12 {
+	// needed for unit tests
+	org.mockito [2.23.0,3.0.0)
 }
