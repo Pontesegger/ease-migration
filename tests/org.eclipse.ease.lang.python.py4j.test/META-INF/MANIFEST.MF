@@ -6,7 +6,7 @@ Bundle-Version: 0.8.0.qualifier
 Fragment-Host: org.eclipse.ease.lang.python.py4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Eclipse.org
-Require-Bundle: org.junit.jupiter.api,
+Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0",
  org.eclipse.core.runtime,
  org.mockito,
  org.eclipse.ease.testhelper

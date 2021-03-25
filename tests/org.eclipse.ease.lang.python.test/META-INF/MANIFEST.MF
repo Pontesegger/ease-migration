@@ -5,5 +5,5 @@ Bundle-SymbolicName: org.eclipse.ease.lang.python.test
 Bundle-Version: 0.8.0.qualifier
 Fragment-Host: org.eclipse.ease.lang.python
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit.jupiter.api
+Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0"
 Automatic-Module-Name: org.eclipse.ease.lang.python.test

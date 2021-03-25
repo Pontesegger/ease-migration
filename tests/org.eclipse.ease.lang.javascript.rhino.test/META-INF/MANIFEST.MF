@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.eclipse.ease.lang.javascript.rhino.test;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Fragment-Host: org.eclipse.ease.lang.javascript.rhino
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit.jupiter.api,
+Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0",
  org.eclipse.ui.workbench,
  org.mockito,
  org.eclipse.ease.testhelper

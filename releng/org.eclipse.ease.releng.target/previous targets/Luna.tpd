@@ -36,3 +36,10 @@ location "http://download.eclipse.org/tools/orbit/downloads/drops/R2018060614512
 location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {
 	org.py4j.feature.feature.group [0.10.4,0.10.5)
 }
+
+// required for JUnit 5 tests
+location "http://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
+	org.junit.jupiter.api [5.5.0,6.0.0)
+	org.junit.jupiter.engine [5.5.0,6.0.0)
+	org.junit.jupiter.params [5.5.0,6.0.0)
+}

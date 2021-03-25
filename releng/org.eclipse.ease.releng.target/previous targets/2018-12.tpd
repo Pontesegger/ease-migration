@@ -24,12 +24,6 @@ location "https://download.eclipse.org/tools/orbit/downloads/drops/R201811281703
 	org.mockito [2.13.0,3.0.0)
 }
 
-location "http://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
-	org.junit.jupiter.api [5.5.0,6.0.0)
-	org.junit.jupiter.engine [5.5.0,6.0.0)
-	org.junit.jupiter.params [5.5.0,6.0.0)
-}
-
 location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
 	// jython interpreter
 	org.eclipse.ease.engine.jython.feature.feature.group lazy
@@ -41,4 +35,11 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 
 location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {
 	org.py4j.feature.feature.group [0.10.4,0.10.5)
+}
+
+// required for JUnit 5 tests
+location "http://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
+	org.junit.jupiter.api [5.5.0,6.0.0)
+	org.junit.jupiter.engine [5.5.0,6.0.0)
+	org.junit.jupiter.params [5.5.0,6.0.0)
 }
