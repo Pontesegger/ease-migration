@@ -111,11 +111,9 @@
       <setupTask
           xsi:type="setup.p2:P2Task">
         <requirement
-            name="net.sourceforge.pmd.eclipse.feature.group"/>
+            name="ch.acanda.eclipse.pmd.feature.feature.group"/>
         <repository
-            url="https://pmd.github.io/pmd-eclipse-plugin-p2-site/"/>
-        <repository
-            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository"/>
+            url="http://www.acanda.ch/eclipse-pmd/release/latest"/>
         <description>Install tpd editor</description>
       </setupTask>
     </setupTask>

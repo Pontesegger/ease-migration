@@ -6,16 +6,15 @@
 	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
 	<description>
-        SysBox PMD rules
+        EASE PMD rules
     </description>
 
 	<!-- see https://pmd.github.io/latest/pmd_rules_java.html for available 
 		rules -->
 
 	<!-- exclude pattern work on the target folder, so only packages can be used -->
-	<exclude-pattern>.*/com/infineon/tools/configuration/.*</exclude-pattern>
-	<exclude-pattern>.*/com/infineon/tools/hexparser/antlr/.*</exclude-pattern>
-	<exclude-pattern>./com/infineon/tools/spanparser/antlr/.*</exclude-pattern>
+	<exclude-pattern>.*/org/eclipse/ease/lang/unittest/definition/.*</exclude-pattern>
+	<exclude-pattern>.*/org/eclipse/ease/lang/unittest/runtime/.*</exclude-pattern>
 
 	<rule ref="category/java/bestpractices.xml">
 		<!-- Skills logger takes care of guarding -->
