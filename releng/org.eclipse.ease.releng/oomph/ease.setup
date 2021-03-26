@@ -4,45 +4,15 @@
     xmlns:xmi="http://www.omg.org/XMI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:git="http://www.eclipse.org/oomph/setup/git/1.0"
-    xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
     xmlns:projects="http://www.eclipse.org/oomph/setup/projects/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="ease"
     label="EASE">
-  <setupTask
-      xsi:type="setup:CompoundTask"
-      name="Mylyn Integration">
-    <setupTask
-        xsi:type="mylyn:MylynBuildsTask"
-        serverURL="https://ci.eclipse.org/ease/"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <buildPlan
-          name="ease.build.core"/>
-      <buildPlan
-          name="ease.build.modules"/>
-      <buildPlan
-          name="ease.nightly"/>
-      <buildPlan
-          name="ease.release"/>
-      <buildPlan
-          name="ease.build.module.doclet"/>
-    </setupTask>
-    <setupTask
-        xsi:type="mylyn:MylynQueriesTask"
-        repositoryURL="https://bugs.eclipse.org/bugs"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <query
-          summary="EASE bugs"
-          url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;product=Ease"/>
-    </setupTask>
-  </setupTask>
   <setupTask
       xsi:type="setup:CompoundTask"
       name="Preferences">
@@ -98,14 +68,56 @@
   </setupTask>
   <setupTask
       xsi:type="setup:CompoundTask"
-      name="Install Target Platform Definition Editor">
+      name="Install IDE Plug-ins">
     <setupTask
-        xsi:type="setup.p2:P2Task">
-      <requirement
-          name="org.eclipse.cbi.targetplatform-feature.feature.group"/>
-      <repository
-          url="http://download.eclipse.org/cbi/tpd/3.0.0-SNAPSHOT/"/>
-      <description>Install tpd editor</description>
+        xsi:type="setup:CompoundTask"
+        name="Target Platform Definition Editor">
+      <setupTask
+          xsi:type="setup.p2:P2Task">
+        <requirement
+            name="org.eclipse.cbi.targetplatform-feature.feature.group"/>
+        <repository
+            url="http://download.eclipse.org/cbi/tpd/3.0.0-SNAPSHOT/"/>
+        <description>Install tpd editor</description>
+      </setupTask>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        name="Checkstyle">
+      <setupTask
+          xsi:type="setup.p2:P2Task">
+        <requirement
+            name="net.sf.eclipsecs.feature.group"/>
+        <repository
+            url="https://checkstyle.org/eclipse-cs/update"/>
+        <description>Install tpd editor</description>
+      </setupTask>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        name="Spotbugs">
+      <setupTask
+          xsi:type="setup.p2:P2Task">
+        <requirement
+            name="com.github.spotbugs.plugin.eclipse.feature.group"/>
+        <repository
+            url="https://spotbugs.github.io/eclipse/"/>
+        <description>Install tpd editor</description>
+      </setupTask>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        name="PMD">
+      <setupTask
+          xsi:type="setup.p2:P2Task">
+        <requirement
+            name="net.sourceforge.pmd.eclipse.feature.group"/>
+        <repository
+            url="https://pmd.github.io/pmd-eclipse-plugin-p2-site/"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository"/>
+        <description>Install tpd editor</description>
+      </setupTask>
     </setupTask>
   </setupTask>
   <project name="core"
