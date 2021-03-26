@@ -3,11 +3,8 @@
     <!-- Ignore generated code -->
     <Match>
         <Or>
-        	<Class name="com.infineon.tools.configuration.IConfigurationFactory"/>
-        	<Class name="com.infineon.tools.configuration.IConfigurationPackage"/>
-            <Package name="com.infineon.tools.configuration.impl"/>
-            <Package name="com.infineon.tools.configuration.util"/>
-            <Package name="com.infineon.tools.hexparser.antlr"/>
+            <Package name="org.eclipse.ease.lang.unittest.definition.*"/>
+            <Package name="org.eclipse.ease.lang.unittest.runtime.*"/>
         </Or>
     </Match>
 
