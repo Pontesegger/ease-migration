@@ -12,18 +12,12 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.views.shell.dropins.variables;
 
-import java.time.Duration;
-
-import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
-import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.Script;
 import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.view.VariablesDragListener;
-import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
+import org.eclipse.ease.ui.views.shell.dropins.AbstractDropin;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.Throttler;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -33,38 +27,28 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-public class VariablesDropin implements IShellDropin, IExecutionListener {
+public class VariablesDropin extends AbstractDropin {
 
 	private TreeViewer fVariablesTree = null;
-	private IReplEngine fEngine;
-	private boolean fIsActive = true;
-
-	private final Throttler fUiUpdater = new Throttler(Display.getDefault(), Duration.ofMillis(500), this::update);
 
 	@Override
 	public void setScriptEngine(IReplEngine engine) {
-		if (fEngine != null)
-			fEngine.removeExecutionListener(this);
-
-		fEngine = engine;
-
-		if (fEngine != null)
-			fEngine.addExecutionListener(this);
+		super.setScriptEngine(engine);
 
 		// set tree input
 		if (fVariablesTree != null) {
 			fVariablesTree.setInput(engine);
-			fUiUpdater.throttledExec();
+
+			update();
 		}
 	}
 
 	@Override
-	public Composite createPartControl(final IWorkbenchPartSite site, final Composite parent) {
+	public Composite createComposite(final IWorkbenchPartSite site, final Composite parent) {
 
 		final Composite composite = new Composite(parent, SWT.NONE);
 		final TreeColumnLayout treeColumnLayout = new TreeColumnLayout();
@@ -94,12 +78,6 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		fVariablesTree.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY, new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() },
 				new VariablesDragListener(fVariablesTree));
 
-		composite.addListener(SWT.Hide, event -> fIsActive = false);
-		composite.addListener(SWT.Show, event -> {
-			fIsActive = true;
-			update();
-		});
-
 		return composite;
 	}
 
@@ -109,24 +87,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 	}
 
 	@Override
-	public void notify(IScriptEngine engine, Script script, int status) {
-		switch (status) {
-		case IExecutionListener.SCRIPT_END:
-			fUiUpdater.throttledExec();
-			break;
-
-		case IExecutionListener.ENGINE_END:
-			engine.removeExecutionListener(this);
-			break;
-
-		default:
-			// nothing to do
-			break;
-		}
-	}
-
-	public void update() {
-		if (fIsActive)
-			fVariablesTree.refresh();
+	public void updateUI() {
+		fVariablesTree.refresh();
 	};
 }

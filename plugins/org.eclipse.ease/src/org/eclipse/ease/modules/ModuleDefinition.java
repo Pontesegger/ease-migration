@@ -5,15 +5,19 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License-Identifier: EPL-2.0
+ *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.modules;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -33,6 +37,12 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
 
 public class ModuleDefinition {
+
+	public static ModuleDefinition forInstance(Object element) {
+		final List<ModuleDefinition> modules = new ArrayList<>(ScriptService.getInstance().getAvailableModules());
+
+		return modules.stream().filter(d -> Objects.equals(d.getModuleClass(), element.getClass())).findAny().orElse(null);
+	}
 
 	public static class ModuleDependency {
 

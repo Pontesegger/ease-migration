@@ -486,7 +486,7 @@
       <dropHandler
             class="org.eclipse.ease.ui.dnd.JarDropHandler"></dropHandler>
       <dropin
-            class="org.eclipse.ease.ui.view.ModuleStackDropin"
+            class="org.eclipse.ease.ui.views.shell.dropins.modules.ModulesStackDropin"
             priority="-1">
       </dropin>
       <dropHandler
