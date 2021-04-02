@@ -50,6 +50,7 @@ import org.eclipse.ease.ui.dnd.ShellDropTarget;
 import org.eclipse.ease.ui.handler.ToggleDropinsSection;
 import org.eclipse.ease.ui.help.hovers.ContentProposalModifier;
 import org.eclipse.ease.ui.preferences.IPreferenceConstants;
+import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ComboContentAdapter;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;

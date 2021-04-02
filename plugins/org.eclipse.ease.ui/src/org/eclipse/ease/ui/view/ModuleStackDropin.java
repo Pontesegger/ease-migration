@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ease.IExecutionListener;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.modules.IEnvironment;
@@ -22,6 +23,7 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.Messages;
 import org.eclipse.ease.ui.modules.ui.ModulesDragListener;
+import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -46,10 +48,10 @@ import org.eclipse.ui.PlatformUI;
 public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 
 	private TableViewer fModulesTable;
-	private IScriptEngine fEngine;
+	private IReplEngine fEngine;
 
 	@Override
-	public void setScriptEngine(IScriptEngine engine) {
+	public void setScriptEngine(IReplEngine engine) {
 		if (fEngine != null)
 			fEngine.removeExecutionListener(this);
 
@@ -172,6 +174,7 @@ public class ModuleStackDropin implements IShellDropin, IExecutionListener {
 	public void notify(IScriptEngine engine, Script script, int status) {
 		switch (status) {
 		case IExecutionListener.SCRIPT_END:
+			// fall through
 		case IExecutionListener.SCRIPT_INJECTION_END:
 			Display.getDefault().asyncExec(() -> fModulesTable.refresh());
 			break;

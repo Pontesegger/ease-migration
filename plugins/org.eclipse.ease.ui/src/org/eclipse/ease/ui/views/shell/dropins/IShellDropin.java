@@ -8,9 +8,9 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.ui.view;
+package org.eclipse.ease.ui.views.shell.dropins;
 
-import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -23,27 +23,27 @@ public interface IShellDropin {
 	/**
 	 * Sets the script engine for this drop-in. If the engine is changed during runtime, this method gets called another time. For all other scripting events
 	 * this drop-in should register a listener on the script engine.
-	 * 
+	 *
 	 * @param engine
 	 *            script engine used in shell view
 	 */
-	public void setScriptEngine(IScriptEngine engine);
+	void setScriptEngine(IReplEngine engine);
 
 	/**
 	 * Create the drop-in visual components.
-	 * 
+	 *
 	 * @param site
 	 *            workbench part site this drop-in is registered to
 	 * @param parent
 	 *            parent container to render in
 	 * @return composite created within parent container (may not be <code>null</code>)
 	 */
-	public Composite createPartControl(final IWorkbenchPartSite site, final Composite parent);
+	Composite createPartControl(IWorkbenchPartSite site, Composite parent);
 
 	/**
 	 * Get this drop-in title. The title is used to populate a tabitem.
-	 * 
+	 *
 	 * @return drop-in title
 	 */
-	public String getTitle();
+	String getTitle();
 }

@@ -10,22 +10,23 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.scripts.view;
 
+import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.ui.ScriptComposite;
-import org.eclipse.ease.ui.view.IShellDropin;
+import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
 public class ScriptDropin implements IShellDropin, IScriptEngineProvider {
 
-	private IScriptEngine fEngine;
+	private IReplEngine fEngine;
 	private ScriptComposite fComposite;
 
 	@Override
-	public void setScriptEngine(IScriptEngine engine) {
+	public void setScriptEngine(IReplEngine engine) {
 		fEngine = engine;
 
 		if (fComposite != null)

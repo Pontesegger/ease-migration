@@ -474,7 +474,7 @@
    <extension
          point="org.eclipse.ease.ui.shell">
       <dropin
-            class="org.eclipse.ease.ui.view.VariablesDropin"
+            class="org.eclipse.ease.ui.views.shell.dropins.variables.VariablesDropin"
             priority="10">
       </dropin>
       <dropHandler
