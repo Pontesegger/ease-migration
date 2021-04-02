@@ -33,6 +33,8 @@ public abstract class AbstractDropin implements IShellDropin, IExecutionListener
 
 	private boolean fIsActive = false;
 
+	private boolean fGloballyHidden = false;
+
 	@Override
 	public void setScriptEngine(IReplEngine engine) {
 		if (fEngine != null)
@@ -77,8 +79,13 @@ public abstract class AbstractDropin implements IShellDropin, IExecutionListener
 	}
 
 	protected void update() {
-		if (fIsActive)
+		if ((!fGloballyHidden) && (fIsActive))
 			updateUI();
+	}
+
+	@Override
+	public void setHidden(boolean hidden) {
+		fGloballyHidden = hidden;
 	}
 
 	protected abstract void updateUI();

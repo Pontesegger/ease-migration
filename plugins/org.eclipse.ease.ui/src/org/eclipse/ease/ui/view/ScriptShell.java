@@ -92,7 +92,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private static final String XML_HISTORY_NODE = "history";
 
-	private static final int[] DEFAULT_SASH_WEIGHTS = new int[] { 70, 30 };
+	private static final int[] DEFAULT_SASH_WEIGHTS = { 70, 30 };
 
 	private class AutoFocus implements KeyListener {
 
@@ -134,13 +134,9 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private int fHistoryLength;
 
-	private boolean fAutoFocus;
-
 	private boolean fKeepCommand;
 
 	private AutoFocus fAutoFocusListener = null;
-
-	private ContentProposalAdapter fContentAssistAdapter = null;
 
 	private final CodeCompletionAggregator fCompletionDispatcher = new CodeCompletionAggregator();
 
@@ -254,10 +250,10 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		final Preferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).node(IPreferenceConstants.NODE_SHELL);
 
 		fHistoryLength = prefs.getInt(IPreferenceConstants.SHELL_HISTORY_LENGTH, IPreferenceConstants.DEFAULT_SHELL_HISTORY_LENGTH);
-		fAutoFocus = prefs.getBoolean(IPreferenceConstants.SHELL_AUTOFOCUS, IPreferenceConstants.DEFAULT_SHELL_AUTOFOCUS);
 		fKeepCommand = prefs.getBoolean(IPreferenceConstants.SHELL_KEEP_COMMAND, IPreferenceConstants.DEFAULT_SHELL_KEEP_COMMAND);
 
-		if (fAutoFocus) {
+		final boolean autoFocus = prefs.getBoolean(IPreferenceConstants.SHELL_AUTOFOCUS, IPreferenceConstants.DEFAULT_SHELL_AUTOFOCUS);
+		if (autoFocus) {
 			if (fAutoFocusListener == null)
 				fAutoFocusListener = new AutoFocus();
 
@@ -313,7 +309,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 	private void addAutoCompletion() {
 		fCompletionDispatcher.addCompletionProvider(new ICompletionProvider() {
 
-			IImageResolver fImageResolver = new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/history.png"));
+			private final IImageResolver fImageResolver = new DescriptorImageResolver(
+					Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/history.png"));
 
 			@Override
 			public boolean isActive(ICompletionContext context) {
@@ -339,12 +336,12 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			}
 		});
 
-		fContentAssistAdapter = new ContentProposalModifier(fInputCombo, new ComboContentAdapter(), fCompletionDispatcher, KeyStroke.getInstance(SWT.CTRL, ' '),
-				fCompletionDispatcher.getActivationChars());
+		final ContentProposalModifier contentAssistAdapter = new ContentProposalModifier(fInputCombo, new ComboContentAdapter(), fCompletionDispatcher,
+				KeyStroke.getInstance(SWT.CTRL, ' '), fCompletionDispatcher.getActivationChars());
 
-		fContentAssistAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		fContentAssistAdapter.setLabelProvider(new CompletionLabelProvider());
-		fContentAssistAdapter.setAutoActivationDelay(500);
+		contentAssistAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+		contentAssistAdapter.setLabelProvider(new CompletionLabelProvider());
+		contentAssistAdapter.setAutoActivationDelay(500);
 	}
 
 	public void runStartupCommands() {
@@ -412,9 +409,6 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		fInputCombo.setFocus();
 	}
 
-	/**
-	 * Clear the output text.
-	 */
 	public final void clearOutput() {
 		fOutputText.clear();
 	}
@@ -429,6 +423,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			fSashWeights = fSashForm.getWeights();
 			fSashForm.setWeights(new int[] { 100, 0 });
 		}
+
+		fDropins.stream().forEach(d -> d.setHidden(!show));
 	}
 
 	@Override

@@ -46,4 +46,6 @@ public interface IShellDropin {
 	 * @return drop-in title
 	 */
 	String getTitle();
+
+	void setHidden(boolean hidden);
 }

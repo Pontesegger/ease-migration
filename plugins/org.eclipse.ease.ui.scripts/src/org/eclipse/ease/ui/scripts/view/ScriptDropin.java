@@ -52,4 +52,9 @@ public class ScriptDropin implements IShellDropin, IScriptEngineProvider {
 	public IScriptEngine getScriptEngine() {
 		return fEngine;
 	}
+
+	@Override
+	public void setHidden(boolean hidden) {
+		// nothing to do
+	}
 }
