@@ -11,10 +11,10 @@
 package org.eclipse.ease;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.debugging.model.EaseDebugLastExecutionResult;
@@ -78,16 +78,8 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 
 	@Override
 	public Collection<EaseDebugVariable> getDefinedVariables() {
-		final Collection<EaseDebugVariable> result = new HashSet<>();
-
-		for (final Entry<String, Object> entry : getVariables().entrySet()) {
-			if (acceptVariable(entry.getValue())) {
-				final EaseDebugVariable variable = createVariable(entry.getKey(), entry.getValue());
-				result.add(variable);
-			}
-		}
-
-		return result;
+		return getVariables().entrySet().stream().filter(entry -> acceptVariable(entry.getValue()))
+				.map(entry -> createVariable(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
 	}
 
 	/**

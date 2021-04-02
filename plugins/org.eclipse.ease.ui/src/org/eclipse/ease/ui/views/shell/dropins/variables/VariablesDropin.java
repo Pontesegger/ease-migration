@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.views.shell.dropins.variables;
 
+import java.time.Duration;
+
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
@@ -21,6 +23,7 @@ import org.eclipse.ease.ui.view.VariablesDragListener;
 import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.Throttler;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -39,6 +42,9 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 
 	private TreeViewer fVariablesTree = null;
 	private IReplEngine fEngine;
+	private boolean fIsActive = true;
+
+	private final Throttler fUiUpdater = new Throttler(Display.getDefault(), Duration.ofMillis(500), this::update);
 
 	@Override
 	public void setScriptEngine(IReplEngine engine) {
@@ -53,7 +59,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		// set tree input
 		if (fVariablesTree != null) {
 			fVariablesTree.setInput(engine);
-			Display.getDefault().asyncExec(() -> fVariablesTree.refresh());
+			fUiUpdater.throttledExec();
 		}
 	}
 
@@ -85,10 +91,14 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 		column2.setText(Messages.VariablesDropin_value);
 		treeViewerColumn2.setLabelProvider(new ContentLabelProvider());
 
-		fVariablesTree.setInput(fEngine);
-
 		fVariablesTree.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY, new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() },
 				new VariablesDragListener(fVariablesTree));
+
+		composite.addListener(SWT.Hide, event -> fIsActive = false);
+		composite.addListener(SWT.Show, event -> {
+			fIsActive = true;
+			update();
+		});
 
 		return composite;
 	}
@@ -102,7 +112,7 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 	public void notify(IScriptEngine engine, Script script, int status) {
 		switch (status) {
 		case IExecutionListener.SCRIPT_END:
-			Display.getDefault().asyncExec(() -> fVariablesTree.refresh());
+			fUiUpdater.throttledExec();
 			break;
 
 		case IExecutionListener.ENGINE_END:
@@ -110,8 +120,13 @@ public class VariablesDropin implements IShellDropin, IExecutionListener {
 			break;
 
 		default:
-			// nothing to do;
+			// nothing to do
 			break;
 		}
 	}
+
+	public void update() {
+		if (fIsActive)
+			fVariablesTree.refresh();
+	};
 }

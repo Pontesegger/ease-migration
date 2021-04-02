@@ -14,27 +14,12 @@ package org.eclipse.ease.ui.views.shell.dropins.variables;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.IReplEngine;
-import org.eclipse.ease.Script;
-import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 public class VariablesContentProvider implements ITreeContentProvider {
-
-	private static final EaseDebugTarget DUMMY_DEBUG_TARGET = new EaseDebugTarget(null, false, false, false) {
-		@Override
-		protected IBreakpoint[] getBreakpoints(Script script) {
-			return new IBreakpoint[0];
-		}
-
-		@Override
-		public boolean supportsBreakpoint(IBreakpoint breakpoint) {
-			return false;
-		}
-	};
 
 	@Override
 	public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
@@ -66,11 +51,7 @@ public class VariablesContentProvider implements ITreeContentProvider {
 			variables.addAll(((IReplEngine) inputElement).getDefinedVariables());
 
 			// add last execution result
-			final EaseDebugVariable lastScriptResult = ((IReplEngine) inputElement).getLastExecutionResult();
-			variables.add(lastScriptResult);
-
-			for (final EaseDebugVariable entry : variables)
-				entry.setParent(DUMMY_DEBUG_TARGET);
+			variables.add(((IReplEngine) inputElement).getLastExecutionResult());
 		}
 
 		return variables.toArray();
