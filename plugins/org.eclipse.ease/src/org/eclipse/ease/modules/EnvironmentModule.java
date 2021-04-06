@@ -372,9 +372,11 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *
 	 * @param value
 	 *            return code
+	 * @throws ExitException
+	 *             always
 	 */
 	@WrapToScript
-	public final void exit(final @ScriptParameter(defaultValue = ScriptParameter.NULL) Object value) {
+	public final void exit(final @ScriptParameter(defaultValue = ScriptParameter.NULL) Object value) throws ExitException {
 		throw new ExitException(value);
 	}
 

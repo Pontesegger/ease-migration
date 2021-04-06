@@ -25,12 +25,12 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.ease.Activator;
-import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptEngineCancellationException;
 import org.eclipse.ease.debugging.dispatcher.EventDispatchJob;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.debugging.events.AbstractEvent;
@@ -326,7 +326,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 			}
 
 			if (request instanceof TerminateRequest)
-				throw new ExitException("Engine termination requested by user");
+				throw new ScriptEngineCancellationException();
 		}
 	}
 

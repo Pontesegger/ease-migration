@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptEngineCancellationException;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.ScriptResult;
@@ -305,7 +306,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	@Override
 	public void terminateCurrent() {
 		if (Thread.currentThread().equals(getThread()))
-			throw new ScriptExecutionException("Script got terminated");
+			throw new ScriptEngineCancellationException();
 		else
 			// requested by a different thread, so do not use getContext() here
 			((ObservingContextFactory) ContextFactory.getGlobal()).terminate(fContext);

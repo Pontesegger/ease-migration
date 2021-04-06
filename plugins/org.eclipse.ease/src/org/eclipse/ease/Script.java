@@ -186,7 +186,7 @@ public class Script {
 	 * @param e
 	 *            exception
 	 */
-	public final void setException(final Throwable e) {
+	public final void setException(final ScriptExecutionException e) {
 		fResult.setException(e);
 
 		// gracefully close input streams & readers

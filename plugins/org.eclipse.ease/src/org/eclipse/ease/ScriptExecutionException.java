@@ -13,6 +13,7 @@ package org.eclipse.ease;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -24,13 +25,13 @@ import org.eclipse.ease.debugging.ScriptStackTrace;
  * The individual script engines should convert their internal exceptions into this one, so that we can display nicely formatted and useful error messages if
  * errors happen during script parsing/running.
  */
-public class ScriptExecutionException extends RuntimeException {
+public class ScriptExecutionException extends ExecutionException {
 	private static final long serialVersionUID = 1887518058581732543L;
 
-	final private String fLineSource;
-	final private int fColumnNumber;
-	final private ScriptStackTrace fScriptStackTrace;
-	final private String fErrorName;
+	private final String fLineSource;
+	private final int fColumnNumber;
+	private final ScriptStackTrace fScriptStackTrace;
+	private final String fErrorName;
 
 	/**
 	 * Internal constructor used for special script exceptions. Does not provide meaningful output for {@link #getMessage()} and {@link #printStackTrace()}.
@@ -46,6 +47,15 @@ public class ScriptExecutionException extends RuntimeException {
 
 	public ScriptExecutionException(String message) {
 		super(message);
+
+		fLineSource = null;
+		fColumnNumber = 0;
+		fScriptStackTrace = null;
+		fErrorName = null;
+	}
+
+	public ScriptExecutionException(Throwable exception) {
+		super(exception);
 
 		fLineSource = null;
 		fColumnNumber = 0;

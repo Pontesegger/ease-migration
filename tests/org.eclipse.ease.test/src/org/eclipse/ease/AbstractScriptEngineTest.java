@@ -190,7 +190,7 @@ public class AbstractScriptEngineTest {
 		assertTrue(result2.isReady());
 		assertNull(result2.getResult());
 		assertTrue(result2.hasException());
-		assertEquals(RuntimeException.class, result2.getException().getClass());
+		assertNotNull(result2.getException());
 	}
 
 	@Test

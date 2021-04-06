@@ -9,39 +9,39 @@ import org.junit.jupiter.api.Test;
 
 public class ScriptResultTest {
 
-	private static final Object fResult = "done";
-	private static final Exception fException = new Exception("some error");
+	private static final Object RESULT = "done";
+	private static final ScriptExecutionException EXCEPTION = new ScriptExecutionException("some error");
 
 	@Test
 	public void isReady() {
-		assertTrue(new ScriptResult(fResult).isReady());
+		assertTrue(new ScriptResult(RESULT).isReady());
 
 		ScriptResult result = new ScriptResult();
 		assertFalse(result.isReady());
 
-		result.setResult(fResult);
+		result.setResult(RESULT);
 		assertTrue(result.isReady());
 
 		result = new ScriptResult();
-		result.setException(new Exception());
+		result.setException(new ScriptExecutionException());
 		assertTrue(result.isReady());
 	}
 
 	@Test
 	public void getResult() {
-		final ScriptResult result = new ScriptResult(fResult);
+		final ScriptResult result = new ScriptResult(RESULT);
 
-		assertEquals(fResult, result.getResult());
+		assertEquals(RESULT, result.getResult());
 		assertNull(result.getException());
 	}
 
 	@Test
 	public void getException() {
 		final ScriptResult result = new ScriptResult();
-		result.setException(fException);
+		result.setException(EXCEPTION);
 
 		assertNull(result.getResult());
-		assertEquals(fException, result.getException());
+		assertEquals(EXCEPTION, result.getException());
 	}
 
 	@Test
@@ -49,10 +49,10 @@ public class ScriptResultTest {
 		final ScriptResult result = new ScriptResult();
 		assertFalse(result.hasException());
 
-		result.setResult(fResult);
+		result.setResult(RESULT);
 		assertFalse(result.hasException());
 
-		result.setException(fException);
+		result.setException(EXCEPTION);
 		assertTrue(result.hasException());
 	}
 }

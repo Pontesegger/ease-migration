@@ -17,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.script.ScriptException;
-
 import org.eclipse.ease.ScriptResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -105,7 +103,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void invalidSyntax() throws Exception {
 		final ScriptResult result = executeCode("1++");
-		assertTrue(result.getException() instanceof ScriptException);
+		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.getResult());
 	}
@@ -113,7 +111,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void runtimeError() throws Exception {
 		final ScriptResult result = executeCode("x");
-		assertTrue(result.getException() instanceof ScriptException);
+		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("NameError"));
 		assertNull(result.getResult());
 	}

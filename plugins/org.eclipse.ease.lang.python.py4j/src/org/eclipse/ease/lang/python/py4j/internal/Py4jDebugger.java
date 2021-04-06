@@ -18,9 +18,9 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptEngineCancellationException;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
 import org.eclipse.ease.lang.python.debugger.IPythonScriptRegistry;
 import org.eclipse.ease.lang.python.debugger.PythonBreakpoint;
@@ -114,7 +114,7 @@ public class Py4jDebugger extends PythonDebugger {
 			 * Therefore we catch that case and re-raise the expected ExitException()
 			 */
 			if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END) {
-				throw new ExitException("Debug aborted by user");
+				throw new ScriptEngineCancellationException();
 			}
 			throw e;
 		}

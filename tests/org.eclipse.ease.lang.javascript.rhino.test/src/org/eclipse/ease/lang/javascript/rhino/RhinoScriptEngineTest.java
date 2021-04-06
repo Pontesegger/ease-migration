@@ -99,7 +99,7 @@ public class RhinoScriptEngineTest {
 
 		assertNull(result.getResult());
 		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertTrue(((ScriptExecutionException) result.getException()).getCause() instanceof Exception);
+		assertTrue(result.getException().getCause() instanceof Exception);
 
 		assertNotNull(fEngine.getExceptionStackTrace());
 		assertEquals(1, fEngine.getExceptionStackTrace().size());
@@ -111,7 +111,7 @@ public class RhinoScriptEngineTest {
 
 		assertNull(result.getResult());
 		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertEquals("ScriptException: test", ((ScriptExecutionException) result.getException()).getMessage());
+		assertEquals("ScriptException: test", result.getException().getMessage());
 
 		assertNotNull(fEngine.getExceptionStackTrace());
 		assertEquals(1, fEngine.getExceptionStackTrace().size());
@@ -156,7 +156,7 @@ public class RhinoScriptEngineTest {
 
 		assertNull(result.getResult());
 		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertTrue(((ScriptExecutionException) result.getException()).getCause() instanceof ClassNotFoundException);
+		assertEquals(ClassNotFoundException.class, result.getException().getCause().getClass());
 
 		assertNotNull(fEngine.getExceptionStackTrace());
 		assertEquals(1, fEngine.getExceptionStackTrace().size());

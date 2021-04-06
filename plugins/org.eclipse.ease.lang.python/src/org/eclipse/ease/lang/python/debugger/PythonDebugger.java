@@ -16,10 +16,10 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.ease.ExitException;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptEngineCancellationException;
 import org.eclipse.ease.debugging.AbstractEaseDebugger;
 import org.eclipse.ease.debugging.EaseDebugFrame;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -216,7 +216,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 			 * Therefore we catch that case and re-raise the expected ExitException()
 			 */
 			if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END) {
-				throw new ExitException("Debug aborted by user");
+				throw new ScriptEngineCancellationException();
 			}
 			throw e;
 		}

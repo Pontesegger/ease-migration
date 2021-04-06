@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 
 import org.eclipse.core.resources.IFile;
@@ -59,13 +58,7 @@ public class ScriptTest {
 
 	@Test
 	public void codeFromScriptable() throws Exception {
-		final Script script = new Script(new IScriptable() {
-
-			@Override
-			public InputStream getSourceCode() throws Exception {
-				return new ByteArrayInputStream(SAMPLE_CODE.getBytes());
-			}
-		});
+		final Script script = new Script((IScriptable) () -> new ByteArrayInputStream(SAMPLE_CODE.getBytes()));
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
@@ -136,7 +129,7 @@ public class ScriptTest {
 	public void getException() {
 		final Script script = new Script(fFile);
 
-		script.setException(new Exception());
+		script.setException(new ScriptExecutionException());
 		assertTrue(script.getResult().hasException());
 	}
 }

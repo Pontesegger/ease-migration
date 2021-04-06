@@ -176,10 +176,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 		if (result.hasException()) {
 			// re-throw previous exception
-
-			if (result.getException() instanceof RuntimeException)
-				throw (RuntimeException) result.getException();
-
 			throw new RuntimeException(result.getException().getMessage(), result.getException());
 		}
 
@@ -232,7 +228,10 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			if (fStackTrace.size() <= 1)
 				e.printStackTrace(getErrorStream());
 
-			script.setException(e);
+			if (e instanceof ScriptExecutionException)
+				script.setException((ScriptExecutionException) e);
+			else
+				script.setException(new ScriptExecutionException(e));
 
 		} finally {
 			if (notifyListeners)
@@ -420,7 +419,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		final IProgressMonitor monitor = getMonitor();
 		if ((monitor != null) && (monitor.isCanceled())) {
 			if (Thread.currentThread().equals(getThread()))
-				throw new ScriptExecutionException("Engine got terminated");
+				throw new ScriptEngineCancellationException();
 		}
 	}
 

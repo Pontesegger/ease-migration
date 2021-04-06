@@ -33,6 +33,7 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
@@ -288,7 +289,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 		else {
 			final ScriptResult invalidEngine = new ScriptResult();
-			invalidEngine.setException(new RuntimeException("No script engines available"));
+			invalidEngine.setException(new ScriptExecutionException("No script engines available"));
 			fOutputText.printResult(invalidEngine);
 		}
 	}
@@ -500,7 +501,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			fScriptEngine = (IReplEngine) candidate;
 		else {
 			final ScriptResult invalidEngine = new ScriptResult();
-			invalidEngine.setException(new RuntimeException("Invalid engine selected for shell: " + id));
+			invalidEngine.setException(new ScriptExecutionException("Invalid engine selected for shell: " + id));
 			fOutputText.printResult(invalidEngine);
 		}
 

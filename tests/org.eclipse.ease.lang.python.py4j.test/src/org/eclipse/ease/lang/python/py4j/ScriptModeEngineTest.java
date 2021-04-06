@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.script.ScriptException;
-
 import org.eclipse.ease.ScriptResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -54,7 +52,7 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	@Test
 	public void incompleteStatement() throws Exception {
 		final ScriptResult result = executeCode("def a():");
-		assertTrue(result.getException() instanceof ScriptException);
+		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.getResult());
 	}
