@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -270,10 +271,16 @@ public class UIBuilderModule extends AbstractScriptModule {
 						pushComposite(getComposite());
 
 						fScriptableDialog = getDialog();
-						getScriptEngine().inject(layoutCode);
-						fScriptableDialog = null;
+						try {
+							getScriptEngine().inject(layoutCode, false);
 
-						getComposite().addDisposeListener(l -> fLifecycleManager.remove(getDialog()));
+						} catch (final ExecutionException e) {
+							// nothing to do
+						} finally {
+							fScriptableDialog = null;
+
+							getComposite().addDisposeListener(l -> fLifecycleManager.remove(getDialog()));
+						}
 					}
 				});
 
@@ -607,7 +614,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (textCallback != null) {
 					try {
 						fProviderElement = element;
-						final Object result = getScriptEngine().inject(textCallback);
+						final Object result = getScriptEngine().inject(textCallback, false);
 
 						if (result != null)
 							return result.toString();
@@ -627,7 +634,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 				if (imageCallback != null) {
 					try {
 						fProviderElement = element;
-						final Object result = getScriptEngine().inject(imageCallback);
+						final Object result = getScriptEngine().inject(imageCallback, false);
 
 						if (result instanceof Image)
 							return (Image) result;
@@ -752,7 +759,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 						if (getChildrenCallback != null) {
 							try {
 								fProviderElement = parentElement;
-								final Object result = getScriptEngine().inject(getChildrenCallback);
+								final Object result = getScriptEngine().inject(getChildrenCallback, false);
 
 								if (result instanceof Object[])
 									return (Object[]) result;
@@ -1083,7 +1090,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 						if (categoryCallback != null) {
 							try {
 								fProviderElement = element;
-								final Object result = getScriptEngine().inject(categoryCallback);
+								final Object result = getScriptEngine().inject(categoryCallback, false);
 
 								if (result != null)
 									return Integer.parseInt(result.toString());
@@ -1104,7 +1111,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 							try {
 								fProviderElement = new Object[] { e1, e2 };
 
-								final Object result = getScriptEngine().inject(compareCallback);
+								final Object result = getScriptEngine().inject(compareCallback, false);
 
 								if (result != null)
 									return Integer.parseInt(result.toString());
@@ -1256,7 +1263,7 @@ public class UIBuilderModule extends AbstractScriptModule {
 	private void runEventCallback(Object event, Object callback) {
 		fUiEvent = event;
 		try {
-			getScriptEngine().inject(callback);
+			getScriptEngine().inject(callback, false);
 		} catch (final Throwable e) {
 			// silently swallow
 		} finally {

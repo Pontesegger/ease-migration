@@ -145,9 +145,9 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Filter used to match all create method from the factory
+	 * Filter used to match all create method from the factory.
 	 */
-	protected static Predicate<Method> createMethodFilter = arg0 -> {
+	protected static final Predicate<Method> CREATE_METHOD_FILTER = arg0 -> {
 		if (arg0 != null) {
 			return arg0.getName().startsWith("create");
 		}
@@ -175,8 +175,13 @@ public class EcoreModule extends AbstractScriptModule {
 
 		final EFactory factory = getFactory();
 		if (factory != null) {
-			getScriptEngine().setVariable(getFactoryVariableName(), factory);
-			getEnvironment().wrap(factory.getClass(), false);
+			try {
+				getScriptEngine().setVariable(getFactoryVariableName(), factory);
+				getEnvironment().wrap(factory.getClass(), false);
+
+			} catch (final java.util.concurrent.ExecutionException e) {
+				getEnvironment().getModule(UIModule.class).showErrorDialog("Error", "Failed to wrap factory class");
+			}
 
 		} else {
 			getEnvironment().getModule(UIModule.class).showErrorDialog("Error", "Unable to find metamodel with URI : " + fUri);
@@ -184,7 +189,7 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Create a new resource to hold model elements
+	 * Create a new resource to hold model elements.
 	 *
 	 * @param name
 	 *            Name of the resource (Optional parameter ask dynamically to the user)
@@ -365,7 +370,7 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Save: The current editor if no eObject is passed in argument The resource containing the eObject passed in argument
+	 * Save the current editor (if no eObject is passed in argument) or the resource containing the eObject passed in argument.
 	 *
 	 * @param target
 	 *            Help to locate the resource to save (Optional save the current editor)
@@ -469,7 +474,7 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Run an operation in the current editor's command stack This is really help ful to manipulate a model using transaction
+	 * Run an operation in the current editor's command stack. This is really helpful to manipulate a model using transaction
 	 *
 	 * @param operation
 	 *            the operation to run
@@ -512,7 +517,7 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	/**
-	 * Display a dialog which ask the user to select between a list of Object
+	 * Display a dialog which asks the user to select between a list of Objects.
 	 *
 	 * @param inputs
 	 *            List of choice for the user
@@ -551,8 +556,7 @@ public class EcoreModule extends AbstractScriptModule {
 	}
 
 	private IItemLabelProvider getLabelProvider(final EObject target) {
-		final IItemLabelProvider labelProvider = (IItemLabelProvider) adapter.adapt(target, IItemLabelProvider.class);
-		return labelProvider;
+		return (IItemLabelProvider) adapter.adapt(target, IItemLabelProvider.class);
 	}
 
 	protected static class RunnableTransactionalCommandWrapper extends AbstractTransactionalCommand {
@@ -560,14 +564,14 @@ public class EcoreModule extends AbstractScriptModule {
 		public RunnableTransactionalCommandWrapper(final TransactionalEditingDomain domain, final String label, final List affectedFiles,
 				final Runnable operation) {
 			super(domain, label, affectedFiles);
-			this.operation = operation;
+			fOperation = operation;
 		}
 
-		private final Runnable operation;
+		private final Runnable fOperation;
 
 		@Override
 		protected CommandResult doExecuteWithResult(final IProgressMonitor monitor, final IAdaptable info) throws ExecutionException {
-			operation.run();
+			fOperation.run();
 			return CommandResult.newOKCommandResult();
 		}
 	}

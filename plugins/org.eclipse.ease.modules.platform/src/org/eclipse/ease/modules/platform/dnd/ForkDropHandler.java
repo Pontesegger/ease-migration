@@ -12,6 +12,7 @@ package org.eclipse.ease.modules.platform.dnd;
 
 import java.io.File;
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ease.IScriptEngine;
@@ -42,11 +43,16 @@ public class ForkDropHandler implements IShellDropHandler {
 			final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
 			if (environment != null) {
 				if (environment.getModule(ScriptingModule.class) == null) {
-					if (environment.loadModule(ScriptingModule.MODULE_ID, false) == null)
-						throw new RuntimeException("Cannot load module '" + ScriptingModule.MODULE_ID + "'");
+					try {
+						if (environment.loadModule(ScriptingModule.MODULE_ID, false) == null)
+							throw new RuntimeException("Cannot load module '" + ScriptingModule.MODULE_ID + "'");
+
+					} catch (final ExecutionException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
-				scriptEngine.executeAsync("fork(\"" + ResourceTools.toAbsoluteLocation(element, null) + "\")");
+				scriptEngine.execute("fork(\"" + ResourceTools.toAbsoluteLocation(element, null) + "\")");
 
 			} else
 				throw new RuntimeException("No environment loaded, cannot execute dropped file");

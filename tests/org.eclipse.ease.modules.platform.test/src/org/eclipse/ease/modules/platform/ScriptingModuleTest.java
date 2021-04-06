@@ -18,7 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.ease.IExecutionListener;
@@ -35,7 +37,7 @@ import org.mockito.ArgumentCaptor;
 public class ScriptingModuleTest {
 
 	@Timeout(value = 2, unit = TimeUnit.SECONDS)
-	public void forkWithoutDebugMode() throws Exception {
+	public void forkWithoutDebugMode() throws MalformedURLException, InterruptedException, ExecutionException {
 		final IScriptService scriptService = ScriptService.getService();
 		final EngineDescription description = scriptService.getEngineByID(RhinoScriptEngine.ENGINE_ID);
 		final IScriptEngine engine = description.createEngine();
@@ -45,8 +47,7 @@ public class ScriptingModuleTest {
 		final URL location = new URL("platform:/plugin/org.eclipse.ease.modules.platform.test/resources/test.js");
 		final ScriptResult result = creatorModule.fork(location, "", RhinoScriptEngine.ENGINE_ID);
 		assertNotNull(result);
-		result.waitForResult();
-		assertEquals("testing fork command", result.getResult().toString());
+		assertEquals("testing fork command", result.get().toString());
 	}
 
 	@Test

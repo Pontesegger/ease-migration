@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.jobs.Job;
@@ -200,7 +201,7 @@ public class ScriptingModule extends AbstractScriptModule {
 				scriptObject = URI.create(resource.toString());
 			}
 
-			final ScriptResult result = engine.executeAsync(scriptObject);
+			final ScriptResult result = engine.execute(scriptObject);
 			engine.schedule();
 			return result;
 		}
@@ -256,11 +257,13 @@ public class ScriptingModule extends AbstractScriptModule {
 	 * @param code
 	 *            code to run.
 	 * @return execution result of executed code
+	 * @throws ExecutionException
+	 *             when execution of <i>code</i> fails
 	 */
 	@WrapToScript
-	public Object executeSync(final Object monitor, final Object code) {
+	public Object executeSync(final Object monitor, final Object code) throws ExecutionException {
 		synchronized (monitor) {
-			return getScriptEngine().inject(code);
+			return getScriptEngine().inject(code, false);
 		}
 	}
 

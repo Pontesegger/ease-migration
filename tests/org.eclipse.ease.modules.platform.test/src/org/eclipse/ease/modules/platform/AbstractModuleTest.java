@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.ScriptResult;
@@ -37,14 +38,14 @@ public abstract class AbstractModuleTest {
 	}
 
 	@Test
-	public void loadModule() throws NoSuchMethodException, SecurityException {
+	public void loadModule() throws NoSuchMethodException, ExecutionException {
 
 		final ICodeFactory codeFactory = ScriptService.getCodeFactory(fEngine);
 		final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
 		final String call = codeFactory.createFunctionCall(loadModuleMethod, getModuleID(), false);
 
 		final ScriptResult result = executeCode(call);
-		assertEquals(getModuleClass(), result.getResult().getClass());
+		assertEquals(getModuleClass(), result.get().getClass());
 		assertNull(result.getException());
 	}
 
@@ -62,12 +63,10 @@ public abstract class AbstractModuleTest {
 	 */
 	protected abstract Object getModuleID();
 
-	protected ScriptResult executeCode(final Object code) {
-		try {
-			return fEngine.executeSync(code);
-		} catch (final InterruptedException e) {
-			throw new RuntimeException("Script engine terminated unexpectedly", e);
-		}
-	}
+	private ScriptResult executeCode(final Object code) {
+		final ScriptResult result = fEngine.execute(code);
+		fEngine.schedule();
 
+		return result;
+	}
 }

@@ -12,6 +12,7 @@ package org.eclipse.ease.modules.platform;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -71,10 +72,12 @@ public class UIModule extends AbstractScriptModule {
 	 * @param code
 	 *            code/object to execute
 	 * @return execution result
+	 * @throws ExecutionException
+	 *             when execution of UI code fails
 	 */
 	@WrapToScript
-	public Object executeUI(final Object code) {
-		return getEnvironment().getScriptEngine().injectUI(code);
+	public Object executeUI(final Object code) throws ExecutionException {
+		return getEnvironment().getScriptEngine().inject(code, true);
 	}
 
 	/**
