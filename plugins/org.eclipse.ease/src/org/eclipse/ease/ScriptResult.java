@@ -10,25 +10,28 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 /**
  * A ScriptResult is a container for a script execution. As execution often occurs detached from the System thread, the result object contains an indicator for
  * pending and finished results. Results itself may contain an object or an exception.
  */
-public class ScriptResult {
+public class ScriptResult implements Future<Object> {
 
 	/** Special void object for script methods not returning a result. */
 	public static final Object VOID = new Object() {
 		@Override
-		public final String toString() {
+		public String toString() {
 			return "<void>";
 		}
 	};
 
-	/** script execution result. */
 	private Object fResult = null;
 
-	/** script execution exception. */
-	private Throwable fException = null;
+	private ScriptExecutionException fException = null;
 
 	private boolean fIsDone = false;
 
@@ -36,16 +39,6 @@ public class ScriptResult {
 	 * Constructor of a pending execution.
 	 */
 	public ScriptResult() {
-	}
-
-	/**
-	 * Constructor for a finished execution.
-	 *
-	 * @param result
-	 *            result of execution
-	 */
-	public ScriptResult(final Object result) {
-		setResult(result);
 	}
 
 	/**
@@ -59,14 +52,13 @@ public class ScriptResult {
 
 	/**
 	 * Blocks execution until the execution result is ready.
+	 *
+	 * @throws InterruptedException
+	 *             when waiting got interrupted externally
 	 */
-	public final synchronized void waitForResult() {
-		while (!isReady()) {
-			try {
-				this.wait();
-			} catch (final InterruptedException e) {
-			}
-		}
+	public final synchronized void waitForResult() throws InterruptedException {
+		if (!isReady())
+			wait();
 	}
 
 	/**
@@ -75,16 +67,17 @@ public class ScriptResult {
 	 *
 	 * @param timeout
 	 *            the maximum time to wait in milliseconds.
+	 * @throws InterruptedException
+	 *             when waiting got interrupted externally
+	 * @throws TimeoutException
+	 *             when result is not ready after timeout
 	 */
-	public final synchronized void waitForResult(long timeout) {
-		final long stopTimestamp = System.currentTimeMillis() + timeout;
+	public final synchronized void waitForResult(long timeout) throws InterruptedException, TimeoutException {
+		if (!isReady())
+			wait(Math.max(0, timeout));
 
-		while ((!isReady()) && (System.currentTimeMillis() < stopTimestamp)) {
-			try {
-				this.wait(Math.max(0, System.currentTimeMillis() - stopTimestamp));
-			} catch (final InterruptedException e) {
-			}
-		}
+		if (!isReady())
+			throw new TimeoutException(String.format("Result not ready after %d milliseconds", timeout));
 	}
 
 	/**
@@ -105,6 +98,7 @@ public class ScriptResult {
 	public final synchronized void setResult(final Object result) {
 		fResult = result;
 		fIsDone = true;
+
 		notifyAll();
 	}
 
@@ -114,9 +108,10 @@ public class ScriptResult {
 	 * @param e
 	 *            exception to be stored
 	 */
-	public final synchronized void setException(final Throwable e) {
+	public final synchronized void setException(final ScriptExecutionException e) {
 		fException = e;
 		fIsDone = true;
+
 		notifyAll();
 	}
 
@@ -125,7 +120,7 @@ public class ScriptResult {
 	 *
 	 * @return stored exception or null
 	 */
-	public final synchronized Throwable getException() {
+	public final synchronized ScriptExecutionException getException() {
 		return fException;
 	}
 
@@ -144,5 +139,40 @@ public class ScriptResult {
 	 */
 	public final synchronized boolean hasException() {
 		return (fException != null);
+	}
+
+	@Override
+	public boolean cancel(boolean mayInterruptIfRunning) {
+		return false;
+	}
+
+	@Override
+	public boolean isCancelled() {
+		return false;
+	}
+
+	@Override
+	public boolean isDone() {
+		return isReady();
+	}
+
+	@Override
+	public Object get() throws InterruptedException, ExecutionException {
+		waitForResult();
+
+		if (hasException())
+			throw getException();
+
+		return getResult();
+	}
+
+	@Override
+	public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+		waitForResult(unit.toMillis(timeout));
+
+		if (hasException())
+			throw getException();
+
+		return getResult();
 	}
 }
