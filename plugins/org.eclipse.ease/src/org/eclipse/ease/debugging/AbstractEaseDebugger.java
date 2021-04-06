@@ -306,7 +306,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 						if (requestor instanceof EaseDebugStackFrame) {
 
 							// evaluate expression
-							final Object result = getEngine().inject(((SetVariablesRequest) request).getExpression());
+							final Object result = getEngine().inject(((SetVariablesRequest) request).getExpression(), false);
 							// set variable
 							((EaseDebugStackFrame) requestor).getDebugFrame().setVariable(((SetVariablesRequest) request).getVariable().getName(), result);
 

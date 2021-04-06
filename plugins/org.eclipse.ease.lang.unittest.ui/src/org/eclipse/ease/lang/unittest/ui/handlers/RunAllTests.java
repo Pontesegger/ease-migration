@@ -39,7 +39,7 @@ public class RunAllTests extends AbstractViewToolbarHandler {
 				engine.setErrorStream(console.getErrorStream());
 				engine.setInputStream(console.getInputStream());
 
-				engine.executeAsync(getTestRoot(testRoot, event));
+				engine.execute(getTestRoot(testRoot, event));
 				engine.schedule();
 			}
 		}

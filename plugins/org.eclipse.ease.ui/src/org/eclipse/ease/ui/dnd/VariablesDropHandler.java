@@ -24,6 +24,6 @@ public class VariablesDropHandler implements IShellDropHandler {
 
 	@Override
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
-		scriptEngine.executeAsync(((EaseDebugVariable) element).getName());
+		scriptEngine.execute(((EaseDebugVariable) element).getName());
 	}
 }

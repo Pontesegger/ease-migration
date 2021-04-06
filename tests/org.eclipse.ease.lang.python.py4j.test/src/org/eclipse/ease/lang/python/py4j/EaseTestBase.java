@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IAdaptable;
@@ -170,9 +171,8 @@ public abstract class EaseTestBase {
 		waitUntil(() -> ((adaptable.getAdapter(Process.class) == null) || !adapter.isAlive()) && engine.isFinished());
 	}
 
-	protected void assertResultIsNone(ScriptResult result) {
-		assertNull(result.getResult());
-		assertNull(result.getException());
+	protected void assertResultIsNone(ScriptResult result) throws ExecutionException {
+		assertNull(result.get());
 	}
 
 }

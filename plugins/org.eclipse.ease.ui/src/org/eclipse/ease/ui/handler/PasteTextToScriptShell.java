@@ -46,7 +46,7 @@ public class PasteTextToScriptShell extends AbstractHandler {
 
 				selectedText = isEmptySelection ? getCurrentLineFromActiveEditor() : selectedText;
 				if ((!selectedText.isEmpty()) && (view instanceof IScriptEngineProvider))
-					((IScriptEngineProvider) view).getScriptEngine().executeAsync(selectedText);
+					((IScriptEngineProvider) view).getScriptEngine().execute(selectedText);
 			}
 		}
 

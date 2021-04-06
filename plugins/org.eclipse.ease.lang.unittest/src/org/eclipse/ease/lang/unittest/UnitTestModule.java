@@ -495,7 +495,7 @@ public class UnitTestModule extends AbstractScriptModule {
 		if (definition != null) {
 			final ICode customCode = definition.getCustomCode(location);
 			if (customCode != null)
-				return getScriptEngine().inject(new Script(customCode.getLocation(), customCode.getContent()));
+				return getScriptEngine().inject(new Script(customCode.getLocation(), customCode.getContent()), false);
 			else
 				throw new Exception("No user specific code for \"" + location + "\" found.");
 

@@ -11,6 +11,7 @@
 package org.eclipse.ease.modules;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.IScriptEngine;
@@ -36,9 +37,9 @@ public interface IEnvironment {
 
 	IScriptEngine getScriptEngine();
 
-	Object getModule(final String name);
+	Object getModule(String name);
 
-	<T extends Object, U extends Class<T>> T getModule(final U clazz);
+	<T extends Object, U extends Class<T>> T getModule(U clazz);
 
 	/**
 	 * Retrieve a list of loaded modules. The returned list is read only.
@@ -55,11 +56,11 @@ public interface IEnvironment {
 	 * @param lineFeed
 	 *            <code>true</code> to add a line feed after the text
 	 */
-	void print(final Object text, boolean lineFeed);
+	void print(Object text, boolean lineFeed);
 
-	void addModuleListener(final IModuleListener listener);
+	void addModuleListener(IModuleListener listener);
 
-	void removeModuleListener(final IModuleListener listener);
+	void removeModuleListener(IModuleListener listener);
 
 	/**
 	 * Load a module. Loading a module generally enhances the script environment with new functions and variables. If a module was already loaded before, it
@@ -76,8 +77,10 @@ public interface IEnvironment {
 	 * @param useCustomNamespace
 	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to a custom object
 	 * @return loaded module instance
+	 * @throws ExecutionException
+	 *             when execution of wrapped module code fails
 	 */
-	Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace);
+	Object loadModule(String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) throws ExecutionException;
 
 	/**
 	 * Wrap a java instance. Will create accessors in the target language for methods and constants defined by the java instance <i>toBeWrapped</i>. If the
@@ -89,8 +92,10 @@ public interface IEnvironment {
 	 * @param useCustomNamespace
 	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to the return value only
 	 * @return wrapped object instance or java class when put to global namespace
+	 * @throws ExecutionException
+	 *             when execution of wrapped code fails
 	 */
-	Object wrap(final Object toBeWrapped, boolean useCustomNamespace);
+	Object wrap(Object toBeWrapped, boolean useCustomNamespace) throws ExecutionException;
 
 	/**
 	 * Register a callback provider for module functions.

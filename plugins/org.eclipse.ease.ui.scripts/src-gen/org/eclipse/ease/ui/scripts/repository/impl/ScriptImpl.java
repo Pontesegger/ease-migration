@@ -519,7 +519,7 @@ public class ScriptImpl extends RawLocationImpl implements IScript {
 			if (executionContent == null)
 				executionContent = getInputStream();
 
-			engine.executeAsync(executionContent);
+			engine.execute(executionContent);
 
 			return engine;
 

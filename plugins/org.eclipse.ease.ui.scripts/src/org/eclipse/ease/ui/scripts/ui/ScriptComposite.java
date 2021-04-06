@@ -19,7 +19,6 @@ import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -46,18 +45,14 @@ import org.osgi.service.event.EventHandler;
 public class ScriptComposite extends Composite implements EventHandler {
 	private final TreeViewer treeViewer;
 
-	private IDoubleClickListener fDoubleClickListener = new IDoubleClickListener() {
+	private IDoubleClickListener fDoubleClickListener = event -> {
 
-		@Override
-		public void doubleClick(final DoubleClickEvent event) {
+		final Object element = ((IStructuredSelection) event.getSelection()).getFirstElement();
 
-			final Object element = ((IStructuredSelection) event.getSelection()).getFirstElement();
-
-			if ((element instanceof IScript) && (fEngineProvider != null)) {
-				final IScriptEngine scriptEngine = fEngineProvider.getScriptEngine();
-				if (scriptEngine != null)
-					scriptEngine.executeAsync("include('script:/" + ((IScript) element).getPath() + "');");
-			}
+		if ((element instanceof IScript) && (this.fEngineProvider != null)) {
+			final IScriptEngine scriptEngine = this.fEngineProvider.getScriptEngine();
+			if (scriptEngine != null)
+				scriptEngine.execute("include('script:/" + ((IScript) element).getPath() + "');");
 		}
 	};
 
@@ -174,18 +169,12 @@ public class ScriptComposite extends Composite implements EventHandler {
 	public void handleEvent(final Event event) {
 		// FIXME needs some performance improvements on multiple script
 		// updates
-		Display.getDefault().asyncExec(new Runnable() {
-
-			@Override
-			public void run() {
-				treeViewer.refresh();
-			}
-		});
+		Display.getDefault().asyncExec(() -> treeViewer.refresh());
 	}
 
 	/**
 	 * Get the selection provider of this composite.
-	 * 
+	 *
 	 * @return selection provider instance (might be <code>null</code>)
 	 */
 	public ISelectionProvider getSelectionProvider() {

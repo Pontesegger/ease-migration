@@ -29,14 +29,15 @@ public class JarDropHandler extends AbstractFileDropHandler {
 	@Override
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
 		try {
-			ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
-			Method loadJarMethod = EnvironmentModule.class.getMethod("loadJar", Object.class);
+			final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
+			final Method loadJarMethod = EnvironmentModule.class.getMethod("loadJar", Object.class);
 
-			String call = codeFactory.createFunctionCall(loadJarMethod, getFileURI(element));
-			scriptEngine.executeAsync(call);
-
-		} catch (Exception e) {
-			Logger.error(Activator.PLUGIN_ID, "loadJar() method not found in Environment module", e);
+			final String call = codeFactory.createFunctionCall(loadJarMethod, getFileURI(element));
+			scriptEngine.execute(call);
+		} catch (final NoSuchMethodException e) {
+			Logger.error(Activator.PLUGIN_ID, "Method loadJar() not found", e);
+		} catch (final SecurityException e) {
+			Logger.error(Activator.PLUGIN_ID, "Method loadJar() not accessible", e);
 		}
 	}
 

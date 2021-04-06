@@ -281,10 +281,10 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 
 				try {
 					result.get();
-					setStyleRange(getStyle(STYLE_RESULT, getText().length(), out.length()));
+					setStyleRange(getStyle(STYLE_RESULT, getText().length() - out.length(), out.length()));
 
-				} catch (ExecutionException | InterruptedException e) {
-					setStyleRange(getStyle(STYLE_ERROR, getText().length(), out.length()));
+				} catch (final ExecutionException e) {
+					setStyleRange(getStyle(STYLE_ERROR, getText().length() - out.length(), out.length()));
 				}
 
 				// scroll to end of window
@@ -319,7 +319,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 			else
 				return (executionResult != null) ? executionResult.toString() : "null";
 
-		} catch (ExecutionException | InterruptedException e) {
+		} catch (final ExecutionException e) {
 			final String message = e.getLocalizedMessage();
 			return (message != null) ? message : e.getClass().getName();
 		}
@@ -341,7 +341,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 				return getImage(type);
 			}
 
-		} catch (ExecutionException | InterruptedException e) {
+		} catch (final ExecutionException e) {
 			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/script_exception.png", true);
 		}
 

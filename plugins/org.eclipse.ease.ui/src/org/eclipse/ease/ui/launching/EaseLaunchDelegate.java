@@ -65,7 +65,7 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 		 * @param locator
 		 *            the source locator to use for this debug session, or <code>null</code> if not supported
 		 */
-		public EASELaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
+		EASELaunch(ILaunchConfiguration launchConfiguration, String mode, ISourceLocator locator) {
 			super(launchConfiguration, mode, locator);
 		}
 
@@ -180,7 +180,7 @@ public class EaseLaunchDelegate extends AbstractLaunchDelegate {
 			engine.setVariable("argv", parameters);
 
 			// execute resource
-			engine.executeAsync(resource);
+			engine.execute(resource);
 
 			// start engine
 			engine.schedule();

@@ -15,13 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IReplEngine;
@@ -60,11 +61,11 @@ public abstract class AbstractEnvironmentTest {
 	}
 
 	@Test
-	public void bootstrappedEnvironment() throws InterruptedException {
+	public void bootstrappedEnvironment() throws ExecutionException {
 		fEngine.schedule();
 
 		// execute some code to synchronize startup sequence
-		fEngine.executeSync(createComment("sync execution"));
+		fEngine.execute(createComment("sync execution")).get();
 
 		final Object environment = fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
@@ -73,25 +74,25 @@ public abstract class AbstractEnvironmentTest {
 	}
 
 	@Test
-	public void reloadEnvironment() throws InterruptedException {
+	public void reloadEnvironment() throws ExecutionException {
 		fEngine.schedule();
 
 		// execute some code to synchronize startup sequence
-		fEngine.executeSync(createComment("sync execution"));
+		fEngine.execute(createComment("sync execution")).get();
 
 		final Object environment = fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
-		final ScriptResult result = fEngine.executeSync("loadModule(\"" + EnvironmentModule.MODULE_NAME + "\")");
+		final ScriptResult result = fEngine.execute("loadModule(\"" + EnvironmentModule.MODULE_NAME + "\")");
 
-		assertEquals(environment, result.getResult());
+		assertEquals(environment, result.get());
 	}
 
 	@Test
-	public void preMethodCallback() throws InterruptedException {
+	public void preMethodCallback() throws ExecutionException {
 		fEngine.schedule();
 
 		// execute some code to synchronize startup sequence
-		fEngine.executeSync(createComment("sync execution"));
+		fEngine.execute(createComment("sync execution")).get();
 
 		final EnvironmentModule environment = (EnvironmentModule) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
@@ -101,18 +102,18 @@ public abstract class AbstractEnvironmentTest {
 		when(callbackProvider.hasPostExecutionCallback(any(Method.class))).thenReturn(false);
 		environment.addModuleCallback(callbackProvider);
 
-		fEngine.executeSync("getModule('" + EnvironmentModule.MODULE_NAME + "');");
+		fEngine.execute("getModule('" + EnvironmentModule.MODULE_NAME + "');").get();
 
 		verify(callbackProvider, times(1)).preExecutionCallback(any(Method.class), any());
 		verify(callbackProvider, times(0)).postExecutionCallback(any(Method.class), any());
 	}
 
 	@Test
-	public void postMethodCallback() throws InterruptedException {
+	public void postMethodCallback() throws ExecutionException {
 		fEngine.schedule();
 
 		// execute some code to synchronize startup sequence
-		fEngine.executeSync(createComment("sync execution"));
+		fEngine.execute(createComment("sync execution")).get();
 
 		final EnvironmentModule environment = (EnvironmentModule) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
@@ -122,26 +123,26 @@ public abstract class AbstractEnvironmentTest {
 		when(callbackProvider.hasPostExecutionCallback(any(Method.class))).thenReturn(true);
 		environment.addModuleCallback(callbackProvider);
 
-		fEngine.executeSync("getModule('" + EnvironmentModule.MODULE_NAME + "');");
+		fEngine.execute("getModule('" + EnvironmentModule.MODULE_NAME + "');").get();
 
 		verify(callbackProvider, times(0)).preExecutionCallback(any(Method.class), any());
 		verify(callbackProvider, times(1)).postExecutionCallback(any(Method.class), any());
 	}
 
 	@Test
-	public void reloadFunctionDefinitions() throws InterruptedException {
+	public void reloadFunctionDefinitions() throws ExecutionException {
 		fEngine.schedule();
 
 		// execute some code to synchronize startup sequence
-		ScriptResult result = fEngine.executeSync("getModule('" + EnvironmentModule.MODULE_NAME + "');");
-		assertNotNull(result.getResult());
+		ScriptResult result = fEngine.execute("getModule('" + EnvironmentModule.MODULE_NAME + "');");
+		assertNotNull(result.get());
 
-		fEngine.executeSync("function getModule(name) { return null; }");
-		result = fEngine.executeSync("getModule('" + EnvironmentModule.MODULE_NAME + "');");
-		assertNull(result.getResult());
+		fEngine.execute("function getModule(name) { return null; }");
+		result = fEngine.execute("getModule('" + EnvironmentModule.MODULE_NAME + "');");
+		assertNull(result.get());
 
-		fEngine.executeSync("loadModule('" + EnvironmentModule.MODULE_NAME + "');");
-		result = fEngine.executeSync("getModule('" + EnvironmentModule.MODULE_NAME + "');");
-		assertNotNull(result.getResult());
+		fEngine.execute("loadModule('" + EnvironmentModule.MODULE_NAME + "');");
+		result = fEngine.execute("getModule('" + EnvironmentModule.MODULE_NAME + "');");
+		assertNotNull(result.get());
 	}
 }

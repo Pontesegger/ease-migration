@@ -90,7 +90,7 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 
 		@Override
 		public Object inject(String expression) throws Throwable {
-			return getEngine().inject(expression);
+			return getEngine().inject(expression, false);
 		}
 	}
 

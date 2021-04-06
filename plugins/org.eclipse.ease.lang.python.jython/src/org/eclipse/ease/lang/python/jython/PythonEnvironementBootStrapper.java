@@ -31,6 +31,6 @@ public class PythonEnvironementBootStrapper implements IScriptEngineLaunchExtens
 
 		code.append("EnvironmentModule().bootstrap()\n");
 
-		engine.executeAsync(new Script("Python Bootstrapper", code));
+		engine.execute(new Script("Python Bootstrapper", code));
 	}
 }

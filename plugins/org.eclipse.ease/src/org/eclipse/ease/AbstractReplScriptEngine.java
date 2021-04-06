@@ -239,7 +239,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 					return new EaseDebugLastExecutionResult(variable);
 				}
 
-			} catch (ExecutionException | InterruptedException e) {
+			} catch (final ExecutionException e) {
 				return new EaseDebugLastExecutionResult("script exception", e);
 			}
 

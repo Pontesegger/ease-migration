@@ -295,21 +295,23 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 
 		if (mainScriptObject != null) {
 
-			// executeSync() will automatically schedule the internal engine
-			final ScriptResult result = fInternalEngine.executeSync(mainScriptObject);
+			final ScriptResult result = fInternalEngine.execute(mainScriptObject);
+			fInternalEngine.schedule();
+			try {
+				return result.get();
 
-			if (mainScriptObject instanceof InputStream) {
-				try {
-					((InputStream) mainScriptObject).close();
-				} catch (final Exception e) {
+			} finally {
+				if (mainScriptObject instanceof InputStream) {
+					try {
+						((InputStream) mainScriptObject).close();
+					} catch (final Exception e) {
+					}
+				} else if (mainScriptObject instanceof IFile) {
+					// we had a local project, delete it
+					final IProject project = ((IFile) mainScriptObject).getProject();
+					project.delete(true, new NullProgressMonitor());
 				}
-			} else if (mainScriptObject instanceof IFile) {
-				// we had a local project, delete it
-				final IProject project = ((IFile) mainScriptObject).getProject();
-				project.delete(true, new NullProgressMonitor());
 			}
-
-			return result.get();
 
 		} else
 			throw new ScriptEngineException("Main-Script cannot be read");

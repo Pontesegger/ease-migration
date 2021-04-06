@@ -12,10 +12,10 @@ package org.eclipse.ease.lang.javascript.rhino;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -24,10 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.ease.AbstractScriptEngine;
-import org.eclipse.ease.IDebugEngine;
-import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.debugging.IScriptDebugFrame;
@@ -36,19 +32,10 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class RhinoDebuggerEngineTest {
-	private static final String SCRIPT_SNIPPET_1 = "foo = 40 + 2;";
-	private static final String SCRIPT_SNIPPET_2 = "new java.lang.String(\"" + SCRIPT_SNIPPET_1 + "\");";
-	private static final String SCRIPT_SNIPPET_4 = "new org.eclipse.core.runtime.Path(\"/\");";
-
-	private static final String THROW_JAVA_EXCEPTION = "throw new java.lang.Exception();";
-	private static final String THROW_JAVA_CLASS = "throw new java.lang.String('test');";
-	private static final String THROW_JAVASCRIPT_EXCEPTION = "throw 'JavaScript';";
-	private static final String THROW_SYNTAX_ERROR = "'asdf";
-	private static final String THROW_RUNTIME_ERROR = "var x;\nx.foobar();\n";
-	private static final String THROW_WRAPPED_EXCEPTION = "java.lang.Class.forName('NotThere')";
+public class RhinoDebuggerEngineTest extends AbstractRhinoScriptEngineTest {
 
 	private static final String PROJECT_NAME = "Sample project";
 	private static final String FOLDER_NAME = "Subfolder";
@@ -61,10 +48,7 @@ public class RhinoDebuggerEngineTest {
 	private static final String MAIN_FILE_CONTENT = "include(\"Subfolder/includeFile.js\")\n" +
 			"\n" +
 			"function throwOnNull(parameter) {\n" +
-			"	try {\n" +
-			"		parameter.substr();\n" +
-			"	} catch (e) {\n" +
-			"	}\n" +
+			"	parameter.substr();\n" +
 			"} \n" +
 			"\n" +
 			"subCall();\n" +
@@ -77,35 +61,33 @@ public class RhinoDebuggerEngineTest {
 	 * @formatter:on
 	 */
 
-	private IWorkspaceRoot fWorkspace;
 	private IProject fProject;
-	private IFolder fFolder;
 	private IFile fMainFile;
 	private IFile fIncludeFile;
 	private RhinoDebuggerEngine fEngine;
 
 	@BeforeEach
-	public void beforeEach() throws Exception {
+	public void beforeEach() throws CoreException, UnsupportedEncodingException {
 
 		// create workspace sample project
-		fWorkspace = ResourcesPlugin.getWorkspace().getRoot();
+		final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 
-		fProject = fWorkspace.getProject(PROJECT_NAME);
+		fProject = workspace.getProject(PROJECT_NAME);
 		if (!fProject.exists())
 			fProject.create(null);
 
 		if (!fProject.isOpen())
 			fProject.open(null);
 
-		fFolder = fProject.getFolder(FOLDER_NAME);
-		if (!fFolder.exists())
-			fFolder.create(0, true, null);
+		final IFolder folder = fProject.getFolder(FOLDER_NAME);
+		if (!folder.exists())
+			folder.create(0, true, null);
 
 		fMainFile = fProject.getFile(MAIN_FILE_NAME);
 		if (!fMainFile.exists())
 			fMainFile.create(new ByteArrayInputStream(MAIN_FILE_CONTENT.getBytes("UTF-8")), false, null);
 
-		fIncludeFile = fFolder.getFile(INCLUDE_FILE_NAME);
+		fIncludeFile = folder.getFile(INCLUDE_FILE_NAME);
 		if (!fIncludeFile.exists())
 			fIncludeFile.create(new ByteArrayInputStream(INCLUDE_FILE_CONTENT.getBytes("UTF-8")), false, null);
 
@@ -117,150 +99,34 @@ public class RhinoDebuggerEngineTest {
 
 	@AfterEach
 	public void afterEach() throws CoreException {
-		fEngine.terminate();
+		getScriptEngine().terminate();
 
 		if (fProject.exists())
 			fProject.delete(true, true, null);
 	}
 
-	@Test
-	public void simpleScriptCode() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(SCRIPT_SNIPPET_1);
-
-		assertEquals(42.0, result.getResult());
-		assertNull(result.getException());
-
-		assertEquals(42.0, fEngine.getVariable("foo"));
+	@Override
+	protected RhinoDebuggerEngine getScriptEngine() {
+		return fEngine;
 	}
 
 	@Test
-	public void accessJavaClasses() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(SCRIPT_SNIPPET_2);
+	@DisplayName("getExceptionStackTrace returns script trace over multiple files")
+	public void getExceptionStackTrace_returns_script_trace_over_multiple_files() throws InterruptedException {
+		final ScriptResult result = executeCode(fMainFile);
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 
-		assertEquals(SCRIPT_SNIPPET_1, result.getResult());
-		assertNull(result.getException());
-	}
-
-	@Test
-	public void accessEclipseClasses() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(SCRIPT_SNIPPET_4);
-
-		assertEquals(new Path("/"), result.getResult());
-		assertNull(result.getException());
-	}
-
-	@Test
-	public void callModuleCode() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync("exit(\"done\");");
-
-		assertEquals("done", result.getResult());
-		assertNull(result.getException());
-	}
-
-	@Test
-	public void optionalModuleParameters() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync("exit();");
-
-		assertNull(result.getResult());
-		assertNull(result.getException());
-	}
-
-	@Test
-	public void throwJavaException() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_JAVA_EXCEPTION);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertTrue(((ScriptExecutionException) result.getException()).getCause() instanceof Exception);
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(1, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void throwJavaClass() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_JAVA_CLASS);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertEquals("ScriptException: test", ((ScriptExecutionException) result.getException()).getMessage());
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(1, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void throwJavaScriptException() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_JAVASCRIPT_EXCEPTION);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(1, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void causeSyntaxErrorException() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_SYNTAX_ERROR);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(1, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void causeRuntimeErrorException() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_RUNTIME_ERROR);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(2, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void causeWrappedException() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync(THROW_WRAPPED_EXCEPTION);
-
-		assertNull(result.getResult());
-		assertTrue(result.getException() instanceof ScriptExecutionException);
-		assertTrue(((ScriptExecutionException) result.getException()).getCause() instanceof ClassNotFoundException);
-
-		assertNotNull(fEngine.getExceptionStackTrace());
-		assertEquals(1, fEngine.getExceptionStackTrace().size());
-		assertEquals(1, fEngine.getExceptionStackTrace().get(0).getLineNumber());
-	}
-
-	@Test
-	public void getExceptionStackTrace() throws InterruptedException {
-		final IScriptService scriptService = ScriptService.getInstance();
-		final IReplEngine engine = (IReplEngine) scriptService.getEngineByID("org.eclipse.ease.javascript.rhinoDebugger").createEngine();
-		// make sure engine does not terminate automatically (would discard the exception stacktrace)
-		engine.setTerminateOnIdle(false);
-		engine.executeSync(fMainFile);
-
-		final List<IScriptDebugFrame> stackTrace = ((IDebugEngine) engine).getExceptionStackTrace(((AbstractScriptEngine) engine).getThread());
+		final List<IScriptDebugFrame> stackTrace = getScriptEngine().getExceptionStackTrace(getScriptEngine().getThread());
 		assertNotNull(stackTrace);
 		assertEquals(3, stackTrace.size());
 
 		assertEquals(fMainFile, stackTrace.get(0).getScript().getFile());
-		assertEquals(5, stackTrace.get(0).getLineNumber());
+		assertEquals(4, stackTrace.get(0).getLineNumber());
 
 		assertEquals(fIncludeFile, stackTrace.get(1).getScript().getFile());
 		assertEquals(2, stackTrace.get(1).getLineNumber());
 
 		assertEquals(fMainFile, stackTrace.get(2).getScript().getFile());
-		assertEquals(10, stackTrace.get(2).getLineNumber());
-
-		engine.terminate();
+		assertEquals(7, stackTrace.get(2).getLineNumber());
 	}
 }

@@ -60,7 +60,7 @@ public class PythonCompletionProviderWrapper implements ICompletionProvider {
 
 					// Inject variable first, then instantiate rest via script
 					engine.setVariable("_pyease_jedi_completion_provider_wrapper", this);
-					engine.inject(stream);
+					engine.inject(stream, false);
 				} catch (final Throwable e) {
 					Logger.error(Activator.PLUGIN_ID, "Cannot instantiate completion provider in Python world.", e);
 					return new ArrayList<>();

@@ -24,6 +24,6 @@ public class ScriptDropHandler implements IShellDropHandler {
 	@Override
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
 		if (element instanceof IScript)
-			scriptEngine.executeAsync("include('script:/" + ((IScript) element).getPath() + "');");
+			scriptEngine.execute("include('script:/" + ((IScript) element).getPath() + "');");
 	}
 }

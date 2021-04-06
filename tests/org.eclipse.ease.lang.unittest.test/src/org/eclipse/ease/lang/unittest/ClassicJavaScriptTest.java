@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
@@ -34,7 +36,7 @@ public class ClassicJavaScriptTest extends TestBase {
 	}
 
 	@BeforeEach
-	public void runTestSuite() {
+	public void runTestSuite() throws ExecutionException {
 		fTestSuite = runSuite(TEST_PROJECT.getFile(JAVASCRIPT_CLASSIC_SUITE_FILENAME));
 	}
 

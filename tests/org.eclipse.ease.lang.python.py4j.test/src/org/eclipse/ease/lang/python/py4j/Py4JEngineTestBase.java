@@ -53,7 +53,10 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 
 	protected ScriptResult executeCode(String code, boolean shellMode) throws Exception {
 		final Script scriptFromShell = new Script("test code", code, shellMode);
-		return fEngine.executeSync(scriptFromShell);
+		final ScriptResult result = fEngine.execute(scriptFromShell);
+		fEngine.schedule();
+
+		return result;
 	}
 
 	/**
@@ -61,7 +64,9 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	 */
 	protected String printExpression(String expression) throws Exception {
 		final Script scriptFromShell = new Script("test code", "import sys; sys.stdout.write(str(" + expression + ")); sys.stdout.flush()", false);
-		final ScriptResult result = fEngine.executeSync(scriptFromShell);
+		final ScriptResult result = fEngine.execute(scriptFromShell);
+		fEngine.schedule();
+
 		assertResultIsNone(result);
 		/* TODO: Until Bug 493677 is resolved we need a delay here to ensure data has been received by the stream gobbler */
 		Thread.sleep(1000);

@@ -11,11 +11,14 @@
 
 package org.eclipse.ease.testhelper.python;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.ease.IReplEngine;
+import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +28,7 @@ public abstract class AbstractPep302ModuleLoadingTest {
 
 	private IReplEngine fEngine;
 
-	abstract protected IReplEngine createEngine();
+	protected abstract IReplEngine createEngine();
 
 	@BeforeEach
 	public void setup() {
@@ -39,70 +42,57 @@ public abstract class AbstractPep302ModuleLoadingTest {
 	}
 
 	@Test
-	public void loadSimpleModule() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync("import eclipse.test.basic");
-
-		// make sure the import does not throw
-		assertFalse(result.hasException());
+	public void loadSimpleModule() {
+		assertDoesNotThrow(() -> fEngine.execute("import eclipse.test.basic").get());
 	}
 
 	@Test
-	public void loadModuleWithDependencies() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync("import eclipse.test.advanced");
-
-		// make sure the import does not throw
-		assertFalse(result.hasException());
+	public void loadModuleWithDependencies() {
+		assertDoesNotThrow(() -> fEngine.execute("import eclipse.test.advanced").get());
 	}
 
 	@Test
-	public void loadNotExistingModule() throws InterruptedException {
-		final ScriptResult result = fEngine.executeSync("import eclipse.test.notthere");
-
-		assertTrue(result.hasException());
+	public void loadNotExistingModule() {
+		assertThrows(ScriptExecutionException.class, () -> fEngine.execute("import eclipse.test.notthere").get());
 	}
 
 	@Test
-	public void accessModule() throws InterruptedException {
-		fEngine.executeSync("import eclipse.test.basic");
-		final ScriptResult result = fEngine.executeSync("eclipse.test.basic.add(2, 4)");
+	public void accessModule() throws ExecutionException {
+		fEngine.execute("import eclipse.test.basic");
+		final ScriptResult result = fEngine.execute("eclipse.test.basic.add(2, 4)");
 
-		assertFalse(result.hasException());
-		assertEquals(6, result.getResult());
+		assertEquals(6, result.get());
 	}
 
 	@Test
-	public void accessAdvancedModule() throws InterruptedException {
-		fEngine.executeSync("import eclipse.test.advanced");
-		final ScriptResult result = fEngine.executeSync("eclipse.test.advanced.area(2, 4)");
+	public void accessAdvancedModule() throws ExecutionException {
+		fEngine.execute("import eclipse.test.advanced");
+		final ScriptResult result = fEngine.execute("eclipse.test.advanced.area(2, 4)");
 
-		assertFalse(result.hasException());
-		assertEquals(8, result.getResult());
+		assertEquals(8, result.get());
 	}
 
 	@Test
-	public void importAs() throws InterruptedException {
-		fEngine.executeSync("import eclipse.test.basic as basic");
-		final ScriptResult result = fEngine.executeSync("basic.add(2, 4)");
+	public void importAs() throws ExecutionException {
+		fEngine.execute("import eclipse.test.basic as basic");
+		final ScriptResult result = fEngine.execute("basic.add(2, 4)");
 
-		assertFalse(result.hasException());
-		assertEquals(6, result.getResult());
+		assertEquals(6, result.get());
 	}
 
 	@Test
-	public void fromBasicImportAll() throws InterruptedException {
-		fEngine.executeSync("from eclipse.test.basic import *");
-		final ScriptResult result = fEngine.executeSync("add(2, 4)");
+	public void fromBasicImportAll() throws ExecutionException {
+		fEngine.execute("from eclipse.test.basic import *");
+		final ScriptResult result = fEngine.execute("add(2, 4)");
 
-		assertFalse(result.hasException());
-		assertEquals(6, result.getResult());
+		assertEquals(6, result.get());
 	}
 
 	@Test
-	public void fromBasicImportMethod() throws InterruptedException {
-		fEngine.executeSync("from eclipse.test.basic import add");
-		final ScriptResult result = fEngine.executeSync("add(2, 4)");
+	public void fromBasicImportMethod() throws ExecutionException {
+		fEngine.execute("from eclipse.test.basic import add");
+		final ScriptResult result = fEngine.execute("add(2, 4)");
 
-		assertFalse(result.hasException());
-		assertEquals(6, result.getResult());
+		assertEquals(6, result.get());
 	}
 }

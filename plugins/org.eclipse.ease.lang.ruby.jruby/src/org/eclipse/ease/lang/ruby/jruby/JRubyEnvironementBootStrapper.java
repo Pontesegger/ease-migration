@@ -21,7 +21,7 @@ public class JRubyEnvironementBootStrapper implements IScriptEngineLaunchExtensi
 	@Override
 	public void createEngine(final IScriptEngine engine) {
 		// load environment module
-		engine.executeAsync("java_import org.eclipse.ease.modules.EnvironmentModule");
-		engine.executeAsync("org.eclipse.ease.modules.EnvironmentModule.bootstrap()");
+		engine.execute("java_import org.eclipse.ease.modules.EnvironmentModule");
+		engine.execute("org.eclipse.ease.modules.EnvironmentModule.bootstrap()");
 	}
 }

@@ -14,6 +14,8 @@ package org.eclipse.ease.lang.unittest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
@@ -33,7 +35,7 @@ public class ModernJavaScriptTest extends TestBase {
 	}
 
 	@BeforeEach
-	public void runTestSuite() {
+	public void runTestSuite() throws ExecutionException {
 		fTestSuite = runSuite(TEST_PROJECT.getFile(JAVASCRIPT_MODERN_SUITE_FILENAME));
 	}
 

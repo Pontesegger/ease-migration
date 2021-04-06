@@ -131,8 +131,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	}
 
 	@Override
-	public final ScriptResult executeAsync(final Object content) {
+	public final ScriptResult execute(final Object content) {
 		final Script script = (content instanceof Script) ? (Script) content : new Script(content);
+
 		fScheduledScripts.add(script);
 
 		synchronized (this) {
@@ -143,47 +144,11 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	}
 
 	@Override
-	public final ScriptResult executeSync(final Object content) throws InterruptedException {
+	public Object inject(Object content, boolean uiThread) throws ExecutionException {
+		final Script script = (content instanceof Script) ? (Script) content : new Script(content);
 
-		// we need to schedule the script first or the engine might finish before we can schedule the script
-		final ScriptResult result = executeAsync(content);
-
-		if (getState() == NONE)
-			// automatically schedule engine as it is not started yet
-			schedule();
-
-		try {
-			result.get();
-		} catch (InterruptedException | ExecutionException e) {
-			// ignore, we simply need the result to be ready
-		}
-
-		return result;
-	}
-
-	@Override
-	public final Object inject(final Object content) {
-		return internalInject(content, false);
-	}
-
-	@Override
-	public final Object injectUI(final Object content) {
-		return internalInject(content, true);
-	}
-
-	private Object internalInject(final Object content, final boolean uiThread) {
 		// injected code shall not trigger a new event, therefore notifyListerners needs to be false
-		ScriptResult result;
-		if (content instanceof Script)
-			result = inject((Script) content, false, uiThread);
-		else
-			result = inject(new Script(content), false, uiThread);
-
-		try {
-			return result.get();
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
+		return inject(script, false, uiThread).get();
 	}
 
 	/**

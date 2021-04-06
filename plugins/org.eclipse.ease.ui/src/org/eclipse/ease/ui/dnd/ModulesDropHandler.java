@@ -51,7 +51,7 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 
 				final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
 				final String call = codeFactory.createFunctionCall(loadModuleMethod, ((ModuleDefinition) element).getPath().toString(), false);
-				scriptEngine.executeAsync(call);
+				scriptEngine.execute(call);
 
 			} else if (element instanceof ModuleEntry) {
 				final ModuleDefinition declaringModule = ((ModuleEntry<?>) element).getModuleDefinition();
@@ -65,11 +65,11 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 						executeDefaultCall(scriptEngine, method);
 
 				} else if (((ModuleEntry<?>) element).getEntry() instanceof Field)
-					scriptEngine.executeAsync(((Field) ((ModuleEntry<?>) element).getEntry()).getName());
+					scriptEngine.execute(((Field) ((ModuleEntry<?>) element).getEntry()).getName());
 
 			} else
 				// fallback solution
-				scriptEngine.executeAsync(element);
+				scriptEngine.execute(element);
 
 		} catch (final NoSuchMethodException | SecurityException e) {
 			Logger.error(Activator.PLUGIN_ID, "loadModule() method not found in Environment module", e);
@@ -86,7 +86,7 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 		final ParametersDialog dialog = new ParametersDialog(Display.getDefault().getActiveShell(), method, method.getParameters());
 		if (dialog.open() == Window.OK) {
 			final String call = codeFactory.createFunctionCall(method, createParameterInstances(method, dialog.getParameters()));
-			scriptEngine.executeAsync(call);
+			scriptEngine.execute(call);
 		}
 	}
 
@@ -129,6 +129,6 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 		final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
 
 		final String call = codeFactory.createFunctionCall(entry);
-		scriptEngine.executeAsync(call);
+		scriptEngine.execute(call);
 	}
 }

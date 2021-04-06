@@ -216,7 +216,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			public void widgetDefaultSelected(final SelectionEvent e) {
 				final String input = fInputCombo.getText();
 				fInputCombo.setText("");
-				fScriptEngine.executeAsync(new Script("User input", input, true));
+				fScriptEngine.execute(new Script("User input", input, true));
 			}
 		});
 
@@ -351,12 +351,12 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		for (final ScriptType scriptType : fScriptEngine.getDescription().getSupportedScriptTypes()) {
 			final String initCommands = prefs.get(IPreferenceConstants.SHELL_STARTUP + scriptType.getName(), "").trim();
 			if (!initCommands.isEmpty())
-				fScriptEngine.executeAsync(initCommands);
+				fScriptEngine.execute(initCommands);
 			else {
 				final ICodeFactory codeFactory = ScriptService.getCodeFactory(fScriptEngine);
 				if (codeFactory != null) {
 					final String helpComment = codeFactory.createCommentedString("use help(\"<topic>\") to get more information", false);
-					fScriptEngine.executeAsync(helpComment);
+					fScriptEngine.execute(helpComment);
 				}
 			}
 		}

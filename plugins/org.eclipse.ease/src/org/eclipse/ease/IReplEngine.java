@@ -23,7 +23,7 @@ public interface IReplEngine extends IScriptEngine {
 	 * @param terminate
 	 *            <code>true</code> to request termination
 	 */
-	void setTerminateOnIdle(final boolean terminate);
+	void setTerminateOnIdle(boolean terminate);
 
 	/**
 	 * Get termination condition when engine is idle.
@@ -40,7 +40,7 @@ public interface IReplEngine extends IScriptEngine {
 	Collection<EaseDebugVariable> getDefinedVariables();
 
 	/**
-	 * Get type information on a given script object
+	 * Get type information on a given script object.
 	 *
 	 * @param object
 	 *            object to inspect

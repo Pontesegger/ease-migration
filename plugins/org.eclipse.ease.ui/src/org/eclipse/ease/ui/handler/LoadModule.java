@@ -35,11 +35,11 @@ public class LoadModule extends AbstractHandler implements IHandler {
 
 			if (moduleID != null)
 				// specific module selected
-				((IScriptEngineProvider) part).getScriptEngine().executeAsync("loadModule('" + moduleID + "');");
+				((IScriptEngineProvider) part).getScriptEngine().execute("loadModule('" + moduleID + "');");
 
 			else
 				// button was clicked, no module selected
-				((IScriptEngineProvider) part).getScriptEngine().executeAsync("listModules();");
+				((IScriptEngineProvider) part).getScriptEngine().execute("listModules();");
 		}
 
 		return null;

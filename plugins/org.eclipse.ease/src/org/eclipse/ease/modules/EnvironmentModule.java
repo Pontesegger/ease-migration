@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	private static final Pattern VALID_TOPICS_PATTERN = Pattern.compile("[\\w ]+(?:\\(\\))?");
 
-	public static void bootstrap() {
+	public static void bootstrap() throws ExecutionException {
 		final ModuleDefinition definition = ModuleHelper.resolveModuleName(MODULE_NAME);
 		final EnvironmentModule instance = (EnvironmentModule) definition.createModuleInstance();
 
@@ -124,7 +125,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	@Override
 	@WrapToScript
-	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
+	public final Object loadModule(final String moduleIdentifier, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace)
+			throws ExecutionException {
 		// resolve identifier
 		final ModuleDefinition definition = ModuleHelper.resolveModuleName(moduleIdentifier);
 		if (definition == null)
@@ -148,8 +150,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *
 	 * @param parentModuleDefinition
 	 *            parent definition to find dependencies for
+	 * @throws ExecutionException
 	 */
-	private void wrapModuleDependencies(ModuleDefinition parentModuleDefinition) {
+	private void wrapModuleDependencies(ModuleDefinition parentModuleDefinition) throws ExecutionException {
 		for (final ModuleDependency dependency : parentModuleDefinition.getDependencies()) {
 			final ModuleDefinition dependencyDefinition = dependency.getDefinition();
 
@@ -285,7 +288,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	@Override
 	@WrapToScript
-	public Object wrap(final Object toBeWrapped, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) {
+	public Object wrap(final Object toBeWrapped, @ScriptParameter(defaultValue = "false") boolean useCustomNamespace) throws ExecutionException {
 		// register new variable in script engine
 
 		final String identifier = getCodeFactory().getSaveVariableName(getWrappedVariableName(toBeWrapped));
@@ -330,13 +333,15 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *            module instance to create wrappers for
 	 * @param identifier
 	 *            identifier to be used to store object in script engine scope
-	 * @param reload
-	 *            flag indicating that the module was already loaded
 	 * @param useCustomNamespace
 	 *            set to <code>true</code> if functions and constants should not be stored to the global namespace but to the return value only
 	 * @return java instance or wrapper object
+	 * @throws ExecutionException
+	 *             when execution fails due to script errors
+	 * @throws InterruptedException
+	 *             when execution gets interrupted
 	 */
-	private Object createWrappers(final Object instance, final String identifier, boolean useCustomNamespace) {
+	private Object createWrappers(final Object instance, final String identifier, boolean useCustomNamespace) throws ExecutionException {
 		final ICodeFactory codeFactory = getCodeFactory();
 		if (null == codeFactory)
 			return null;
@@ -348,9 +353,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 			wrapperCode = codeFactory.createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
 
 		if (useCustomNamespace)
-			return getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode));
+			return getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode), false);
 		else
-			getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode));
+			getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode), false);
 
 		return instance;
 	}
@@ -361,10 +366,12 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 * @param data
 	 *            code to be interpreted
 	 * @return result of code execution
+	 * @throws ExecutionException
+	 *             when execution of <i>data</i> fails
 	 */
 	@WrapToScript
-	public final Object execute(final Object data) {
-		return getScriptEngine().inject(data);
+	public final Object execute(final Object data) throws ExecutionException {
+		return getScriptEngine().inject(data, false);
 	}
 
 	/**
@@ -389,15 +396,16 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 * @param filename
 	 *            name of file to be included
 	 * @return result of include operation
-	 * @throws Throwable
+	 * @throws ExecutionException
+	 *             when included code fails
 	 */
 	@WrapToScript
-	public final Object include(final String filename) {
+	public final Object include(final String filename) throws ExecutionException {
 		final Object file = ResourceTools.resolve(filename, getScriptEngine().getExecutedFile());
 		if (file != null)
-			return getScriptEngine().inject(file);
+			return getScriptEngine().inject(file, false);
 
-		throw new RuntimeException("Cannot locate '" + filename + "'");
+		throw new IllegalArgumentException("Cannot locate '" + filename + "'");
 	}
 
 	/**

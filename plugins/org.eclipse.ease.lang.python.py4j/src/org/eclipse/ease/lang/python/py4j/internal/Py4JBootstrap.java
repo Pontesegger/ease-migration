@@ -24,6 +24,6 @@ public class Py4JBootstrap implements IScriptEngineLaunchExtension {
 
 	@Override
 	public void createEngine(final IScriptEngine engine) {
-		engine.executeAsync(new Script(Py4JBootstrap.class.getSimpleName(), BOOTSTRAP_CODE));
+		engine.execute(new Script(Py4JBootstrap.class.getSimpleName(), BOOTSTRAP_CODE));
 	}
 }

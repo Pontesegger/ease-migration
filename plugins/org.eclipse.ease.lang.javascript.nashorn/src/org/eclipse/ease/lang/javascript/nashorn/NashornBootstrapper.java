@@ -21,6 +21,6 @@ public class NashornBootstrapper implements IScriptEngineLaunchExtension {
 	@Override
 	public void createEngine(final IScriptEngine engine) {
 		// seems nashorn cannot call static methods on a class instance
-		engine.executeAsync(new Script("Bootloader", "Packages." + EnvironmentModule.class.getName() + ".bootstrap();"));
+		engine.execute(new Script("Bootloader", "Packages." + EnvironmentModule.class.getName() + ".bootstrap();"));
 	}
 }

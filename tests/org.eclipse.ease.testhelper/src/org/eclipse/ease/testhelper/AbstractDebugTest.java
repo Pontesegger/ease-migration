@@ -141,7 +141,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "primitive-integer-definition-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final EaseDebugStackFrame stackFrame = getTopmostStackFrame();
 			if (stackFrame != null) {
@@ -159,7 +159,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -218,7 +218,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -277,7 +277,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -337,7 +337,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -371,7 +371,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame[] stackFrames = getStackFrames();
 			assertEquals(1, stackFrames.length);
@@ -388,7 +388,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "include-command-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 
 			private boolean fFirstSuspend = true;
@@ -423,7 +423,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(INCLUDE_SCRIPT), getLineNumber(INCLUDE_SCRIPT, "include-last-line-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame[] stackFrames = getStackFrames();
 			assertEquals(2, stackFrames.length);
@@ -441,7 +441,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			elementProvider.getDebugElement().resume();
 		});
@@ -480,7 +480,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), 2);
 		assertEquals(2, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			elementProvider.getDebugElement().terminate();
 		});
@@ -524,7 +524,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), 2);
 		assertEquals(2, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			elementProvider.getDebugElement().disconnect();
 
@@ -571,7 +571,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 
 			final EaseWatchExpressionDelegate expressionDelegate = new EaseWatchExpressionDelegate();
@@ -602,7 +602,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 
 			assertFalse(getDebugTarget().isDisconnected());
@@ -670,7 +670,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
 	public void terminatedState() throws CoreException {
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 		});
 
@@ -730,7 +730,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -759,7 +759,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -788,7 +788,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -817,7 +817,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame stackFrame = getTopmostStackFrame();
 			assertNotNull(stackFrame);
@@ -866,7 +866,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -896,7 +896,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			final IStackFrame stackFrame = getTopmostStackFrame();
 			assertNotNull(stackFrame);
@@ -937,7 +937,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLastLineNumber());
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -1007,7 +1007,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-result-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, () -> {
 			try {
 				final IStackFrame stackFrame = getTopmostStackFrame();
@@ -1031,7 +1031,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		setBreakpoint(getFile(MAIN_SCRIPT), getLineNumber(MAIN_SCRIPT, "testMethod-call-hook"));
 		assertEquals(1, getBreakpoints().length);
 
-		fScriptEngine.executeAsync(getFile(MAIN_SCRIPT));
+		fScriptEngine.execute(getFile(MAIN_SCRIPT));
 
 		final int suspendedEvents = runUntilTerminated(fScriptEngine, new Runnable() {
 

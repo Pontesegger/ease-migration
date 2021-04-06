@@ -50,11 +50,11 @@ public class ResourceDropHandler implements IShellDropHandler {
 
 			if ((element instanceof IFile) || (element instanceof File)) {
 				final String call = codeFactory.createFunctionCall(includeMethod, ResourceTools.toAbsoluteLocation(element, null));
-				scriptEngine.executeAsync(call);
+				scriptEngine.execute(call);
 
 			} else if (element instanceof URI) {
 				final String call = codeFactory.createFunctionCall(includeMethod, element.toString());
-				scriptEngine.executeAsync(call);
+				scriptEngine.execute(call);
 
 			} else {
 				final IFile adaptedFile = Platform.getAdapterManager().getAdapter(element, IFile.class);
@@ -63,14 +63,13 @@ public class ResourceDropHandler implements IShellDropHandler {
 
 				else
 					// fallback solution
-					scriptEngine.executeAsync(element);
+					scriptEngine.execute(element);
 			}
 
-		} catch (final Exception e) {
-			Logger.error(Activator.PLUGIN_ID, "include() method not found in Environment module", e);
-
-			// fallback solution
-			scriptEngine.executeAsync(element);
+		} catch (final NoSuchMethodException e) {
+			Logger.error(Activator.PLUGIN_ID, "Method include() not found", e);
+		} catch (final SecurityException e) {
+			Logger.error(Activator.PLUGIN_ID, "Method include() not accessible", e);
 		}
 	}
 

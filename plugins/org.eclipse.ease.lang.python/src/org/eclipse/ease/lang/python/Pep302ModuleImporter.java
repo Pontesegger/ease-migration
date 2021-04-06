@@ -107,7 +107,7 @@ public class Pep302ModuleImporter implements IScriptEngineLaunchExtension {
 			final String code = StringTools.toString(resourceStream);
 			resourceStream.close();
 
-			engine.executeAsync(code);
+			engine.execute(code);
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -99,7 +99,7 @@ public class ScriptResult implements Future<Object> {
 			final Object result = get();
 			return ((result == null) ? "[null]" : fResult.toString());
 
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (final ExecutionException e) {
 			return "Exception: " + e.getLocalizedMessage();
 		}
 	}
@@ -133,7 +133,7 @@ public class ScriptResult implements Future<Object> {
 	}
 
 	@Override
-	public Object get() throws InterruptedException, ExecutionException {
+	public Object get() throws ExecutionException {
 		waitForResult();
 
 		if (hasException())
@@ -156,10 +156,15 @@ public class ScriptResult implements Future<Object> {
 		return get(milliSeconds, TimeUnit.MILLISECONDS);
 	}
 
-	private void waitForResult() throws InterruptedException {
+	private void waitForResult() throws ExecutionException {
 		synchronized (this) {
-			while (!isDone())
-				wait();
+			while (!isDone()) {
+				try {
+					wait();
+				} catch (final InterruptedException e) {
+					throw new ScriptEngineInterruptedException(e);
+				}
+			}
 		}
 	}
 

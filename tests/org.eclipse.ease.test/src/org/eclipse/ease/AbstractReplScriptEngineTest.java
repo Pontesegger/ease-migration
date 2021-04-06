@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -100,12 +101,13 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 
 	@Test
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
-	public void keepRunningOnIdle() throws InterruptedException {
+	public void keepRunningOnIdle() throws ExecutionException {
 		getTestEngine().setTerminateOnIdle(false);
-		getTestEngine().executeAsync(SAMPLE_CODE);
+		getTestEngine().execute(SAMPLE_CODE);
 		getTestEngine().schedule();
 
-		final ScriptResult result = getTestEngine().executeSync(SAMPLE_CODE);
+		final ScriptResult result = getTestEngine().execute(SAMPLE_CODE);
+		result.get();
 		assertTrue(result.isDone());
 	}
 

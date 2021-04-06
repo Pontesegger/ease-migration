@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.lang.unittest.runtime.ITestContainer;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
@@ -76,7 +78,7 @@ public class TestBase {
 	private String fTestOutput;
 	private String fErrorOutput;
 
-	public ITestSuite runSuite(IFile suiteFile) {
+	public ITestSuite runSuite(IFile suiteFile) throws ExecutionException {
 		final IScriptService scriptService = ScriptService.getService();
 		final TestSuiteScriptEngine engine = (TestSuiteScriptEngine) scriptService.getEngineByID(TestSuiteScriptEngine.ENGINE_ID).createEngine();
 
@@ -85,15 +87,14 @@ public class TestBase {
 		final ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 		engine.setErrorStream(errorStream);
 
-		try {
-			final ITestSuite testSuite = (ITestSuite) engine.executeSync(suiteFile).getResult();
-			setTestOutput(outputStream.toString());
-			setTestErrorOutput(errorStream.toString());
+		final ScriptResult result = engine.execute(suiteFile);
+		engine.schedule();
 
-			return testSuite;
-		} catch (final InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+		final ITestSuite testSuite = (ITestSuite) result.get();
+		setTestOutput(outputStream.toString());
+		setTestErrorOutput(errorStream.toString());
+
+		return testSuite;
 	}
 
 	private void setTestErrorOutput(String errorOutput) {

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.dnd;
 
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
@@ -47,14 +49,14 @@ public abstract class AbstractModuleDropHandler implements IShellDropHandler {
 					try {
 						final String functionCall = codeFactory.createFunctionCall(EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class),
 								moduleID, false);
-						return scriptEngine.executeSync(functionCall);
+						return scriptEngine.execute(functionCall).get();
 
 					} catch (final NoSuchMethodException e) {
 						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not found", e);
 					} catch (final SecurityException e) {
 						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not accessible", e);
-					} catch (final InterruptedException e) {
-						Logger.error(Activator.PLUGIN_ID, "Script execution interrupted", e);
+					} catch (final ExecutionException e) {
+						Logger.error(Activator.PLUGIN_ID, "Method loadModule() failed to execute script code", e);
 					}
 
 				} else

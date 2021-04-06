@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -147,8 +148,8 @@ public class AbstractScriptEngineTest {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
-		final ScriptResult result1 = fTestEngine.executeAsync(VALID_SAMPLE_CODE);
-		final ScriptResult result2 = fTestEngine.executeAsync("2");
+		final ScriptResult result1 = fTestEngine.execute(VALID_SAMPLE_CODE);
+		final ScriptResult result2 = fTestEngine.execute("2");
 		fTestEngine.schedule();
 
 		fTestEngine.joinEngine();
@@ -173,8 +174,8 @@ public class AbstractScriptEngineTest {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
-		final ScriptResult result1 = fTestEngine.executeAsync(VALID_SAMPLE_CODE);
-		final ScriptResult result2 = fTestEngine.executeAsync("ERROR");
+		final ScriptResult result1 = fTestEngine.execute(VALID_SAMPLE_CODE);
+		final ScriptResult result2 = fTestEngine.execute("ERROR");
 		fTestEngine.schedule();
 
 		fTestEngine.joinEngine();
@@ -199,7 +200,8 @@ public class AbstractScriptEngineTest {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
-		final ScriptResult result1 = fTestEngine.executeSync(VALID_SAMPLE_CODE);
+		final ScriptResult result1 = fTestEngine.execute(VALID_SAMPLE_CODE);
+		fTestEngine.schedule();
 
 		fTestEngine.joinEngine();
 
@@ -214,8 +216,8 @@ public class AbstractScriptEngineTest {
 
 	@Test
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
-	public void inject() throws InterruptedException {
-		assertEquals(VALID_SAMPLE_CODE, fTestEngine.inject(VALID_SAMPLE_CODE));
+	public void inject() throws ExecutionException {
+		assertEquals(VALID_SAMPLE_CODE, fTestEngine.inject(VALID_SAMPLE_CODE, false));
 	}
 
 	@Test
@@ -241,7 +243,7 @@ public class AbstractScriptEngineTest {
 
 		ScriptResult scriptResult = null;
 		for (int loop = 0; loop <= 100; loop++)
-			scriptResult = engine.executeAsync("Loop " + loop + "\n");
+			scriptResult = engine.execute("Loop " + loop + "\n");
 
 		engine.schedule();
 
@@ -276,7 +278,7 @@ public class AbstractScriptEngineTest {
 
 		ScriptResult scriptResult = null;
 		for (int loop = 0; loop <= 100; loop++)
-			scriptResult = engine.executeAsync("Loop " + loop + "\n");
+			scriptResult = engine.execute("Loop " + loop + "\n");
 
 		engine.schedule();
 
@@ -310,7 +312,7 @@ public class AbstractScriptEngineTest {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		engine.setOutputStream(bos);
 
-		final ScriptResult scriptResult = engine.executeAsync(VALID_SAMPLE_CODE);
+		final ScriptResult scriptResult = engine.execute(VALID_SAMPLE_CODE);
 
 		engine.schedule();
 		engine.joinEngine();
@@ -338,7 +340,7 @@ public class AbstractScriptEngineTest {
 		engine.setOutputStream(bos);
 
 		for (int loop = 0; loop < 10; loop++)
-			engine.executeAsync("Loop " + loop + "\n");
+			engine.execute("Loop " + loop + "\n");
 
 		engine.schedule();
 

@@ -3,12 +3,13 @@
 package org.eclipse.ease.lang.unittest.runtime.impl;
 
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.ScriptResult;
+import org.eclipse.ease.ScriptEngineInterruptedException;
 import org.eclipse.ease.lang.unittest.TestSuiteScriptEngine;
 import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ICode;
@@ -354,21 +355,16 @@ public class TestSuite extends TestContainer implements ITestSuite {
 
 					fSetupEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, this);
 
-					ScriptResult result;
 					try {
-						result = fSetupEngine.executeSync(new Script(customCode.getLocation(), customCode.getContent()));
-					} catch (final InterruptedException e) {
+						fSetupEngine.execute(new Script(customCode.getLocation(), customCode.getContent())).get();
+					} catch (final ScriptEngineInterruptedException e) {
 						getTest("[user event]").addError("Aborted by user", fSetupEngine);
-						return;
-					}
-					if (result.hasException()) {
-						getTest("[" + codeLocation + "]").addError(result.getException().getMessage(), fSetupEngine);
-						return;
+					} catch (final ExecutionException e) {
+						getTest("[" + codeLocation + "]").addError(e.getMessage(), fSetupEngine);
 					}
 				} else {
 					getTest("[" + codeLocation + "]").addError(
 							"Could not create setup/teardown engine. Please select an appropriate engine on the Overview tab of the *.suite file.", null);
-					return;
 				}
 			}
 		}

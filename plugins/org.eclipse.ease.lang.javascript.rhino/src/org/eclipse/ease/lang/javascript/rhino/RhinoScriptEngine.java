@@ -541,7 +541,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 					final Object debuggerContextData = getContext().getDebuggerContextData();
 					getContext().setDebugger(null, null);
 
-					final Object inject = inject(name + ".length;");
+					final Object inject = inject(name + ".length;", false);
 					if (inject instanceof Integer)
 						variable.setType(Type.NATIVE_OBJECT);
 

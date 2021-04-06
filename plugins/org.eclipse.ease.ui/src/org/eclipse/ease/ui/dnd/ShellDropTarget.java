@@ -147,7 +147,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 		if (element instanceof IResource)
 			element = ResourceTools.toAbsoluteLocation(element, null);
 
-		fScriptEngineProvider.getScriptEngine().executeAsync(element.toString());
+		fScriptEngineProvider.getScriptEngine().execute(element.toString());
 	}
 
 	private Object unpackElement(Object element) {

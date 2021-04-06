@@ -17,6 +17,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -30,31 +31,19 @@ import org.eclipse.ease.service.EngineDescription;
 public interface IScriptEngine {
 
 	/** Trace enablement for script engines. */
-	boolean TRACE_SCRIPT_ENGINE = org.eclipse.ease.Activator.getDefault().isDebugging()
+	boolean TRACE_SCRIPT_ENGINE = Activator.getDefault().isDebugging()
 			&& "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.ease/debug/scriptEngine"));
 
 	/**
-	 * Execute script code asynchronously. The code provided will be scheduled and executed as soon as all previously scheduled code is executed. If
-	 * <i>content</i> is a {@link Reader} object, or a {@link File} special treatment is done, otherwise the toString() method is used to extract script code.
+	 * Execute script code. The code provided will be scheduled and executed as soon as all previously scheduled code is executed. If <i>content</i> is a
+	 * {@link Reader} object, or a {@link File} special treatment is done, otherwise the toString() method is used to extract script code. This is a
+	 * non-blocking call.
 	 *
 	 * @param content
 	 *            content to be executed.
 	 * @return execution result
 	 */
-	ScriptResult executeAsync(final Object content);
-
-	/**
-	 * Execute script code synchronously. The code provided will be scheduled and executed as soon as all previously scheduled code is executed.If
-	 * <i>content</i> is a {@link Reader} object, or a {@link File} special treatment is done, otherwise the toString() method is used to extract script code.
-	 * In case the engine was not started yet, it will be automatically started by this call. This is a blocking call.
-	 *
-	 * @param content
-	 *            content to be executed.
-	 * @return execution result
-	 * @throws InterruptedException
-	 *             when execution is interrupted
-	 */
-	ScriptResult executeSync(final Object content) throws InterruptedException;
+	ScriptResult execute(Object content);
 
 	/**
 	 * Inject script code and execute synchronously. Code passed to this method will be invoked immediately. It might interrupt a currently running execution
@@ -62,19 +51,13 @@ public interface IScriptEngine {
 	 *
 	 * @param content
 	 *            content to be executed.
+	 * @param uiThread
+	 *            execute code in UI thread
 	 * @return execution result
+	 * @throws ExecutionException
+	 *             when code execution failed
 	 */
-	Object inject(final Object content);
-
-	/**
-	 * Inject script code and execute synchronously within the UI thread. Code passed to this method will be invoked immediately. It might interrupt a currently
-	 * running execution requested asynchronously.
-	 *
-	 * @param content
-	 *            content to be executed.
-	 * @return execution result
-	 */
-	Object injectUI(final Object content);
+	Object inject(Object content, boolean uiThread) throws ExecutionException;
 
 	/**
 	 * Get the currently executed file instance.
@@ -89,7 +72,7 @@ public interface IScriptEngine {
 	 * @param outputStream
 	 *            default output stream
 	 */
-	void setOutputStream(final OutputStream outputStream);
+	void setOutputStream(OutputStream outputStream);
 
 	/**
 	 * Set the default error stream for the interpreter.
@@ -97,7 +80,7 @@ public interface IScriptEngine {
 	 * @param errorStream
 	 *            default error stream
 	 */
-	void setErrorStream(final OutputStream errorStream);
+	void setErrorStream(OutputStream errorStream);
 
 	/**
 	 * Set the default input stream for the interpreter.
@@ -105,7 +88,7 @@ public interface IScriptEngine {
 	 * @param inputStream
 	 *            default input stream
 	 */
-	void setInputStream(final InputStream inputStream);
+	void setInputStream(InputStream inputStream);
 
 	PrintStream getOutputStream();
 
@@ -119,7 +102,7 @@ public interface IScriptEngine {
 	 * @param closeStreams
 	 *            <code>true</code> to close streams
 	 */
-	void setCloseStreamsOnTerminate(final boolean closeStreams);
+	void setCloseStreamsOnTerminate(boolean closeStreams);
 
 	/**
 	 * Schedule script execution. This will start the script engine that either waits for input or immediate starts execution of previously scheduled input.
@@ -155,7 +138,7 @@ public interface IScriptEngine {
 	 * @param content
 	 *            variable content
 	 */
-	void setVariable(final String name, final Object content);
+	void setVariable(String name, Object content);
 
 	/**
 	 * Get a script variable. Retrieve a variable from the global script scope.
@@ -165,7 +148,7 @@ public interface IScriptEngine {
 	 *
 	 * @return variable content or <code>null</code>
 	 */
-	Object getVariable(final String name);
+	Object getVariable(String name);
 
 	/**
 	 * Check if a variable exists within the scope of the engine. As a variable content may be <code>null</code>, {@link #getVariable(String)} might not be
@@ -197,7 +180,7 @@ public interface IScriptEngine {
 	 * @param url
 	 *            url to load jar file from
 	 */
-	void registerJar(final URL url);
+	void registerJar(URL url);
 
 	/**
 	 * Join engine execution thread. Waits for engine execution up to <i>timeout</i> milliseconds.
