@@ -106,7 +106,7 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 		getTestEngine().schedule();
 
 		final ScriptResult result = getTestEngine().executeSync(SAMPLE_CODE);
-		assertTrue(result.isReady());
+		assertTrue(result.isDone());
 	}
 
 	@Test

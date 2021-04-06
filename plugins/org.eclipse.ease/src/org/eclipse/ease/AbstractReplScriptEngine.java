@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -226,16 +228,21 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	@Override
 	public EaseDebugVariable getLastExecutionResult() {
 		if (fLastExecutionResult != null) {
-			if (ScriptResult.VOID.equals(fLastExecutionResult.getResult())) {
-				return new EaseDebugLastExecutionResult("no method return value", ScriptResult.VOID, "");
+			try {
+				final Object result = fLastExecutionResult.get();
 
-			} else if (fLastExecutionResult.hasException()) {
-				return new EaseDebugLastExecutionResult("script exception", fLastExecutionResult.getException());
+				if (Objects.equals(ScriptResult.VOID, result)) {
+					return new EaseDebugLastExecutionResult("no method return value", ScriptResult.VOID, "");
 
-			} else {
-				final EaseDebugVariable variable = createVariable("script returned", fLastExecutionResult.getResult());
-				return new EaseDebugLastExecutionResult(variable);
+				} else {
+					final EaseDebugVariable variable = createVariable("script returned", fLastExecutionResult.getResult());
+					return new EaseDebugLastExecutionResult(variable);
+				}
+
+			} catch (ExecutionException | InterruptedException e) {
+				return new EaseDebugLastExecutionResult("script exception", e);
 			}
+
 		} else
 			return new EaseDebugLastExecutionResult("no method return value", null, "");
 	}

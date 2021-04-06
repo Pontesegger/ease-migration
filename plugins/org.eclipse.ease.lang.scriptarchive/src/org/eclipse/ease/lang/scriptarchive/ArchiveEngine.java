@@ -309,11 +309,7 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 				project.delete(true, new NullProgressMonitor());
 			}
 
-			// unpack execution result
-			if (result.hasException())
-				throw result.getException();
-
-			return result.getResult();
+			return result.get();
 
 		} else
 			throw new ScriptEngineException("Main-Script cannot be read");

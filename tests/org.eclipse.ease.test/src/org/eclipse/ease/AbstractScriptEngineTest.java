@@ -156,12 +156,12 @@ public class AbstractScriptEngineTest {
 		assertTrue(fTestEngine.isFinished());
 		assertEquals("12", bos.toString());
 
-		assertTrue(result1.isReady());
+		assertTrue(result1.isDone());
 		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
 		assertFalse(result1.hasException());
 		assertNull(result1.getException());
 
-		assertTrue(result2.isReady());
+		assertTrue(result2.isDone());
 		assertEquals("2", result2.getResult());
 		assertFalse(result2.hasException());
 		assertNull(result2.getException());
@@ -182,12 +182,12 @@ public class AbstractScriptEngineTest {
 		assertTrue(fTestEngine.isFinished());
 		assertEquals(VALID_SAMPLE_CODE, bos.toString());
 
-		assertTrue(result1.isReady());
+		assertTrue(result1.isDone());
 		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
 		assertFalse(result1.hasException());
 		assertNull(result1.getException());
 
-		assertTrue(result2.isReady());
+		assertTrue(result2.isDone());
 		assertNull(result2.getResult());
 		assertTrue(result2.hasException());
 		assertNotNull(result2.getException());
@@ -206,7 +206,7 @@ public class AbstractScriptEngineTest {
 		assertTrue(fTestEngine.isFinished());
 		assertEquals(VALID_SAMPLE_CODE, bos.toString());
 
-		assertTrue(result1.isReady());
+		assertTrue(result1.isDone());
 		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
 		assertFalse(result1.hasException());
 		assertNull(result1.getException());
@@ -254,7 +254,7 @@ public class AbstractScriptEngineTest {
 
 		assertFalse(bos.toString().contains("Loop 100"));
 
-		assertTrue(scriptResult.isReady());
+		assertTrue(scriptResult.isDone());
 		assertNull(scriptResult.getResult());
 		assertTrue(scriptResult.hasException());
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
@@ -289,7 +289,7 @@ public class AbstractScriptEngineTest {
 
 		assertFalse(bos.toString().contains("Loop 100"));
 
-		assertTrue(scriptResult.isReady(), "result " + scriptResult.hashCode() + " is not ready");
+		assertTrue(scriptResult.isDone(), "result " + scriptResult.hashCode() + " is not ready");
 		assertNull(scriptResult.getResult());
 		assertTrue(scriptResult.hasException());
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
@@ -317,7 +317,7 @@ public class AbstractScriptEngineTest {
 
 		assertTrue(bos.toString().isEmpty());
 
-		assertTrue(scriptResult.isReady());
+		assertTrue(scriptResult.isDone());
 		assertNull(scriptResult.getResult());
 		assertTrue(scriptResult.hasException());
 		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());

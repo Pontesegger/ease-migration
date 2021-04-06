@@ -11,6 +11,8 @@
 
 package org.eclipse.ease.ui.view;
 
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -275,9 +277,15 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 					append("\n\t");
 
 				// append message
-				final StyleRange styleRange = getStyle(result.hasException() ? STYLE_ERROR : STYLE_RESULT, getText().length(), out.length());
 				append(out);
-				setStyleRange(styleRange);
+
+				try {
+					result.get();
+					setStyleRange(getStyle(STYLE_RESULT, getText().length(), out.length()));
+
+				} catch (ExecutionException | InterruptedException e) {
+					setStyleRange(getStyle(STYLE_ERROR, getText().length(), out.length()));
+				}
 
 				// scroll to end of window
 				scrollToEnd();
@@ -291,7 +299,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	private void scrollToEnd() {
 		setHorizontalPixel(0);
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=538973
-		// seems the StyledText widget has a strange bug when trying to scroll correctly. we therefore add a factor to the calculated pixel offset to make sure
+		// seems the StyledText widget has a strange bug when trying to scroll correctly. We therefore add a factor to the calculated pixel offset to make sure
 		// we correctly scroll to the end.
 		setTopPixel((int) (getLineHeight() * getLineCount() * 1.1));
 	}
@@ -304,16 +312,16 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 * @return text string
 	 */
 	private String getResultMessage(ScriptResult result) {
-		if (result.hasException()) {
-			final String message = result.getException().getLocalizedMessage();
-			return (message != null) ? message : result.getException().getClass().getName();
-
-		} else {
-			final Object executionResult = result.getResult();
+		try {
+			final Object executionResult = result.get();
 			if (fCurrentEngine != null)
 				return fCurrentEngine.toString(executionResult);
 			else
 				return (executionResult != null) ? executionResult.toString() : "null";
+
+		} catch (ExecutionException | InterruptedException e) {
+			final String message = e.getLocalizedMessage();
+			return (message != null) ? message : e.getClass().getName();
 		}
 	}
 
@@ -325,14 +333,16 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 * @return image or <code>null</code>
 	 */
 	private Image getResultImage(ScriptResult result) {
-		if (result.hasException())
-			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/script_exception.png", true);
+		try {
+			result.get(); // fetch result to provoke exception check
 
-		else {
 			if (fCurrentEngine != null) {
 				final ScriptObjectType type = fCurrentEngine.getType(result.getResult());
 				return getImage(type);
 			}
+
+		} catch (ExecutionException | InterruptedException e) {
+			return Activator.getImage(Activator.PLUGIN_ID, "/icons/eobj16/script_exception.png", true);
 		}
 
 		return null;

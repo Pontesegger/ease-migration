@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -151,7 +152,11 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			// automatically schedule engine as it is not started yet
 			schedule();
 
-		result.waitForResult();
+		try {
+			result.get();
+		} catch (InterruptedException | ExecutionException e) {
+			// ignore, we simply need the result to be ready
+		}
 
 		return result;
 	}
@@ -166,7 +171,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return internalInject(content, true);
 	}
 
-	private final Object internalInject(final Object content, final boolean uiThread) {
+	private Object internalInject(final Object content, final boolean uiThread) {
 		// injected code shall not trigger a new event, therefore notifyListerners needs to be false
 		ScriptResult result;
 		if (content instanceof Script)
@@ -174,12 +179,11 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		else
 			result = inject(new Script(content), false, uiThread);
 
-		if (result.hasException()) {
-			// re-throw previous exception
-			throw new RuntimeException(result.getException().getMessage(), result.getException());
+		try {
+			return result.get();
+		} catch (ExecutionException | InterruptedException e) {
+			throw new RuntimeException(e.getMessage(), e);
 		}
-
-		return result.getResult();
 	}
 
 	/**

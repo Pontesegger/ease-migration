@@ -152,20 +152,81 @@ public class ScriptResultTest {
 	}
 
 	@Test
+	@DisplayName("get(milliseconds) waits for execution exception")
+	public void get_with_milliseconds_timeout_waits_for_execution_result() throws InterruptedException, ExecutionException, TimeoutException {
+		final ScriptResult result = new ScriptResult();
+
+		new Job("SetResult") {
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				result.setResult(RESULT);
+				return Status.OK_STATUS;
+			}
+		}.schedule(500);
+
+		assertEquals(RESULT, result.get(5000));
+	}
+
+	@Test
+	@DisplayName("get(milliseconds) times out")
+	public void get_milliseconds_times_out() {
+		final ScriptResult result = new ScriptResult();
+
+		assertThrows(TimeoutException.class, () -> result.get(500));
+	}
+
+	@Test
+	@DisplayName("setResult() after setException() throws")
+	public void setResult_after_setException_throws() {
+		final ScriptResult result = new ScriptResult();
+
+		result.setException(EXCEPTION);
+		assertThrows(IllegalArgumentException.class, () -> result.setResult(RESULT));
+	}
+
+	@Test
+	@DisplayName("setResult() after setResult() throws")
+	public void setResult_after_setResult_throws() {
+		final ScriptResult result = new ScriptResult();
+
+		result.setResult(RESULT);
+		assertThrows(IllegalArgumentException.class, () -> result.setResult(RESULT));
+	}
+
+	@Test
+	@DisplayName("setException() after setResult() throws")
+	public void setException_after_setResult_throws() {
+		final ScriptResult result = new ScriptResult();
+
+		result.setResult(RESULT);
+		assertThrows(IllegalArgumentException.class, () -> result.setException(EXCEPTION));
+	}
+
+	@Test
+	@DisplayName("setException() after setException() throws")
+	public void setException_after_setException_throws() {
+		final ScriptResult result = new ScriptResult();
+
+		result.setException(EXCEPTION);
+		assertThrows(IllegalArgumentException.class, () -> result.setException(EXCEPTION));
+	}
+
+	@Test
 	public void isReady() {
 		ScriptResult result = new ScriptResult();
 		result.setResult(RESULT);
-		assertTrue(result.isReady());
+		assertTrue(result.isDone());
 
 		result = new ScriptResult();
-		assertFalse(result.isReady());
+		assertFalse(result.isDone());
 
 		result.setResult(RESULT);
-		assertTrue(result.isReady());
+		assertTrue(result.isDone());
 
 		result = new ScriptResult();
 		result.setException(new ScriptExecutionException());
-		assertTrue(result.isReady());
+		assertTrue(result.isDone());
 	}
 
 	@Test
@@ -187,14 +248,20 @@ public class ScriptResultTest {
 	}
 
 	@Test
-	public void hasException() {
+	@DisplayName("hasException() == true when exception is present")
+	public void hasException_true_when_exception_is_present() {
 		final ScriptResult result = new ScriptResult();
-		assertFalse(result.hasException());
-
-		result.setResult(RESULT);
-		assertFalse(result.hasException());
 
 		result.setException(EXCEPTION);
 		assertTrue(result.hasException());
+	}
+
+	@Test
+	@DisplayName("hasException() == false when result is present")
+	public void hasException_false_when_result_is_present() {
+		final ScriptResult result = new ScriptResult();
+
+		result.setResult(RESULT);
+		assertFalse(result.hasException());
 	}
 }

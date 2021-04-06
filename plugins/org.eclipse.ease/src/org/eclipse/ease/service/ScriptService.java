@@ -36,7 +36,6 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineLaunchExtension;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
-import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.modules.ModuleCategoryDefinition;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.tools.ResourceTools;
@@ -44,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
-public class ScriptService implements IScriptService, BundleListener, IExecutionListener {
+public final class ScriptService implements IScriptService, BundleListener, IExecutionListener {
 
 	private static final String ENGINE = "engine";
 
@@ -398,12 +397,7 @@ public class ScriptService implements IScriptService, BundleListener, IExecution
 				// no file available, try to include to resolve URIs
 				scriptObject = "include(\"" + scriptLocation + "\")";
 
-			final ScriptResult scriptResult = engine.executeSync(scriptObject);
-
-			if (scriptResult.hasException())
-				throw scriptResult.getException();
-
-			return scriptResult.getResult();
+			return engine.executeSync(scriptObject).get();
 		}
 
 		throw new IllegalArgumentException("Cannot locate a matching script engine");

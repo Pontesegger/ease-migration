@@ -36,57 +36,14 @@ public class ScriptResult implements Future<Object> {
 	private boolean fIsDone = false;
 
 	/**
-	 * Constructor of a pending execution.
-	 */
-	public ScriptResult() {
-	}
-
-	/**
-	 * Verify that this ScriptResult is processed. If the result is ready, execution of the underlying script is done.
-	 *
-	 * @return true when processing is done
-	 */
-	public final synchronized boolean isReady() {
-		return fIsDone;
-	}
-
-	/**
-	 * Blocks execution until the execution result is ready.
-	 *
-	 * @throws InterruptedException
-	 *             when waiting got interrupted externally
-	 */
-	public final synchronized void waitForResult() throws InterruptedException {
-		if (!isReady())
-			wait();
-	}
-
-	/**
-	 * Blocks execution until the execution result is ready or the timeout is reached. Once this method returns you still need to query {@link #isReady()} as
-	 * the timeout might have depleted.
-	 *
-	 * @param timeout
-	 *            the maximum time to wait in milliseconds.
-	 * @throws InterruptedException
-	 *             when waiting got interrupted externally
-	 * @throws TimeoutException
-	 *             when result is not ready after timeout
-	 */
-	public final synchronized void waitForResult(long timeout) throws InterruptedException, TimeoutException {
-		if (!isReady())
-			wait(Math.max(0, timeout));
-
-		if (!isReady())
-			throw new TimeoutException(String.format("Result not ready after %d milliseconds", timeout));
-	}
-
-	/**
 	 * Get the result value stored.
 	 *
 	 * @return result value
 	 */
-	public final synchronized Object getResult() {
-		return fResult;
+	public final Object getResult() {
+		synchronized (this) {
+			return fResult;
+		}
 	}
 
 	/**
@@ -95,11 +52,16 @@ public class ScriptResult implements Future<Object> {
 	 * @param result
 	 *            object to be stored
 	 */
-	public final synchronized void setResult(final Object result) {
-		fResult = result;
-		fIsDone = true;
+	public final void setResult(final Object result) {
+		synchronized (this) {
+			if (isDone())
+				throw new IllegalArgumentException("ScriptResult already completed");
 
-		notifyAll();
+			fResult = result;
+			fIsDone = true;
+
+			notifyAll();
+		}
 	}
 
 	/**
@@ -108,11 +70,16 @@ public class ScriptResult implements Future<Object> {
 	 * @param e
 	 *            exception to be stored
 	 */
-	public final synchronized void setException(final ScriptExecutionException e) {
-		fException = e;
-		fIsDone = true;
+	public final void setException(final ScriptExecutionException e) {
+		synchronized (this) {
+			if (isDone())
+				throw new IllegalArgumentException("ScriptResult already completed");
 
-		notifyAll();
+			fException = e;
+			fIsDone = true;
+
+			notifyAll();
+		}
 	}
 
 	/**
@@ -120,16 +87,21 @@ public class ScriptResult implements Future<Object> {
 	 *
 	 * @return stored exception or null
 	 */
-	public final synchronized ScriptExecutionException getException() {
-		return fException;
+	public final ScriptExecutionException getException() {
+		synchronized (this) {
+			return fException;
+		}
 	}
 
 	@Override
 	public final String toString() {
-		if (fException != null)
-			return "Exception: " + fException.getLocalizedMessage();
+		try {
+			final Object result = get();
+			return ((result == null) ? "[null]" : fResult.toString());
 
-		return ((fResult != null) ? fResult.toString() : "[null]");
+		} catch (InterruptedException | ExecutionException e) {
+			return "Exception: " + e.getLocalizedMessage();
+		}
 	}
 
 	/**
@@ -137,8 +109,10 @@ public class ScriptResult implements Future<Object> {
 	 *
 	 * @return true when this result contains an exception
 	 */
-	public final synchronized boolean hasException() {
-		return (fException != null);
+	public final boolean hasException() {
+		synchronized (this) {
+			return (fException != null);
+		}
 	}
 
 	@Override
@@ -153,7 +127,9 @@ public class ScriptResult implements Future<Object> {
 
 	@Override
 	public boolean isDone() {
-		return isReady();
+		synchronized (this) {
+			return fIsDone;
+		}
 	}
 
 	@Override
@@ -174,5 +150,27 @@ public class ScriptResult implements Future<Object> {
 			throw getException();
 
 		return getResult();
+	}
+
+	public Object get(long milliSeconds) throws InterruptedException, ExecutionException, TimeoutException {
+		return get(milliSeconds, TimeUnit.MILLISECONDS);
+	}
+
+	private void waitForResult() throws InterruptedException {
+		synchronized (this) {
+			while (!isDone())
+				wait();
+		}
+	}
+
+	private void waitForResult(long milliseconds) throws InterruptedException, TimeoutException {
+		final long waitUntil = System.currentTimeMillis() + milliseconds;
+		synchronized (this) {
+			while (!isDone() && (System.currentTimeMillis() < waitUntil))
+				wait(waitUntil - System.currentTimeMillis());
+
+			if (!isDone())
+				throw new TimeoutException(String.format("Result not ready after %d milliseconds", milliseconds));
+		}
 	}
 }
