@@ -25,7 +25,7 @@ import org.eclipse.ease.service.ScriptType;
  */
 public interface ICompletionContext {
 
-	public enum Type {
+	enum Type {
 		UNKNOWN, NONE, STATIC_CLASS, CLASS_INSTANCE, PACKAGE, STRING_LITERAL
 	};
 

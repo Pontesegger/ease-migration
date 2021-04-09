@@ -34,7 +34,7 @@ public class DelegatingJarClassLoader extends ClassLoader {
 		if (fURLClassLoader != null) {
 			try {
 				return fURLClassLoader.loadClass(name);
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				// ignore, class not found in registered JARs
 			}
 		}
@@ -54,12 +54,12 @@ public class DelegatingJarClassLoader extends ClassLoader {
 			fURLClassLoader = URLClassLoader.newInstance(new URL[] { url });
 
 		else {
-			URL[] registeredURLs = fURLClassLoader.getURLs();
-			List<URL> urlList = Arrays.asList(registeredURLs);
+			final URL[] registeredURLs = fURLClassLoader.getURLs();
+			final List<URL> urlList = Arrays.asList(registeredURLs);
 
 			if (!urlList.contains(url)) {
 				// new URL, add to list
-				URL[] updatedURLs = Arrays.copyOf(registeredURLs, registeredURLs.length + 1);
+				final URL[] updatedURLs = Arrays.copyOf(registeredURLs, registeredURLs.length + 1);
 				updatedURLs[updatedURLs.length - 1] = url;
 				fURLClassLoader = URLClassLoader.newInstance(updatedURLs);
 			}

@@ -26,13 +26,13 @@ public interface ICodeFactory {
 	String RESULT_NAME = "__result";
 
 	/** Trace enablement for module wrappers. */
-	boolean TRACE_MODULE_WRAPPER = org.eclipse.ease.Activator.getDefault().isDebugging()
+	boolean TRACE_MODULE_WRAPPER = Activator.getDefault().isDebugging()
 			&& "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.ease/debug/moduleWrapper"));
 
 	/**
 	 * Parameter definition class. Holds data to describe a script parameter used in a function call.
 	 */
-	public class Parameter {
+	class Parameter {
 
 		private Class<?> fClazz;
 		private String fName = "";
@@ -105,13 +105,13 @@ public interface ICodeFactory {
 	String createFunctionCall(Method method, Object... parameters);
 
 	/**
-	 * Get the default value for a given parameter
+	 * Get the default value for a given parameter.
 	 *
 	 * @param parameter
 	 *            parameter to get default value for
 	 * @return String representation of default value
 	 */
-	String getDefaultValue(final Parameter parameter);
+	String getDefaultValue(Parameter parameter);
 
 	/**
 	 * Create code for the provided comment. Typically line or block comment tokens will be added around the comment. Start block comment token will be added

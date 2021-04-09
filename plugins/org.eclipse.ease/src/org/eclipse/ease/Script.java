@@ -39,7 +39,7 @@ public class Script {
 	/** Script title (optional). */
 	private final String fTitle;
 
-	/** Interactive/shell originated script piece */
+	/** Interactive/shell originated script piece. */
 	private final boolean fIsShell;
 
 	/**

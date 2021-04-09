@@ -22,22 +22,22 @@ public interface ICodeParser {
 
 	/**
 	 * Parses the file for a comment section at the beginning.
-	 * 
+	 *
 	 * @param stream
 	 *            code content stream
 	 * @return comment data without decoration characters (eg: '*' at beginning of each line)
 	 */
-	String getHeaderComment(final InputStream stream);
+	String getHeaderComment(InputStream stream);
 
 	/**
 	 * Verify if a line of code is accepted before the header comment section. This allows special magic tokens to be placed before the header comment as some
 	 * script languages depend on that.
-	 * 
+	 *
 	 * @param line
 	 *            line of code
 	 * @return <code>true</code> when line is accepted before the comment header
 	 */
-	boolean isAcceptedBeforeHeader(final String line);
+	boolean isAcceptedBeforeHeader(String line);
 
 	/**
 	 * Parse the given piece of code into a language specific {@link ICompletionContext}.

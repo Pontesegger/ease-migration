@@ -46,11 +46,11 @@ public final class ContributionTools {
 		if (!iconPath.matches("\\p{Alpha}[\\p{Alnum}+.-]*:.*")) { //$NON-NLS-1$
 			// First attempt to resolve in ISharedImages (e.g. "IMG_OBJ_FOLDER")
 			// as per bug 391232 & AbstractUIPlugin.imageDescriptorFromPlugin().
-			ImageDescriptor d = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(iconPath);
+			final ImageDescriptor d = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(iconPath);
 			if (d != null)
 				return d;
 
-			String extendingPluginId = element.getDeclaringExtension().getContributor().getName();
+			final String extendingPluginId = element.getDeclaringExtension().getContributor().getName();
 			iconPath = "platform:/plugin/" + extendingPluginId + "/" + iconPath; //$NON-NLS-1$//$NON-NLS-2$
 		}
 		URL url = null;
@@ -61,7 +61,7 @@ public final class ContributionTools {
 
 				return ImageDescriptor.createFromURL(url);
 			}
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			/* IGNORE */
 		}
 
@@ -70,7 +70,7 @@ public final class ContributionTools {
 
 	/**
 	 * Rewrite certain types of URLs to more durable forms, as these URLs may may be persisted in the model.
-	 * 
+	 *
 	 * @param url
 	 *            the url
 	 * @return the rewritten URL
@@ -85,20 +85,20 @@ public final class ContributionTools {
 			return url;
 		}
 
-		BundleContext ctxt = FrameworkUtil.getBundle(IViewRegistry.class).getBundleContext();
+		final BundleContext ctxt = FrameworkUtil.getBundle(IViewRegistry.class).getBundleContext();
 		try {
-			URI uri = url.toURI();
-			String host = uri.getHost();
-			String bundleId = host.substring(0, host.indexOf('.'));
-			Bundle bundle = ctxt.getBundle(Long.parseLong(bundleId));
-			StringBuilder builder = new StringBuilder("platform:/plugin/"); //$NON-NLS-1$
+			final URI uri = url.toURI();
+			final String host = uri.getHost();
+			final String bundleId = host.substring(0, host.indexOf('.'));
+			final Bundle bundle = ctxt.getBundle(Long.parseLong(bundleId));
+			final StringBuilder builder = new StringBuilder("platform:/plugin/"); //$NON-NLS-1$
 			builder.append(bundle.getSymbolicName());
 			builder.append(uri.getPath());
 			return new URL(builder.toString());
 
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			/* IGNORE */
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			/* IGNORE */
 		}
 

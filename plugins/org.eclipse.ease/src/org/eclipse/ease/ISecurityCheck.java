@@ -16,7 +16,7 @@ package org.eclipse.ease;
  */
 public interface ISecurityCheck {
 
-	public enum ActionType {
+	enum ActionType {
 		INJECT_CODE // called before code fragments get executed
 	}
 

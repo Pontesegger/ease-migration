@@ -55,12 +55,12 @@ public interface IDebugEngine extends IScriptEngine {
 	 *
 	 * @param name
 	 *            variable to be removed.
-	 * @return
+	 * @return variable content
 	 */
-	Object removeVariable(final String name);
+	Object removeVariable(String name);
 
 	/**
-	 * Get variables within a specific scope or child elements for a given object
+	 * Get variables within a specific scope or child elements for a given object.
 	 *
 	 * @param scope
 	 *            scope or parent object

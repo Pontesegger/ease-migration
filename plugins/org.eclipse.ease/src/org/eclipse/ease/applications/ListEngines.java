@@ -22,8 +22,8 @@ public class ListEngines implements IApplication {
 	public Object start(final IApplicationContext context) throws Exception {
 		System.out.println("Name: engineID");
 		System.out.println("==============");
-		IScriptService service = ScriptService.getService();
-		for (EngineDescription description : service.getEngines())
+		final IScriptService service = ScriptService.getService();
+		for (final EngineDescription description : service.getEngines())
 			System.out.println("\t" + description.getName() + ": " + description.getID());
 
 		return 0;

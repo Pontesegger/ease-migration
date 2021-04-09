@@ -17,7 +17,12 @@ import org.eclipse.core.runtime.Status;
 /**
  * Global Logger implementation for EASE. Provides means to log errors, warnings, infos and to create trace output.
  */
-public class Logger {
+public final class Logger {
+
+	@Deprecated
+	private Logger() {
+		// do not use
+	}
 
 	/**
 	 * Log an error.

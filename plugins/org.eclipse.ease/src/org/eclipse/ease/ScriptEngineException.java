@@ -18,38 +18,18 @@ public class ScriptEngineException extends Exception {
 
 	private static final long serialVersionUID = -4763996831240579435L;
 
-	/**
-	 * @see Exception#Exception()
-	 */
 	public ScriptEngineException() {
 	}
 
-	/**
-	 * @see Exception#Exception(String)
-	 */
 	public ScriptEngineException(String message) {
 		super(message);
 	}
 
-	/**
-	 * @see Exception#Exception(Throwable)
-	 */
 	public ScriptEngineException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * @see Exception#Exception(String, Throwable)
-	 */
 	public ScriptEngineException(String message, Throwable cause) {
 		super(message, cause);
 	}
-
-	/**
-	 * @see Exception#Exception(String, Throwable, boolean, boolean)
-	 */
-	protected ScriptEngineException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
-
 }

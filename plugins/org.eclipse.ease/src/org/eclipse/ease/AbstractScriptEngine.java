@@ -103,7 +103,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	private boolean fCloseStreamsOnTerminate;
 
 	/** Registered security checks for engine actions. */
-	private final HashMap<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();
+	private final Map<ActionType, List<ISecurityCheck>> fSecurityChecks = new HashMap<>();
 
 	private Object fExecutionRootFile;;
 
