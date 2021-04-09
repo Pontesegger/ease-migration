@@ -16,10 +16,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.Logger;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.modules.ModuleHelper;
@@ -27,7 +29,7 @@ import org.eclipse.ease.tools.StringTools;
 
 public class PythonCodeFactory extends AbstractCodeFactory {
 
-	public static List<String> RESERVED_KEYWORDS = new ArrayList<>();
+	public static final List<String> RESERVED_KEYWORDS = new ArrayList<>();
 
 	/**
 	 * List of Java primitive types as they need to be handled differently from normal classes when getting their py4j representation.
@@ -157,7 +159,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 	private static String toSafeNameStatic(String name) {
 		while (RESERVED_KEYWORDS.contains(name))
-			name = name + "_";
+			return toSafeNameStatic(name + "_");
 
 		return name;
 	}
@@ -315,7 +317,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	private String buildMethodBody(List<Parameter> parameters, Method method, String classIdentifier, IEnvironment environment) {
 		final StringBuilder body = new StringBuilder();
 
-		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
+		final String methodId = environment.registerMethod(method);
 
 		// insert deprecation warnings
 		if (ModuleHelper.isDeprecated(method))
@@ -329,12 +331,13 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 		body.append(buildNumberConversions(parameters)).append(StringTools.LINE_DELIMITER);
 
 		// check for callbacks
-		body.append("if not ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\"):")
-				.append(StringTools.LINE_DELIMITER);
+		body.append(String.format("if not %s.hasMethodCallback(\"%s\"):%n", EnvironmentModule.getWrappedVariableName(environment), methodId));
+		if (Objects.equals(Void.TYPE, method.getReturnType())) {
+			body.append(String.format("    %s.%s(%s)%n", classIdentifier, method.getName(), buildParameterList(parameters)));
+			body.append(String.format("    return %s.VOID%n", ScriptResult.class.getName()));
+		} else
+			body.append(String.format("    return %s.%s(%s)%n", classIdentifier, method.getName(), buildParameterList(parameters)));
 
-		// simple execution
-		body.append("    return ").append(classIdentifier).append(".").append(method.getName()).append("(").append(buildParameterList(parameters)).append(")")
-				.append(StringTools.LINE_DELIMITER);
 		body.append(StringTools.LINE_DELIMITER);
 
 		// execution with callbacks
@@ -364,7 +367,11 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 				.append(buildParameterList(parameters)).append(")").append(StringTools.LINE_DELIMITER);
 		body.append("    ").append(EnvironmentModule.getWrappedVariableName(environment)).append(".postMethodCallback(\"").append(methodId).append("\"")
 				.append(", ").append(RESULT_NAME).append(")").append(StringTools.LINE_DELIMITER);
-		body.append("    return ").append(RESULT_NAME).append(StringTools.LINE_DELIMITER);
+
+		if (Objects.equals(Void.TYPE, method.getReturnType())) {
+			body.append(String.format("    return %s.VOID%n", ScriptResult.class.getName()));
+		} else
+			body.append(String.format("    return %s%n", RESULT_NAME));
 
 		return body.toString();
 	}
@@ -444,7 +451,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	 *            instance identifier to be used
 	 * @return wrapper code to be loaded by python
 	 */
-	public String createPep302WrapperCode(IEnvironment environment, Object instance, String identifier) {
+	public String createPep302WrapperCode(EnvironmentModule environment, Object instance, String identifier) {
 		return createWrapper(environment, instance, identifier, false, environment.getScriptEngine());
 	}
 }

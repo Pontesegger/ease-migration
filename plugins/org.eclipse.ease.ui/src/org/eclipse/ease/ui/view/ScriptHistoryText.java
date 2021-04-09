@@ -254,43 +254,45 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 		final String message = getResultMessage(result);
 		final Image image = getResultImage(result);
 
-		// // print to output pane
-		Display.getDefault().asyncExec(() -> {
-			// indent message
-			final String out = message.replaceAll("\\r?\\n", "\n\t");
+		if (message != null) {
+			// // print to output pane
+			Display.getDefault().asyncExec(() -> {
+				// indent message
+				final String out = message.replaceAll("\\r?\\n", "\n\t");
 
-			if (!isDisposed()) {
+				if (!isDisposed()) {
 
-				// append image
-				if (image != null) {
-					append("\n   "); // dummy character to be replaced by image
+					// append image
+					if (image != null) {
+						append("\n   "); // dummy character to be replaced by image
 
-					final StyleRange styleRange = new StyleRange();
-					styleRange.start = getText().length() - 1;
-					styleRange.length = 1;
-					styleRange.data = image;
-					final Rectangle rect = image.getBounds();
-					styleRange.metrics = new GlyphMetrics(rect.height, 0, rect.width);
+						final StyleRange styleRange = new StyleRange();
+						styleRange.start = getText().length() - 1;
+						styleRange.length = 1;
+						styleRange.data = image;
+						final Rectangle rect = image.getBounds();
+						styleRange.metrics = new GlyphMetrics(rect.height, 0, rect.width);
 
-					setStyleRange(styleRange);
-				} else
-					append("\n\t");
+						setStyleRange(styleRange);
+					} else
+						append("\n\t");
 
-				// append message
-				append(out);
+					// append message
+					append(out);
 
-				try {
-					result.get();
-					setStyleRange(getStyle(STYLE_RESULT, getText().length() - out.length(), out.length()));
+					try {
+						result.get();
+						setStyleRange(getStyle(STYLE_RESULT, getText().length() - out.length(), out.length()));
 
-				} catch (final ExecutionException e) {
-					setStyleRange(getStyle(STYLE_ERROR, getText().length() - out.length(), out.length()));
+					} catch (final ExecutionException e) {
+						setStyleRange(getStyle(STYLE_ERROR, getText().length() - out.length(), out.length()));
+					}
+
+					// scroll to end of window
+					scrollToEnd();
 				}
-
-				// scroll to end of window
-				scrollToEnd();
-			}
-		});
+			});
+		}
 	}
 
 	/**
