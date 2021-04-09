@@ -32,8 +32,8 @@ public class ScriptModeEngineTest extends ModeTestBase {
 		final ScriptResult result = super.executeCode(code, false);
 		assertNotNull(result);
 		assertNull(result.getException());
-		assertNotNull(result.getResult());
-		assertEquals(target, result.getResult());
+		assertNotNull(result.get());
+		assertEquals(target, result.get());
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class ScriptModeEngineTest extends ModeTestBase {
 		final ScriptResult result = executeCode("def a():");
 		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
-		assertNull(result.getResult());
+		assertNull(result.get());
 	}
 
 	@Test

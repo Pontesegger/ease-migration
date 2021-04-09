@@ -33,17 +33,17 @@ public class Py4JEngineTest extends Py4JEngineTestBase {
 		// try to use each function from the other mode
 		final ScriptResult resultScript_a = executeCode("a(20)", false);
 		assertNull(resultScript_a.getException());
-		assertEquals(21, resultScript_a.getResult());
+		assertEquals(21, resultScript_a.get());
 		final ScriptResult resultScript_b = executeCode("b(10)", false);
 		assertNull(resultScript_b.getException());
-		assertEquals(12, resultScript_b.getResult());
+		assertEquals(12, resultScript_b.get());
 
 		final ScriptResult result21 = executeCode("a(20)", true);
 		assertNull(result21.getException());
-		assertEquals(21, result21.getResult());
+		assertEquals(21, result21.get());
 		final ScriptResult result22 = executeCode("b(20)", true);
 		assertNull(result22.getException());
-		assertEquals(22, result22.getResult());
+		assertEquals(22, result22.get());
 	}
 
 	/**

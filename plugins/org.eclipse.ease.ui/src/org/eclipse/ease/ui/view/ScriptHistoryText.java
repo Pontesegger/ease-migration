@@ -73,7 +73,7 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 		private boolean fRun;
 		private volatile boolean fStarted;
 
-		public BlendBackgroundJob() {
+		BlendBackgroundJob() {
 			super("Darken Script Shell background");
 			setSystem(true);
 		}
@@ -334,10 +334,10 @@ public class ScriptHistoryText extends StyledText implements IExecutionListener 
 	 */
 	private Image getResultImage(ScriptResult result) {
 		try {
-			result.get(); // fetch result to provoke exception check
+			final Object scriptResult = result.get(); // fetch result to provoke exception check
 
 			if (fCurrentEngine != null) {
-				final ScriptObjectType type = fCurrentEngine.getType(result.getResult());
+				final ScriptObjectType type = fCurrentEngine.getType(scriptResult);
 				return getImage(type);
 			}
 

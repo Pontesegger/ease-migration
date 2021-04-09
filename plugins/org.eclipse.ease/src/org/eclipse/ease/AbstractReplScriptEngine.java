@@ -235,7 +235,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 					return new EaseDebugLastExecutionResult("no method return value", ScriptResult.VOID, "");
 
 				} else {
-					final EaseDebugVariable variable = createVariable("script returned", fLastExecutionResult.getResult());
+					final EaseDebugVariable variable = createVariable("script returned", result);
 					return new EaseDebugLastExecutionResult(variable);
 				}
 

@@ -45,8 +45,8 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 		final ScriptResult result = executeCode(line, true);
 		if (expectMore) {
 			assertNull(result.getException());
-			assertTrue(result.getResult() instanceof String);
-			assertTrue(result.getResult().toString().startsWith("..."));
+			assertTrue(result.get() instanceof String);
+			assertTrue(result.get().toString().startsWith("..."));
 		}
 		return result;
 	}

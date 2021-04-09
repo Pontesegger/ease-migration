@@ -36,17 +36,6 @@ public class ScriptResult implements Future<Object> {
 	private boolean fIsDone = false;
 
 	/**
-	 * Get the result value stored.
-	 *
-	 * @return result value
-	 */
-	public final Object getResult() {
-		synchronized (this) {
-			return fResult;
-		}
-	}
-
-	/**
 	 * Set the result to be stored.
 	 *
 	 * @param result
@@ -136,9 +125,6 @@ public class ScriptResult implements Future<Object> {
 	public Object get() throws ExecutionException {
 		waitForResult();
 
-		if (hasException())
-			throw getException();
-
 		return getResult();
 	}
 
@@ -146,10 +132,16 @@ public class ScriptResult implements Future<Object> {
 	public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 		waitForResult(unit.toMillis(timeout));
 
+		return getResult();
+	}
+
+	private Object getResult() throws ScriptExecutionException {
 		if (hasException())
 			throw getException();
 
-		return getResult();
+		synchronized (this) {
+			return fResult;
+		}
 	}
 
 	public Object get(long milliSeconds) throws InterruptedException, ExecutionException, TimeoutException {

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -117,12 +118,12 @@ public class ScriptTest {
 	}
 
 	@Test
-	public void getResult() {
+	public void getResult() throws ExecutionException {
 		final Script script = new Script(fFile);
 		assertNotNull(script.getResult());
 
 		script.setResult("result");
-		assertEquals("result", script.getResult().getResult());
+		assertEquals("result", script.getResult().get());
 	}
 
 	@Test

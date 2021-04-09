@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -144,7 +144,7 @@ public class AbstractScriptEngineTest {
 
 	@Test
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
-	public void executeValidCodeAndTerminate() throws InterruptedException {
+	public void executeValidCodeAndTerminate() throws ExecutionException, InterruptedException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
@@ -158,19 +158,15 @@ public class AbstractScriptEngineTest {
 		assertEquals("12", bos.toString());
 
 		assertTrue(result1.isDone());
-		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
-		assertFalse(result1.hasException());
-		assertNull(result1.getException());
+		assertEquals(VALID_SAMPLE_CODE, result1.get());
 
 		assertTrue(result2.isDone());
-		assertEquals("2", result2.getResult());
-		assertFalse(result2.hasException());
-		assertNull(result2.getException());
+		assertEquals("2", result2.get());
 	}
 
 	@Test
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
-	public void executeErrorCodeAndTerminate() throws InterruptedException {
+	public void executeErrorCodeAndTerminate() throws InterruptedException, ExecutionException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
@@ -184,19 +180,14 @@ public class AbstractScriptEngineTest {
 		assertEquals(VALID_SAMPLE_CODE, bos.toString());
 
 		assertTrue(result1.isDone());
-		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
-		assertFalse(result1.hasException());
-		assertNull(result1.getException());
+		assertEquals(VALID_SAMPLE_CODE, result1.get());
 
-		assertTrue(result2.isDone());
-		assertNull(result2.getResult());
-		assertTrue(result2.hasException());
-		assertNotNull(result2.getException());
+		assertThrows(ScriptExecutionException.class, () -> result2.get());
 	}
 
 	@Test
 	@Timeout(value = 3, unit = TimeUnit.SECONDS)
-	public void executeSync() throws InterruptedException {
+	public void executeSync() throws InterruptedException, ExecutionException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		fTestEngine.setOutputStream(bos);
 
@@ -209,9 +200,7 @@ public class AbstractScriptEngineTest {
 		assertEquals(VALID_SAMPLE_CODE, bos.toString());
 
 		assertTrue(result1.isDone());
-		assertEquals(VALID_SAMPLE_CODE, result1.getResult());
-		assertFalse(result1.hasException());
-		assertNull(result1.getException());
+		assertEquals(VALID_SAMPLE_CODE, result1.get());
 	}
 
 	@Test
@@ -256,10 +245,9 @@ public class AbstractScriptEngineTest {
 
 		assertFalse(bos.toString().contains("Loop 100"));
 
-		assertTrue(scriptResult.isDone());
-		assertNull(scriptResult.getResult());
-		assertTrue(scriptResult.hasException());
-		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
+		final ScriptResult result = scriptResult;
+		assertTrue(result.isDone());
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 	}
 
 	@Test
@@ -291,10 +279,9 @@ public class AbstractScriptEngineTest {
 
 		assertFalse(bos.toString().contains("Loop 100"));
 
-		assertTrue(scriptResult.isDone(), "result " + scriptResult.hashCode() + " is not ready");
-		assertNull(scriptResult.getResult());
-		assertTrue(scriptResult.hasException());
-		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
+		final ScriptResult result = scriptResult;
+		assertTrue(result.isDone(), "result " + scriptResult.hashCode() + " is not ready");
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 	}
 
 	@Test
@@ -319,10 +306,9 @@ public class AbstractScriptEngineTest {
 
 		assertTrue(bos.toString().isEmpty());
 
-		assertTrue(scriptResult.isDone());
-		assertNull(scriptResult.getResult());
-		assertTrue(scriptResult.hasException());
-		assertEquals(ScriptExecutionException.class, scriptResult.getException().getClass());
+		final ScriptResult result = scriptResult;
+		assertTrue(result.isDone(), "result " + scriptResult.hashCode() + " is not ready");
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 	}
 
 	@Test

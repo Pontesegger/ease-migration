@@ -29,9 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public abstract class ModeTestBase extends Py4JEngineTestBase {
-	abstract protected ScriptResult executeCode(String code) throws Exception;
+	protected abstract ScriptResult executeCode(String code) throws Exception;
 
-	abstract protected void executeCode(String code, Object result) throws Exception;
+	protected abstract void executeCode(String code, Object result) throws Exception;
 
 	@BeforeEach
 	public void loadModules() throws Exception {
@@ -94,9 +94,9 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		final ScriptResult result = executeCode("object()", false);
 		assertNotNull(result);
 		assertNull(result.getException());
-		assertNotNull(result.getResult());
-		assertTrue(result.getResult() instanceof String);
-		assertTrue(result.getResult().toString().startsWith("<object object at "));
+		assertNotNull(result.get());
+		assertTrue(result.get() instanceof String);
+		assertTrue(result.get().toString().startsWith("<object object at "));
 	}
 
 	@Test
@@ -113,8 +113,8 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		final ScriptResult result = executeCode("Foo()");
 		assertNotNull(result);
 		assertNull(result.getException());
-		assertNotNull(result.getResult());
-		assertTrue(result.getResult() instanceof IScriptable);
+		assertNotNull(result.get());
+		assertTrue(result.get() instanceof IScriptable);
 	}
 
 	@Test
@@ -167,10 +167,10 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		final ScriptResult result = executeCode("longArray([1, 2])", false);
 		assertNotNull(result);
 		assertNull(result.getException());
-		assertNotNull(result.getResult());
+		assertNotNull(result.get());
 
 		// FIXME: Different behavior between Python 2 and 3
-		assertEquals(new Long(3), Long.valueOf(result.getResult().toString()));
+		assertEquals(new Long(3), Long.valueOf(result.get().toString()));
 	}
 
 	@Test

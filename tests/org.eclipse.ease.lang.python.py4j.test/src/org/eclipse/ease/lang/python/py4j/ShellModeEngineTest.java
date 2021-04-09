@@ -33,15 +33,15 @@ public class ShellModeEngineTest extends ModeTestBase {
 		final ScriptResult result = super.executeCode(code, true);
 		assertNotNull(result);
 		assertNull(result.getException());
-		assertNotNull(result.getResult());
-		assertEquals(target, result.getResult());
+		assertNotNull(result.get());
+		assertEquals(target, result.get());
 	}
 
 	@Test
 	public void callModuleCode() throws Exception {
 		final ScriptResult result = executeCode("exit(\"done\")");
 		assertNull(result.getException());
-		assertEquals("done", result.getResult());
+		assertEquals("done", result.get());
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 	public void getScriptEngine() throws Exception {
 		final ScriptResult result = executeCode("getScriptEngine()");
 		assertNull(result.getException());
-		assertSame(fEngine, result.getResult());
+		assertSame(fEngine, result.get());
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 		// assertResultIsNone(push("", false));final
 		final ScriptResult result = push("a()", false);
 		assertNull(result.getException());
-		assertEquals(42, result.getResult());
+		assertEquals(42, result.get());
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 		final ScriptResult result = executeCode("1++");
 		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
-		assertNull(result.getResult());
+		assertNull(result.get());
 	}
 
 	@Test
@@ -113,6 +113,6 @@ public class ShellModeEngineTest extends ModeTestBase {
 		final ScriptResult result = executeCode("x");
 		assertNotNull(result.getException());
 		assertTrue(fErrorStream.getAndClearOutput().contains("NameError"));
-		assertNull(result.getResult());
+		assertNull(result.get());
 	}
 }

@@ -2,7 +2,6 @@ package org.eclipse.ease;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -230,20 +229,10 @@ public class ScriptResultTest {
 	}
 
 	@Test
-	public void getResult() {
-		final ScriptResult result = new ScriptResult();
-		result.setResult(RESULT);
-
-		assertEquals(RESULT, result.getResult());
-		assertNull(result.getException());
-	}
-
-	@Test
 	public void getException() {
 		final ScriptResult result = new ScriptResult();
 		result.setException(EXCEPTION);
 
-		assertNull(result.getResult());
 		assertEquals(EXCEPTION, result.getException());
 	}
 

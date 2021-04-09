@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -290,8 +291,13 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 		if (!getTerminateOnIdle()) {
 			// high probability to run in interactive shell mode
 
-			if (IExecutionListener.SCRIPT_END == status)
-				setVariable("_", script.getResult().getResult());
+			if (IExecutionListener.SCRIPT_END == status) {
+				try {
+					setVariable("_", script.getResult().get());
+				} catch (final ExecutionException e) {
+					setVariable("_", e.getCause());
+				}
+			}
 		}
 
 		super.notifyExecutionListeners(script, status);

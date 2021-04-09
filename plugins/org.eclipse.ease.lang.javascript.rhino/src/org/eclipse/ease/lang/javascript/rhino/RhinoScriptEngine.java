@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.IExecutionListener;
@@ -617,8 +618,13 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		if (!getTerminateOnIdle()) {
 			// high probability to run in interactive shell mode
 
-			if (IExecutionListener.SCRIPT_END == status)
-				setVariable("_", script.getResult().getResult());
+			if (IExecutionListener.SCRIPT_END == status) {
+				try {
+					setVariable("_", script.getResult().get());
+				} catch (final ExecutionException e) {
+					setVariable("_", e.getCause());
+				}
+			}
 		}
 
 		super.notifyExecutionListeners(script, status);
