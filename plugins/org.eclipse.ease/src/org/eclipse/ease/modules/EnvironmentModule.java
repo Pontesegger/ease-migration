@@ -53,14 +53,11 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	public static final String MODULE_NAME = "/System/Environment";
 
-	public static final String EASE_CODE_PREFIX = "__EASE_";
-	public static final String MODULE_PREFIX = EASE_CODE_PREFIX + "MOD_";
-
 	private static final Pattern VALID_TOPICS_PATTERN = Pattern.compile("[\\w ]+(?:\\(\\))?");
 
 	public static void bootstrap() throws ExecutionException {
 		final ModuleDefinition definition = ModuleHelper.resolveModuleName(MODULE_NAME);
-		final EnvironmentModule instance = (EnvironmentModule) definition.createModuleInstance();
+		final IEnvironment instance = (IEnvironment) definition.createModuleInstance();
 
 		instance.initialize(AbstractScriptEngine.getCurrentScriptEngine(), instance);
 
@@ -628,6 +625,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		}
 	}
 
+	@Override
 	public String registerMethod(Method method) {
 		final String key = Integer.toString(method.toString().hashCode());
 		fRegisteredMethods.put(key, method);

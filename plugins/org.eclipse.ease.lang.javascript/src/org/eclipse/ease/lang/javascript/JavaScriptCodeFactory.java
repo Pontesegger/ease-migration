@@ -177,7 +177,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
 		final StringBuilder scriptCode = new StringBuilder();
 
-		scriptCode.append(EnvironmentModule.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
+		scriptCode.append(IEnvironment.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
 		scriptCode.append("\tjavaInstance: ").append(identifier).append(',').append(StringTools.LINE_DELIMITER);
 
 		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// field definitions").append(StringTools.LINE_DELIMITER);
@@ -278,7 +278,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		if (ModuleHelper.isDeprecated(method))
 			body.append("printError('" + method.getName() + "() is deprecated. Consider updating your code.', true);").append(StringTools.LINE_DELIMITER);
 
-		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
+		final String methodId = environment.registerMethod(method);
 
 		// body.append("var hasCallback = false;").append(StringTools.LINE_DELIMITER);
 		body.append("if (!").append(EnvironmentModule.getWrappedVariableName(environment)).append(".hasMethodCallback(\"").append(methodId).append("\")) {")

@@ -12,7 +12,7 @@
 package org.eclipse.ease.ui.views.shell.dropins.variables;
 
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
-import org.eclipse.ease.modules.EnvironmentModule;
+import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -20,7 +20,7 @@ public class HiddenVariablesFilter extends ViewerFilter {
 	@Override
 	public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 		if (element instanceof EaseDebugVariable)
-			return !((EaseDebugVariable) element).getName().startsWith(EnvironmentModule.EASE_CODE_PREFIX);
+			return !((EaseDebugVariable) element).getName().startsWith(IEnvironment.EASE_CODE_PREFIX);
 
 		return true;
 	}

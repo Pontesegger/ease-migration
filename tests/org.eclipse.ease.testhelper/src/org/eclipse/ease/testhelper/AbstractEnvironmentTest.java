@@ -94,7 +94,7 @@ public abstract class AbstractEnvironmentTest {
 		// execute some code to synchronize startup sequence
 		fEngine.execute(createComment("sync execution")).get();
 
-		final EnvironmentModule environment = (EnvironmentModule) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
+		final IEnvironment environment = (IEnvironment) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
 		final IModuleCallbackProvider callbackProvider = mock(IModuleCallbackProvider.class);
 
@@ -115,7 +115,7 @@ public abstract class AbstractEnvironmentTest {
 		// execute some code to synchronize startup sequence
 		fEngine.execute(createComment("sync execution")).get();
 
-		final EnvironmentModule environment = (EnvironmentModule) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
+		final IEnvironment environment = (IEnvironment) fEngine.getVariable(EnvironmentModule.getWrappedVariableName(new EnvironmentModule()));
 
 		final IModuleCallbackProvider callbackProvider = mock(IModuleCallbackProvider.class);
 

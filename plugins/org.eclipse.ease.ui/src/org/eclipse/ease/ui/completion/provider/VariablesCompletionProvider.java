@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ICompletionContext.Type;
-import org.eclipse.ease.modules.EnvironmentModule;
+import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
@@ -34,7 +34,7 @@ public class VariablesCompletionProvider extends AbstractCompletionProvider {
 	protected void prepareProposals(final ICompletionContext context) {
 		for (final Entry<String, Object> variable : context.getScriptEngine().getVariables().entrySet()) {
 			// ignore mapped modules
-			if (!variable.getKey().startsWith(EnvironmentModule.MODULE_PREFIX)) {
+			if (!variable.getKey().startsWith(IEnvironment.MODULE_PREFIX)) {
 				if (matchesFilterIgnoreCase(variable.getKey())) {
 					final String type = (variable.getValue() != null) ? variable.getValue().getClass().getSimpleName() : "null";
 					final StyledString styledString = new StyledString(variable.getKey());

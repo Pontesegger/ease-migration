@@ -11,7 +11,7 @@
 package org.eclipse.ease.lang.javascript.rhino.debugger.actions;
 
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
-import org.eclipse.ease.modules.EnvironmentModule;
+import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.jface.viewers.Viewer;
 
 public class ModuleFilterAction extends ViewFilterAction {
@@ -24,7 +24,7 @@ public class ModuleFilterAction extends ViewFilterAction {
 	@Override
 	public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 		if (element instanceof EaseDebugVariable) {
-			if (((EaseDebugVariable) element).getName().startsWith(EnvironmentModule.MODULE_PREFIX))
+			if (((EaseDebugVariable) element).getName().startsWith(IEnvironment.MODULE_PREFIX))
 				return getValue();
 		}
 

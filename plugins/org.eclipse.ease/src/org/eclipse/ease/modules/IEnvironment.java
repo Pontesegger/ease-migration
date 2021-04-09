@@ -10,13 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ease.modules;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.IScriptEngine;
 
-public interface IEnvironment {
+public interface IEnvironment extends IScriptModule {
+
+	String EASE_CODE_PREFIX = "__EASE_";
+	String MODULE_PREFIX = EASE_CODE_PREFIX + "MOD_";
 
 	static IEnvironment getEnvironment(final IScriptEngine engine) {
 		for (final Object variable : engine.getVariables().values()) {
@@ -104,4 +108,13 @@ public interface IEnvironment {
 	 *            callback provider instance
 	 */
 	void addModuleCallback(IModuleCallbackProvider callbackProvider);
+
+	/**
+	 * Register a method in the environment to allow for callbacks.
+	 *
+	 * @param method
+	 *            method to be registered
+	 * @return unique ID identifying the method
+	 */
+	String registerMethod(Method method);
 }

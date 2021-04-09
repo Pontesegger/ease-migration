@@ -55,7 +55,7 @@ public class RubyCodeFactory extends AbstractCodeFactory {
 	@Override
 	public String createFunctionWrapper(final IEnvironment environment, final String moduleVariable, final Method method) {
 
-		final String methodId = ((EnvironmentModule) environment).registerMethod(method);
+		final String methodId = environment.registerMethod(method);
 
 		final StringBuilder rubyScriptCode = new StringBuilder();
 

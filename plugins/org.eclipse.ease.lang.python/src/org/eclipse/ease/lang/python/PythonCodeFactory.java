@@ -444,7 +444,7 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	 *            instance identifier to be used
 	 * @return wrapper code to be loaded by python
 	 */
-	public String createPep302WrapperCode(EnvironmentModule environment, Object instance, String identifier) {
+	public String createPep302WrapperCode(IEnvironment environment, Object instance, String identifier) {
 		return createWrapper(environment, instance, identifier, false, environment.getScriptEngine());
 	}
 }

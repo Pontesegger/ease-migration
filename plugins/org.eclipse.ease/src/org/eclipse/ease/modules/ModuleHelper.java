@@ -168,7 +168,7 @@ public final class ModuleHelper {
 		final IScriptService scriptService = ScriptService.getService();
 
 		for (final Entry<String, Object> entry : engine.getVariables().entrySet()) {
-			if (entry.getKey().startsWith(EnvironmentModule.MODULE_PREFIX)) {
+			if (entry.getKey().startsWith(IEnvironment.MODULE_PREFIX)) {
 				final Class<? extends Object> moduleClass = entry.getValue().getClass();
 
 				for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
