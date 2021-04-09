@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.python.py4j;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.ease.IReplEngine;
@@ -44,7 +43,6 @@ public abstract class Py4JEngineTestBase extends EaseTestBase {
 	protected ScriptResult push(String line, boolean expectMore) throws Exception {
 		final ScriptResult result = executeCode(line, true);
 		if (expectMore) {
-			assertNull(result.getException());
 			assertTrue(result.get() instanceof String);
 			assertTrue(result.get().toString().startsWith("..."));
 		}

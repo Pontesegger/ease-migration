@@ -3,7 +3,7 @@ package org.eclipse.ease;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -131,6 +131,6 @@ public class ScriptTest {
 		final Script script = new Script(fFile);
 
 		script.setException(new ScriptExecutionException());
-		assertTrue(script.getResult().hasException());
+		assertThrows(ScriptExecutionException.class, () -> script.getResult().get());
 	}
 }

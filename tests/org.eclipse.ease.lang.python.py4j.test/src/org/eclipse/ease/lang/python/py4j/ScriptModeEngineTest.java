@@ -14,8 +14,10 @@ package org.eclipse.ease.lang.python.py4j;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,6 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	protected void executeCode(String code, Object target) throws Exception {
 		final ScriptResult result = super.executeCode(code, false);
 		assertNotNull(result);
-		assertNull(result.getException());
 		assertNotNull(result.get());
 		assertEquals(target, result.get());
 	}
@@ -52,7 +53,7 @@ public class ScriptModeEngineTest extends ModeTestBase {
 	@Test
 	public void incompleteStatement() throws Exception {
 		final ScriptResult result = executeCode("def a():");
-		assertNotNull(result.getException());
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.get());
 	}

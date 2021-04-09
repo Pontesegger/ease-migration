@@ -210,47 +210,4 @@ public class ScriptResultTest {
 		result.setException(EXCEPTION);
 		assertThrows(IllegalArgumentException.class, () -> result.setException(EXCEPTION));
 	}
-
-	@Test
-	public void isReady() {
-		ScriptResult result = new ScriptResult();
-		result.setResult(RESULT);
-		assertTrue(result.isDone());
-
-		result = new ScriptResult();
-		assertFalse(result.isDone());
-
-		result.setResult(RESULT);
-		assertTrue(result.isDone());
-
-		result = new ScriptResult();
-		result.setException(new ScriptExecutionException());
-		assertTrue(result.isDone());
-	}
-
-	@Test
-	public void getException() {
-		final ScriptResult result = new ScriptResult();
-		result.setException(EXCEPTION);
-
-		assertEquals(EXCEPTION, result.getException());
-	}
-
-	@Test
-	@DisplayName("hasException() == true when exception is present")
-	public void hasException_true_when_exception_is_present() {
-		final ScriptResult result = new ScriptResult();
-
-		result.setException(EXCEPTION);
-		assertTrue(result.hasException());
-	}
-
-	@Test
-	@DisplayName("hasException() == false when result is present")
-	public void hasException_false_when_result_is_present() {
-		final ScriptResult result = new ScriptResult();
-
-		result.setResult(RESULT);
-		assertFalse(result.hasException());
-	}
 }

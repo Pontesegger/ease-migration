@@ -15,8 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,6 @@ public class ShellModeEngineTest extends ModeTestBase {
 	protected void executeCode(String code, Object target) throws Exception {
 		final ScriptResult result = super.executeCode(code, true);
 		assertNotNull(result);
-		assertNull(result.getException());
 		assertNotNull(result.get());
 		assertEquals(target, result.get());
 	}
@@ -40,7 +41,6 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void callModuleCode() throws Exception {
 		final ScriptResult result = executeCode("exit(\"done\")");
-		assertNull(result.getException());
 		assertEquals("done", result.get());
 	}
 
@@ -52,7 +52,6 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void getScriptEngine() throws Exception {
 		final ScriptResult result = executeCode("getScriptEngine()");
-		assertNull(result.getException());
 		assertSame(fEngine, result.get());
 	}
 
@@ -96,14 +95,13 @@ public class ShellModeEngineTest extends ModeTestBase {
 		push("", false);
 		// assertResultIsNone(push("", false));final
 		final ScriptResult result = push("a()", false);
-		assertNull(result.getException());
 		assertEquals(42, result.get());
 	}
 
 	@Test
 	public void invalidSyntax() throws Exception {
 		final ScriptResult result = executeCode("1++");
-		assertNotNull(result.getException());
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 		assertTrue(fErrorStream.getAndClearOutput().contains("SyntaxError"));
 		assertNull(result.get());
 	}
@@ -111,7 +109,7 @@ public class ShellModeEngineTest extends ModeTestBase {
 	@Test
 	public void runtimeError() throws Exception {
 		final ScriptResult result = executeCode("x");
-		assertNotNull(result.getException());
+		assertThrows(ScriptExecutionException.class, () -> result.get());
 		assertTrue(fErrorStream.getAndClearOutput().contains("NameError"));
 		assertNull(result.get());
 	}

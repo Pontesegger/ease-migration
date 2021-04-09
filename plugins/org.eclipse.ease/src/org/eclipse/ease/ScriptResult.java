@@ -71,17 +71,6 @@ public class ScriptResult implements Future<Object> {
 		}
 	}
 
-	/**
-	 * Get the exception stored within this result.
-	 *
-	 * @return stored exception or null
-	 */
-	public final ScriptExecutionException getException() {
-		synchronized (this) {
-			return fException;
-		}
-	}
-
 	@Override
 	public final String toString() {
 		try {
@@ -90,17 +79,6 @@ public class ScriptResult implements Future<Object> {
 
 		} catch (final ExecutionException e) {
 			return "Exception: " + e.getLocalizedMessage();
-		}
-	}
-
-	/**
-	 * Checks whether this result contains an exception.
-	 *
-	 * @return true when this result contains an exception
-	 */
-	public final boolean hasException() {
-		synchronized (this) {
-			return (fException != null);
 		}
 	}
 
@@ -125,30 +103,37 @@ public class ScriptResult implements Future<Object> {
 	public Object get() throws ExecutionException {
 		waitForResult();
 
-		return getResult();
+		return getResultOrThrow();
 	}
 
 	@Override
 	public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
 		waitForResult(unit.toMillis(timeout));
 
-		return getResult();
-	}
-
-	private Object getResult() throws ScriptExecutionException {
-		if (hasException())
-			throw getException();
-
-		synchronized (this) {
-			return fResult;
-		}
+		return getResultOrThrow();
 	}
 
 	public Object get(long milliSeconds) throws InterruptedException, ExecutionException, TimeoutException {
 		return get(milliSeconds, TimeUnit.MILLISECONDS);
 	}
 
-	private void waitForResult() throws ExecutionException {
+	private Object getResultOrThrow() throws ScriptExecutionException {
+		synchronized (this) {
+			if (fException != null)
+				throw fException;
+
+			return fResult;
+		}
+	}
+
+	/**
+	 * Blocks execution until the execution result is ready.
+	 *
+	 * @deprecated use {@link #get()}
+	 */
+	@Deprecated
+	public void waitForResult() throws ExecutionException {
+		// instead of removing this method should be marked 'private'
 		synchronized (this) {
 			while (!isDone()) {
 				try {
@@ -160,7 +145,17 @@ public class ScriptResult implements Future<Object> {
 		}
 	}
 
-	private void waitForResult(long milliseconds) throws InterruptedException, TimeoutException {
+	/**
+	 * Blocks execution until the execution result is ready or the timeout is reached. Once this method returns you still need to query {@link #isReady()} as
+	 * the timeout might have depleted.
+	 *
+	 * @param milliseconds
+	 *            the maximum time to wait in milliseconds.
+	 * @deprecated use {@link #get(long, TimeUnit)}
+	 */
+	@Deprecated
+	public void waitForResult(long milliseconds) throws InterruptedException, TimeoutException {
+		// instead of removing this method should be marked 'private'
 		final long waitUntil = System.currentTimeMillis() + milliseconds;
 		synchronized (this) {
 			while (!isDone() && (System.currentTimeMillis() < waitUntil))
@@ -168,6 +163,66 @@ public class ScriptResult implements Future<Object> {
 
 			if (!isDone())
 				throw new TimeoutException(String.format("Result not ready after %d milliseconds", milliseconds));
+		}
+	}
+
+	/**
+	 * Verify that this ScriptResult is processed. If the result is ready, execution of the underlying script is done.
+	 *
+	 * @return true when processing is done
+	 * @deprecated use {@link #isDone()}
+	 */
+	@Deprecated
+	public final boolean isReady() {
+		return isDone();
+	}
+
+	/**
+	 * Get the result value stored.
+	 *
+	 * @return result value
+	 * @deprecated use {@link #get()}
+	 */
+	@Deprecated
+	public final Object getResult() {
+		try {
+			return get();
+		} catch (final ExecutionException e) {
+			throw new RuntimeException("Execution failed", e);
+		}
+	}
+
+	/**
+	 * Get the exception stored within this result.
+	 *
+	 * @return stored exception or null
+	 * @deprecated use {@link #get()}
+	 */
+	@Deprecated
+	public final Throwable getException() {
+		try {
+			get();
+			throw new RuntimeException("Execution did not throw an exception");
+
+		} catch (final ExecutionException e) {
+			return e;
+		}
+	}
+
+	/**
+	 * Checks whether this result contains an exception.
+	 *
+	 * @return true when this result contains an exception
+	 * @deprecated use {@link #get()}
+	 */
+	@Deprecated
+	public final boolean hasException() {
+		try {
+			get();
+			return false;
+
+		} catch (final ExecutionException e) {
+			return true;
 		}
 	}
 }

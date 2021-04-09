@@ -13,7 +13,6 @@ package org.eclipse.ease.lang.python.py4j;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -93,7 +92,6 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 	public void createPythonObject() throws Exception {
 		final ScriptResult result = executeCode("object()", false);
 		assertNotNull(result);
-		assertNull(result.getException());
 		assertNotNull(result.get());
 		assertTrue(result.get() instanceof String);
 		assertTrue(result.get().toString().startsWith("<object object at "));
@@ -112,7 +110,6 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 		executeCode(sb.toString(), false);
 		final ScriptResult result = executeCode("Foo()");
 		assertNotNull(result);
-		assertNull(result.getException());
 		assertNotNull(result.get());
 		assertTrue(result.get() instanceof IScriptable);
 	}
@@ -166,7 +163,6 @@ public abstract class ModeTestBase extends Py4JEngineTestBase {
 	public void javaLongArray() throws Exception {
 		final ScriptResult result = executeCode("longArray([1, 2])", false);
 		assertNotNull(result);
-		assertNull(result.getException());
 		assertNotNull(result.get());
 
 		// FIXME: Different behavior between Python 2 and 3
