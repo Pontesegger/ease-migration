@@ -12,7 +12,6 @@
 package org.eclipse.ease.modules.platform;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
@@ -46,7 +45,6 @@ public abstract class AbstractModuleTest {
 
 		final ScriptResult result = executeCode(call);
 		assertEquals(getModuleClass(), result.get().getClass());
-		assertNull(result.getException());
 	}
 
 	/**
