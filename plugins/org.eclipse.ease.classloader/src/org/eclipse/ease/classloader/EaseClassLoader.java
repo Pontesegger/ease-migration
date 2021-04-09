@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ease.classloader;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -91,18 +92,19 @@ public class EaseClassLoader extends ClassLoader {
 			fRegisteredJars.put(engine, URLClassLoader.newInstance(new URL[] { url }, this));
 
 		else {
-			final URL[] registeredURLs = fRegisteredJars.get(engine).getURLs();
-			final List<URL> urlList = Arrays.asList(registeredURLs);
+			final List<URL> urlList = Arrays.asList(fRegisteredJars.get(engine).getURLs());
 			if (!urlList.contains(url)) {
-				// new URL, add to list
-				final URL[] updatedURLs = Arrays.copyOf(registeredURLs, registeredURLs.length + 1);
-				updatedURLs[updatedURLs.length - 1] = url;
-				fRegisteredJars.put(engine, URLClassLoader.newInstance(updatedURLs, this));
+				urlList.add(url);
+				fRegisteredJars.put(engine, URLClassLoader.newInstance(urlList.toArray(new URL[0]), this));
 			}
 		}
 	}
 
 	public void unregisterEngine(final Job engine) {
-		fRegisteredJars.remove(engine);
+		try (URLClassLoader classLoader = fRegisteredJars.remove(engine)) {
+			// nothing to do
+		} catch (final IOException e) {
+			// closing classloader failed, giving up
+		}
 	}
 }

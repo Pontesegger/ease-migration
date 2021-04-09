@@ -48,6 +48,76 @@
 					</execution>
 				</executions>
 			</plugin>
+
+
+			<!-- enable PMD code analysis -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${maven.pmd.version}</version>
+				<configuration>
+					<linkXRef>false</linkXRef>
+					<rulesets>../../releng/org.eclipse.ease.releng/pmd/pmd_rules_unittest.xml</rulesets>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>pmd-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>pmd</goal>
+							<goal>cpd</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- enable spotbugs code analysis -->
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${maven.spotbugs.version}</version>
+
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<fork>false</fork>
+
+					<excludeFilterFile>../../releng/org.eclipse.ease.releng/spotbugs/spotbugs_filter_unittest.xml</excludeFilterFile>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>spotbugs-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>spotbugs</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- enable checkstyle code analysis -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven.checkstyle.version}</version>
+				<configuration>
+					<configLocation>../../releng/org.eclipse.ease.releng/checkstyle/checkstyle_rules_unittest.xml</configLocation>
+					<linkXRef>false</linkXRef>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>checkstyle-integration</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>  

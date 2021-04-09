@@ -35,6 +35,7 @@ import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptExecutionException;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,7 +49,7 @@ import py4j.JavaServer;
 public class Py4jScriptEngine extends AbstractReplScriptEngine {
 
 	/**
-	 * The ID of the Engine, to match the declaration in the plugin.xml
+	 * The ID of the Engine, to match the declaration in the plugin.xml.
 	 */
 	public static final String ENGINE_ID = "org.eclipse.ease.lang.python.py4j.engine";
 
@@ -103,7 +104,8 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	private ClientServer fGatewayServer;
 	protected IPythonSideEngine fPythonSideEngine;
 	private Process fPythonProcess;
-	private Thread fInputGobbler, fErrorGobbler;
+	private Thread fInputGobbler;
+	private Thread fErrorGobbler;
 
 	private CountDownLatch fPythonStartupComplete;
 
@@ -176,8 +178,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		pb.command().add(Integer.toString(javaListeningPort));
 		pb.command().addAll(prependsPythonPath);
 
-		final Process start = pb.start();
-		return start;
+		return pb.start();
 	}
 
 	private File getPy4jPythonSrc() throws IOException {
@@ -236,8 +237,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		if (script.isShellMode()) {
 			interactiveReturn = fPythonSideEngine.executeInteractive(script.getCode());
 		} else {
-			final String code = script.getCode();
-			interactiveReturn = fPythonSideEngine.executeScript(code, fileName);
+			interactiveReturn = fPythonSideEngine.executeScript(script.getCode(), fileName);
 		}
 		final Object exception = interactiveReturn.getException();
 		if (exception instanceof Throwable) {
@@ -356,6 +356,9 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	public String toString(Object object) {
 		if (object == null)
 			return "None";
+
+		if (ScriptResult.VOID.equals(object))
+			return null;
 
 		return super.toString(object);
 	}
