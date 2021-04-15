@@ -81,6 +81,6 @@
          Source packages of EASE components.
       </description>
    </category-def>
-   <repository-reference location="http://https://bintray.com/artifact/download/pontesegger/ease-engines" enabled="true" />
-   <repository-reference location="http://https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1" enabled="true" />
+   <repository-reference location="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest" enabled="true" />
+   <repository-reference location="http://eclipse.py4j.org/" enabled="true" />
 </site>

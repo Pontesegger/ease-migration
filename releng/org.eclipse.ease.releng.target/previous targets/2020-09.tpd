@@ -25,7 +25,7 @@ location "https://download.eclipse.org/tools/orbit/downloads/drops/R202008312006
 	org.mozilla.javascript [1.7.10,1.8.0)
 }
 
-location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
+location "https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest" ease-engines {
 	// jython interpreter
 	org.eclipse.ease.engine.jython.feature.feature.group lazy
 	// groovy interpreter
@@ -34,6 +34,6 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 	org.eclipse.ease.engine.jruby.feature.feature.group lazy
 }
 
-location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1/" py4j-eclipse {
-	org.py4j.feature.feature.group [0.10.8,0.10.9)
+location "http://eclipse.py4j.org/" py4j-eclipse {
+	org.py4j.feature.feature.group lazy
 }

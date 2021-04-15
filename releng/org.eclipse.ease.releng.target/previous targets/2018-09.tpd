@@ -19,7 +19,7 @@ location "http://download.eclipse.org/releases/2018-09/" eclipse-2018-09 {
 	org.eclipse.jdt
 }
 
-location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-engines {
+location "https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest" ease-engines {
 	// jython interpreter
 	org.eclipse.ease.engine.jython.feature.feature.group lazy
 	// groovy interpreter
@@ -28,8 +28,8 @@ location "https://bintray.com/artifact/download/pontesegger/ease-engines/" ease-
 	org.eclipse.ease.engine.jruby.feature.feature.group lazy
 }
 
-location "https://dl.bintray.com/py4j/py4j-eclipse/0.10.4/" py4j-eclipse {
-	org.py4j.feature.feature.group [0.10.4,0.10.5)
+location "http://eclipse.py4j.org/" py4j-eclipse {
+	org.py4j.feature.feature.group lazy
 }
 
 // required for JUnit 5 tests

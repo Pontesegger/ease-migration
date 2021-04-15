@@ -199,99 +199,99 @@
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2019-06"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2019-03">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2019-03"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2018-09">
           <repository
               url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository/"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2018-09/"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2019-09">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2019-09"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2019-12">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2019-12"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2020-03">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200224183213/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2020-03"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2020-06">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2020-06"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2020-09">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2020-09"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
         <repositoryList
             name="2020-12">
           <repository
               url="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository"/>
           <repository
-              url="https://dl.bintray.com/pontesegger/ease-engines/"/>
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
           <repository
               url="http://download.eclipse.org/releases/2020-12"/>
           <repository
-              url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1"/>
+              url="http://eclipse.py4j.org/"/>
         </repositoryList>
       </targlet>
     </setupTask>
