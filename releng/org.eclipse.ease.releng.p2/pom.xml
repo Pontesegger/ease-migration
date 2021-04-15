@@ -12,7 +12,6 @@
 		<relativePath>../org.eclipse.ease.releng</relativePath>
 	</parent>
 
-		<!--
 	<pluginRepositories>
 		<pluginRepository>
 			<id>jboss-public-repository-group</id>
@@ -20,16 +19,18 @@
 			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
-		--> 
+
+	<properties>
+		<!-- used plugin versions -->
+		<org.jboss.tools.tycho.plugins.version>2.2.0</org.jboss.tools.tycho.plugins.version>
+	</properties>
 
 	<build>
 		<plugins>
-		<!-- 
-	
 			<plugin>
 				<groupId>org.jboss.tools.tycho-plugins</groupId>
 				<artifactId>repository-utils</artifactId>
-				<version>${org.jboss.tools.tycho-plugins.version}</version>
+				<version>${org.jboss.tools.tycho.plugins.version}</version>
 				<executions>
 					<execution>
 						<id>generate-facade</id>
@@ -41,14 +42,12 @@
 				</executions>
 				<configuration>
 					<associateSites>
-						<site>https://bintray.com/artifact/download/pontesegger/ease-engines
-						</site>
-						<site>https://dl.bintray.com/py4j/py4j-eclipse/0.10.8.1</site>
+						<site>https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest</site>
+						<site>https://eclipse.py4j.org/</site>
 					</associateSites>
 					<skipBuildInfo>true</skipBuildInfo>
 				</configuration>
 			</plugin>
-		 -->
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
