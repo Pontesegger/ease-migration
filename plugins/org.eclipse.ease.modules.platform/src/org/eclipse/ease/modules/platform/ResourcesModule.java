@@ -695,16 +695,16 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 
 		// evaluate expression to look for
 		Pattern regExp;
-		if (!pattern.startsWith("^"))
-			regExp = Pattern.compile(pattern.replace("*", ".*").replace('?', '.'));
-		else
+		if (pattern.startsWith("^"))
 			regExp = Pattern.compile(pattern);
+		else
+			regExp = Pattern.compile(pattern.replace("*", ".*").replace('?', '.'));
 
 		final List<Object> result = new ArrayList<>();
 
 		// locate root folder to start with
 		Object root = ResourceTools.resolve(rootFolder, getScriptEngine().getExecutedFile());
-		if (root == null)
+		if ((root == null) || (rootFolder == null))
 			root = getWorkspace();
 
 		if (root instanceof IContainer) {
@@ -740,19 +740,22 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 				final File container = toVisit.iterator().next();
 				toVisit.remove(container);
 
-				for (final File child : container.listFiles()) {
-					if (child.isFile()) {
-						if (regExp.matcher(child.getName()).matches())
-							result.add(child);
+				final File[] files = container.listFiles();
+				if (files != null) {
+					for (final File child : files) {
+						if (child.isFile()) {
+							if (regExp.matcher(child.getName()).matches())
+								result.add(child);
 
-					} else if ((recursive) && (child.isDirectory()))
-						toVisit.add(child);
+						} else if ((recursive) && (child.isDirectory()))
+							toVisit.add(child);
+					}
 				}
 
 			} while (!toVisit.isEmpty());
 		}
 
-		return result.toArray(new Object[result.size()]);
+		return result.toArray(new Object[0]);
 	}
 
 	/**
