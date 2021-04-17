@@ -43,7 +43,7 @@
 				<configuration>
 					<associateSites>
 						<site>https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest</site>
-						<site>https://eclipse.py4j.org/</site>
+						<site>http://eclipse.py4j.org/</site>
 					</associateSites>
 					<skipBuildInfo>true</skipBuildInfo>
 				</configuration>
