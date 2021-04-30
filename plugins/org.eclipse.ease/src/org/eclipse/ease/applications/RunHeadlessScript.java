@@ -5,12 +5,17 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License-Identifier: EPL-2.0
+ *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.applications;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,57 +41,70 @@ import org.eclipse.ui.IStartup;
 
 public class RunHeadlessScript implements IApplication {
 
+	/**
+	 *
+	 */
+	private static final String HELP = "-help";
+
+	/**
+	 *
+	 */
+	private static final String ENGINE = "-engine";
+
+	private static final String SCRIPT_ARGUMENTS = "scriptArguments";
+
+	private static final String SCRIPT = "-script";
+
+	private static final String REFRESH_WORKSPACE = "-refreshWorkspace";
+
+	private static final String WORKSPACE = "-workspace";
+
 	/** List of classes that should not be loaded on early startup. */
 	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList("org.eclipse.team.svn.ui.startup.SVNCoreStartup",
 			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter", "org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler");
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {
 		final Map<String, Object> parameters = new HashMap<>();
-		parameters.put("args", new ArrayList<String>());
+		parameters.put(SCRIPT_ARGUMENTS, new ArrayList<String>());
 
 		for (int index = 0; index < arguments.length; index++) {
-			if (parameters.containsKey("script")) {
+			if (parameters.containsKey(SCRIPT)) {
 				// script arguments
-				((List) parameters.get("args")).add(arguments[index]);
+				((List) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index]);
 
-			} else if ("-script".equals(arguments[index])) {
+			} else if (SCRIPT.equals(arguments[index])) {
 				if ((index + 1) < arguments.length) {
-					parameters.put("script", arguments[index + 1]);
-					((List) parameters.get("args")).add(arguments[index + 1]);
+					parameters.put(SCRIPT, arguments[index + 1]);
+					((List) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index + 1]);
 					index++;
 
-				} else {
-					System.out.println("ERROR: script name is missing");
-					return null;
-				}
+				} else
+					throw new IllegalArgumentException("script name is missing");
 
-			} else if ("-workspace".equals(arguments[index])) {
+			} else if (WORKSPACE.equals(arguments[index])) {
 				if ((index + 1) < arguments.length) {
-					parameters.put("workspace", arguments[index + 1]);
+					parameters.put(WORKSPACE, arguments[index + 1]);
 					index++;
 
-				} else {
-					System.out.println("ERROR: workspace location is missing");
-					return null;
-				}
+				} else
+					throw new IllegalArgumentException("workspace name is missing");
 
-			} else if ("-engine".equals(arguments[index])) {
+			} else if (REFRESH_WORKSPACE.equals(arguments[index])) {
+				parameters.put(REFRESH_WORKSPACE, true);
+
+			} else if (ENGINE.equals(arguments[index])) {
 				if ((index + 1) < arguments.length) {
-					parameters.put("engine", arguments[index + 1]);
+					parameters.put(ENGINE, arguments[index + 1]);
 					index++;
 
-				} else {
-					System.out.println("ERROR: workspace location is missing");
-					return null;
-				}
+				} else
+					throw new IllegalArgumentException("engine ID is missing");
 
-			} else if ("-help".equals(arguments[index])) {
+			} else if (HELP.equals(arguments[index])) {
 				return null;
 
-			} else {
-				System.out.println("ERROR: invalid args (" + arguments[index] + ")");
-				return null;
-			}
+			} else
+				throw new IllegalArgumentException(String.format("invalid argument: %s", arguments[index]));
 		}
 
 		return parameters;
@@ -103,101 +121,114 @@ public class RunHeadlessScript implements IApplication {
 		System.out.println("\t\t<script parameters> will be passed to the script as String[] in the variable 'argv'");
 	}
 
+	private static void printError(String message) {
+		System.out.println("ERROR: " + message);
+	}
+
 	@Override
 	public Object start(final IApplicationContext context) throws Exception {
-		final Object object = context.getArguments().get(IApplicationContext.APPLICATION_ARGS);
-		if (object instanceof String[]) {
-			final Map<String, Object> parameters = extractInputParameters((String[]) object);
+		try {
+			final Object object = context.getArguments().get(IApplicationContext.APPLICATION_ARGS);
+			if (object instanceof String[]) {
+				final Map<String, Object> parameters = extractInputParameters((String[]) object);
 
-			if (parameters != null) {
+				if (parameters != null) {
 
-				// create workspace
-				Location location = null;
-				if (parameters.containsKey("workspace")) {
+					// create workspace
+					final Location location = loadWorkspace(parameters);
 
-					location = Platform.getInstanceLocation();
-					// stick to the deprecated method as file.toURI().toURL() will not work on paths containing spaces
-					final URL workspaceURL = new File(parameters.get("workspace").toString()).toURL();
+					loadEarlyStartupExtensions();
 
-					// check if workspace location has not been set yet (can be set only once!)
-					if (!location.isSet()) {
-						if (!location.set(workspaceURL, true)) {
-							// could not lock the workspace.
-							System.err.println("ERROR: Could not set the workspace to \"" + location.getURL() + "\"");
-							return -1;
-						}
+					try {
+						// execute script
+						if (parameters.containsKey(SCRIPT)) {
 
-					} else if (!location.getURL().toString().equals(workspaceURL.toString())) {
-						System.err.println("ERROR: Could not set the workspace as it is already set to \"" + location.getURL() + "\"");
-						return -1;
-					}
+							final String scriptLocation = parameters.get(SCRIPT).toString();
+							final String engineID = (parameters.containsKey(ENGINE)) ? parameters.get(ENGINE).toString() : null;
+							final String[] arguments = ((List<String>) parameters.get(SCRIPT_ARGUMENTS)).toArray(new String[0]);
 
-					if (parameters.containsKey("refreshWorkspace"))
-						ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-				}
+							try {
+								final Object result = ScriptService.getInstance().executeScript(scriptLocation, engineID, arguments);
+								return getScriptResult(result);
 
-				loadEarlyStartupExtensions();
+							} catch (final Throwable throwable) {
+								return -1;
+							}
 
-				try {
-					// execute script
-					if (parameters.containsKey("script")) {
+						} else
+							throw new IllegalArgumentException(String.format("Parameter '%s' is required", SCRIPT));
 
-						final String scriptLocation = parameters.get("script").toString();
-						final String engineID = (parameters.containsKey("engine")) ? parameters.get("engine").toString() : null;
-						final String[] arguments = ((List<String>) parameters.get("args")).toArray(new String[0]);
-
-						try {
-							final Object result = ScriptService.getInstance().executeScript(scriptLocation, engineID, arguments);
-
-							if (result != null) {
-								if (ScriptResult.VOID.equals(result)) {
-									return 0;
-								}
-
-								try {
-									return Integer.parseInt(result.toString());
-								} catch (final Exception e) {
-									// no integer
-								}
-
-								try {
-									return new Double(Double.parseDouble(result.toString())).intValue();
-								} catch (final Exception e) {
-									// no double
-								}
-
-								try {
-									return Boolean.parseBoolean(result.toString()) ? 0 : -1;
-								} catch (final Exception e) {
-									// no boolean
-								}
-
-								// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
-							} else
-								return 0;
-
-						} catch (final Throwable throwable) {
-							return -1;
+					} finally {
+						if (location != null) {
+							// persist workspace
+							ResourcesPlugin.getWorkspace().save(true, null);
+							// make sure we do not lock the workspace permanently
+							location.release();
 						}
 					}
 
-					System.err.println("ERROR: Could not access file \"" + parameters.get("script") + "\"");
+				} else
+					// could not extract parameters
+					printUsage();
+			}
 
-				} finally {
-					// persist workspace
-					ResourcesPlugin.getWorkspace().save(true, null);
+		} catch (final IOException e) {
+			printError(String.format(e.getMessage()));
+			printUsage();
 
-					// make sure we do not lock the workspace permanently
-					if (location != null)
-						location.release();
-				}
-
-			} else
-				// could not extract parameters
-				printUsage();
+		} catch (final IllegalArgumentException e) {
+			printError(String.format("invalid command line argument%n\t%s%n", e.getMessage()));
+			printUsage();
 		}
 
 		return -1;
+	}
+
+	private int getScriptResult(final Object result) {
+		if (result != null) {
+			if (ScriptResult.VOID.equals(result)) {
+				return 0;
+			}
+
+			try {
+				return Integer.parseInt(result.toString());
+			} catch (final NumberFormatException e) {
+				// no integer
+			}
+
+			try {
+				return Double.valueOf(result.toString()).intValue();
+			} catch (final NumberFormatException e) {
+				// no double
+			}
+
+			// we do not know the return type, but typically parseBoolean() will deal with anything you throw at it
+			return Boolean.parseBoolean(result.toString()) ? 0 : -1;
+
+		} else
+			return 0;
+	}
+
+	private Location loadWorkspace(final Map<String, Object> parameters) throws MalformedURLException, IOException, CoreException {
+		Location location = null;
+		if (parameters.containsKey(WORKSPACE)) {
+
+			location = Platform.getInstanceLocation();
+			// stick to the deprecated method as file.toURI().toURL() will not work on paths containing spaces
+			final URL workspaceURL = new File(parameters.get(WORKSPACE).toString()).toURL();
+
+			// check if workspace location has not been set yet (can be set only once!)
+			if (!location.isSet()) {
+				if (!location.set(workspaceURL, true))
+					throw new IOException(String.format("Could not set the workspace to '%s'", location.getURL()));
+
+			} else if (!location.getURL().toString().equals(workspaceURL.toString()))
+				throw new IOException(String.format("Could not set the workspace as it is already set to '%s'", location.getURL()));
+
+			if (parameters.containsKey(REFRESH_WORKSPACE))
+				ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		}
+		return location;
 	}
 
 	/**
@@ -215,11 +246,11 @@ public class RunHeadlessScript implements IApplication {
 							try {
 								((IStartup) earlyStartupParticipant).earlyStartup();
 							} catch (final Throwable e1) {
-								System.err.println("ERROR: Failed to execute " + earlyStartupParticipant.getClass().getName() + ".earlyStartup(): " + e1);
+								printError(String.format("Failed to execute %s.earlyStartup(): %s", earlyStartupParticipant.getClass().getName(), e1));
 							}
 						}
 					} catch (final CoreException e1) {
-						System.err.println("ERROR: Could not create instance for startup code: " + e.getAttribute("class"));
+						printError("Could not create instance for startup code: " + e.getAttribute("class"));
 					}
 				}
 			}
