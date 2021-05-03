@@ -10,6 +10,7 @@ import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineInterruptedException;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.lang.unittest.TestSuiteScriptEngine;
 import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ICode;
@@ -343,20 +344,24 @@ public class TestSuite extends TestContainer implements ITestSuite {
 		if (definition != null) {
 			final ICode customCode = definition.getCustomCode(codeLocation);
 			if ((customCode != null) && (!customCode.getContent().trim().isEmpty())) {
-				if (fSetupEngine == null)
+				if (fSetupEngine == null) {
 					fSetupEngine = strategy.createScriptEngine(this, null);
-
-				if (fSetupEngine != null) {
-					if (fSetupEngine instanceof IReplEngine)
-						((IReplEngine) fSetupEngine).setTerminateOnIdle(false);
 
 					if (fSetupEngine instanceof AbstractScriptEngine)
 						((AbstractScriptEngine) fSetupEngine).setExecutionRootFile(getResource());
 
 					fSetupEngine.setVariable(TestSuiteScriptEngine.TEST_SUITE_VARIABLE, this);
 
+					if (fSetupEngine instanceof IReplEngine) {
+						((IReplEngine) fSetupEngine).setTerminateOnIdle(false);
+						fSetupEngine.schedule();
+					}
+				}
+
+				if (fSetupEngine != null) {
 					try {
-						fSetupEngine.execute(new Script(customCode.getLocation(), customCode.getContent())).get();
+						final ScriptResult result = fSetupEngine.execute(new Script(customCode.getLocation(), customCode.getContent()));
+						result.get();
 					} catch (final ScriptEngineInterruptedException e) {
 						getTest("[user event]").addError("Aborted by user", fSetupEngine);
 					} catch (final ExecutionException e) {
