@@ -53,6 +53,17 @@ public interface IEnvironment extends IScriptModule {
 	List<Object> getModules();
 
 	/**
+	 * Retrieve a definition for a given module instance.
+	 *
+	 * @param moduleInstance
+	 *            instance of module to retrieve definition for
+	 * @return module definition
+	 * @throws IllegalArgumentException
+	 *             when no definition can be found for <i>moduleInstance</i>
+	 */
+	ModuleDefinition getModuleDefinition(Object moduleInstance);
+
+	/**
 	 * Print to standard output.
 	 *
 	 * @param text

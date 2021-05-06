@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -204,6 +206,14 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		return fModuleTracker.getAvailableModules().stream().filter(state -> state.isLoaded()).map(state -> state.getInstance()).collect(Collectors.toList());
 	}
 
+	@Override
+	public ModuleDefinition getModuleDefinition(Object moduleInstance) {
+		final Optional<ModuleDefinition> definition = fModuleTracker.getAvailableModules().stream()
+				.filter(state -> Objects.equals(moduleInstance, state.getInstance())).map(s -> s.getModuleDefinition()).findFirst();
+
+		return definition.orElseThrow(() -> new IllegalArgumentException("No module loaded for provided instance"));
+	}
+
 	/**
 	 * Write a message to the output stream of the script engine.
 	 *
@@ -271,9 +281,12 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 			}
 		}
 
-		if (doRead)
+		if (doRead) {
 			// read a single line
-			return new BufferedReader(new InputStreamReader(inputStream)).readLine();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+				return reader.readLine();
+			}
+		}
 
 		return null;
 	}
