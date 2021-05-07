@@ -103,211 +103,108 @@ public class ChartingModule extends AbstractScriptModule {
 	 *            default is "", if number is written inside format like "f#25" point size will be set(in this case 25), please write format correctly, if for
 	 *            example 2 colors will be written like "rg" then the last one will be taken, in this case g or green, so please set line style, point size,
 	 *            color and Marker Type only once. Used matlab syntax to define plot format:
-	 *            <table cellspacing="0" class="body" cellpadding="4" border="2">
-	 *
-	 *            <tr valign="top">
-	 *            <th valign="top">Specifier</th>
-	 *            <th valign="top">LineStyle</th>
+	 *            <table>
+	 *            <tr>
+	 *            <th>Specifier</th>
+	 *            <th>LineStyle</th>
 	 *            </tr>
-	 *
-	 *            <tr valign="top">
-	 *            <td>'<tt>-</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Solid line (default)
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'-'</td>
+	 *            <td>Solid line (default)</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>--</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Dashed line
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'--'</td>
+	 *            <td>Dashed line</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>:</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Dotted line
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>':'</td>
+	 *            <td>Dotted line</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>-.</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Dash-dot line
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'-.'</td>
+	 *            <td>Dash-dot line</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>#</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            No line
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'#'</td>
+	 *            <td>No line</td>
 	 *            </tr>
-	 *
 	 *            </table>
-	 *            <table cellspacing="0" class="body" cellpadding="4" border="2">
 	 *
-	 *            <tr valign="top">
-	 *            <th>
-	 *            <p>
-	 *            Specifier
-	 *            </p>
-	 *            </th>
-	 *            <th>
-	 *            <p>
-	 *            Color
-	 *            </p>
-	 *            </th>
+	 *            <table>
+	 *            <tr>
+	 *            <th>Specifier</th>
+	 *            <th>Color</th>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>r</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Red
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>r</td>
+	 *            <td>Red</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>g</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Green
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>g</td>
+	 *            <td>Green</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>b</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Blue
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>b</td>
+	 *            <td>Blue</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>c</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Cyan
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>c</td>
+	 *            <td>Cyan</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>m</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Magenta
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>m</td>
+	 *            <td>Magenta</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>y</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Yellow
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>y</td>
+	 *            <td>Yellow</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>k</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            Black
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>k</td>
+	 *            <td>Black</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td><tt>w</tt></td>
-	 *            <td>
-	 *            <p>
-	 *            White
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>w</td>
+	 *            <td>White</td>
 	 *            </tr>
-	 *
 	 *            </table>
-	 *            <table cellspacing="0" class="body" cellpadding="4" border="2">
-	 *            <tr valign="top">
-	 *            <th>
-	 *            <p>
-	 *            Specifier
-	 *            </p>
-	 *            </th>
-	 *            <th>
-	 *            <p>
-	 *            Marker Type
-	 *            </p>
-	 *            </th>
+	 *
+	 *            <table>
+	 *            <tr>
+	 *            <th>Specifier</th>
+	 *            <th>Marker Type</th>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>+</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Plus sign
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'+'</td>
+	 *            <td>Plus sign</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>o</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Circle
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'o'</td>
+	 *            <td>Circle</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>p</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Point
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'p'</td>
+	 *            <td>Point</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>x</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Cross
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'x'</td>
+	 *            <td>Cross</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>s</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Square
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'s'</td>
+	 *            <td>Square</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>f</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Filled Square
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'f'</td>
+	 *            <td>Filled Square</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>d</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Diamond
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'d'</td>
+	 *            <td>Diamond</td>
 	 *            </tr>
-	 *            <tr valign="top">
-	 *            <td>'<tt>v</tt>'</td>
-	 *            <td>
-	 *            <p>
-	 *            Downward-pointing triangle
-	 *            </p>
-	 *            </td>
+	 *            <tr>
+	 *            <td>'v'</td>
+	 *            <td>Downward-pointing triangle</td>
 	 *            </tr>
 	 *            </table>
 	 *
@@ -321,9 +218,6 @@ public class ChartingModule extends AbstractScriptModule {
 		return getChart().series(seriesName, format);
 	}
 
-	/**
-	 * Create new chart if possible and return it, if workbench is not working exception will be thrown.
-	 */
 	private Chart getChart() throws Throwable {
 		if (fChart == null)
 			figure(null);
