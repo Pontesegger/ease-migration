@@ -141,6 +141,8 @@
 							<outputDirectory>${project.build.directory}/../mydocs</outputDirectory>
 							<doclet>org.eclipse.ease.helpgenerator.V9ModuleDoclet</doclet>
 							<docletPath>${doclet.path}</docletPath>
+
+							<!-- required for maven-javadoc-plugin before 3.0.0 -->
 							<additionalparam>-root ${basedir}
 								-encoding 'UTF-8'
 								-failOnHTMLError true
@@ -149,11 +151,26 @@
 									https://docs.oracle.com/en/java/javase/11/docs/api
 								-linkoffline
 									../../org.eclipse.platform.doc.isv/reference/api/
-									http://help.eclipse.org/oxygen/topic/org.eclipse.platform.doc.isv/reference/api
+									https://help.eclipse.org/2021-03/topic/org.eclipse.platform.doc.isv/reference/api
 								-linkoffline
 									../../org.eclipse.ease.help/help/api-docs/javadoc/
 									https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc
 							</additionalparam>
+
+							<!-- required for maven-javadoc-plugin 3.0.0 and higher -->
+							<additionalOptions>-root ${basedir}
+								-encoding 'UTF-8'
+								-failOnHTMLError true
+								-failOnMissingDocs true
+								-link
+									https://docs.oracle.com/en/java/javase/11/docs/api
+								-linkoffline
+									../../org.eclipse.platform.doc.isv/reference/api/
+									https://help.eclipse.org/2021-03/topic/org.eclipse.platform.doc.isv/reference/api
+								-linkoffline
+									../../org.eclipse.ease.help/help/api-docs/javadoc/
+									https://ci.eclipse.org/ease/job/ease.build.core/JavaDoc
+							</additionalOptions>
 
 							<useStandardDocletOptions>false</useStandardDocletOptions>
 						</configuration>
