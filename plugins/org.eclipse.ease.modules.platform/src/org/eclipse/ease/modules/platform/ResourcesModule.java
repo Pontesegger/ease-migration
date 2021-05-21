@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -48,6 +49,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
@@ -936,41 +938,27 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 	 * @return zip file reference
 	 * @throws IOException
 	 *             when zip file cannot be created
+	 * @throws URISyntaxException
+	 *             when target location cannot be encoded correctly (possibly due to special characters)
 	 */
 	@WrapToScript
-	public Object zip(Object sourceLocation, Object zipLocation) throws IOException {
-		// resolve source
-		Object sourceFile = ResourceTools.resolve(sourceLocation, getScriptEngine().getExecutedFile());
-		if (sourceFile instanceof IResource)
-			sourceFile = ((IResource) sourceFile).getLocation().toFile();
+	public Object zip(Object sourceLocation, Object zipLocation) throws IOException, URISyntaxException {
 
-		if (!(sourceFile instanceof File))
-			throw new IOException("Cannot resolve source: " + sourceLocation);
-
-		final java.nio.file.Path sourceFilePath = ((File) sourceFile).toPath();
-
-		// resolve target
-		Object zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
-		if (zipFile instanceof IFile)
-			zipFile = ((IFile) zipFile).getLocation().toFile();
-
-		if (!(zipFile instanceof File))
-			throw new IOException("Cannot resolve target: " + zipLocation);
-
-		final java.nio.file.Path zipFilePath = ((File) zipFile).toPath();
+		final java.nio.file.Path sourceFilePath = resolveFile(sourceLocation);
+		final java.nio.file.Path zipFilePath = resolveFile(zipLocation);
 
 		// create zip file
-		final URI uri = URI.create("jar:file:" + zipFilePath.toUri().getPath());
+		final URI uri = URIUtil.fromString("jar:file:" + zipFilePath.toUri().getPath());
 		final Map<String, String> env = new HashMap<>();
-		env.put("create", ((File) zipFile).exists() ? Boolean.FALSE.toString() : Boolean.TRUE.toString());
+		env.put("create", zipFilePath.toFile().exists() ? Boolean.FALSE.toString() : Boolean.TRUE.toString());
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(uri, env)) {
 
 			final java.nio.file.Path root = fileSystem.getPath("/");
 
-			if (Files.isDirectory(((File) sourceFile).toPath())) {
+			if (Files.isDirectory(sourceFilePath)) {
 				// source is a directory
-				Files.walkFileTree(((File) sourceFile).toPath(), new SimpleFileVisitor<java.nio.file.Path>() {
+				Files.walkFileTree(sourceFilePath, new SimpleFileVisitor<java.nio.file.Path>() {
 					@Override
 					public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs) throws IOException {
 						final java.nio.file.Path relativePath = sourceFilePath.relativize(file);
@@ -1002,7 +990,7 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 		}
 
 		// refresh workspace
-		zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
+		final Object zipFile = ResourceTools.resolve(zipLocation, getScriptEngine().getExecutedFile());
 		if (zipFile instanceof IFile) {
 			try {
 				((IFile) zipFile).getParent().refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
@@ -1012,6 +1000,17 @@ public class ResourcesModule extends AbstractScriptModule implements IExecutionL
 		}
 
 		return zipFile;
+	}
+
+	private java.nio.file.Path resolveFile(Object location) throws IOException {
+		Object file = ResourceTools.resolve(location, getScriptEngine().getExecutedFile());
+		if (file instanceof IResource)
+			file = ((IResource) file).getLocation().toFile();
+
+		if (!(file instanceof File))
+			throw new IOException(String.format("Cannot resolve location: %s", location));
+
+		return ((File) file).toPath();
 	}
 
 	/**
