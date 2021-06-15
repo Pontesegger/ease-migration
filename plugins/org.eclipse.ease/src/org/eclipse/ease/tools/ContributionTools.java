@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * Contributors:
  *     original code template from org.eclipse.ui.internal.menus.MemuHelper
  *     Christian Pontesegger - adaptions to get ImageDescriptors and to remove some complexity

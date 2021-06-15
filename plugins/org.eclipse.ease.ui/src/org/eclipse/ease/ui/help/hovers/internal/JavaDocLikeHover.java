@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * This class is taken from org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover
  *
  * Contributors:

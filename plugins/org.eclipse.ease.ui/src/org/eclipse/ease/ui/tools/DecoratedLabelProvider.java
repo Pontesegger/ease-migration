@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * Code copied from org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider
  *
  * Contributors:

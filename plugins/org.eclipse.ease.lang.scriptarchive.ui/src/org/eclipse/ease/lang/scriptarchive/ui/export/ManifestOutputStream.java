@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *     IBM Corporation - some methods of this class were taken from org.eclipse.pde.internal.core.util.ManifestUtils
