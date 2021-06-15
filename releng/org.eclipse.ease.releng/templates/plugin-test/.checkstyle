@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
+  <local-check-config name="${bundle.vendor} Checkstyle" location="/${releng.project}/checkstyle/checkstyle_rules_unittest.xml" type="project" description="">
+    <additional-data name="protect-config-file" value="false"/>
+  </local-check-config>
+  <fileset name="All files" enabled="true" check-config-name="${bundle.vendor} Checkstyle" local="true">
+    <file-match-pattern match-pattern=".java$" include-pattern="true"/>
+  </fileset>
+</fileset-config>
