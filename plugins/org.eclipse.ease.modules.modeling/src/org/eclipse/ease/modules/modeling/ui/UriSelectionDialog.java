@@ -6,6 +6,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * Contributors:
  *  	Gabriel Barbier (Mia-Software) - initial API and implementation
  * 		Nicolas Guyomar (Mia-Software) - Bug 333652 Extension point offering the possibility to declare an EPackage browser

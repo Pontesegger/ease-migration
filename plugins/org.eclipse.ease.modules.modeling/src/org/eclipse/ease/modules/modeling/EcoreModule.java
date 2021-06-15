@@ -5,6 +5,8 @@
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
+ * SPDX-License_Identifier: EPL-2.0
+ *
  * Contributors:
  *    Pierre-Charles David (Obeo) - initial API and implementation, pierre-charles.david@obeo.fr
  *    Vincent Hemery (Atos Origin) - removing modeler dependencies, laurent.redor@obeo.fr
