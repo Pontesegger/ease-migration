@@ -21,7 +21,7 @@ function Setup() {
 	// project defaults
 	this.addReplacement("${releng.name}", "Eclipse EASE");
 	this.addReplacement("${java.version}", "JavaSE-1.8");
-	this.addReplacement("${bundle.version}", "0.8.0");
+	this.addReplacement("${bundle.version}", "0.9.0");
 	this.addReplacement("${bundle.vendor}", "Eclipse.org");
 	this.addReplacement("${project.root.id}", "org.eclipse.ease");
 
