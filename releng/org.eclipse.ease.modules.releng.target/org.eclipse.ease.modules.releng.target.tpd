@@ -1,8 +1,8 @@
-target "2020-09" with source requirements
+target "2021-06" with source requirements
 
 environment JavaSE-11
 
-location "http://download.eclipse.org/releases/2020-09/" eclipse-2020-09 {
+location "https://download.eclipse.org/releases/2021-06/" eclipse-2021-06 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -12,10 +12,6 @@ location "http://download.eclipse.org/releases/2020-09/" eclipse-2020-09 {
 	org.eclipse.emf.feature.group
 
 	// modeling modules
-	org.eclipse.papyrus.infra.feature.feature.group
-	org.eclipse.papyrus.infra.gmfdiag.feature.feature.group
-	//	org.eclipse.papyrus.sysml.feature.feature.group
-	org.eclipse.papyrus.uml.diagram.feature.feature.group
 	org.eclipse.uml2.uml
 	org.eclipse.gmf.runtime.diagram.ui
 	org.eclipse.ocl.examples.classic.feature.group
@@ -35,9 +31,15 @@ location "http://download.eclipse.org/releases/2020-09/" eclipse-2020-09 {
 	org.eclipse.osgi
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository/" eclipse-orbit-2020-09 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20210602031627/repository" eclipse-orbit-2021-06 {
 // for java unit test of modules
 	org.mockito [2.13.0,3.0.0)
+}
+
+location "https://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
+	org.eclipse.papyrus.infra.feature.feature.group
+	org.eclipse.papyrus.infra.gmfdiag.feature.feature.group
+	org.eclipse.papyrus.uml.diagram.feature.feature.group
 }
 
 location "http://download.eclipse.org/technology/subversive/4.0/update-site/" {
