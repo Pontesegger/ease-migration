@@ -55,7 +55,7 @@ Setup.prototype.createPlugin = function(pluginId, pluginName) {
 	this.addReplacement("${bundle.id}", pluginId);
 	this.addReplacement("${bundle.name}", pluginName);
 
-	this.internalCreatePlugin(pluginId, pluginName, "workspace://${releng.location}/templates/plugin");
+	this.internalCreatePlugin(pluginId, pluginName, "workspace://${releng.project}/templates/plugin");
 
 	// add to master pom
 	this.replaceInFile("workspace://${releng.location}/pom.xml", "<!-- plugin insertion point -->", "<module>../../plugins/${bundle.id}</module>\n\t\t<!-- plugin insertion point -->");
@@ -80,11 +80,11 @@ Setup.prototype.createTestFragment = function(pluginId, pluginName) {
 	this.addReplacement("${bundle.name}", pluginName);
 	this.addReplacement("${bundle.host.id}", pluginId);
 
-	this.internalCreatePlugin(pluginId, pluginName, "workspace://${releng.location}/templates/plugin-test");
+	this.internalCreatePlugin(pluginId, pluginName, "workspace://${releng.project}/templates/plugin-test");
 	
 	// add to master pom
-	this.replaceInFile("workspace://${releng.location}/pom.xml", "<!-- test insertion point -->", "<module>../../tests/${bundle.id}</module>\n\t\t\t\t<!-- test insertion point -->");
-	this.replaceInFile("workspace://${releng.location}.coverage/pom.xml", "<!-- test insertion point -->", "<dependency>\n\t\t\t<groupId>${project.root.id}</groupId>\n\t\t\t<artifactId>${bundle.id}</artifactId>\n\t\t\t<version>${bundle.version}-SNAPSHOT</version>\n\t\t\t<scope>test</scope>\n\t\t</dependency>\n\t\t<!-- test insertion point -->");
+	this.replaceInFile("workspace://${releng.project}/pom.xml", "<!-- test insertion point -->", "<module>../../tests/${bundle.id}</module>\n\t\t\t\t<!-- test insertion point -->");
+	this.replaceInFile("workspace://${releng.project}.coverage/pom.xml", "<!-- test insertion point -->", "<dependency>\n\t\t\t<groupId>${project.root.id}</groupId>\n\t\t\t<artifactId>${bundle.id}</artifactId>\n\t\t\t<version>${bundle.version}-SNAPSHOT</version>\n\t\t\t<scope>test</scope>\n\t\t</dependency>\n\t\t<!-- test insertion point -->");
 }
 
 Setup.prototype.internalCreatePlugin = function(pluginId, pluginName, templateFolder) {
@@ -105,7 +105,7 @@ Setup.prototype.internalCreatePlugin = function(pluginId, pluginName, templateFo
 }
 
 Setup.prototype.createFiles = function(project, templateFolder) {
-	var templateFolder = new java.lang.String(replaceText(templateFolder));
+	var templateFolder = new java.lang.String(this.replaceText(templateFolder));
 	var prefix = templateFolder.substring(templateFolder.indexOf("://") + 3);
 
 	var templates = findFiles("*", templateFolder, true);
@@ -144,14 +144,16 @@ Setup.prototype.addReplacement = function(key, value) {
 }
 
 Setup.prototype.replaceInFile = function(file, search, replacement) {
-	var content = readFile(this.replaceText(file));
-	var handle = writeFile(file, content.replace(search, replacement));
+	var resolvedFile = this.replaceText(file)
+	var content = readFile(resolvedFile);
+	var handle = writeFile(resolvedFile, content.replace(search, replacement));
 	closeFile(handle);
 }
 
 Setup.prototype.appendToFile = function(file, text) {
-	var content = readFile(file);
-	var handle = writeFile(file, content + text);
+	var resolvedFile = this.replaceText(file)
+	var content = readFile(resolvedFile);
+	var handle = writeFile(resolvedFile, content + text);
 	closeFile(handle);
 }
 
