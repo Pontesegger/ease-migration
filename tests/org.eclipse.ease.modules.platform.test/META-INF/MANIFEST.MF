@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Platform Modules Test
 Bundle-SymbolicName: org.eclipse.ease.modules.platform.test
-Bundle-Version: 0.8.0.qualifier
+Bundle-Version: 0.9.0.qualifier
 Bundle-Vendor: Eclipse.org
 Fragment-Host: org.eclipse.ease.modules.platform
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
