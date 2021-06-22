@@ -15,8 +15,11 @@ package org.eclipse.ease.lang.javascript;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.ease.AbstractCodeFactory;
 import org.eclipse.ease.IScriptEngine;
@@ -28,76 +31,14 @@ import org.eclipse.ease.tools.StringTools;
 
 public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
-	public static List<String> RESERVED_KEYWORDS = new ArrayList<>();
+	private static final List<String> RESERVED_KEYWORDS = Arrays.asList("abstract", "arguments", "boolean", "break", "byte", "case", "catch", "char", "class",
+			"const", "continue", "debugger", "default", "delete", "do", "double", "else", "enum", "eval", "export", "extends", "false", "final", "finally",
+			"float", "for", "function", "goto", "if", "implements", "import", "in", "instanceof", "int", "interface", "let", "long", "native", "new", "null",
+			"package", "private", "protected", "public", "return", "short", "static", "super", "switch", "synchronized", "this", "throw", "throws", "transient",
+			"true", "try", "typeof", "var", "void", "volatile", "while", "with", "yield");
 
-	static {
-		RESERVED_KEYWORDS.add("abstract");
-		RESERVED_KEYWORDS.add("arguments");
-		RESERVED_KEYWORDS.add("boolean");
-		RESERVED_KEYWORDS.add("break");
-		RESERVED_KEYWORDS.add("byte");
-		RESERVED_KEYWORDS.add("case");
-		RESERVED_KEYWORDS.add("catch");
-		RESERVED_KEYWORDS.add("char");
-		RESERVED_KEYWORDS.add("class");
-		RESERVED_KEYWORDS.add("const");
-		RESERVED_KEYWORDS.add("continue");
-		RESERVED_KEYWORDS.add("debugger");
-		RESERVED_KEYWORDS.add("default");
-		RESERVED_KEYWORDS.add("delete");
-		RESERVED_KEYWORDS.add("do");
-		RESERVED_KEYWORDS.add("double");
-		RESERVED_KEYWORDS.add("else");
-		RESERVED_KEYWORDS.add("enum");
-		RESERVED_KEYWORDS.add("eval");
-		RESERVED_KEYWORDS.add("export");
-		RESERVED_KEYWORDS.add("extends");
-		RESERVED_KEYWORDS.add("false");
-		RESERVED_KEYWORDS.add("final");
-		RESERVED_KEYWORDS.add("finally");
-		RESERVED_KEYWORDS.add("float");
-		RESERVED_KEYWORDS.add("for");
-		RESERVED_KEYWORDS.add("function");
-		RESERVED_KEYWORDS.add("goto");
-		RESERVED_KEYWORDS.add("if");
-		RESERVED_KEYWORDS.add("implements");
-		RESERVED_KEYWORDS.add("import");
-		RESERVED_KEYWORDS.add("in");
-		RESERVED_KEYWORDS.add("instanceof");
-		RESERVED_KEYWORDS.add("int");
-		RESERVED_KEYWORDS.add("interface");
-		RESERVED_KEYWORDS.add("let");
-		RESERVED_KEYWORDS.add("long");
-		RESERVED_KEYWORDS.add("native");
-		RESERVED_KEYWORDS.add("new");
-		RESERVED_KEYWORDS.add("null");
-		RESERVED_KEYWORDS.add("package");
-		RESERVED_KEYWORDS.add("private");
-		RESERVED_KEYWORDS.add("protected");
-		RESERVED_KEYWORDS.add("public");
-		RESERVED_KEYWORDS.add("return");
-		RESERVED_KEYWORDS.add("short");
-		RESERVED_KEYWORDS.add("static");
-		RESERVED_KEYWORDS.add("super");
-		RESERVED_KEYWORDS.add("switch");
-		RESERVED_KEYWORDS.add("synchronized");
-		RESERVED_KEYWORDS.add("this");
-		RESERVED_KEYWORDS.add("throw");
-		RESERVED_KEYWORDS.add("throws");
-		RESERVED_KEYWORDS.add("transient");
-		RESERVED_KEYWORDS.add("true");
-		RESERVED_KEYWORDS.add("try");
-		RESERVED_KEYWORDS.add("typeof");
-		RESERVED_KEYWORDS.add("var");
-		RESERVED_KEYWORDS.add("void");
-		RESERVED_KEYWORDS.add("volatile");
-		RESERVED_KEYWORDS.add("while");
-		RESERVED_KEYWORDS.add("with");
-		RESERVED_KEYWORDS.add("yield");
-	}
-
-	private static boolean isValidMethodName(final String methodName) {
-		return JavaScriptHelper.isSaveName(methodName) && !RESERVED_KEYWORDS.contains(methodName);
+	public static boolean isSaveName(final String identifier) {
+		return Pattern.matches("[a-zA-Z_$][a-zA-Z0-9_$]*", identifier) && !RESERVED_KEYWORDS.contains(identifier);
 	}
 
 	@Override
@@ -105,13 +46,8 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		final StringBuilder code = new StringBuilder();
 		code.append("new Packages.").append(clazz.getName()).append('(');
 
-		if (parameters != null) {
-			for (final String parameter : parameters)
-				code.append(parameter).append(", ");
-
-			if (parameters.length > 0)
-				code.delete(code.length() - 2, code.length());
-		}
+		if (parameters != null)
+			code.append(Arrays.asList(parameters).stream().collect(Collectors.joining(", ")));
 
 		code.append(')');
 
@@ -125,7 +61,29 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 	@Override
 	public String getSaveVariableName(final String variableName) {
-		return JavaScriptHelper.getSaveName(variableName);
+		// check if name is already valid
+		if (isSaveName(variableName))
+			return variableName;
+
+		// not valid, convert string to valid format
+		final StringBuilder buffer = new StringBuilder(variableName.replaceAll("[^a-zA-Z0-9_$]", "_"));
+
+		// check for valid first character
+		if (buffer.length() > 0) {
+			final char start = buffer.charAt(0);
+			if (((start < 65) || ((start > 90) && (start < 97)) || (start > 122)) && (start != '_'))
+				buffer.insert(0, '_');
+		} else {
+			// buffer is empty, create a random string of lowercase letters
+			buffer.append('_');
+			for (int index = 0; index < new Random().nextInt(20); index++)
+				buffer.append('a' + new Random().nextInt(26));
+		}
+
+		if (RESERVED_KEYWORDS.contains(buffer.toString()))
+			return "_" + buffer.toString();
+
+		return buffer.toString();
 	}
 
 	private StringBuilder verifyParameters(Method method, final List<Parameter> parameters, String indent) {
@@ -210,7 +168,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 				// append method aliases
 				for (final String alias : getMethodAliases(method)) {
-					if (!isValidMethodName(alias)) {
+					if (!isSaveName(alias)) {
 						Logger.error(PluginConstants.PLUGIN_ID,
 								"The method name \"" + alias + "\" from the module \"" + identifier + "\" can not be wrapped because it's name is reserved");
 
@@ -246,7 +204,7 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 
 		// build function declarations
 		for (final String name : getMethodNames(method)) {
-			if (!isValidMethodName(name)) {
+			if (!isSaveName(name)) {
 				Logger.error(PluginConstants.PLUGIN_ID,
 						"The method name \"" + name + "\" from the module \"" + moduleVariable + "\" can not be wrapped because it's name is reserved");
 

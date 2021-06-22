@@ -24,7 +24,7 @@ import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptObjectType;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
-import org.eclipse.ease.lang.javascript.JavaScriptHelper;
+import org.eclipse.ease.lang.javascript.JavaScriptCodeFactory;
 
 public class NashornScriptEngine extends AbstractReplScriptEngine {
 
@@ -63,7 +63,7 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	protected void internalSetVariable(final String name, final Object content) {
-		if (!JavaScriptHelper.isSaveName(name))
+		if (!JavaScriptCodeFactory.isSaveName(name))
 			throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
 
 		fEngine.put(name, content);

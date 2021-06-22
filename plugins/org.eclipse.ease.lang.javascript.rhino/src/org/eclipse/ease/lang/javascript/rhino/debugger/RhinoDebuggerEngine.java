@@ -28,7 +28,7 @@ import org.eclipse.ease.debugging.events.debugger.ThreadCreatedEvent;
 import org.eclipse.ease.debugging.events.debugger.ThreadTerminatedEvent;
 import org.eclipse.ease.debugging.model.EaseDebugTarget;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
-import org.eclipse.ease.lang.javascript.JavaScriptHelper;
+import org.eclipse.ease.lang.javascript.JavaScriptCodeFactory;
 import org.eclipse.ease.lang.javascript.rhino.RhinoScriptEngine;
 import org.eclipse.ease.lang.javascript.rhino.debugger.RhinoDebugger.RhinoDebugFrame;
 import org.eclipse.ease.lang.javascript.rhino.debugger.model.RhinoDebugTarget;
@@ -138,7 +138,7 @@ public class RhinoDebuggerEngine extends RhinoScriptEngine implements IDebugEngi
 	}
 
 	public void setVariable(String name, Object content, Scriptable scope) {
-		if (!JavaScriptHelper.isSaveName(name))
+		if (!JavaScriptCodeFactory.isSaveName(name))
 			throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
 
 		final Object jsOut = internaljavaToJS(content, scope);

@@ -42,7 +42,7 @@ import org.eclipse.ease.debugging.IScriptDebugFrame;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.debugging.model.EaseDebugVariable.Type;
-import org.eclipse.ease.lang.javascript.JavaScriptHelper;
+import org.eclipse.ease.lang.javascript.JavaScriptCodeFactory;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.swt.widgets.Display;
 import org.mozilla.javascript.Context;
@@ -399,7 +399,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		runInJobContext(new RunnableWithResult<Boolean>() {
 			@Override
 			public Boolean runWithTry() throws Throwable {
-				if (!JavaScriptHelper.isSaveName(name))
+				if (!JavaScriptCodeFactory.isSaveName(name))
 					throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
 
 				final Scriptable scope = fScope;
