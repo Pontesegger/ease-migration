@@ -89,7 +89,7 @@
         <requirement
             name="net.sf.eclipsecs.feature.group"/>
         <repository
-            url="https://checkstyle.org/eclipse-cs/update"/>
+            url="https://checkstyle.org/eclipse-cs-update-site"/>
         <description>Install tpd editor</description>
       </setupTask>
     </setupTask>
@@ -293,6 +293,17 @@
           <repository
               url="http://eclipse.py4j.org/"/>
         </repositoryList>
+        <repositoryList
+            name="2021-06">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20210602031627/repository"/>
+          <repository
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
+          <repository
+              url="https://download.eclipse.org/releases/2021-06"/>
+          <repository
+              url="http://eclipse.py4j.org/"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -471,7 +482,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2020-12"
+        defaultValue="2021-06"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
@@ -646,6 +657,19 @@
           <repository
               url="http://download.eclipse.org/ease/integration/nightly"/>
         </repositoryList>
+        <repositoryList
+            name="2021-06">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20210602031627/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2021-06"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -730,7 +754,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2020-12"
+        defaultValue="2021-06"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
