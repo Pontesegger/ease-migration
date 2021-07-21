@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.ui.completion.IHelpResolver;
 import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
@@ -70,7 +71,7 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 	}
 
 	protected static ModuleDefinition getModuleDefinition(final String identifier) {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
+		final IScriptService scriptService = ScriptService.getService();
 		return scriptService.getModuleDefinition(identifier);
 	}
 
