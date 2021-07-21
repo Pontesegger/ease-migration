@@ -83,7 +83,7 @@ Setup.prototype.createTestFragment = function(pluginId, pluginName) {
 	this.internalCreatePlugin(pluginId, pluginName, "workspace://${releng.project}/templates/plugin-test");
 	
 	// add to master pom
-	this.replaceInFile("workspace://${releng.project}/pom.xml", "<!-- test insertion point -->", "<module>../../tests/${bundle.id}</module>\n\t\t\t\t<!-- test insertion point -->");
+	this.replaceInFile("workspace://${releng.project}/pom.xml", "<!-- test insertion point -->", "<module>../../tests/${bundle.id}</module>\n\t\t<!-- test insertion point -->");
 	this.replaceInFile("workspace://${releng.project}.coverage/pom.xml", "<!-- test insertion point -->", "<dependency>\n\t\t\t<groupId>${project.root.id}</groupId>\n\t\t\t<artifactId>${bundle.id}</artifactId>\n\t\t\t<version>${bundle.version}-SNAPSHOT</version>\n\t\t\t<scope>test</scope>\n\t\t</dependency>\n\t\t<!-- test insertion point -->");
 }
 
@@ -146,14 +146,14 @@ Setup.prototype.addReplacement = function(key, value) {
 Setup.prototype.replaceInFile = function(file, search, replacement) {
 	var resolvedFile = this.replaceText(file)
 	var content = readFile(resolvedFile);
-	var handle = writeFile(resolvedFile, content.replace(search, replacement));
+	var handle = writeFile(resolvedFile, content.replace(search, this.replaceText(replacement)));
 	closeFile(handle);
 }
 
 Setup.prototype.appendToFile = function(file, text) {
 	var resolvedFile = this.replaceText(file)
 	var content = readFile(resolvedFile);
-	var handle = writeFile(resolvedFile, content + text);
+	var handle = writeFile(resolvedFile, content + this.replaceText(text));
 	closeFile(handle);
 }
 

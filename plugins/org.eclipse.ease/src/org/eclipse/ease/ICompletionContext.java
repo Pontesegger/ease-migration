@@ -13,89 +13,47 @@
 
 package org.eclipse.ease;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.ScriptType;
 
-/**
- * Interface for completion context. This context helps ICompletionProvider to simplify completion proposal calculation. Stores information about given input,
- * filter for part of interest, and Source stack for part of interest.
- *
- * @author Martin Kloesch
- */
 public interface ICompletionContext {
 
-	enum Type {
-		UNKNOWN, NONE, STATIC_CLASS, CLASS_INSTANCE, PACKAGE, STRING_LITERAL
-	};
+	List<Object> getTokens();
 
-	String getOriginalCode();
+	String getText();
 
-	String getProcessedCode();
+	int getReplaceOffset();
 
-	String getFilter();
-
-	Class<? extends Object> getReferredClazz();
+	int getReplaceLength();
 
 	/**
-	 * Get the base resource of the context. Typically holds a reference to the file open in an editor
-	 *
-	 * @return base resource or <code>null</code>
-	 */
-	Object getResource();
-
-	/**
-	 * Get the running script engine. Only works for live engines like a shell.
+	 * Get active script engine.
 	 *
 	 * @return script engine or <code>null</code>
 	 */
 	IScriptEngine getScriptEngine();
 
-	ScriptType getScriptType();
-
 	/**
-	 * Get a list of loaded modules.
+	 * Get all loaded modules.
 	 *
 	 * @return loaded modules
 	 */
-	Collection<ModuleDefinition> getLoadedModules();
+	List<ModuleDefinition> getLoadedModules();
 
 	/**
-	 * Get a list of included resource. Returns a map of resource objects -&gt; resource content.
+	 * Get a text filter to be applied for the current input. This is the prefix of the expected completion proposals.
 	 *
-	 * @return map of included resources
+	 * @return filter text or empty string
 	 */
-	Map<Object, String> getIncludedResources();
+	String getFilter();
 
-	public Type getType();
+	String getFilterToken();
 
-	int getOffset();
+	boolean isStringLiteral(String input);
 
-	int getSelectionRange();
+	ScriptType getScriptType();
 
-	/**
-	 * Returns the package for PACKAGE types.
-	 *
-	 * @return package name
-	 */
-	String getPackage();
-
-	/**
-	 * Get the caller method for string literals. On STRING_LITERAL types this value denotes the calling method. The whole context of the caller is passed as a
-	 * value. Eg. "new java.lang.String". May not return <code>null</code>.
-	 *
-	 * @return calling method or empty string
-	 */
-	String getCaller();
-
-	/**
-	 * Get the index of the parameter for string literals. On STRING_LITERAL types this value indicates which parameter we are looking at: 0 for the first, 1
-	 * for the second, ...
-	 *
-	 * @return parameter offset for string literals
-	 */
-	int getParameterOffset();
-
+	Object getResource();
 }

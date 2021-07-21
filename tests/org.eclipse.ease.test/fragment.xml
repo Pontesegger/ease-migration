@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension-point id="test" name="Test" schema="schema/test.exsd"/>
+   <extension
+         point="org.eclipse.ease.test">
+      <entry
+            ID="stringEntry"
+            class="java.lang.String">
+      </entry>
+      <entry
+            ID="stringbuilderEntry"
+            class="java.lang.StringBuilder">
+      </entry>
+   </extension>
+
+</fragment>

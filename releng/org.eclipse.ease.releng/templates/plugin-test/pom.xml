@@ -8,7 +8,7 @@
 	
 	<parent>
 		<groupId>${project.root.id}</groupId>
-		<artifactId>${project.root.id}.unittests</artifactId>
+		<artifactId>${project.root.id}.core.tests</artifactId>
 		<version>${bundle.version}-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>

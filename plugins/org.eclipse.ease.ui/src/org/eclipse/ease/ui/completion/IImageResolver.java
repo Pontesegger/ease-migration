@@ -19,7 +19,7 @@ public interface IImageResolver {
 
 	/**
 	 * Returns an image instance. Only called when the actual image gets displayed.
-	 * 
+	 *
 	 * @return image to be displayed in proposal
 	 */
 	Image getImage();

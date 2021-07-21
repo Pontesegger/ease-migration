@@ -9,6 +9,23 @@
             name="Sample"
             visible="true">
       </module>
+      <module
+            class="org.eclipse.ease.ui.test.RootModule"
+            id="org.eclipse.ease.ui.test.rootModule"
+            name="Test Root"
+            visible="true">
+      </module>
+      <category
+            id="org.eclipse.ease.ui.test.category"
+            name="Testing">
+      </category>
+      <module
+            category="org.eclipse.ease.ui.test.category"
+            class="org.eclipse.ease.ui.test.SubModule"
+            id="org.eclipse.ease.ui.test.subModule"
+            name="Test Sub"
+            visible="true">
+      </module>
    </extension>
    <extension
          point="org.eclipse.help.toc">

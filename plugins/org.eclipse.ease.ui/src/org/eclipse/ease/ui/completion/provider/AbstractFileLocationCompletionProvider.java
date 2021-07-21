@@ -10,6 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.ui.completion.provider;
 
 import java.io.File;
@@ -20,71 +21,26 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.ICompletionContext;
-import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.ease.tools.ResourceTools;
-import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
 import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public abstract class AbstractFileLocationCompletionProvider extends AbstractCompletionProvider {
-
-	private static class ResourceImageResolver implements IImageResolver {
-
-		private final Object fFile;
-
-		public ResourceImageResolver(Object file) {
-			fFile = file;
-		}
-
-		@Override
-		public Image getImage() {
-			if (fFile instanceof IResource) {
-				final IWorkbenchAdapter adapter = Platform.getAdapterManager().getAdapter(fFile, IWorkbenchAdapter.class);
-				return (adapter != null) ? adapter.getImageDescriptor(fFile).createImage() : null;
-
-			} else if (fFile instanceof File) {
-
-				if (isRootFile((File) fFile))
-					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
-
-				if (((File) fFile).isFile())
-					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE).createImage();
-
-				if (((File) fFile).isDirectory())
-					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
-
-			} else if (fFile instanceof ImageDescriptor)
-				return ((ImageDescriptor) fFile).createImage();
-
-			return null;
-		}
-	}
 
 	private static final int ORDER_URI_SCHEME = ScriptCompletionProposal.ORDER_DEFAULT;
 	private static final int ORDER_PROJECT = ScriptCompletionProposal.ORDER_DEFAULT + 1;
 	private static final int ORDER_FOLDER = ScriptCompletionProposal.ORDER_DEFAULT + 2;
 	private static final int ORDER_FILE = ScriptCompletionProposal.ORDER_DEFAULT + 3;
 
-	private final ILabelProvider fLabelProvider = new WorkbenchLabelProvider();
-
-	public AbstractFileLocationCompletionProvider() {
-		Display.getDefault().syncExec(() -> fLabelProvider.getImage(ResourcesPlugin.getWorkspace().getRoot()));
-	}
-
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return (context.getType() == Type.STRING_LITERAL);
+		return super.isActive(context) && isStringParameter(context);
 	}
 
 	@Override
@@ -95,7 +51,7 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 		if ((matches(context.getFilter(), "workspace:/")) && (showCandidate("workspace://")))
 			addProposal("workspace://", "workspace://", null, ORDER_URI_SCHEME, null);
 
-		if ((matches(context.getFilter(), "project:/")) && (getContext().getResource() instanceof IResource) && (showCandidate("project://")))
+		if ((matches(context.getFilter(), "project:/")) && (showCandidate("project://")) && (getContext().getResource() instanceof IResource))
 			addProposal("project://", "project://", null, ORDER_URI_SCHEME, null);
 
 		if ((matches(context.getFilter(), "file://")) && (showCandidate("file:///")))
@@ -143,14 +99,10 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 			final Object parentFolder = resolver.getParentFolder();
 
 			if ((parentFolder instanceof IResource) && !(parentFolder instanceof IWorkspaceRoot)) {
-				addProposal("..", resolver.getParentString() + "../",
-						new ResourceImageResolver(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER)), ORDER_FOLDER,
-						null);
+				addProposal("..", resolver.getParentString() + "../", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
 
 			} else if ((parentFolder instanceof File) && !(isRootFile((File) parentFolder)) && !(ResourceTools.VIRTUAL_WINDOWS_ROOT.equals(parentFolder))) {
-				addProposal("..", resolver.getParentString() + "/../",
-						new ResourceImageResolver(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER)), ORDER_FOLDER,
-						null);
+				addProposal("..", resolver.getParentString() + "/../", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
 			}
 		}
 	}
@@ -209,5 +161,36 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 
 	protected static boolean isFolder(final Object candidate) {
 		return ((candidate instanceof File) && (((File) candidate).isDirectory())) || (candidate instanceof IContainer);
+	}
+
+	private static final class ResourceImageResolver implements IImageResolver {
+
+		private final Object fFile;
+
+		private ResourceImageResolver(Object file) {
+			fFile = file;
+		}
+
+		@Override
+		public Image getImage() {
+			if (fFile instanceof IResource) {
+				final IWorkbenchAdapter adapter = Platform.getAdapterManager().getAdapter(fFile, IWorkbenchAdapter.class);
+				return (adapter == null) ? null : adapter.getImageDescriptor(fFile).createImage();
+
+			} else if (fFile instanceof File) {
+
+				if (isRootFile((File) fFile))
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
+
+				if (((File) fFile).isFile())
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FILE).createImage();
+
+				if (((File) fFile).isDirectory())
+					return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER).createImage();
+
+			}
+
+			return null;
+		}
 	}
 }

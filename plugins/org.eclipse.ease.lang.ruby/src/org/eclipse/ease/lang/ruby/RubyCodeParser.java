@@ -13,6 +13,8 @@
 package org.eclipse.ease.lang.ruby;
 
 import org.eclipse.ease.AbstractCodeParser;
+import org.eclipse.ease.ICompletionContext;
+import org.eclipse.ease.IScriptEngine;
 
 public class RubyCodeParser extends AbstractCodeParser {
 
@@ -38,5 +40,10 @@ public class RubyCodeParser extends AbstractCodeParser {
 	@Override
 	protected String getBlockCommentEndToken() {
 		return BLOCK_COMMENT_END;
+	}
+
+	@Override
+	public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
+		return null;
 	}
 }

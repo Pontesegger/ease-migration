@@ -4,7 +4,8 @@ Bundle-Name: EASE Groovy Language (Incubation)
 Bundle-SymbolicName: org.eclipse.ease.lang.groovy;singleton:=true
 Bundle-Version: 0.9.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.ease
+Require-Bundle: org.eclipse.ease,
+ org.eclipse.ease.ui
 Bundle-Vendor: Eclipse.org
 Export-Package: org.eclipse.ease.lang.groovy
 Automatic-Module-Name: org.eclipse.ease.lang.groovy

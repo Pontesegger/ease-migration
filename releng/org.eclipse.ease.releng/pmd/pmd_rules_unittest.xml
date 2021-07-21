@@ -24,6 +24,9 @@
 
 		<!-- More than 1 assert allowed in tests -->
 		<exclude name="JUnitTestContainsTooManyAsserts" />
+
+		<!-- JUnit 5 tests should be package private -->
+		<exclude name="JUnit5TestShouldBePackagePrivate" />
 	</rule>
 
 	<rule ref="category/java/codestyle.xml">

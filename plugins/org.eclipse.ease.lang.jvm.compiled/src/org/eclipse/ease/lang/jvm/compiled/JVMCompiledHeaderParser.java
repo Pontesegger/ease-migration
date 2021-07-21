@@ -13,6 +13,8 @@
 package org.eclipse.ease.lang.jvm.compiled;
 
 import org.eclipse.ease.AbstractCodeParser;
+import org.eclipse.ease.ICompletionContext;
+import org.eclipse.ease.IScriptEngine;
 
 public class JVMCompiledHeaderParser extends AbstractCodeParser {
 
@@ -38,5 +40,10 @@ public class JVMCompiledHeaderParser extends AbstractCodeParser {
 	@Override
 	protected boolean hasBlockComment() {
 		return true;
+	}
+
+	@Override
+	public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
+		return null;
 	}
 }

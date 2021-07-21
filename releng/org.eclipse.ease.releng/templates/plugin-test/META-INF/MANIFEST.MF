@@ -6,6 +6,7 @@ Automatic-Module-Name: ${bundle.id}
 Bundle-Version: ${bundle.version}.qualifier
 Bundle-Vendor: ${bundle.vendor}
 Bundle-RequiredExecutionEnvironment: ${java.version}
-Fragment-Host: ${bundle.host.id};bundle-version="${bundle.version}"
+Fragment-Host: ${bundle.host.id}
 Require-Bundle: org.junit.jupiter.api,
- org.mockito
+ org.mockito,
+ org.junit.jupiter.params

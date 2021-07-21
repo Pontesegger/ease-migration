@@ -14,22 +14,23 @@
 package org.eclipse.ease.ui.completion.provider;
 
 import org.eclipse.ease.ICompletionContext;
+import org.eclipse.ease.modules.EnvironmentModule;
 
 public class EnvironmentLocationCompletionProvider extends AbstractFileLocationCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return super.isActive(context) && ((context.getCaller().endsWith("include")) || (context.getCaller().endsWith("loadJar")))
-				&& (context.getParameterOffset() == 0);
+		return super.isActive(context)
+				&& (isMethodParameter(context, EnvironmentModule.INCLUDE_METHOD, 0) || isMethodParameter(context, EnvironmentModule.LOAD_JAR_METHOD, 0));
 	}
 
 	@Override
 	protected boolean showCandidate(final Object candidate) {
 		if (isFile(candidate)) {
-			if (getContext().getCaller().endsWith("include"))
+			if (isMethodParameter(getContext(), EnvironmentModule.INCLUDE_METHOD, 0))
 				return hasFileExtension(candidate, getContext().getScriptType().getDefaultExtension());
 
-			else if (getContext().getCaller().endsWith("loadJar"))
+			else if (isMethodParameter(getContext(), EnvironmentModule.LOAD_JAR_METHOD, 0))
 				return hasFileExtension(candidate, "jar");
 		}
 

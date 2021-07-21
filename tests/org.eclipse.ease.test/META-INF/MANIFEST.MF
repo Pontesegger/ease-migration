@@ -4,7 +4,7 @@ Bundle-Name: Tests for org.eclipse.ease
 Bundle-SymbolicName: org.eclipse.ease.test;singleton:=true
 Bundle-Version: 0.9.0.qualifier
 Fragment-Host: org.eclipse.ease
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0",
  org.mockito,
  org.eclipse.ease.ui.scripts,

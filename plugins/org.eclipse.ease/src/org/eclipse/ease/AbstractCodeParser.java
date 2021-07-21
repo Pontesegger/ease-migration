@@ -142,12 +142,6 @@ public abstract class AbstractCodeParser implements ICodeParser {
 	}
 
 	@Override
-	public ICompletionContext getContext(final IScriptEngine scriptEngine, final Object resource, final String contents, final int position,
-			final int selectionRange) {
-		return null;
-	}
-
-	@Override
 	public SignatureInfo getSignatureInfo(final InputStream stream) throws ScriptSignatureException {
 		final BufferedReader bReader = new BufferedReader(new InputStreamReader(stream));
 		try {

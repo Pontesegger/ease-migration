@@ -11,8 +11,8 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.ui.modules;
+package org.eclipse.ease.ui.test;
 
-public class ModulesToolsTest {
+public class SubModule {
 
 }

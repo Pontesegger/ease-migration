@@ -44,9 +44,7 @@ public class PythonCodeParser extends AbstractCodeParser {
 
 	@Override
 	public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
-		final PythonCompletionContext context = new PythonCompletionContext(scriptEngine);
-		context.calculateContext(resource, contents, position, selectionRange);
-
-		return context;
+		return (scriptEngine != null) ? new PythonCompletionContext(scriptEngine, contents, position)
+				: new PythonCompletionContext(resource, contents, position);
 	}
 }

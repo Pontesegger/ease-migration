@@ -185,7 +185,7 @@ public class ModuleDefinition {
 	}
 
 	/**
-	 * Sets visibility status of module in preferences
+	 * Sets visibility status of module in preferences.
 	 *
 	 * @param visible
 	 *            <code>true</code> to make visible

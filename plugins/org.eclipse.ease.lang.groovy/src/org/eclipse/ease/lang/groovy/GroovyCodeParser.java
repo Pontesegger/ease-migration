@@ -13,6 +13,9 @@
 package org.eclipse.ease.lang.groovy;
 
 import org.eclipse.ease.AbstractCodeParser;
+import org.eclipse.ease.ICompletionContext;
+import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.ui.completion.BasicContext;
 
 public class GroovyCodeParser extends AbstractCodeParser {
 
@@ -38,5 +41,11 @@ public class GroovyCodeParser extends AbstractCodeParser {
 	@Override
 	protected String getBlockCommentEndToken() {
 		return BLOCK_COMMENT_END;
+	}
+
+	@Override
+	public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
+		return (scriptEngine != null) ? new BasicContext(scriptEngine, contents, position)
+				: new BasicContext(GroovyHelper.getScriptType(), resource, contents, position);
 	}
 }

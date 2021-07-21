@@ -68,6 +68,7 @@ public class ScriptCompletionProposal
 	public ScriptCompletionProposal(final ICompletionContext context, final StyledString styledString, final String replacementString,
 			final IImageResolver imageResolver, final int sortOrder, final IHelpResolver helpResolver) {
 		this(context, styledString.getString(), replacementString, imageResolver, sortOrder, helpResolver);
+
 		fStyledString = styledString;
 	}
 
@@ -101,11 +102,7 @@ public class ScriptCompletionProposal
 	@Override
 	public void apply(final IDocument document) {
 		try {
-			if (fContext.getFilter() != null)
-				document.replace(fContext.getOffset() - fContext.getFilter().length(), fContext.getFilter().length(), fReplacementString);
-
-			else
-				document.replace(fContext.getOffset(), 0, fReplacementString);
+			document.replace(fContext.getReplaceOffset(), fContext.getReplaceLength(), fReplacementString);
 
 		} catch (final BadLocationException e) {
 			Logger.error(Activator.PLUGIN_ID, "Could not insert completion proposal into document", e);
@@ -114,11 +111,7 @@ public class ScriptCompletionProposal
 
 	@Override
 	public Point getSelection(final IDocument document) {
-		if (fContext.getFilter() != null)
-			return new Point((fContext.getOffset() - fContext.getFilter().length()) + fReplacementString.length(), 0);
-
-		else
-			return new Point(fContext.getOffset() + fReplacementString.length(), 0);
+		return new Point(fContext.getReplaceOffset() + fReplacementString.length(), 0);
 	}
 
 	@Override
@@ -159,33 +152,26 @@ public class ScriptCompletionProposal
 	// ------------------------------------------------------------------
 	@Override
 	public String getContent() {
-		final String original = fContext.getOriginalCode();
-		return original.substring(0, original.length() - fContext.getFilter().length()) + fReplacementString;
+		final String prefix = fContext.getText().substring(0, fContext.getReplaceOffset() - fContext.getFilter().length());
+		final String suffix = fContext.getText().substring(fContext.getReplaceOffset());
+
+		return prefix + fReplacementString + suffix;
 	}
 
 	@Override
 	public int getCursorPosition() {
-		return getContent().length();
+		final String prefix = fContext.getText().substring(0, fContext.getReplaceOffset() - fContext.getFilter().length());
+
+		return (prefix + fReplacementString).length();
 	}
 
 	@Override
 	public String getLabel() {
-		return getDisplayString() + "x";
+		return getDisplayString();
 	}
 
 	@Override
 	public String getDescription() {
 		return getAdditionalProposalInfo();
-	}
-
-	// ------------------------------------------------------------------
-	// Custom methods for script completion in EASE
-	// ------------------------------------------------------------------
-	public String getReplacementString() {
-		return fReplacementString;
-	}
-
-	public int getCursorStartPosition() {
-		return fContext.getOriginalCode().length() - fContext.getFilter().length();
 	}
 }

@@ -57,6 +57,15 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	public static final String MODULE_NAME = "/System/Environment";
 
+	/** Used by code completion. Keep in sync with method name in this class. */
+	public static final String INCLUDE_METHOD = "include";
+
+	/** Used by code completion. Keep in sync with method name in this class. */
+	public static final String LOAD_JAR_METHOD = "loadJar";
+
+	/** Used by code completion. Keep in sync with method name in this class. */
+	public static final String LOAD_MODULE_METHOD = "loadModule";
+
 	private static final Pattern VALID_TOPICS_PATTERN = Pattern.compile("[\\w ]+(?:\\(\\))?");
 
 	public static void bootstrap() throws ExecutionException {

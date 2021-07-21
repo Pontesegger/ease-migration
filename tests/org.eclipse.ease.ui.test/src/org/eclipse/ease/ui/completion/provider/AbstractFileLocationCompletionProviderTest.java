@@ -13,16 +13,12 @@
 
 package org.eclipse.ease.ui.completion.provider;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,10 +27,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ease.ICompletionContext;
+import org.eclipse.ease.ui.completion.BasicContext;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class AbstractFileLocationCompletionProviderTest {
@@ -89,7 +86,7 @@ public class AbstractFileLocationCompletionProviderTest {
 		if (!fFolder.exists())
 			fFolder.create(0, true, null);
 
-		fFile1 = fFolder.getFile(FILE1_NAME);
+		fFile1 = fProject.getFile(FILE1_NAME);
 		if (!fFile1.exists())
 			fFile1.create(new ByteArrayInputStream(FILE1_CONTENT.getBytes("UTF-8")), false, null);
 
@@ -117,140 +114,157 @@ public class AbstractFileLocationCompletionProviderTest {
 		}
 	}
 
-	@Disabled
 	@Test
-	public void checkOperatingSystem() {
-		assertTrue(isLinux() || isWindows(), "Operating system is: " + System.getProperty("os.name"));
+	@DisplayName("getProposals('') contains 'workspace://'")
+	public void getProposals_contains_workspace_root() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext(""));
+		assertNotNull(findProposal(proposals, "workspace://"));
 	}
 
-	@Disabled
 	@Test
-	public void absoluteRootWorkspaceProposals() {
-
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("");
-		when(context.getFilter()).thenReturn("");
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains("workspace://"), "<workspace://> proposal missing");
-		assertTrue(content.contains("file:///"), "<file:///> proposal missing");
-		assertEquals(2, proposals.size());
+	@DisplayName("getProposals('') contains 'file://'")
+	public void getProposals_contains_filesystem_root() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext(""));
+		assertNotNull(findProposal(proposals, "file://"));
 	}
 
-	@Disabled
 	@Test
-	public void workspaceProposals() {
-
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("workspace://");
-		when(context.getFilter()).thenReturn("workspace://");
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains(PROJECT_NAME), "<" + PROJECT_NAME + "> proposal missing");
-		assertEquals(1, proposals.size());
+	@DisplayName("getProposals('') does not contain 'project://' without resource")
+	public void getProposals_does_not_contain_project_root_without_resource() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext(""));
+		assertNull(findProposal(proposals, "project://"));
 	}
 
-	@Disabled
 	@Test
-	public void workspaceProjectProposals() {
-
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("workspace://" + PROJECT_NAME + "/");
-		when(context.getFilter()).thenReturn("workspace://" + PROJECT_NAME + "/");
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains(".."), "<..> proposal missing");
-		assertTrue(content.contains(FOLDER_NAME), "<" + FOLDER_NAME + "> proposal missing");
-		assertTrue(content.contains(".project"), "<.project> proposal missing");
-		assertEquals(3, proposals.size());
+	@DisplayName("getProposals('') does not contain 'project://' with file resource")
+	public void getProposals_does_not_contain_project_root_with_file_resource() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fFsFile1));
+		assertNull(findProposal(proposals, "project://"));
 	}
 
-	@Disabled
 	@Test
-	public void workspaceFolderProposals() {
-
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("workspace://" + PROJECT_NAME + "/" + FOLDER_NAME + "/");
-		when(context.getFilter()).thenReturn("workspace://" + PROJECT_NAME + "/" + FOLDER_NAME + "/");
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains(".."), "<..> proposal missing");
-		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
-		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
-		assertEquals(3, proposals.size());
+	@DisplayName("getProposals('') contains 'project://' with workspace resource")
+	public void getProposals_contains_project_root_with_workspace_resource() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fFile1));
+		assertNotNull(findProposal(proposals, "project://"));
 	}
 
-	@Disabled
 	@Test
-	public void relativeRootWorkspaceProposals() {
-
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("");
-		when(context.getFilter()).thenReturn("");
-		when(context.getResource()).thenReturn(fFile1);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains("workspace://"), "<workspace://> proposal missing");
-		assertTrue(content.contains("file:///"), "<file:///> proposal missing");
-		assertTrue(content.contains("project://"), "<project://> proposal missing");
-		assertTrue(content.contains(".."), "<..> proposal missing");
-		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
-		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
-		assertEquals(6, proposals.size());
+	@DisplayName("getProposals('workspace://') contains projects")
+	public void getProposals_contains_projects_for_workspace_root() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://"));
+		assertNotNull(findProposal(proposals, fProject.getName()));
 	}
 
-	@Disabled
 	@Test
-	public void fileSystemRootProposals() {
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn("file:///");
-		when(context.getFilter()).thenReturn("file:///");
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertFalse(content.contains(".."), "<..> proposal exists");
-		assertFalse(proposals.isEmpty());
+	@DisplayName("getProposals('workspace://') does not contain contains '..'")
+	public void getProposals_doe_not_contain_back_proposal() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://"));
+		assertNull(findProposal(proposals, ".."));
 	}
 
-	@Disabled
 	@Test
-	public void fileSystemFolderProposals() {
-		final ICompletionContext context = mock(ICompletionContext.class);
-		when(context.getOriginalCode()).thenReturn(fFsFolder.getAbsolutePath());
-		when(context.getFilter()).thenReturn(fFsFolder.getAbsolutePath());
-		when(context.getResource()).thenReturn(null);
-
-		final Collection<? extends ScriptCompletionProposal> proposals = fProvider.getProposals(context);
-		final Collection<String> content = extractDisplayedContent(proposals);
-
-		assertTrue(content.contains(".."), "<..> proposal missing");
-		assertTrue(content.contains(FILE1_NAME), "<" + FILE1_NAME + "> proposal missing");
-		assertTrue(content.contains(FILE2_NAME), "<" + FILE2_NAME + "> proposal missing");
-		assertEquals(3, proposals.size());
+	@DisplayName("getProposals('workspace://<project>') contains project root folders")
+	public void getProposals_contains_project_root_folders_for_workspace_project() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://" + fProject.getName() + "/"));
+		assertNotNull(findProposal(proposals, fFolder.getName()));
 	}
 
-	private static Collection<String> extractDisplayedContent(Collection<? extends ScriptCompletionProposal> proposals) {
-		final Collection<String> content = new HashSet<>();
+	@Test
+	@DisplayName("getProposals('workspace://<project>') contains project root files")
+	public void getProposals_contains_project_root_files_for_workspace_project() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://" + fProject.getName() + "/"));
+		assertNotNull(findProposal(proposals, fFile1.getName()));
+	}
 
-		for (final ScriptCompletionProposal proposal : proposals)
-			content.add(proposal.getDisplayString());
+	@Test
+	@DisplayName("getProposals('workspace://<project>/<folder>') contains folder files")
+	public void getProposals_contains_files_for_workspace_folder() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider
+				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/"));
+		assertNotNull(findProposal(proposals, fFile2.getName()));
+	}
 
-		return content;
+	@Test
+	@DisplayName("getProposals('workspace://<project>/<folder>') contains '..' proposal")
+	public void getProposals_contains_back_for_workspace_folder() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider
+				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/"));
+		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	@DisplayName("getProposals('project://') contains project root folders")
+	public void getProposals_contains_project_root_folders_for_project_root() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://", fFile2));
+		assertNotNull(findProposal(proposals, fFolder.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('project://') contains project root files")
+	public void getProposals_contains_project_root_files_for_project_root() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://", fFile2));
+		assertNotNull(findProposal(proposals, fFile1.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('project://<folder>') contains folder files")
+	public void getProposals_contains_files_for_project_folder() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://" + fFolder.getName() + "/", fFile2));
+		assertNotNull(findProposal(proposals, fFile2.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('project://<folder>') contains '..' proposal")
+	public void getProposals_contains_back_for_project_folder() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://" + fFolder.getName() + "/", fFile2));
+		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	@Test
+	@DisplayName("getProposals('file://') contains root file systems")
+	public void getProposals_contains_root_file_systems() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("file://"));
+		for (final File root : File.listRoots())
+			assertNotNull(findProposal(proposals, root.getName()), String.format("Root entry not found for %s", root.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('') contains files for project")
+	public void getProposals_contains_files_for_project() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fProject));
+		assertNotNull(findProposal(proposals, fFile1.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('') contains '..' for project")
+	public void getProposals_contains_back_for_project() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fProject));
+		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	@Test
+	@DisplayName("getProposals('') contains files for filesystem")
+	public void getProposals_contains_files_for_filesystem() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fFsFile1));
+		assertNotNull(findProposal(proposals, fFsFile1.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('') contains '..' for filesystem")
+	public void getProposals_contains_back_for_filesystem() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fFsFile1));
+		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	private ScriptCompletionProposal findProposal(Collection<ScriptCompletionProposal> proposals, String displayString) {
+		return proposals.stream().filter(p -> p.getDisplayString().startsWith(displayString)).findFirst().orElseGet(() -> null);
+	}
+
+	private ICompletionContext createContext(String input) {
+		return createContext(input, null);
+	}
+
+	private ICompletionContext createContext(String input, Object resource) {
+		return new BasicContext(null, resource, "\"" + input, input.length() + 1);
 	}
 }

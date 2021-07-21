@@ -15,7 +15,24 @@ package org.eclipse.ease.lang.groovy;
 
 import java.util.regex.Pattern;
 
-public class GroovyHelper {
+import org.eclipse.ease.service.IScriptService;
+import org.eclipse.ease.service.ScriptService;
+import org.eclipse.ease.service.ScriptType;
+
+public final class GroovyHelper {
+
+	/** Script type identifier for JavaScript. Must match with the script type 'name' from plugin.xml. */
+	public static final String SCRIPT_TYPE_GROOVY = "Groovy";
+
+	/**
+	 * Get the {@link ScriptType} for java script.
+	 *
+	 * @return script type definition
+	 */
+	public static ScriptType getScriptType() {
+		final IScriptService scriptService = ScriptService.getInstance();
+		return scriptService.getAvailableScriptTypes().get(SCRIPT_TYPE_GROOVY);
+	}
 
 	public static boolean isSaveName(final String identifier) {
 		return Pattern.matches("[a-zA-Z_$][a-zA-Z0-9_$]*", identifier);

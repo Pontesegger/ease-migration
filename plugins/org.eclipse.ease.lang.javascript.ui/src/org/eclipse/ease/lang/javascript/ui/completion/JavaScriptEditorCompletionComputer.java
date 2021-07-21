@@ -13,6 +13,7 @@
 
 package org.eclipse.ease.lang.javascript.ui.completion;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import org.eclipse.ease.lang.javascript.ui.PluginConstants;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.completion.CodeCompletionAggregator;
-import org.eclipse.ease.ui.completion.ICompletionProvider;
+import org.eclipse.ease.ui.completion.provider.ICompletionProvider;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -43,10 +44,6 @@ import org.eclipse.wst.jsdt.ui.text.java.IJavaCompletionProposalComputer;
  * JSDT JavaScript Editors. So all editors of this type share the same instance.
  */
 public class JavaScriptEditorCompletionComputer implements IJavaCompletionProposalComputer {
-	/**
-	 * {@link CodeCompletionAggregator} to handle the actual creation of proposals.
-	 */
-	private final CodeCompletionAggregator fCompletionAggregator = new CodeCompletionAggregator();
 
 	/**
 	 * Constructor sets up {@link CodeCompletionAggregator} and loads registered {@link ICompletionProvider}.
@@ -54,9 +51,6 @@ public class JavaScriptEditorCompletionComputer implements IJavaCompletionPropos
 	public JavaScriptEditorCompletionComputer() {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		final ScriptType scriptType = scriptService.getAvailableScriptTypes().get(JavaScriptHelper.SCRIPT_TYPE_JAVASCRIPT);
-
-		fCompletionAggregator.setScriptType(scriptType);
-		fCompletionAggregator.setCodeParser(scriptType.getCodeParser());
 	}
 
 	@Override
@@ -80,7 +74,10 @@ public class JavaScriptEditorCompletionComputer implements IJavaCompletionPropos
 
 					final int cursorPosition = context.getInvocationOffset();
 					final int selectionRange = context.getViewer().getSelectedRange().y;
-					return fCompletionAggregator.getCompletionProposals(resource, relevantText, cursorPosition, selectionRange, monitor);
+
+					final CodeCompletionAggregator aggregator = new CodeCompletionAggregator(resource, JavaScriptHelper.getScriptType());
+
+					return new ArrayList<>(aggregator.getProposals(relevantText, cursorPosition, monitor));
 
 				} catch (final BadLocationException e) {
 					Logger.error(PluginConstants.PLUGIN_ID, "Failed to calculate proposals for JavaScript editor", e);

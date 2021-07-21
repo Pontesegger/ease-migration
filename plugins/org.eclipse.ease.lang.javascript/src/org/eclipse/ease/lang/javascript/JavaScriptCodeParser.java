@@ -12,11 +12,11 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript;
 
+import org.eclipse.ease.AbstractCodeParser;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.ui.completion.AbstractCompletionParser;
 
-public class JavaScriptCodeParser extends AbstractCompletionParser {
+public class JavaScriptCodeParser extends AbstractCodeParser {
 
 	private static final String LINE_COMMENT = "//";
 	private static final String BLOCK_COMMENT_START = "/*";
@@ -44,9 +44,7 @@ public class JavaScriptCodeParser extends AbstractCompletionParser {
 
 	@Override
 	public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
-		final JavaScriptCompletionContext context = new JavaScriptCompletionContext(scriptEngine);
-		context.calculateContext(resource, contents, position, selectionRange);
-
-		return context;
+		return (scriptEngine != null) ? new JavaScriptCompletionContext(scriptEngine, contents, position)
+				: new JavaScriptCompletionContext(resource, contents, position);
 	}
 }

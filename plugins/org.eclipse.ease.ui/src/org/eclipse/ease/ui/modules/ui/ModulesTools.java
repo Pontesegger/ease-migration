@@ -27,7 +27,6 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.ui.PlatformUI;
 
@@ -65,12 +64,10 @@ public final class ModulesTools {
 		}
 	}
 
-	private static Styler OPTIONAL_PARAMETER_STYLE = new Styler() {
-		private final Font italic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DEFAULT_FONT);
-
+	private static final Styler OPTIONAL_PARAMETER_STYLE = new Styler() {
 		@Override
 		public void applyStyles(TextStyle textStyle) {
-			textStyle.font = italic;
+			textStyle.font = JFaceResources.getFontRegistry().getItalic(JFaceResources.DEFAULT_FONT);
 			textStyle.foreground = JFaceResources.getColorRegistry().get("QUALIFIER_COLOR");
 		}
 	};

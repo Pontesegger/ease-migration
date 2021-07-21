@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
-<fragment>
+<plugin>
    <extension
          point="org.eclipse.ease.ui.codeCompletionProvider">
       <codeCompletionProvider
@@ -14,4 +14,4 @@
       </codeCompletionProvider>
    </extension>
 
-</fragment>
+</plugin>

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class AbstractCodeParserTest {
 
 	// classic implementation of a HeaderParser
-	private class HeaderParser extends AbstractCodeParser {
+	private static class HeaderParser extends AbstractCodeParser {
 
 		@Override
 		protected boolean hasBlockComment() {
@@ -54,38 +54,43 @@ public class AbstractCodeParserTest {
 
 			return super.stripCommentLine(commentLine);
 		}
+
+		@Override
+		public ICompletionContext getContext(IScriptEngine scriptEngine, Object resource, String contents, int position, int selectionRange) {
+			return null;
+		}
 	}
 
 	// @formatter:off
-	private static final String TEMPLATE_BLOCK_HEADER = 
-			  "/**\n" 
+	private static final String TEMPLATE_BLOCK_HEADER =
+			  "/**\n"
 			+ " * This is a block comment with a keyword.\n"
 			+ " * \n"
 			+ " * key: word\n"
 			+ " * menu: no menu selected\n"
 			+ " * multi: this is a multi\n"
-			+ " * line keyword\n" 
+			+ " * line keyword\n"
 			+ " **/\n";
 
 	private static final String TEMPLATE_LINE_HEADER =
 			  "//\n"
 			+ "// This is a block comment with a keyword.\n"
-			+ "// \n" 
+			+ "// \n"
 			+ " // key: word\n"
-			+ "// menu: no menu selected\n" 
-			+ "// multi: this is a multi\n" 
-			+ "// line keyword\n" 
+			+ "// menu: no menu selected\n"
+			+ "// multi: this is a multi\n"
+			+ "// line keyword\n"
 			+ "//\n";
 
 	private static final String TEMPLATE_NO_COMMENT =
 			  "var a = 13;\n"
 			+ TEMPLATE_BLOCK_HEADER;
-	
+
 	private static final String TEMPLATE_WHITESPACE_BEFORE_BLOCK_HEADER =
 			  "\n"
 			+ "\t\t\n"
 			+ "        \n"
-			+ "     " 
+			+ "     "
 			+ TEMPLATE_BLOCK_HEADER;
 	// @formatter:on
 
@@ -133,7 +138,7 @@ public class AbstractCodeParserTest {
 		assertEquals("this is a multi line keyword", keywords.get("multi"));
 	}
 
-	private static final InputStream toStream(String data) {
+	private static InputStream toStream(String data) {
 		return new ByteArrayInputStream(data.getBytes());
 	}
 }

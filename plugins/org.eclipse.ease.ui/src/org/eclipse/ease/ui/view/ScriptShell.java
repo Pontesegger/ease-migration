@@ -14,10 +14,11 @@
 package org.eclipse.ease.ui.view;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
@@ -40,12 +41,12 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.Activator;
-import org.eclipse.ease.ui.completion.AbstractCompletionProvider.DescriptorImageResolver;
 import org.eclipse.ease.ui.completion.CodeCompletionAggregator;
 import org.eclipse.ease.ui.completion.CompletionLabelProvider;
-import org.eclipse.ease.ui.completion.ICompletionProvider;
 import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
+import org.eclipse.ease.ui.completion.provider.AbstractCompletionProvider.DescriptorImageResolver;
+import org.eclipse.ease.ui.completion.provider.ICompletionProvider;
 import org.eclipse.ease.ui.console.ScriptConsole;
 import org.eclipse.ease.ui.dnd.ShellDropTarget;
 import org.eclipse.ease.ui.handler.ToggleDropinsSection;
@@ -139,7 +140,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private AutoFocus fAutoFocusListener = null;
 
-	private final CodeCompletionAggregator fCompletionDispatcher = new CodeCompletionAggregator();
+	private CodeCompletionAggregator fCompletionDispatcher = null;
 
 	private Collection<IShellDropin> fDropins = Collections.emptySet();
 
@@ -239,8 +240,6 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		}
 		fHistory = fInputCombo.getItems().clone();
 
-		addAutoCompletion();
-
 		// clear reference as we are done with initialization
 		fInitMemento = null;
 
@@ -319,26 +318,15 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			}
 
 			@Override
-			public Collection<? extends ScriptCompletionProposal> getProposals(ICompletionContext context) {
-				final Collection<ScriptCompletionProposal> proposals = new HashSet<>();
-
-				for (final String history : fHistory) {
-					if (history.startsWith(context.getOriginalCode())) {
-						proposals.add(new ScriptCompletionProposal(context, history, history, fImageResolver, ScriptCompletionProposal.ORDER_HISTORY, null) {
-							@Override
-							public String getContent() {
-								return getReplacementString();
-							}
-						});
-					}
-				}
-
-				return proposals;
+			public Collection<ScriptCompletionProposal> getProposals(ICompletionContext context) {
+				return Arrays.asList(fHistory).stream().filter(t -> t.startsWith(context.getText()))
+						.map(t -> new ScriptCompletionProposal(context, t, t, fImageResolver, ScriptCompletionProposal.ORDER_HISTORY, null))
+						.collect(Collectors.toList());
 			}
 		});
 
 		final ContentProposalModifier contentAssistAdapter = new ContentProposalModifier(fInputCombo, new ComboContentAdapter(), fCompletionDispatcher,
-				KeyStroke.getInstance(SWT.CTRL, ' '), fCompletionDispatcher.getActivationChars());
+				KeyStroke.getInstance(SWT.CTRL, ' '), new char[] { '.' });
 
 		contentAssistAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 		contentAssistAdapter.setLabelProvider(new CompletionLabelProvider());
@@ -539,7 +527,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 				dropin.setScriptEngine(fScriptEngine);
 
 			// set script engine
-			fCompletionDispatcher.setScriptEngine(fScriptEngine);
+			fCompletionDispatcher = new CodeCompletionAggregator(fScriptEngine);
+			addAutoCompletion();
 		}
 	}
 

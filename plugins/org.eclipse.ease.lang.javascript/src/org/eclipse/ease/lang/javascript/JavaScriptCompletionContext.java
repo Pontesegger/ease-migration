@@ -14,41 +14,69 @@
 package org.eclipse.ease.lang.javascript;
 
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.ui.completion.CompletionContext;
+import org.eclipse.ease.ui.completion.BasicContext;
+import org.eclipse.ease.ui.completion.tokenizer.IVariablesResolver;
+import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 
-public class JavaScriptCompletionContext extends CompletionContext {
+public class JavaScriptCompletionContext extends BasicContext {
 
-	public JavaScriptCompletionContext(final IScriptEngine scriptEngine) {
-		super(scriptEngine, JavaScriptHelper.getScriptType());
+	public JavaScriptCompletionContext(IScriptEngine scriptEngine, String contents, int position) {
+		super(scriptEngine, contents, position);
+	}
+
+	public JavaScriptCompletionContext(Object resource, String contents, int position) {
+		super(JavaScriptHelper.getScriptType(), resource, contents, position);
 	}
 
 	@Override
-	protected boolean isLiteral(final char candidate) {
-		for (final char literal : "'\"".toCharArray()) {
-			if (candidate == literal)
-				return true;
+	protected InputTokenizer getInputTokenizer() {
+		if (getScriptEngine() != null)
+			return new JavaScriptInputTokenizer(v -> {
+				final Object variable = getScriptEngine().getVariable(v);
+				return (variable == null) ? null : variable.getClass();
+			});
+
+		return new JavaScriptInputTokenizer();
+	}
+
+	private final class JavaScriptInputTokenizer extends InputTokenizer {
+
+		private static final String PACKAGES_PREFIX = "Packages.";
+
+		private JavaScriptInputTokenizer() {
+			super();
 		}
 
-		return false;
-	}
+		private JavaScriptInputTokenizer(IVariablesResolver variablesResolver) {
+			super(variablesResolver);
+		}
 
-	@Override
-	protected String simplifyCode() {
-		final String code = super.simplifyCode();
-		if (code.startsWith("Packages."))
-			return code.substring("Packages.".length());
+		@Override
+		protected Class<?> getClass(String input) {
+			if (input.startsWith(PACKAGES_PREFIX))
+				return filterRhinoClasses(super.getClass(input.substring(PACKAGES_PREFIX.length())));
 
-		return code;
-	}
+			return filterRhinoClasses(super.getClass(input));
+		}
 
-	@Override
-	protected Class<? extends Object> getVariableClazz(final String name) {
-		final Class<? extends Object> clazz = super.getVariableClazz(name);
+		private Class<?> filterRhinoClasses(Class<?> clazz) {
+			if ((clazz != null) && (clazz.getName().startsWith("org.mozilla.javascript")))
+				return null;
 
-		// skip all rhino specific classes
-		if ((clazz != null) && (clazz.getName().startsWith("org.mozilla.javascript")))
-			return null;
+			return clazz;
+		}
 
-		return clazz;
+		@Override
+		protected Package getPackage(String input) {
+			if (input.startsWith(PACKAGES_PREFIX))
+				return super.getPackage(input.substring(PACKAGES_PREFIX.length()));
+
+			return super.getPackage(input);
+		}
+
+		@Override
+		protected boolean isLiteral(final char candidate) {
+			return ('"' == candidate) || ('\'' == candidate);
+		}
 	}
 }

@@ -198,6 +198,7 @@
 		<module>../../tests/org.eclipse.ease.ui.scripts.test</module>
 		<module>../../tests/org.eclipse.ease.ui.test</module>
 
+		<module>../../tests/org.eclipse.ease.ui.completions.java.test</module>
 		<!-- test insertion point -->
 		
 	</modules>

@@ -315,7 +315,8 @@ public final class ScriptService implements IScriptService, BundleListener, IExe
 	@Override
 	public ModuleDefinition getModuleDefinition(final String moduleId) {
 		for (final ModuleDefinition definition : getAvailableModules()) {
-			if (definition.getId().equals(moduleId))
+
+			if ((definition.getId().equals(moduleId)) || (definition.getPath().toString().equals(moduleId)))
 				return definition;
 		}
 

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Java Code Completion Support Unit Tests
+Bundle-SymbolicName: org.eclipse.ease.ui.completions.java.test
+Automatic-Module-Name: org.eclipse.ease.ui.completions.java.test
+Bundle-Version: 0.9.0.qualifier
+Bundle-Vendor: Eclipse.org
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Fragment-Host: org.eclipse.ease.ui.completions.java
+Require-Bundle: org.junit.jupiter.api,
+ org.mockito,
+ org.junit.jupiter.params

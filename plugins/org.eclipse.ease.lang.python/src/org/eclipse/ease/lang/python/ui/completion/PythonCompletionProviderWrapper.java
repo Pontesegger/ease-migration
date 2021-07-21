@@ -10,6 +10,7 @@
  * Contributors:
  *     Martin Kloesch - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.lang.python.ui.completion;
 
 import java.io.InputStream;
@@ -21,8 +22,8 @@ import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.lang.python.Activator;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
-import org.eclipse.ease.ui.completion.ICompletionProvider;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
+import org.eclipse.ease.ui.completion.provider.ICompletionProvider;
 
 /**
  * {@link ICompletionProvider} dispatching actual completion calculation to Python.
@@ -43,13 +44,8 @@ public class PythonCompletionProviderWrapper implements ICompletionProvider {
 		fPythonProvider = provider;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.ui.completion.ICompletionProvider#getProposals(org. eclipse.ease.ICompletionContext)
-	 */
 	@Override
-	public Collection<? extends ScriptCompletionProposal> getProposals(ICompletionContext context) {
+	public Collection<ScriptCompletionProposal> getProposals(ICompletionContext context) {
 		if (!isActive(context)) {
 			return new ArrayList<>();
 		}
@@ -78,11 +74,6 @@ public class PythonCompletionProviderWrapper implements ICompletionProvider {
 		return new ArrayList<>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ease.ui.completion.ICompletionProvider#isActive(org.eclipse. ease.ICompletionContext)
-	 */
 	@Override
 	public boolean isActive(ICompletionContext context) {
 		if (fPythonProvider == null) {
@@ -91,5 +82,4 @@ public class PythonCompletionProviderWrapper implements ICompletionProvider {
 			return fPythonProvider.isActive(context);
 		}
 	}
-
 }
