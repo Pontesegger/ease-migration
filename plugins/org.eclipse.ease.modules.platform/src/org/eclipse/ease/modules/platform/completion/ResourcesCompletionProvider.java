@@ -13,54 +13,43 @@
 package org.eclipse.ease.modules.platform.completion;
 
 import org.eclipse.ease.ICompletionContext;
-import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.modules.platform.ResourcesModule;
 import org.eclipse.ease.modules.platform.ScriptingModule;
 import org.eclipse.ease.modules.platform.UIModule;
-import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.ui.completion.provider.AbstractFileLocationCompletionProvider;
-import org.eclipse.ui.PlatformUI;
 
 public class ResourcesCompletionProvider extends AbstractFileLocationCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		if (super.isActive(context)) {
+		if (super.isActive(context))
+			return isMethodFromResources(context) || isMethodFromScripting(context) || isMethodFromUi(context);
 
-			// Resources module
-			if (context.getLoadedModules().contains(getModule(ResourcesModule.MODULE_ID))) {
+		return false;
+	}
 
-				// simple methods
-				if (context.getCaller().endsWith("copyFile") || context.getCaller().endsWith("createFile") || context.getCaller().endsWith("createFolder")
-						|| context.getCaller().endsWith("deleteFile") || context.getCaller().endsWith("deleteFolder")
-						|| context.getCaller().endsWith("fileExists"))
-					return true;
+	private boolean isMethodFromUi(final ICompletionContext context) {
+		if (context.getLoadedModules().contains(getModuleDefinition(UIModule.MODULE_ID)))
+			return isMethodParameter(context, "showEditor", 0) || isMethodParameter(context, "openEditor", 0);
 
-				if ((context.getCaller().endsWith("findFiles")) && (context.getParameterOffset() == 1))
-					return true;
-				if ((context.getCaller().endsWith("getFile")) && (context.getParameterOffset() == 0))
-					return true;
-				if ((context.getCaller().endsWith("openFile")) && (context.getParameterOffset() == 0))
-					return true;
-				if ((context.getCaller().endsWith("readFile")) && (context.getParameterOffset() == 0))
-					return true;
-				if ((context.getCaller().endsWith("writeFile")) && (context.getParameterOffset() == 0))
-					return true;
-				if ((context.getCaller().endsWith("createProblemMarker")) && (context.getParameterOffset() == 1))
-					return true;
-			}
+		return false;
+	}
 
-			// Scripting module
-			if (context.getLoadedModules().contains(getModule(ScriptingModule.MODULE_ID))) {
-				if ((context.getCaller().endsWith("fork")) && (context.getParameterOffset() == 0))
-					return true;
-			}
+	private boolean isMethodFromScripting(final ICompletionContext context) {
+		if (context.getLoadedModules().contains(getModuleDefinition(ScriptingModule.MODULE_ID)))
+			return isMethodParameter(context, "fork", 0);
 
-			// UI module
-			if (context.getLoadedModules().contains(getModule(UIModule.MODULE_ID))) {
-				if ((context.getCaller().endsWith("showEditor")) || (context.getCaller().endsWith("openEditor")))
-					return true;
-			}
+		return false;
+	}
+
+	private boolean isMethodFromResources(final ICompletionContext context) {
+		if (context.getLoadedModules().contains(getModuleDefinition(ResourcesModule.MODULE_ID))) {
+			return isMethodParameter(context, "copyFile", 0) || isMethodParameter(context, "copyFile", 1) || isMethodParameter(context, "createFile", 0)
+					|| isMethodParameter(context, "createFolder", 0) || isMethodParameter(context, "deleteFile", 0)
+					|| isMethodParameter(context, "deleteFolder", 0) || isMethodParameter(context, "fileExists", 0)
+					|| isMethodParameter(context, "findFiles", 1) || isMethodParameter(context, "getFile", 0) || isMethodParameter(context, "openFile", 0)
+					|| isMethodParameter(context, "readFile", 0) || isMethodParameter(context, "writeFile", 0)
+					|| isMethodParameter(context, "createProblemMarker", 1);
 		}
 
 		return false;
@@ -68,19 +57,13 @@ public class ResourcesCompletionProvider extends AbstractFileLocationCompletionP
 
 	@Override
 	protected boolean showCandidate(final Object candidate) {
-		final String caller = getContext().getCaller();
-
-		if ((caller.endsWith("showEditor")) || (caller.endsWith("openEditor")))
+		if (isMethodFromUi(getContext()))
 			return !isFileSystemResource(candidate);
 
-		if ((caller.endsWith("createFile")) || (caller.endsWith("createFolder")) || (caller.endsWith("deleteFolder")) || (caller.endsWith("findFiles")))
+		if (isMethodParameter(getContext(), "createFile", 0) || isMethodParameter(getContext(), "createFolder", 0)
+				|| isMethodParameter(getContext(), "deleteFolder", 0) || isMethodParameter(getContext(), "findFiles", 1))
 			return !isFile(candidate);
 
 		return super.showCandidate(candidate);
-	}
-
-	private static ModuleDefinition getModule(final String identifier) {
-		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
-		return scriptService.getModuleDefinition(identifier);
 	}
 }

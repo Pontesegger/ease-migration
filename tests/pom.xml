@@ -24,7 +24,16 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
-					<providerHint>junit5</providerHint>
+					<providerHint>junit57</providerHint>
+					<trimStackTrace>false</trimStackTrace>
+					
+					<dependencies>
+						<!-- avoid CNFE in Surefire when looking for JUnitPlatformProvider -->
+						<dependency>
+							<artifactId>org.junit</artifactId>
+							<type>eclipse-plugin</type>
+						</dependency>
+					</dependencies>
 				</configuration>
 			</plugin>
 

@@ -41,7 +41,8 @@ import org.eclipse.swt.widgets.Display;
  * </p>
  */
 public class LaunchModule extends AbstractScriptModule {
-	public static final String MODULE_NAME = "/System/Launch";
+
+	public static final String MODULE_ID = "/System/Launch";
 
 	/**
 	 * Obtain the platform launch manager. This allows access to the Eclipse debug core launch manager, allowing control over all non-UI aspects of launches.

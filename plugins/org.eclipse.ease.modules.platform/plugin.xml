@@ -58,7 +58,7 @@
             class="org.eclipse.ease.modules.platform.completion.ResourcesCompletionProvider">
       </codeCompletionProvider>
       <codeCompletionProvider
-            class="org.eclipse.ease.modules.platform.debug.LaunchModuleCompletionProvider">
+            class="org.eclipse.ease.modules.platform.completion.LaunchModuleCompletionProvider">
       </codeCompletionProvider>
    </extension>
    <extension

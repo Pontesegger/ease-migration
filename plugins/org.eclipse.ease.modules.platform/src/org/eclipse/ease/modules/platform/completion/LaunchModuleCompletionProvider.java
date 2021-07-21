@@ -10,7 +10,7 @@
  * Contributors:
  *     Jonah Graham - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.modules.platform.debug;
+package org.eclipse.ease.modules.platform.completion;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,32 +24,33 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.ease.ICompletionContext;
-import org.eclipse.ease.ICompletionContext.Type;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.platform.PluginConstants;
-import org.eclipse.ease.ui.completion.AbstractCompletionProvider;
+import org.eclipse.ease.modules.platform.debug.LaunchModule;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
+import org.eclipse.ease.ui.completion.provider.AbstractCompletionProvider;
 
 public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		if (context.getType() == Type.STRING_LITERAL) {
-			final String caller = context.getCaller();
-			final int param = context.getParameterOffset();
-			if (caller.endsWith("launch") || caller.endsWith("launchUI")) {
-				return (param == 0) || (param == 1);
-			}
-			if (caller.endsWith("getLaunchConfiguration")) {
-				return param == 0;
-			}
-		}
+		if ((isStringParameter(context)) && (context.getLoadedModules().contains(getModuleDefinition(LaunchModule.MODULE_ID))))
+			return isLaunchConfigurationParameter(context) || isLaunchTypeParameter(context);
+
 		return false;
+	}
+
+	private boolean isLaunchConfigurationParameter(ICompletionContext context) {
+		return isMethodParameter(context, "launch", 0) || isMethodParameter(context, "launchUI", 0) || isMethodParameter(context, "getLaunchConfiguration", 0);
+	}
+
+	private boolean isLaunchTypeParameter(ICompletionContext context) {
+		return isMethodParameter(context, "launch", 1) || isMethodParameter(context, "launchUI", 1);
 	}
 
 	@Override
 	protected void prepareProposals(ICompletionContext context) {
-		if (context.getParameterOffset() == 0) {
+		if (isLaunchConfigurationParameter(getContext())) {
 
 			try {
 				final ILaunchConfiguration[] configurations = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations();
@@ -64,7 +65,7 @@ public class LaunchModuleCompletionProvider extends AbstractCompletionProvider {
 				Logger.warning(PluginConstants.PLUGIN_ID, "Code Completion: could not read launch configurations", e);
 			}
 
-		} else {
+		} else if (isLaunchTypeParameter(getContext())) {
 			// TODO: Make this parameter dependent on the selected launch config
 			// to only populate the relevant modes
 			final Collection<ScriptCompletionProposal> proposals = new ArrayList<>();
