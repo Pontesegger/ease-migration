@@ -41,14 +41,8 @@ import org.eclipse.ui.IStartup;
 
 public class RunHeadlessScript implements IApplication {
 
-	/**
-	 *
-	 */
 	private static final String HELP = "-help";
 
-	/**
-	 *
-	 */
 	private static final String ENGINE = "-engine";
 
 	private static final String SCRIPT_ARGUMENTS = "scriptArguments";
@@ -61,7 +55,8 @@ public class RunHeadlessScript implements IApplication {
 
 	/** List of classes that should not be loaded on early startup. */
 	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList("org.eclipse.team.svn.ui.startup.SVNCoreStartup",
-			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter", "org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler");
+			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter", "org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler",
+			"org.eclipse.epp.internal.mpc.ui.wizards.MarketplaceDropAdapter", "org.eclipse.epp.internal.mpc.ui.discovery.MissingNatureDetector");
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {
 		final Map<String, Object> parameters = new HashMap<>();
