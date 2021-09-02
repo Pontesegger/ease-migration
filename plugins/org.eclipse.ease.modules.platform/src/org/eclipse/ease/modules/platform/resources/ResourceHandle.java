@@ -10,7 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.modules.platform;
+package org.eclipse.ease.modules.platform.resources;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -55,7 +55,7 @@ public class ResourceHandle extends FilesystemHandle {
 			} else {
 				// replace content
 				fFile.setContents(new ByteArrayInputStream(data), false, false, null);
-				setMode(getMode() | APPEND);
+				setMode(APPEND);
 			}
 
 		} catch (final CoreException e) {
@@ -74,13 +74,17 @@ public class ResourceHandle extends FilesystemHandle {
 	}
 
 	@Override
-	public boolean createFile(final boolean createHierarchy) throws CoreException {
+	public boolean createFile(final boolean createHierarchy) throws IOException {
 		if (createHierarchy)
 			createFolder(fFile.getParent());
 
-		fFile.create(new ByteArrayInputStream(new byte[0]), false, null);
+		try {
+			fFile.create(new ByteArrayInputStream(new byte[0]), false, null);
+			return true;
 
-		return true;
+		} catch (final CoreException e) {
+			throw new IOException(e);
+		}
 	}
 
 	/**
@@ -92,30 +96,35 @@ public class ResourceHandle extends FilesystemHandle {
 	 * @throws CoreException
 	 *             thrown when folder cannot be created
 	 */
-	public static boolean createFolder(final IContainer container) throws CoreException {
+	public static boolean createFolder(final IContainer container) throws IOException {
 
 		if (!container.isAccessible()) {
 			final IContainer parent = container.getParent();
 
-			if (!parent.isAccessible()) {
-				if (parent instanceof IFolder)
-					createFolder(parent);
+			try {
+				if (!parent.isAccessible()) {
+					if (parent instanceof IFolder)
+						createFolder(parent);
 
-				else if (parent instanceof IProject) {
-					((IProject) parent).create(null);
+					else if (parent instanceof IProject) {
+						((IProject) parent).create(null);
+						((IProject) parent).open(null);
+					}
+
+					else
+						return false;
+				}
+
+				if (container instanceof IFolder)
+					((IFolder) container).create(0, true, null);
+
+				else if (container instanceof IProject) {
+					((IProject) container).create(null);
 					((IProject) parent).open(null);
 				}
 
-				else
-					return false;
-			}
-
-			if (container instanceof IFolder)
-				((IFolder) container).create(0, true, null);
-
-			else if (container instanceof IProject) {
-				((IProject) container).create(null);
-				((IProject) parent).open(null);
+			} catch (final CoreException e) {
+				throw new IOException(e);
 			}
 		}
 

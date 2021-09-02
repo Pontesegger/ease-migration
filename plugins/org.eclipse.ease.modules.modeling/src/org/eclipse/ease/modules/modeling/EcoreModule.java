@@ -36,8 +36,8 @@ import org.eclipse.ease.modules.ScriptParameter;
 import org.eclipse.ease.modules.WrapToScript;
 import org.eclipse.ease.modules.modeling.selector.GMFSemanticSeletor;
 import org.eclipse.ease.modules.modeling.ui.UriSelectionDialog;
-import org.eclipse.ease.modules.platform.ResourcesModule;
 import org.eclipse.ease.modules.platform.UIModule;
+import org.eclipse.ease.modules.platform.resources.ResourcesModule;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.tools.ResourceTools;
 import org.eclipse.emf.common.util.URI;
@@ -198,10 +198,12 @@ public class EcoreModule extends AbstractScriptModule {
 	 * @param uri
 	 *            URI locating the container of the resource (Optional parameter ask dynamically to the user)
 	 * @return the created resource
+	 * @throws IOException
+	 *             when resource cannot be created
 	 */
 	@WrapToScript
 	public Resource createResource(@ScriptParameter(defaultValue = ScriptParameter.NULL) final String name,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String uri) {
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) final String uri) throws IOException {
 		ResourceSet resourceSet = getResourceSet();
 		if (resourceSet == null) {
 			Logger.warning(Activator.PLUGIN_ID, "Unable to get the current resourceSet. Creating a new one...");
@@ -221,14 +223,16 @@ public class EcoreModule extends AbstractScriptModule {
 	 * Create a new URI. This URI is use to locate a resource.
 	 *
 	 * @param containerURI
-	 *            path of the container of the new resource. (Optional Ask dynamically to the user)
+	 *            path of the container of the new resource. Opens a dialog when set to <code>null</code>.
 	 * @param fileName
 	 *            name of the new resource. (Optional Ask dynamically to the user)
 	 * @return the created URI
+	 * @throws IOException
+	 *             when user dialog fails to load
 	 */
 	@WrapToScript
 	public URI createURI(@ScriptParameter(defaultValue = ScriptParameter.NULL) final String containerURI,
-			@ScriptParameter(defaultValue = ScriptParameter.NULL) String fileName) {
+			@ScriptParameter(defaultValue = ScriptParameter.NULL) String fileName) throws IOException {
 		URI container = null;
 		if (containerURI == null) {
 			// Launch dialog to get an URI

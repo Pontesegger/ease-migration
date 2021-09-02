@@ -3,7 +3,7 @@
    <extension point="org.eclipse.ease.modules">
       <module category="org.eclipse.ease.category.system" class="org.eclipse.ease.modules.platform.UIModule" id="org.eclipse.ease.modules.platform.ui" name="UI" visible="true">
       </module>
-      <module category="org.eclipse.ease.category.system" class="org.eclipse.ease.modules.platform.ResourcesModule" id="org.eclipse.ease.modules.platform.resources" name="Resources" visible="true">
+      <module category="org.eclipse.ease.category.system" class="org.eclipse.ease.modules.platform.resources.ResourcesModule" id="org.eclipse.ease.modules.platform.resources" name="Resources" visible="true">
       </module>
       <module category="org.eclipse.ease.category.system" class="org.eclipse.ease.modules.platform.ScriptingModule" id="org.eclipse.ease.modules.platform.scripting" name="Scripting" visible="true">
       </module>

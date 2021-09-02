@@ -13,9 +13,9 @@
 package org.eclipse.ease.modules.platform.completion;
 
 import org.eclipse.ease.ICompletionContext;
-import org.eclipse.ease.modules.platform.ResourcesModule;
 import org.eclipse.ease.modules.platform.ScriptingModule;
 import org.eclipse.ease.modules.platform.UIModule;
+import org.eclipse.ease.modules.platform.resources.ResourcesModule;
 import org.eclipse.ease.ui.completion.provider.AbstractFileLocationCompletionProvider;
 
 public class ResourcesCompletionProvider extends AbstractFileLocationCompletionProvider {

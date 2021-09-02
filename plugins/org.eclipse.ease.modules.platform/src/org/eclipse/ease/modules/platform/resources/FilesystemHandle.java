@@ -10,7 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.modules.platform;
+package org.eclipse.ease.modules.platform.resources;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -54,6 +54,11 @@ public class FilesystemHandle implements IFileHandle {
 	}
 
 	@Override
+	public int getMode() {
+		return fMode;
+	}
+
+	@Override
 	public String read(final int characters) throws IOException {
 		final BufferedReader reader = getReader();
 		if (reader != null) {
@@ -68,6 +73,9 @@ public class FilesystemHandle implements IFileHandle {
 				}
 
 				result.append(new String(buffer, 0, length));
+
+				if (result.length() == characters)
+					break;
 			}
 
 			return result.toString();
@@ -136,7 +144,7 @@ public class FilesystemHandle implements IFileHandle {
 	}
 
 	@Override
-	public boolean createFile(final boolean createHierarchy) throws Exception {
+	public boolean createFile(final boolean createHierarchy) throws IOException {
 		if (createHierarchy) {
 			final File folder = fFile.getParentFile();
 			if (!folder.exists())
@@ -148,10 +156,6 @@ public class FilesystemHandle implements IFileHandle {
 
 	public void setMode(final int mode) {
 		fMode = mode;
-	}
-
-	protected int getMode() {
-		return fMode;
 	}
 
 	@Override

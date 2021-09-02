@@ -10,8 +10,9 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ease.modules.platform;
+package org.eclipse.ease.modules.platform.resources;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,7 +22,7 @@ import org.eclipse.core.resources.IFile;
 /**
  * Generic handle to an {@link IFile} or {@link File} instance.
  */
-public interface IFileHandle {
+public interface IFileHandle extends Closeable {
 
 	/** Open file in read mode. */
 	int READ = 1;
@@ -53,7 +54,7 @@ public interface IFileHandle {
 	String readLine() throws IOException;
 
 	/**
-	 * Returns the java.io.File Path to the underlying file
+	 * Returns the java.io.File Path to the underlying file.
 	 *
 	 * @return Path of the file
 	 * @throws IOException
@@ -98,11 +99,12 @@ public interface IFileHandle {
 	 * @throws Exception
 	 *             on creation errors
 	 */
-	boolean createFile(boolean createHierarchy) throws Exception;
+	boolean createFile(boolean createHierarchy) throws IOException;
 
 	/**
 	 * Close a file instance.
 	 */
+	@Override
 	void close();
 
 	/**
@@ -111,4 +113,11 @@ public interface IFileHandle {
 	 * @return base file object
 	 */
 	Object getFile();
+
+	/**
+	 * Get the mode (READ/WRITE/APPEND) this handle is operating for.
+	 *
+	 * @return file mode
+	 */
+	int getMode();
 }
