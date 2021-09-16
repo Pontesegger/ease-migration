@@ -18,22 +18,22 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.service.ScriptService;
+import org.eclipse.ease.tools.PlatformExtension;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -53,11 +53,17 @@ public class RunHeadlessScript implements IApplication {
 
 	private static final String WORKSPACE = "-workspace";
 
-	/** List of classes that should not be loaded on early startup. */
-	private static final Collection<String> EARLY_STARTUP_BLACKLIST = Arrays.asList("org.eclipse.team.svn.ui.startup.SVNCoreStartup",
-			"org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter", "org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler",
-			"org.eclipse.epp.internal.mpc.ui.wizards.MarketplaceDropAdapter", "org.eclipse.epp.internal.mpc.ui.discovery.MissingNatureDetector",
-			"com.python.pydev.debug.DebugEarlyStartup");
+	private static void loadStartupExtension(PlatformExtension extension) {
+		try {
+			Logger.info(Activator.PLUGIN_ID, String.format("Loading early startup extension: %s", extension.getAttribute("class")));
+			extension.createInstance("class", IStartup.class).earlyStartup();
+
+		} catch (final ClassCastException e) {
+			printError(String.format("Failed to execute earlyStartup(): %s", e.getMessage()));
+		} catch (final CoreException e) {
+			printError(String.format("Could not create instance for startup code: %s", extension.getAttribute("class")));
+		}
+	}
 
 	private static Map<String, Object> extractInputParameters(final String[] arguments) {
 		final Map<String, Object> parameters = new HashMap<>();
@@ -231,26 +237,13 @@ public class RunHeadlessScript implements IApplication {
 	 * Load eclipse extensions for extension point: org.eclipse.ui.startup.
 	 */
 	private void loadEarlyStartupExtensions() {
-		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.startup");
-		for (final IConfigurationElement e : config) {
-			if (e.getName().equals("startup")) {
-				if (!EARLY_STARTUP_BLACKLIST.contains(e.getAttribute("class"))) {
-					try {
-						Logger.info(Activator.PLUGIN_ID, "Loading early startup extension: " + e.getAttribute("class"));
-						final Object earlyStartupParticipant = e.createExecutableExtension("class");
-						if (earlyStartupParticipant instanceof IStartup) {
-							try {
-								((IStartup) earlyStartupParticipant).earlyStartup();
-							} catch (final Throwable e1) {
-								printError(String.format("Failed to execute %s.earlyStartup(): %s", earlyStartupParticipant.getClass().getName(), e1));
-							}
-						}
-					} catch (final CoreException e1) {
-						printError("Could not create instance for startup code: " + e.getAttribute("class"));
-					}
-				}
-			}
-		}
+		final Collection<PlatformExtension> headlessExtensions = PlatformExtension.createFor("org.eclipse.ease.headless");
+		final List<String> blacklistedStartups = headlessExtensions.stream().filter(e -> "startupBlacklist".equals(e.getConfigurationElement().getName()))
+				.map(e -> e.getAttribute("className")).collect(Collectors.toList());
+
+		final Collection<PlatformExtension> earlyStartups = PlatformExtension.createFor("org.eclipse.ui.startup");
+		earlyStartups.stream().filter(e -> "startup".equals(e.getConfigurationElement().getName()))
+				.filter(e -> !blacklistedStartups.contains(e.getAttribute("class"))).forEach(RunHeadlessScript::loadStartupExtension);
 	}
 
 	@Override

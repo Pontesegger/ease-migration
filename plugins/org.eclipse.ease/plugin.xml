@@ -3,6 +3,7 @@
    <extension-point id="language" name="Language" schema="schema/language.exsd"/>
    <extension-point id="modules" name="Modules" schema="schema/modules.exsd"/>
    <extension-point id="scriptType" name="ScriptType" schema="schema/scriptType.exsd"/>
+   <extension-point id="headless" name="Headless" schema="schema/headless.exsd"/>
    <extension point="org.eclipse.ui.services">
       <serviceFactory factoryClass="org.eclipse.ease.service.ScriptServiceFactory">
          <service serviceClass="org.eclipse.ease.service.IScriptService"/>
@@ -79,5 +80,26 @@
             class="org.eclipse.ease.applications.ListEngines">
       </run>
    </application>
+</extension>
+<extension
+      point="org.eclipse.ease.headless">
+   <startupBlacklist
+         className="org.eclipse.team.svn.ui.startup.SVNCoreStartup">
+   </startupBlacklist>
+   <startupBlacklist
+         className="org.eclipse.egit.ui.internal.clone.GitCloneDropAdapter">
+   </startupBlacklist>
+   <startupBlacklist
+         className="org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdateScheduler">
+   </startupBlacklist>
+   <startupBlacklist
+         className="org.eclipse.epp.internal.mpc.ui.wizards.MarketplaceDropAdapter">
+   </startupBlacklist>
+   <startupBlacklist
+         className="org.eclipse.epp.internal.mpc.ui.discovery.MissingNatureDetector">
+   </startupBlacklist>
+   <startupBlacklist
+         className="com.python.pydev.debug.DebugEarlyStartup">
+   </startupBlacklist>
 </extension>
 </plugin>
