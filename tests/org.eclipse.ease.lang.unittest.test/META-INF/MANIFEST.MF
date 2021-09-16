@@ -6,4 +6,5 @@ Fragment-Host: org.eclipse.ease.lang.unittest
 Automatic-Module-Name: org.eclipse.ease.lang.unittest.test
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0",
- org.eclipse.ease.lang.javascript.rhino
+ org.eclipse.ease.lang.javascript.rhino,
+ org.mockito

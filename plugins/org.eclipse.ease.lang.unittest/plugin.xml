@@ -82,5 +82,15 @@
             name="JUnit">
       </generator>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ease.lang.unittest.runtime.ITestSuite"
+            class="org.eclipse.ease.lang.unittest.adapters.HeadlessResultAdapter">
+         <adapter
+               type="java.lang.Integer">
+         </adapter>
+      </factory>
+   </extension>
 
 </plugin>

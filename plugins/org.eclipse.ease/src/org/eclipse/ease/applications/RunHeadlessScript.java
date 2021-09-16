@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -188,9 +189,12 @@ public class RunHeadlessScript implements IApplication {
 
 	private int getScriptResult(final Object result) {
 		if (result != null) {
-			if (ScriptResult.VOID.equals(result)) {
+			if (ScriptResult.VOID.equals(result))
 				return 0;
-			}
+
+			final Integer adaptedResult = Adapters.adapt(result, Integer.class);
+			if (adaptedResult != null)
+				return adaptedResult;
 
 			try {
 				return Integer.parseInt(result.toString());
