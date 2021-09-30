@@ -19,6 +19,13 @@ location "http://download.eclipse.org/releases/2020-06/" eclipse-2020-06 {
 	org.eclipse.jdt
 }
 
+location "https://download.eclipse.org/releases/2021-06/" eclipse-2021-06 {
+	// use required unittest framework
+	org.junit.jupiter.api [5.7.1,6.0.0)
+	org.junit.jupiter.engine [5.7.1,6.0.0)
+	org.junit.jupiter.params [5.7.1,6.0.0)
+}
+
 location "https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/" eclipse-orbit-2020-06 {
 	// needed for unit tests
 	org.mockito [2.13.0,3.0.0)

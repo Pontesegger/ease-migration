@@ -32,11 +32,11 @@ location "http://eclipse.py4j.org/" py4j-eclipse {
 	org.py4j.feature.feature.group lazy
 }
 
-// required for JUnit 5 tests
-location "http://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
-	org.junit.jupiter.api [5.5.0,6.0.0)
-	org.junit.jupiter.engine [5.5.0,6.0.0)
-	org.junit.jupiter.params [5.5.0,6.0.0)
+location "https://download.eclipse.org/releases/2021-06/" eclipse-2021-06 {
+	// use required unittest framework
+	org.junit.jupiter.api [5.7.1,6.0.0)
+	org.junit.jupiter.engine [5.7.1,6.0.0)
+	org.junit.jupiter.params [5.7.1,6.0.0)
 }
 
 location "https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository/" eclipse-orbit-2020-12 {
