@@ -187,6 +187,8 @@
             name="org.py4j.feature.feature.group"
             versionRange="0.10.8.1"
             optional="true"/>
+        <requirement
+            name="org.python.pydev.feature.source.feature.group"/>
         <sourceLocator
             rootFolder="${ease.core.git.clone.location}">
           <excludedPath>developers</excludedPath>
@@ -303,6 +305,8 @@
               url="https://download.eclipse.org/releases/2021-06"/>
           <repository
               url="http://eclipse.py4j.org/"/>
+          <repository
+              url="http://www.pydev.org/updates"/>
         </repositoryList>
       </targlet>
     </setupTask>
@@ -669,6 +673,8 @@
               url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
           <repository
               url="http://download.eclipse.org/ease/integration/nightly"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-12"/>
         </repositoryList>
       </targlet>
     </setupTask>

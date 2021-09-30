@@ -37,3 +37,7 @@ location "https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/late
 location "http://eclipse.py4j.org/" py4j-eclipse {
 	org.py4j.feature.feature.group lazy
 }
+
+location "http://www.pydev.org/updates" pydev {
+	org.python.pydev.feature.feature.group lazy
+}
