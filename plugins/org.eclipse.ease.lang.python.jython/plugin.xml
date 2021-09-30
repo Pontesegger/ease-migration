@@ -16,6 +16,10 @@
             class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
             engineID="org.eclipse.ease.python.jython">
       </launchExtension>
+            <launchExtension
+                  class="org.eclipse.ease.lang.python.PyDevPathImporter"
+                  engineID="org.eclipse.ease.python.jython">
+            </launchExtension>
             <engine
                   class="org.eclipse.ease.lang.python.jython.debugger.JythonDebuggerEngine"
                   debugger="true"
@@ -28,6 +32,10 @@
             </engine>
             <launchExtension
                   class="org.eclipse.ease.lang.python.jython.PythonEnvironementBootStrapper"
+                  engineID="org.eclipse.ease.python.jythonDebugger">
+            </launchExtension>
+            <launchExtension
+                  class="org.eclipse.ease.lang.python.PyDevPathImporter"
                   engineID="org.eclipse.ease.python.jythonDebugger">
             </launchExtension>
    </extension>

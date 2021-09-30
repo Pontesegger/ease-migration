@@ -3,7 +3,7 @@
           "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
           "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
-<!-- SysBox Plug-in rules. Based on sun ruleset. -->
+<!-- EASE Plug-in rules. Based on sun ruleset. -->
 
 <module name="Checker">
 	<property name="severity" value="warning" />

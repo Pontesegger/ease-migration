@@ -148,23 +148,6 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	private Process startPythonProcess(final int javaListeningPort) throws IOException, MalformedURLException, URISyntaxException, CoreException {
 		final ProcessBuilder pb = new ProcessBuilder();
 
-		final List<String> prependsPythonPath = new ArrayList<>();
-
-		prependsPythonPath.add(getPy4jPythonSrc().toString());
-
-		// Add EASE Python directory to python path
-		final Bundle bundle = Platform.getBundle("org.eclipse.ease.lang.python");
-		try {
-			URL url = bundle.getEntry("pysrc");
-			url = FileLocator.toFileURL(url);
-			final URI uri = new URI(url.getProtocol(), url.getPath(), null);
-			prependsPythonPath.add(new File(uri).getAbsolutePath());
-		} catch (final IllegalStateException e) {
-			Logger.error(Activator.PLUGIN_ID, "Cannot get entry pysrc because the plugin has not been initialized properly.", e);
-		} catch (final IOException | URISyntaxException e) {
-			Logger.error(Activator.PLUGIN_ID, "Cannot append additional Python modules to search path.", e);
-		}
-
 		final IPreferenceStore preferenceStore = Activator.getDefault().getPreferenceStore();
 		String interpreter = preferenceStore.getString(Py4JScriptEnginePrefConstants.INTERPRETER);
 		final boolean ignorePythonEnvVariables = preferenceStore.getBoolean(Py4JScriptEnginePrefConstants.IGNORE_PYTHON_ENV_VARIABLES);
@@ -178,9 +161,31 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 		}
 		pb.command().add(getPy4jEaseMainPy().toString());
 		pb.command().add(Integer.toString(javaListeningPort));
-		pb.command().addAll(prependsPythonPath);
+		pb.command().addAll(getPythonPathAdditions());
 
 		return pb.start();
+	}
+
+	private List<String> getPythonPathAdditions() throws IOException {
+		final List<String> pathAdditions = new ArrayList<>();
+
+		pathAdditions.add(getPy4jPythonSrc().toString());
+
+		// Add EASE Python directory to python path
+		final Bundle bundle = Platform.getBundle("org.eclipse.ease.lang.python");
+		try {
+			URL url = bundle.getEntry("pysrc");
+			url = FileLocator.toFileURL(url);
+			final URI uri = new URI(url.getProtocol(), url.getPath(), null);
+			pathAdditions.add(new File(uri).getAbsolutePath());
+
+		} catch (final IllegalStateException e) {
+			Logger.error(Activator.PLUGIN_ID, "Cannot get entry pysrc because the plugin has not been initialized properly.", e);
+
+		} catch (final IOException | URISyntaxException e) {
+			Logger.error(Activator.PLUGIN_ID, "Cannot append additional Python modules to search path.", e);
+		}
+		return pathAdditions;
 	}
 
 	private File getPy4jPythonSrc() throws IOException {

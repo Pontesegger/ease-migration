@@ -18,7 +18,7 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.modules.EnvironmentModule;
 
 /**
- * Loads basic module support for script Py4J based engines
+ * Loads basic module support for script Py4J based engines.
  */
 public class Py4JBootstrap implements IScriptEngineLaunchExtension {
 
