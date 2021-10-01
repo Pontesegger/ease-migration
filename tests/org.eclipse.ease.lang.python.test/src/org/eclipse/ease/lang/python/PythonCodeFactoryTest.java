@@ -42,8 +42,7 @@ public class PythonCodeFactoryTest {
 			+ "        return org.eclipse.ease.ScriptResult.VOID\n"
 			+ "\n"
 			+ "voidMethod.__ease__ = True\n"
-			+ "\n"
-			+ "";
+			+ "\n";
 
 	private static final String PY4J_INT_METHOD = "def intMethodWithParameters(a, b):\n"
 			+ "    if not __EASE_MOD_org_eclipse_ease_modules_EnvironmentModule.hasMethodCallback(\"1234\"):\n"
@@ -61,8 +60,7 @@ public class PythonCodeFactoryTest {
 			+ "        return __result\n"
 			+ "\n"
 			+ "intMethodWithParameters.__ease__ = True\n"
-			+ "\n"
-			+ "";
+			+ "\n";
 	// @formatter:on
 
 	private static String replaceMocks(String code) {

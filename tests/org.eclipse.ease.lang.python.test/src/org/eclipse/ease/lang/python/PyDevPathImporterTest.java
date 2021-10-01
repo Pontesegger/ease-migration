@@ -53,29 +53,30 @@ public class PyDevPathImporterTest {
 	@DisplayName("notify() registers project paths")
 	public void notify_registers_project_paths() throws ExecutionException, CoreException {
 		final IScriptEngine engine = mock(IScriptEngine.class);
-		final Script script = mock(Script.class);
-
-		final IResource resource = mock(IResource.class);
-		final IProject project = mock(IProject.class);
-		final PythonNature pythonNature = mock(PythonNature.class);
-		final IPythonPathNature pythonPathNature = mock(IPythonPathNature.class);
-
-		when(script.getFile()).thenReturn(resource);
-		when(resource.getProject()).thenReturn(project);
-		when(project.isOpen()).thenReturn(true);
-		when(project.getNature(any())).thenReturn(pythonNature);
-		when(pythonNature.getPythonPathNature()).thenReturn(pythonPathNature);
-		when(pythonPathNature.getOnlyProjectPythonPathStr(true)).thenReturn("one|two");
-
-		final ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
+		final Script script = setupScript("one|two");
 
 		final PyDevPathImporter importer = new PyDevPathImporter();
 		importer.notify(engine, script, IExecutionListener.SCRIPT_START);
 
+		final ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
 		verify(engine).inject(codeCaptor.capture(), eq(false));
-
 		assertTrue(codeCaptor.getValue().contains("sys.path.append('one')"));
 		assertTrue(codeCaptor.getValue().contains("sys.path.append('two')"));
+	}
+
+	@Test
+	@DisplayName("notify() escapes path on windows")
+	public void notify_escapes_path_on_windows() throws ExecutionException, CoreException {
+		final IScriptEngine engine = mock(IScriptEngine.class);
+		final Script script = setupScript("C:\\one|C:\\another\\two");
+
+		final PyDevPathImporter importer = new PyDevPathImporter();
+		importer.notify(engine, script, IExecutionListener.SCRIPT_START);
+
+		final ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
+		verify(engine).inject(codeCaptor.capture(), eq(false));
+		assertTrue(codeCaptor.getValue().contains("sys.path.append('C:\\\\one')"));
+		assertTrue(codeCaptor.getValue().contains("sys.path.append('C:\\\\another\\\\two')"));
 	}
 
 	@Test
@@ -112,5 +113,22 @@ public class PyDevPathImporterTest {
 
 		final PyDevPathImporter importer = new PyDevPathImporter();
 		assertDoesNotThrow(() -> importer.notify(engine, script, IExecutionListener.SCRIPT_START));
+	}
+
+	private Script setupScript(String path) throws CoreException {
+		final Script script = mock(Script.class);
+
+		final IResource resource = mock(IResource.class);
+		final IProject project = mock(IProject.class);
+		final PythonNature pythonNature = mock(PythonNature.class);
+		final IPythonPathNature pythonPathNature = mock(IPythonPathNature.class);
+
+		when(script.getFile()).thenReturn(resource);
+		when(resource.getProject()).thenReturn(project);
+		when(project.isOpen()).thenReturn(true);
+		when(project.getNature(any())).thenReturn(pythonNature);
+		when(pythonNature.getPythonPathNature()).thenReturn(pythonPathNature);
+		when(pythonPathNature.getOnlyProjectPythonPathStr(true)).thenReturn(path);
+		return script;
 	}
 }

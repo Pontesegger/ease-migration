@@ -58,7 +58,7 @@ public class PyDevPathImporter implements IScriptEngineLaunchExtension, IExecuti
 
 					final String importCode = Arrays.asList(paths).stream().filter(p -> Objects.nonNull(p) && !p.isEmpty())
 							.map(p -> String.format("sys.path.append('%s')%n", p)).collect(Collectors.joining());
-					final String code = String.format("import sys%n%s", importCode);
+					final String code = String.format("import sys%n%s", importCode).replace("\\", "\\\\");
 
 					engine.inject(code, false);
 				}
