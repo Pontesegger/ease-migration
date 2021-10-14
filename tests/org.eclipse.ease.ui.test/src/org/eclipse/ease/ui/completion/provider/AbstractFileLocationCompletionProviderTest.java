@@ -13,6 +13,7 @@
 
 package org.eclipse.ease.ui.completion.provider;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -157,28 +158,43 @@ public class AbstractFileLocationCompletionProviderTest {
 	}
 
 	@Test
-	@DisplayName("getProposals('workspace://') does not contain contains '..'")
-	public void getProposals_doe_not_contain_back_proposal() {
+	@DisplayName("getProposals('workspace://') does not contain '..'")
+	public void getProposals_does_not_contain_back_proposal() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://"));
 		assertNull(findProposal(proposals, ".."));
 	}
 
 	@Test
-	@DisplayName("getProposals('workspace://<project>') contains project root folders")
+	@DisplayName("getProposals('workspace://<project>/') contains project root folders")
 	public void getProposals_contains_project_root_folders_for_workspace_project() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://" + fProject.getName() + "/"));
 		assertNotNull(findProposal(proposals, fFolder.getName()));
 	}
 
 	@Test
-	@DisplayName("getProposals('workspace://<project>') contains project root files")
+	@DisplayName("getProposals('workspace://<project>/<folder>/../') contains project root folders")
+	public void getProposals_contains_project_root_folders_for_workspace_project_with_back_path() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider
+				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/../"));
+		assertNotNull(findProposal(proposals, fFolder.getName()));
+	}
+
+	@Test
+	@DisplayName("getProposals('workspace://<project>/') contains project root files")
 	public void getProposals_contains_project_root_files_for_workspace_project() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://" + fProject.getName() + "/"));
 		assertNotNull(findProposal(proposals, fFile1.getName()));
 	}
 
 	@Test
-	@DisplayName("getProposals('workspace://<project>/<folder>') contains folder files")
+	@DisplayName("getProposals('workspace://<project>/') does not contain '..'")
+	public void getProposals_does_not_contain_back_proposal_for_project() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("workspace://" + fProject.getName() + "/"));
+		assertNull(findProposal(proposals, ".."));
+	}
+
+	@Test
+	@DisplayName("getProposals('workspace://<project>/<folder>/') contains folder files")
 	public void getProposals_contains_files_for_workspace_folder() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider
 				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/"));
@@ -186,11 +202,22 @@ public class AbstractFileLocationCompletionProviderTest {
 	}
 
 	@Test
-	@DisplayName("getProposals('workspace://<project>/<folder>') contains '..' proposal")
+	@DisplayName("getProposals('workspace://<project>/<folder>/') contains '..' proposal")
 	public void getProposals_contains_back_for_workspace_folder() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider
 				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/"));
+
 		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	@Test
+	@DisplayName("'..' proposal for 'workspace://<project>/<folder>/' contains correct replacement string")
+	public void back_proposal_contains_correct_replacement_string_for_absolute_workspace_folder_link() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider
+				.getProposals(createContext("workspace://" + fProject.getName() + "/" + fFolder.getName() + "/"));
+		final ScriptCompletionProposal proposal = findProposal(proposals, "..");
+
+		assertEquals("\"workspace://" + fProject.getName() + "/" + fFolder.getName() + "/../", proposal.getContent());
 	}
 
 	@DisplayName("getProposals('project://') contains project root folders")
@@ -207,17 +234,27 @@ public class AbstractFileLocationCompletionProviderTest {
 	}
 
 	@Test
-	@DisplayName("getProposals('project://<folder>') contains folder files")
+	@DisplayName("getProposals('project://<folder>/') contains folder files")
 	public void getProposals_contains_files_for_project_folder() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://" + fFolder.getName() + "/", fFile2));
 		assertNotNull(findProposal(proposals, fFile2.getName()));
 	}
 
 	@Test
-	@DisplayName("getProposals('project://<folder>') contains '..' proposal")
+	@DisplayName("getProposals('project://<folder>/') contains '..' proposal")
 	public void getProposals_contains_back_for_project_folder() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://" + fFolder.getName() + "/", fFile2));
+
 		assertNotNull(findProposal(proposals, ".."));
+	}
+
+	@Test
+	@DisplayName("'..' proposal for 'project://<folder>/' contains correct replacement string")
+	public void back_proposal_contains_correct_replacement_string_for_relative_workspace_folder_link() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("project://" + fFolder.getName() + "/", fFile2));
+		final ScriptCompletionProposal proposal = findProposal(proposals, "..");
+
+		assertEquals("\"project://" + fFolder.getName() + "/../", proposal.getContent());
 	}
 
 	@Test
@@ -233,13 +270,6 @@ public class AbstractFileLocationCompletionProviderTest {
 	public void getProposals_contains_files_for_project() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fProject));
 		assertNotNull(findProposal(proposals, fFile1.getName()));
-	}
-
-	@Test
-	@DisplayName("getProposals('') contains '..' for project")
-	public void getProposals_contains_back_for_project() {
-		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("", fProject));
-		assertNotNull(findProposal(proposals, ".."));
 	}
 
 	@Test

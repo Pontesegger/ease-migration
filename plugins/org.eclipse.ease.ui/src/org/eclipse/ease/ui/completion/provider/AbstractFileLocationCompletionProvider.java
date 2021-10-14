@@ -98,8 +98,8 @@ public abstract class AbstractFileLocationCompletionProvider extends AbstractCom
 		if ((matches(resolver.getFilterPart(), "..")) && (showCandidate(".."))) {
 			final Object parentFolder = resolver.getParentFolder();
 
-			if ((parentFolder instanceof IResource) && !(parentFolder instanceof IWorkspaceRoot)) {
-				addProposal("..", resolver.getParentString() + "../", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
+			if ((parentFolder instanceof IResource) && !(parentFolder instanceof IWorkspaceRoot) && !(parentFolder instanceof IProject)) {
+				addProposal("..", resolver.getParentString() + "/../", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);
 
 			} else if ((parentFolder instanceof File) && !(isRootFile((File) parentFolder)) && !(ResourceTools.VIRTUAL_WINDOWS_ROOT.equals(parentFolder))) {
 				addProposal("..", resolver.getParentString() + "/../", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), ORDER_FOLDER, null);

@@ -14,6 +14,7 @@ package org.eclipse.ease.ui.completions.java.provider;
 
 import java.util.Collection;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.ui.completion.IHelpResolver;
@@ -38,7 +39,16 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 	}
 
 	private boolean isClass(ICompletionContext context) {
-		return new TokenList(context.getTokens()).getFromLast(Class.class).size() == 1;
+		final TokenList tokens = new TokenList(context.getTokens()).getFromLast(Class.class);
+		if (!tokens.isEmpty()) {
+			tokens.remove(0);
+			tokens.removeIfMatches(0, "()");
+			tokens.removeIfMatches(0, ".");
+
+			return (tokens.isEmpty()) || InputTokenizer.isTextFilter(tokens.get(0));
+		}
+
+		return false;
 	}
 
 	private boolean isPackage(ICompletionContext context) {
@@ -70,12 +80,33 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 				}
 			}
 
+		} else if (isClass(context)) {
+			final Class<?> baseClass = (Class<?>) new TokenList(context.getTokens()).getFromLast(Class.class).get(0);
+			final String basePackage = baseClass.getPackage().getName();
+
+			final Pattern filterPattern = Pattern.compile(baseClass.getSimpleName() + "\\." + createFilterPattern(filter).pattern());
+
+			for (final String candidate : JavaResources.getInstance().getClasses().get(basePackage)) {
+				if (filterPattern.matcher(candidate).matches()) {
+					final String replacementString = (basePackage + "." + candidate).substring(baseClass.getName().length() + 1);
+
+					final IHelpResolver helpResolver = new JavaClassHelpResolver(basePackage, candidate);
+					final IImageResolver imageResolver = new JavaClassImageResolver(basePackage, candidate);
+
+					final StyledString styledString = new StyledString(candidate);
+					styledString.append(" - " + basePackage, StyledString.QUALIFIER_STYLER);
+
+					addProposal(styledString, replacementString, imageResolver, ScriptCompletionProposal.ORDER_CLASS, helpResolver);
+				}
+			}
+
 		} else {
 			// no package provided, look in all packages for matching class
+			final Pattern filterPattern = createFilterPattern(filter);
 
 			for (final Entry<String, Collection<String>> packageEntry : JavaResources.getInstance().getClasses().entrySet()) {
 				for (final String candidate : packageEntry.getValue()) {
-					if (candidate.startsWith(filter)) {
+					if (filterPattern.matcher(candidate).matches()) {
 						final IHelpResolver helpResolver = new JavaClassHelpResolver(packageEntry.getKey(), candidate);
 						final IImageResolver imageResolver = new JavaClassImageResolver(packageEntry.getKey(), candidate);
 
@@ -87,6 +118,22 @@ public class JavaClassCompletionProvider extends AbstractCompletionProvider {
 				}
 			}
 		}
+	}
+
+	private Pattern createFilterPattern(String filter) {
+		final StringBuffer filterPattern = new StringBuffer();
+
+		for (final byte character : filter.getBytes()) {
+			if (Character.isUpperCase((char) character))
+				filterPattern.append(".*");
+
+			filterPattern.append((char) character);
+		}
+
+		if (filterPattern.toString().startsWith(".*"))
+			filterPattern.delete(0, 2);
+
+		return Pattern.compile(filterPattern.toString() + ".*");
 	}
 
 	private String getPackageName(ICompletionContext context) {

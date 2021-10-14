@@ -73,12 +73,64 @@ public class JavaClassCompletionProviderTest {
 	}
 
 	@Test
+	@DisplayName("prepareProposals() contains 'FileReader' for package context with filter")
+	public void prepareProposals_instance_contains_class_for_package_context_with_filter() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.Fil"));
+
+		final ScriptCompletionProposal proposal = findProposal(proposals, "FileReader");
+		assertNotNull(proposal);
+	}
+
+	@Test
+	@DisplayName("prepareProposals() contains 'GetField' for class context")
+	public void prepareProposals_instance_contains_inner_class_for_class_context() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.ObjectInputStream."));
+
+		final ScriptCompletionProposal proposal = findProposal(proposals, "ObjectInputStream.GetField");
+		assertNotNull(proposal);
+	}
+
+	@Test
+	@DisplayName("prepareProposals() contains 'GetField' for class context with filter")
+	public void prepareProposals_instance_contains_inner_class_for_class_context_with_filter() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.ObjectInputStream.Get"));
+
+		final ScriptCompletionProposal proposal = findProposal(proposals, "ObjectInputStream.GetField");
+		assertNotNull(proposal);
+	}
+
+	@Test
+	@DisplayName("prepareProposals() does not contain GetField when GetField is already part of the filter")
+	public void prepareProposals_does_not_contain_inner_class_for_a_given_inner_class_context() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.ObjectInputStream.GetField."));
+
+		assertTrue(proposals.isEmpty());
+	}
+
+	@Test
 	@DisplayName("prepareProposals() contains 'FileReader' for global context")
 	public void prepareProposals_instance_contains_class_for_global_context() {
 		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("File"));
 
 		final ScriptCompletionProposal proposal = findProposal(proposals, "FileReader");
 		assertNotNull(proposal);
+	}
+
+	@Test
+	@DisplayName("prepareProposals() contains 'FileReader' for context 'FiR'")
+	public void prepareProposals_instance_contains_class_for_partial_context() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("FiR"));
+
+		final ScriptCompletionProposal proposal = findProposal(proposals, "FileReader");
+		assertNotNull(proposal);
+	}
+
+	@Test
+	@DisplayName("prepareProposals() is empty for context 'java.io.FileInputStream'")
+	public void prepareProposals_is_empty_for_exact_class_context() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.FileInputStream"));
+
+		assertTrue(proposals.isEmpty());
 	}
 
 	private ScriptCompletionProposal findProposal(Collection<ScriptCompletionProposal> proposals, String displayString) {

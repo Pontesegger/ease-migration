@@ -60,7 +60,7 @@ public class JavaPackagesCompletionProviderTest {
 
 	@ParameterizedTest(name = "for context ''{0}''")
 	@DisplayName("isActive() = false")
-	@ValueSource(strings = { "foo()", "foo().bar" })
+	@ValueSource(strings = { "foo()", "foo().bar", "java.io.File", "include(\"" })
 	public void isActive_equals_false(String input) {
 		assertFalse(fProvider.isActive(createContext(input)));
 	}
@@ -130,6 +130,14 @@ public class JavaPackagesCompletionProviderTest {
 		final ScriptCompletionProposal proposal = findProposal(proposals, "java");
 		assertEquals("java.io.File", proposal.getContent());
 		assertEquals(5, proposal.getCursorPosition());
+	}
+
+	@Test
+	@DisplayName("prepareProposals() is empty for context 'java.io.notthere'")
+	public void prepareProposals_is_empty_for_exact_class_context() {
+		final Collection<ScriptCompletionProposal> proposals = fProvider.getProposals(createContext("java.io.notthere"));
+
+		assertTrue(proposals.isEmpty());
 	}
 
 	private ScriptCompletionProposal findProposal(Collection<ScriptCompletionProposal> proposals, String displayString) {

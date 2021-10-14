@@ -11,28 +11,12 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.ui.test;
+package org.eclipse.ease.ui.completion.tokenizer;
 
-import org.eclipse.ease.modules.ScriptParameter;
-import org.eclipse.ease.modules.WrapToScript;
+import java.lang.reflect.Method;
 
-public class RootModule {
+@FunctionalInterface
+public interface IMethodResolver {
 
-	@WrapToScript
-	public static final String TEST_CONSTANT = "";
-
-	@WrapToScript
-	public void testMethod() {
-		// nothing to do
-	}
-
-	@WrapToScript
-	public void testWithMandatoryParameters(String mandatory) {
-		// nothing to do
-	}
-
-	@WrapToScript
-	public void testWithOptionalParameters(@ScriptParameter(defaultValue = "") String optionalParameter) {
-		// nothing to do
-	}
+	Method resolveMethod(String methodName);
 }

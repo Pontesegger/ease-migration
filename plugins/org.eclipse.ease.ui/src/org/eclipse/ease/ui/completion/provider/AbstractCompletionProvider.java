@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.modules.ModuleDefinition;
@@ -25,7 +26,6 @@ import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.ui.completion.IHelpResolver;
 import org.eclipse.ease.ui.completion.IImageResolver;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
-import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 import org.eclipse.ease.ui.completion.tokenizer.TokenList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
@@ -33,42 +33,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 
 public abstract class AbstractCompletionProvider implements ICompletionProvider {
-
-	public static class DescriptorImageResolver implements IImageResolver {
-		private final ImageDescriptor fDescriptor;
-
-		public DescriptorImageResolver() {
-			fDescriptor = null;
-		}
-
-		public DescriptorImageResolver(ImageDescriptor descriptor) {
-			fDescriptor = descriptor;
-		}
-
-		@Override
-		public Image getImage() {
-			return (getDescriptor() != null) ? getDescriptor().createImage() : null;
-		}
-
-		protected ImageDescriptor getDescriptor() {
-			return fDescriptor;
-		}
-	}
-
-	public static class WorkbenchDescriptorImageResolver extends DescriptorImageResolver {
-		private final String fIdentifier;
-
-		public WorkbenchDescriptorImageResolver(String identifier) {
-			super();
-
-			fIdentifier = identifier;
-		}
-
-		@Override
-		protected ImageDescriptor getDescriptor() {
-			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(fIdentifier);
-		}
-	}
 
 	protected static ModuleDefinition getModuleDefinition(final String identifier) {
 		final IScriptService scriptService = ScriptService.getService();
@@ -80,7 +44,7 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return true;
+		return context.isValid();
 	}
 
 	@Override
@@ -139,27 +103,40 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 	}
 
 	protected boolean isStringParameter(ICompletionContext context) {
-		return isMethodCall(context) && context.isStringLiteral(context.getFilterToken());
+		return isMethodCall(context) && isStringLiteral(context);
+	}
+
+	protected boolean isStringLiteral(ICompletionContext context) {
+		final List<String> stringTokens = context.getTokens().stream().filter(t -> t instanceof String).map(t -> (String) t).collect(Collectors.toList());
+
+		for (final String token : stringTokens) {
+			if (context.isStringLiteral(token))
+				return true;
+		}
+
+		return false;
 	}
 
 	private boolean matchesMethodName(ICompletionContext context, String name) {
 		final List<Object> tokens = context.getTokens();
-		final TokenList candidates = new TokenList(tokens).getFromLast("(");
+		final TokenList candidates = new TokenList(tokens).getFromLast(Method.class);
 
 		if (!candidates.isEmpty())
-			return name.equals(tokens.get(tokens.size() - 1 - candidates.size()));
+			return name.equals(((Method) candidates.get(0)).getName());
 
 		return false;
 	}
 
 	private boolean isMethodCall(ICompletionContext context) {
-		final TokenList candidates = new TokenList(context.getTokens()).getFromLast("(");
+		final TokenList candidates = new TokenList(context.getTokens()).getFromLast(Method.class);
 
 		if (!candidates.isEmpty()) {
-			candidates.removeIfMatches(0, "(");
-			candidates.removeAny(",");
+			for (final Object token : candidates.subList(1, candidates.size())) {
+				if (!(token instanceof String))
+					return false;
+			}
 
-			return candidates.isEmpty() || ((candidates.size() == 1) && (InputTokenizer.isTextFilter(candidates.get(0))));
+			return true;
 		}
 
 		return false;
@@ -169,7 +146,7 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 		final TokenList candidates = new TokenList(context.getTokens()).getFromLast("(");
 
 		if (!candidates.isEmpty()) {
-			candidates.removeIfMatches(0, "(");
+			candidates.remove(0);
 			return parameterIndex == candidates.stream().filter(t -> ",".equals(t)).count();
 		}
 
@@ -177,12 +154,48 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 	}
 
 	protected static boolean matches(final String filter, final String proposal) {
-		return (filter != null) ? proposal.startsWith(filter) : true;
+		return (filter == null) || proposal.startsWith(filter);
 	}
 
 	protected static boolean matchesIgnoreCase(final String filter, final String proposal) {
-		return (filter != null) ? proposal.toLowerCase().startsWith(filter.toLowerCase()) : true;
+		return (filter == null) || proposal.toLowerCase().startsWith(filter.toLowerCase());
 	}
 
 	protected abstract void prepareProposals(ICompletionContext context);
+
+	public static class DescriptorImageResolver implements IImageResolver {
+		private final ImageDescriptor fDescriptor;
+
+		public DescriptorImageResolver() {
+			fDescriptor = null;
+		}
+
+		public DescriptorImageResolver(ImageDescriptor descriptor) {
+			fDescriptor = descriptor;
+		}
+
+		@Override
+		public Image getImage() {
+			return (getDescriptor() != null) ? getDescriptor().createImage() : null;
+		}
+
+		protected ImageDescriptor getDescriptor() {
+			return fDescriptor;
+		}
+	}
+
+	public static class WorkbenchDescriptorImageResolver extends DescriptorImageResolver {
+		private final String fIdentifier;
+
+		public WorkbenchDescriptorImageResolver(String identifier) {
+			super();
+
+			fIdentifier = identifier;
+		}
+
+		@Override
+		protected ImageDescriptor getDescriptor() {
+			return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(fIdentifier);
+		}
+	}
 }

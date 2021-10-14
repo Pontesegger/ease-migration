@@ -11,28 +11,18 @@
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.ease.ui.test;
+package org.eclipse.ease.ui.completion.tokenizer;
 
-import org.eclipse.ease.modules.ScriptParameter;
-import org.eclipse.ease.modules.WrapToScript;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RootModule {
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-	@WrapToScript
-	public static final String TEST_CONSTANT = "";
+public class TokenListTest {
 
-	@WrapToScript
-	public void testMethod() {
-		// nothing to do
-	}
-
-	@WrapToScript
-	public void testWithMandatoryParameters(String mandatory) {
-		// nothing to do
-	}
-
-	@WrapToScript
-	public void testWithOptionalParameters(@ScriptParameter(defaultValue = "") String optionalParameter) {
-		// nothing to do
+	@Test
+	@DisplayName("new TokenList() is empty")
+	public void new_TokenList_is_empty() {
+		assertTrue(new TokenList().isEmpty());
 	}
 }

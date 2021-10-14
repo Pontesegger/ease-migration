@@ -54,7 +54,7 @@ public class VariablesCompletionProviderTest {
 
 	@ParameterizedTest(name = "for context ''{0}''")
 	@DisplayName("isActive() = false")
-	@ValueSource(strings = { "com.", "method()" })
+	@ValueSource(strings = { "com.", "method()", "method(''", "include(\"", "\"" })
 	public void isActive_equals_false(String input) {
 		assertFalse(fProvider.isActive(createContext(input)));
 	}

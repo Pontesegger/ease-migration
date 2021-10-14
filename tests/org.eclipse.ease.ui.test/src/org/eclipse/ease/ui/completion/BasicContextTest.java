@@ -14,6 +14,8 @@
 package org.eclipse.ease.ui.completion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -76,30 +78,6 @@ public class BasicContextTest {
 	}
 
 	@Test
-	@DisplayName("getFilterToken() is empty for ''")
-	public void getFilterToken_is_empty_for_empty_input() {
-		final BasicContext context = createContext("");
-
-		assertEquals("", context.getFilterToken());
-	}
-
-	@Test
-	@DisplayName("getFilterToken() = 12 for 'java.io.File().exists(12'")
-	public void getFilterToken_contains_parameter_prefix() {
-		final BasicContext context = createContext("java.io.File().exists(12");
-
-		assertEquals("12", context.getFilterToken());
-	}
-
-	@Test
-	@DisplayName("getFilterToken() = \"123 for 'java.io.File().exists(\"123'")
-	public void getFilterToken_removes_string_literal_start() {
-		final BasicContext context = createContext("java.io.File().exists(\"123");
-
-		assertEquals("\"123", context.getFilterToken());
-	}
-
-	@Test
 	@DisplayName("getScriptEngine() returns engine")
 	public void getScriptEngine_returns_engine() {
 		final IScriptEngine scriptEngine = createEngine();
@@ -157,6 +135,20 @@ public class BasicContextTest {
 		final List<ModuleDefinition> modules = new BasicContext(scriptEngine, "", 0).getLoadedModules();
 		assertEquals(1, modules.size());
 		assertEquals("/Testing/Test Sub", modules.get(0).getPath().toString());
+	}
+
+	@Test
+	@DisplayName("isValid() = true")
+	public void isValid_equals_true() {
+		final BasicContext context = createContext("foo('");
+		assertTrue(context.isValid());
+	}
+
+	@Test
+	@DisplayName("isValid() = false")
+	public void isInvalid_equals_true() {
+		final BasicContext context = createContext("foo(''");
+		assertFalse(context.isValid());
 	}
 
 	private IScriptEngine createEngine() {

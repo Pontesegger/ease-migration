@@ -15,7 +15,8 @@ package org.eclipse.ease.lang.javascript;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ui.completion.BasicContext;
-import org.eclipse.ease.ui.completion.tokenizer.IVariablesResolver;
+import org.eclipse.ease.ui.completion.tokenizer.IClassResolver;
+import org.eclipse.ease.ui.completion.tokenizer.IMethodResolver;
 import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 
 public class JavaScriptCompletionContext extends BasicContext {
@@ -30,25 +31,34 @@ public class JavaScriptCompletionContext extends BasicContext {
 
 	@Override
 	protected InputTokenizer getInputTokenizer() {
-		if (getScriptEngine() != null)
-			return new JavaScriptInputTokenizer(v -> {
-				final Object variable = getScriptEngine().getVariable(v);
-				return (variable == null) ? null : variable.getClass();
-			});
-
-		return new JavaScriptInputTokenizer();
+		return new JavaScriptInputTokenizer(getModuleMethodResolver(), getVariablesResolver());
 	}
 
-	private final class JavaScriptInputTokenizer extends InputTokenizer {
+	@Override
+	protected IClassResolver getVariablesResolver() {
+		if (getScriptEngine() != null) {
+			return v -> {
+				if (getScriptEngine().hasVariable(v)) {
+					final Object variable = getScriptEngine().getVariable(v);
+					if (variable != null)
+						return (variable.getClass().getName().startsWith("org.mozilla.javascript")) ? null : variable.getClass();
+
+					return null;
+				}
+
+				return null;
+			};
+		}
+
+		return v -> null;
+	}
+
+	private static final class JavaScriptInputTokenizer extends InputTokenizer {
 
 		private static final String PACKAGES_PREFIX = "Packages.";
 
-		private JavaScriptInputTokenizer() {
-			super();
-		}
-
-		private JavaScriptInputTokenizer(IVariablesResolver variablesResolver) {
-			super(variablesResolver);
+		private JavaScriptInputTokenizer(IMethodResolver moduleMethodResolver, IClassResolver variablesResolver) {
+			super(moduleMethodResolver, variablesResolver);
 		}
 
 		@Override
@@ -72,11 +82,6 @@ public class JavaScriptCompletionContext extends BasicContext {
 				return super.getPackage(input.substring(PACKAGES_PREFIX.length()));
 
 			return super.getPackage(input);
-		}
-
-		@Override
-		protected boolean isLiteral(final char candidate) {
-			return ('"' == candidate) || ('\'' == candidate);
 		}
 	}
 }

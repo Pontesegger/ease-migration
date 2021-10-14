@@ -15,6 +15,8 @@ package org.eclipse.ease.ui.completion;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.ease.ICodeParser;
 import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.completion.provider.ICompletionProvider;
@@ -29,7 +32,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 
 public class CodeCompletionAggregatorTest {
 
@@ -37,23 +39,28 @@ public class CodeCompletionAggregatorTest {
 		return Arrays.asList(new ScriptCompletionProposal(null, displayString, null, null, 0, null));
 	}
 
-	private ScriptType fScriptType;
 	private CodeCompletionAggregator fAggregator;
 
 	@BeforeEach
 	public void beforeEach() {
-		fScriptType = mock(ScriptType.class);
-		when(fScriptType.getName()).thenReturn("TestEngine");
 
-		fAggregator = new CodeCompletionAggregator(null, fScriptType);
+		final ICodeParser codeParser = mock(ICodeParser.class);
+		when(codeParser.getContext(any(), any(), any(), anyInt(), anyInt()))
+				.thenAnswer(invocation -> new BasicContext(null, invocation.getArgument(1), invocation.getArgument(2), invocation.getArgument(3)));
+
+		final ScriptType scriptType = mock(ScriptType.class);
+		when(scriptType.getName()).thenReturn("TestEngine");
+		when(scriptType.getCodeParser()).thenReturn(codeParser);
+
+		fAggregator = new CodeCompletionAggregator(null, scriptType);
 	}
 
 	@Test
 	@DisplayName("getProposals() contains proposal from local provider")
 	public void getProposals_contains_proposal_from_local_provider() {
 		final ICompletionProvider localProvider = mock(ICompletionProvider.class);
-		when(localProvider.getProposals(ArgumentMatchers.any())).thenReturn(createProposal("test1"));
-		when(localProvider.isActive(ArgumentMatchers.any())).thenReturn(true);
+		when(localProvider.getProposals(any())).thenReturn(createProposal("test1"));
+		when(localProvider.isActive(any())).thenReturn(true);
 
 		fAggregator.addCompletionProvider(localProvider);
 

@@ -15,7 +15,6 @@ package org.eclipse.ease.ui.completion.tokenizer;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,13 +23,22 @@ import java.util.regex.Pattern;
 
 public class InputTokenizer {
 
+	public static final String INVALID = "--== invalid input ==--";
+
 	private static final Pattern PACKAGE_PATTERN = Pattern.compile("(java|com|org)\\.([\\p{Lower}\\d]+\\.?)*");
 	private static final Pattern CLASS_PATTERN = Pattern.compile("(java|com|org)\\.([\\p{Lower}\\d]+\\.?)\\.\\p{Upper}(\\w)*");
+	private static final Pattern INNER_CLASS_PATTERN = Pattern.compile("(java|com|org)\\.([\\p{Lower}\\d]+\\.?)(\\.\\p{Upper}(\\w)*){2}");
 	private static final Pattern VARIABLES_PATTERN = Pattern.compile("\\p{Alpha}\\w*");
 
+	private static final char[] STRING_LITERALS = { '"', '\'' };
 	private static final char[] DELIMITERS = { '.', '(', ',' };
 
 	public static boolean isDelimiter(Object element) {
+		for (final char c : STRING_LITERALS) {
+			if (new String(new char[] { c }).equals(element))
+				return true;
+		}
+
 		for (final char c : DELIMITERS) {
 			if (new String(new char[] { c }).equals(element))
 				return true;
@@ -43,13 +51,15 @@ public class InputTokenizer {
 		return (element instanceof String) && (!isDelimiter(element));
 	}
 
-	private final IVariablesResolver fVariablesResolver;
+	private final IClassResolver fVariablesResolver;
+	private final IMethodResolver fModuleMethodResolver;
 
 	public InputTokenizer() {
-		this(v -> null);
+		this(v -> null, v -> null);
 	}
 
-	public InputTokenizer(IVariablesResolver variablesResolver) {
+	public InputTokenizer(IMethodResolver moduleMethodResolver, IClassResolver variablesResolver) {
+		fModuleMethodResolver = moduleMethodResolver;
 		fVariablesResolver = variablesResolver;
 	}
 
@@ -63,10 +73,10 @@ public class InputTokenizer {
 			return simpleToken;
 
 		final int delimiterPosition = findLastDelimiter(simpleInput);
-		if (delimiterPosition > 0)
+		if (delimiterPosition >= 0)
 			return divideAndConquerTokens(simpleInput, delimiterPosition);
 		else
-			return Arrays.asList(simpleInput);
+			return List.of(simpleInput);
 	}
 
 	private List<Object> divideAndConquerTokens(String simpleInput, final int delimiterPosition) {
@@ -82,21 +92,13 @@ public class InputTokenizer {
 		if (method != null)
 			tokens.add(method);
 
-		else if ("()".equals(delimiterAndRest))
-			tokens.add(delimiterAndRest);
+		else if ("()".equals(delimiterAndRest)) {
+			if (!(tokens.get(tokens.size() - 1) instanceof Method))
+				tokens.add(delimiterAndRest);
 
-		else if (delimiterAndRest.startsWith("(") && (delimiterAndRest.length() > 1)) {
-			tokens.add("(");
+		} else if ((delimiterAndRest.length() > 1) && isDelimiter(delimiterAndRest.substring(0, 1))) {
+			tokens.add(delimiterAndRest.substring(0, 1));
 			tokens.add(delimiterAndRest.substring(1).trim());
-
-		} else if (delimiterAndRest.startsWith(".") && (delimiterAndRest.length() > 1)) {
-			tokens.add(".");
-			tokens.add(delimiterAndRest.substring(1).trim());
-
-		} else if (delimiterAndRest.startsWith(",") && (delimiterAndRest.length() > 1)) {
-			tokens.add(",");
-			tokens.add(delimiterAndRest.substring(1).trim());
-
 		} else
 			tokens.add(delimiterAndRest);
 
@@ -104,20 +106,19 @@ public class InputTokenizer {
 	}
 
 	private Method detectMethod(Class<?> clazz, String methodName) {
-		return Arrays.asList(clazz.getMethods()).stream().filter(m -> methodName.equals(m.getName())).findFirst().orElse(null);
+		return List.of(clazz.getMethods()).stream().filter(m -> methodName.equals(m.getName())).findFirst().orElse(null);
 	}
 
 	private Class<?> getTrailingClassToken(List<Object> tokens) {
 		Object checkToken = null;
 		if ((tokens.size() >= 2) && ("()".equals(tokens.get(tokens.size() - 1)))) {
 			checkToken = tokens.get(tokens.size() - 2);
-
-			if (checkToken instanceof Method)
-				return ((Method) checkToken).getReturnType();
-
 		} else if (!tokens.isEmpty()) {
 			checkToken = tokens.get(tokens.size() - 1);
 		}
+
+		if (checkToken instanceof Method)
+			return ((Method) checkToken).getReturnType();
 
 		if (checkToken instanceof Class<?>)
 			return (Class<?>) checkToken;
@@ -127,6 +128,12 @@ public class InputTokenizer {
 
 	private int findLastDelimiter(String input) {
 		int position = -1;
+		for (final char delimiter : STRING_LITERALS)
+			position = Math.max(position, input.lastIndexOf(delimiter));
+
+		if (position != -1)
+			return position;
+
 		for (final char delimiter : DELIMITERS)
 			position = Math.max(position, input.lastIndexOf(delimiter));
 
@@ -137,26 +144,42 @@ public class InputTokenizer {
 		if (input.isEmpty())
 			return Collections.emptyList();
 
-		final Matcher variablesMatcher = VARIABLES_PATTERN.matcher(input);
-		if (variablesMatcher.matches()) {
-			final Class<?> candidate = fVariablesResolver.resolveClass(input);
-			if ((candidate != null) && (!isBlacklisted(candidate)))
-				return Arrays.asList(candidate, "()");
-		}
+		if (INVALID.equals(input))
+			return List.of(INVALID);
 
 		final Package packageInstance = getPackage(input);
 		if (packageInstance != null)
-			return Arrays.asList(packageInstance);
+			return List.of(packageInstance);
 
 		final Class<?> clazz = getClass(input);
 		if (clazz != null)
-			return Arrays.asList(clazz);
+			return List.of(clazz);
+
+		if (isVariablePattern(input)) {
+			final Class<?> candidate = fVariablesResolver.resolveClass(input);
+			if (candidate != null)
+				return List.of(candidate, "()");
+
+		} else if (isCompletedMethodCall(input)) {
+			final Method candidate = fModuleMethodResolver.resolveMethod(input.substring(0, input.length() - 2));
+			if (candidate != null)
+				return List.of(candidate);
+
+		} else if (input.endsWith("(")) {
+			final Method candidate = fModuleMethodResolver.resolveMethod(input.substring(0, input.length() - 1));
+			if (candidate != null)
+				return List.of(candidate, "(");
+		}
 
 		return null;
 	}
 
-	private boolean isBlacklisted(Class<?> candidate) {
-		return candidate.getName().startsWith("org.mozilla.javascript");
+	private boolean isVariablePattern(String input) {
+		return VARIABLES_PATTERN.matcher(input).matches();
+	}
+
+	private boolean isCompletedMethodCall(String input) {
+		return input.endsWith("()") && isVariablePattern(input.substring(0, input.length() - 2));
 	}
 
 	protected Package getPackage(String input) {
@@ -176,6 +199,19 @@ public class InputTokenizer {
 			} catch (final ClassNotFoundException e) {
 				// class does not exist
 			}
+
+		} else {
+			final Matcher innerClassMatcher = INNER_CLASS_PATTERN.matcher(input);
+			if (innerClassMatcher.matches()) {
+				try {
+					final int lastDelimiter = input.lastIndexOf('.');
+					if (lastDelimiter > 0) {
+						return getClass().getClassLoader().loadClass(input.substring(0, lastDelimiter) + "$" + input.substring(lastDelimiter + 1));
+					}
+				} catch (final ClassNotFoundException e1) {
+					// give up
+				}
+			}
 		}
 
 		return null;
@@ -183,6 +219,9 @@ public class InputTokenizer {
 
 	private String getSimplifiedInput(String input) {
 		String simplifiedInput = input.trim();
+
+		final boolean endsWithLiteral = endsWithLiteral(simplifiedInput);
+
 		simplifiedInput = simplifyLiterals(simplifiedInput);
 		final String trailingLiteral = getTrailingLiteral(simplifiedInput);
 		simplifiedInput = simplifiedInput.substring(0, simplifiedInput.length() - trailingLiteral.length());
@@ -191,11 +230,26 @@ public class InputTokenizer {
 		simplifiedInput = simplifyParameters(simplifiedInput);
 		simplifiedInput = clipIrrelevantStuff(simplifiedInput);
 
+		if (endsWithLiteral && trailingLiteral.isEmpty())
+			return INVALID;
+
 		return simplifiedInput + trailingLiteral;
 	}
 
+	private boolean endsWithLiteral(String input) {
+		for (final String literal : getLiterals()) {
+			if (input.endsWith(literal))
+				return true;
+		}
+
+		return false;
+	}
+
 	private String getTrailingLiteral(String input) {
-		final int literalStart = input.indexOf('"');
+		int literalStart = -1;
+
+		for (final String literal : getLiterals())
+			literalStart = Math.max(literalStart, input.indexOf(literal));
 
 		return (literalStart >= 0) ? input.substring(literalStart) : "";
 	}
@@ -286,26 +340,28 @@ public class InputTokenizer {
 	private String simplifyLiterals(String input) {
 		final StringBuilder simplified = new StringBuilder(input);
 
-		int startIndex;
-		int endIndex = 0;
-		do {
-			startIndex = simplified.indexOf("\"");
-			if (startIndex >= 0) {
-				endIndex = simplified.indexOf("\"", startIndex + 1);
+		for (final String literal : getLiterals()) {
+			int startIndex;
+			int endIndex = 0;
+			do {
+				startIndex = simplified.indexOf(literal);
+				if (startIndex >= 0) {
+					endIndex = simplified.indexOf(literal, startIndex + 1);
 
-				while ((endIndex > startIndex) && (simplified.charAt(endIndex - 1) == '\\')) {
-					endIndex = simplified.indexOf("\"", endIndex + 1);
+					while ((endIndex > startIndex) && (simplified.charAt(endIndex - 1) == '\\')) {
+						endIndex = simplified.indexOf(literal, endIndex + 1);
+					}
+
+					if (endIndex > startIndex)
+						simplified.delete(startIndex, endIndex + 1);
 				}
-
-				if (endIndex > startIndex)
-					simplified.delete(startIndex, endIndex + 1);
-			}
-		} while ((startIndex >= 0) && (endIndex > startIndex));
+			} while ((startIndex >= 0) && (endIndex > startIndex));
+		}
 
 		return simplified.toString();
 	}
 
-	protected boolean isLiteral(final char candidate) {
-		return ('"' == candidate);
+	protected List<String> getLiterals() {
+		return List.of("\"", "'");
 	}
 }

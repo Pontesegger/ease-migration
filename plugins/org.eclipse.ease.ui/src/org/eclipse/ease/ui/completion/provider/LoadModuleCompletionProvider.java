@@ -28,7 +28,7 @@ public class LoadModuleCompletionProvider extends AbstractPathCompletionProvider
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return (super.isActive(context)) && isMethodParameter(context, EnvironmentModule.LOAD_MODULE_METHOD, 0);
+		return super.isActive(context) && isMethodParameter(context, EnvironmentModule.LOAD_MODULE_METHOD, 0) && isStringParameter(context);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class LoadModuleCompletionProvider extends AbstractPathCompletionProvider
 		final Collection<IPath> paths = filter(getPathsFromElements(availableModules), context);
 
 		paths.stream().forEach(p -> {
-			addProposal(p.toString(), p.toString() + "/", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), 10, null);
+			addProposal(p.toString(), p.toString() + "/", new WorkbenchDescriptorImageResolver(ISharedImages.IMG_OBJ_FOLDER), 100, null);
 		});
 
 		final Collection<ModuleDefinition> modules = filter(availableModules, context);
@@ -49,8 +49,8 @@ public class LoadModuleCompletionProvider extends AbstractPathCompletionProvider
 			if (!m.isVisible())
 				displayString.append(" (hidden)", StyledString.DECORATIONS_STYLER);
 
-			addProposal(displayString, m.getName(), new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/module.png")),
-					0, null);
+			addProposal(displayString, m.getPath().toString(),
+					new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/module.png")), 90, null);
 		});
 	}
 

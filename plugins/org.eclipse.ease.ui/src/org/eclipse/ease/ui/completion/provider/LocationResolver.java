@@ -10,6 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.ui.completion.provider;
 
 import java.io.File;
@@ -107,7 +108,11 @@ public class LocationResolver {
 		if (ResourceTools.isAbsolute(fLocation))
 			return ResourceTools.toAbsoluteLocation(getParentFolder(), null);
 
-		return fLocation.substring(0, fLocation.length() - getFilterPart().length());
+		String parentString = fLocation.substring(0, fLocation.length() - getFilterPart().length());
+		while (parentString.endsWith("/"))
+			parentString = parentString.substring(0, parentString.length() - 1);
+
+		return parentString;
 	}
 
 	/**

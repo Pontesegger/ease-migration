@@ -13,6 +13,7 @@
 
 package org.eclipse.ease.ui.completions.java.provider;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,29 @@ public class JavaPackagesCompletionProvider extends AbstractCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return super.isActive(context) && !isCallChain(context);
+		return super.isActive(context) && !isCallChain(context) && !isJavaClassContext(context) && !isStringLiteral(context);
+	}
+
+	private boolean isJavaClassContext(ICompletionContext context) {
+		TokenList tokens = new TokenList(context.getTokens()).getFromLast(Class.class);
+		if (!tokens.isEmpty()) {
+			tokens.remove(0);
+			tokens.removeIfMatches(0, "()");
+			tokens.removeIfMatches(0, ".");
+
+			return (tokens.isEmpty()) || ((tokens.size() == 1) && (!InputTokenizer.isDelimiter(tokens.get(0))));
+		}
+
+		tokens = new TokenList(context.getTokens()).getFromLast(Method.class);
+		if (!tokens.isEmpty()) {
+			tokens.remove(0);
+			tokens.removeIfMatches(0, "()");
+			tokens.removeIfMatches(0, ".");
+
+			return (tokens.isEmpty()) || ((tokens.size() == 1) && (!InputTokenizer.isDelimiter(tokens.get(0))));
+		}
+
+		return false;
 	}
 
 	private boolean isCallChain(ICompletionContext context) {

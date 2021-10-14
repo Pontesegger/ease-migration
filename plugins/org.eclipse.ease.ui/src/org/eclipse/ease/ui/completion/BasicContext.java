@@ -13,11 +13,13 @@
 
 package org.eclipse.ease.ui.completion;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,8 @@ import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.modules.ModuleHelper;
 import org.eclipse.ease.service.ScriptType;
+import org.eclipse.ease.ui.completion.tokenizer.IClassResolver;
+import org.eclipse.ease.ui.completion.tokenizer.IMethodResolver;
 import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 import org.eclipse.ease.ui.completion.tokenizer.TokenList;
 
@@ -37,6 +41,7 @@ public class BasicContext implements ICompletionContext {
 	private final IScriptEngine fScriptEngine;
 	private final ScriptType fScriptType;
 	private final Object fResource;
+	private List<Object> fTokenCache = null;
 
 	public BasicContext(IScriptEngine scriptEngine, String content, int cursorPosition) {
 		fScriptEngine = scriptEngine;
@@ -56,21 +61,47 @@ public class BasicContext implements ICompletionContext {
 
 	@Override
 	public List<Object> getTokens() {
-		return getInputTokenizer().getTokens(getRelevantText());
+		if (fTokenCache == null)
+			fTokenCache = getInputTokenizer().getTokens(getRelevantText());
+
+		return fTokenCache;
+	}
+
+	@Override
+	public boolean isValid() {
+		final List<Object> tokens = getTokens();
+		return !((tokens.size() == 1) && (InputTokenizer.INVALID.equals(tokens.get(0))));
 	}
 
 	protected InputTokenizer getInputTokenizer() {
-		if (getScriptEngine() != null)
-			return new InputTokenizer(v -> {
+		return new InputTokenizer(getModuleMethodResolver(), getVariablesResolver());
+	}
+
+	protected IClassResolver getVariablesResolver() {
+		if (getScriptEngine() != null) {
+			return v -> {
 				if (getScriptEngine().hasVariable(v)) {
 					final Object variable = getScriptEngine().getVariable(v);
 					return variable == null ? null : variable.getClass();
 				}
 
 				return null;
-			});
+			};
+		}
 
-		return new InputTokenizer();
+		return v -> null;
+	}
+
+	protected IMethodResolver getModuleMethodResolver() {
+		return v -> {
+			for (final ModuleDefinition definition : getLoadedModules()) {
+				final Optional<Method> matchingMethod = definition.getMethods().stream().filter(m -> m.getName().equals(v)).findFirst();
+				if (matchingMethod.isPresent())
+					return matchingMethod.get();
+			}
+
+			return null;
+		};
 	}
 
 	@Override
@@ -137,25 +168,20 @@ public class BasicContext implements ICompletionContext {
 	}
 
 	@Override
-	public String getFilterToken() {
-		final Object lastToken = new TokenList(getTokens()).getLastToken();
-		return (isFilter(lastToken)) ? lastToken.toString() : "";
-	}
-
-	@Override
 	public String getFilter() {
-		final String filter = getFilterToken();
+		final Object lastToken = new TokenList(getTokens()).getLastToken();
 
-		return isStringLiteral(filter) ? filter.substring(1) : filter;
-	}
+		if (lastToken instanceof String) {
+			if (!InputTokenizer.isDelimiter(lastToken))
+				return (String) lastToken;
+		}
 
-	private boolean isFilter(final Object lastToken) {
-		return (lastToken instanceof String) && (!InputTokenizer.isDelimiter(lastToken));
+		return "";
 	}
 
 	@Override
 	public boolean isStringLiteral(String input) {
-		return input.startsWith("\"");
+		return input.startsWith("\"") || input.startsWith("'");
 	}
 
 	@Override

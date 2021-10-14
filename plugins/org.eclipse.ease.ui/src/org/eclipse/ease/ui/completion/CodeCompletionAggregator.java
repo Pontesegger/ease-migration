@@ -15,6 +15,7 @@ package org.eclipse.ease.ui.completion;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,14 +85,13 @@ public class CodeCompletionAggregator implements IContentProposalProvider {
 			}
 		}
 
+		Collections.sort(proposals);
+
 		return proposals;
 	}
 
 	private ICompletionContext createContext(String content, int cursorPosition) {
-		if (fScriptEngine == null)
-			return new BasicContext(fScriptType, null, content, cursorPosition);
-
-		return new BasicContext(fScriptEngine, content, cursorPosition);
+		return fScriptType.getCodeParser().getContext(fScriptEngine, null, content, cursorPosition, 0);
 	}
 
 	private List<ICompletionProvider> getProposalProviders() {

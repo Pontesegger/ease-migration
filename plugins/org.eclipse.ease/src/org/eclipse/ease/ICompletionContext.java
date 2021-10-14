@@ -49,9 +49,9 @@ public interface ICompletionContext {
 	 */
 	String getFilter();
 
-	String getFilterToken();
-
 	boolean isStringLiteral(String input);
+
+	boolean isValid();
 
 	ScriptType getScriptType();
 

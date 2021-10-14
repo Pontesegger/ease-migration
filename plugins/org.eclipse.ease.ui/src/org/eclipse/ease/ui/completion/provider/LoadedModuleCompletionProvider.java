@@ -25,30 +25,28 @@ public class LoadedModuleCompletionProvider extends AbstractCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return super.isActive(context) && isModuleContext(context);
+		return super.isActive(context) && isModuleMethodFilter(context);
 	}
 
-	private boolean isModuleContext(ICompletionContext context) {
-		TokenList tokenList = new TokenList(context.getTokens());
+	private boolean isModuleMethodFilter(ICompletionContext context) {
 
-		final TokenList methodCall = tokenList.getFromLast("(");
+		TokenList tokensToInvestigate = new TokenList(context.getTokens());
+		final TokenList methodCall = tokensToInvestigate.getFromLast("(");
+
 		if (!methodCall.isEmpty()) {
 			methodCall.remove(0);
 			while (methodCall.removeIfMatches(0, ",")) {
 				// repeat
 			}
 
-			tokenList = methodCall;
+			tokensToInvestigate = methodCall;
 		}
 
-		if (tokenList.isEmpty())
+		if (tokensToInvestigate.isEmpty())
 			return true;
 
-		if (tokenList.size() == 1) {
-			return (tokenList.get(0) instanceof String) && (!context.isStringLiteral(tokenList.get(0).toString()));
-		}
-
-		return false;
+		return (tokensToInvestigate.size() == 1) && (tokensToInvestigate.get(0) instanceof String)
+				&& (!context.isStringLiteral(tokensToInvestigate.get(0).toString()));
 	}
 
 	@Override

@@ -42,9 +42,11 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 
 	@Override
 	protected void prepareProposals(final ICompletionContext context) {
-		final boolean isStatic = isStaticClassContext(context);
+		final TokenList tokens = getRelevantTokens(context);
 
-		final Class<? extends Object> clazz = getJavaClass(context);
+		final boolean isStatic = isStaticClassContext(tokens);
+
+		final Class<? extends Object> clazz = getJavaClass(tokens);
 		final String filter = context.getFilter();
 
 		for (final Method method : clazz.getMethods()) {
@@ -71,10 +73,10 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 		styledString.append(" - " + field.getDeclaringClass().getSimpleName(), StyledString.QUALIFIER_STYLER);
 
 		final IImageResolver imageResolver = Modifier.isStatic(field.getModifiers())
-				? new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_field.png"))
+				? new DescriptorImageResolver(Activator.getImageDescriptor("org.eclipse.ease.ui.completions.java", "/icons/eobj16/static_field.png"))
 				: new JDTImageResolver(ISharedImages.IMG_FIELD_PUBLIC);
 
-		addProposal(styledString, field.getName(), imageResolver, ScriptCompletionProposal.ORDER_FIELD, helpResolver);
+		addProposal(styledString, getDotPrefix() + field.getName(), imageResolver, ScriptCompletionProposal.ORDER_FIELD, helpResolver);
 	}
 
 	private void addMethodProposal(Method method) {
@@ -84,17 +86,24 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 		styledString.append(" - " + method.getDeclaringClass().getSimpleName(), StyledString.QUALIFIER_STYLER);
 
 		final IImageResolver imageResolver = Modifier.isStatic(method.getModifiers())
-				? new DescriptorImageResolver(Activator.getImageDescriptor(Activator.PLUGIN_ID, "/icons/eobj16/static_function.png"))
+				? new DescriptorImageResolver(Activator.getImageDescriptor("org.eclipse.ease.ui.completions.java", "/icons/eobj16/static_function.png"))
 				: new JDTImageResolver(ISharedImages.IMG_OBJS_PUBLIC);
 
 		if (method.getParameterTypes().length > 0)
-			addProposal(styledString, method.getName() + "(", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
+			addProposal(styledString, getDotPrefix() + method.getName() + "(", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
 		else
-			addProposal(styledString, method.getName() + "()", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
+			addProposal(styledString, getDotPrefix() + method.getName() + "()", imageResolver, ScriptCompletionProposal.ORDER_METHOD, helpResolver);
+	}
+
+	private String getDotPrefix() {
+		final Object lastToken = getRelevantTokens(getContext()).getLastToken();
+
+		return ((lastToken instanceof Class<?>) || (lastToken instanceof Method) || ("()".equals(lastToken))) ? "." : "";
 	}
 
 	private boolean isJavaClassContext(ICompletionContext context) {
-		final TokenList tokens = new TokenList(context.getTokens()).getFromLast(Class.class);
+
+		final TokenList tokens = getRelevantTokens(context);
 		if (!tokens.isEmpty()) {
 			tokens.remove(0);
 			tokens.removeIfMatches(0, "()");
@@ -106,13 +115,39 @@ public class JavaMethodCompletionProvider extends AbstractCompletionProvider {
 		return false;
 	}
 
-	private boolean isStaticClassContext(ICompletionContext context) {
-		final TokenList tokens = new TokenList(context.getTokens()).getFromLast(Class.class);
-		return (tokens.size() == 1) || (!"()".equals(tokens.get(1)));
+	private TokenList getRelevantTokens(ICompletionContext context) {
+		final TokenList classTokens = new TokenList(context.getTokens()).getFromLast(Class.class);
+		final TokenList methodTokens = new TokenList(context.getTokens()).getFromLast(Method.class);
+
+		if ((!classTokens.isEmpty()) && (!methodTokens.isEmpty()))
+			return classTokens.size() < methodTokens.size() ? classTokens : methodTokens;
+		else if (!classTokens.isEmpty())
+			return classTokens;
+		else if (!methodTokens.isEmpty())
+			return methodTokens;
+
+		return new TokenList();
 	}
 
-	private Class<?> getJavaClass(ICompletionContext context) {
-		return (Class<?>) new TokenList(context.getTokens()).getFromLast(Class.class).get(0);
+	private boolean isStaticClassContext(TokenList tokens) {
+		if ((!tokens.isEmpty()) && (tokens.get(0) instanceof Class<?>))
+			return (tokens.size() == 1) || ((tokens.size() >= 2) && (!"()".equals(tokens.get(1))));
+
+		return false;
+	}
+
+	private Class<?> getJavaClass(TokenList tokens) {
+		if (!tokens.isEmpty()) {
+			final Object baseElement = tokens.get(0);
+
+			if (baseElement instanceof Class<?>)
+				return (Class<?>) baseElement;
+
+			if (baseElement instanceof Method)
+				return ((Method) baseElement).getReturnType();
+		}
+
+		return null;
 	}
 
 	private String getMethodReturnType(final Method method) {

@@ -39,10 +39,10 @@ public class ScriptCompletionProposal
 		implements ICompletionProposal, ICompletionProposalExtension5, ICompletionProposalExtension6, IContentProposal, Comparable<ScriptCompletionProposal> {
 
 	public static final int ORDER_HISTORY = 0;
-	public static final int ORDER_FIELD = 20;
-	public static final int ORDER_METHOD = 40;
 	public static final int ORDER_PACKAGE = 60;
-	public static final int ORDER_CLASS = 80;
+	public static final int ORDER_CLASS = 70;
+	public static final int ORDER_FIELD = 80;
+	public static final int ORDER_METHOD = 90;
 	public static final int ORDER_DEFAULT = 100;
 
 	private final String fDisplayString;
@@ -74,7 +74,7 @@ public class ScriptCompletionProposal
 
 	@Override
 	public int compareTo(final ScriptCompletionProposal o) {
-		final int priority = fSortOrder - o.fSortOrder;
+		final int priority = o.fSortOrder - fSortOrder;
 		if (priority != 0)
 			return priority;
 

@@ -21,7 +21,6 @@ import org.eclipse.ease.ICompletionContext;
 import org.eclipse.ease.modules.IEnvironment;
 import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.completion.ScriptCompletionProposal;
-import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 import org.eclipse.ease.ui.completion.tokenizer.TokenList;
 import org.eclipse.jface.viewers.StyledString;
 
@@ -32,20 +31,14 @@ public class VariablesCompletionProvider extends AbstractCompletionProvider {
 
 	@Override
 	public boolean isActive(final ICompletionContext context) {
-		return super.isActive(context) && (context.getScriptEngine() != null) && ((context.getTokens().size() <= 1) || (isParameter(context)));
+		return super.isActive(context) && (context.getScriptEngine() != null) && ((context.getTokens().size() <= 1) || (isParameter(context)))
+				&& !isStringLiteral(context);
 	}
 
 	private boolean isParameter(ICompletionContext context) {
 		final TokenList candidates = new TokenList(context.getTokens()).getFromLast("(");
 
-		if (!candidates.isEmpty()) {
-			candidates.removeIfMatches(0, "(");
-			candidates.removeAny(",");
-
-			return candidates.isEmpty() || ((candidates.size() == 1) && (InputTokenizer.isTextFilter(candidates.get(0))));
-		}
-
-		return false;
+		return !candidates.isEmpty();
 	}
 
 	@Override

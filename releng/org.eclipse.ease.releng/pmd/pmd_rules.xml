@@ -88,6 +88,9 @@
 
 		<!-- fails in maven build, see https://github.com/pmd/pmd/issues/873 -->
 		<exclude name="DataflowAnomalyAnalysis" />
+		
+		<!-- ignore locales when converting strings -->
+		<exclude name="UseLocaleWithCaseConversions" />
 	</rule>
 
 	<rule ref="category/java/errorprone.xml/EmptyCatchBlock">

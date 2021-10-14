@@ -20,6 +20,10 @@ public class TokenList extends ArrayList<Object> {
 
 	private static final long serialVersionUID = -6713581488474706366L;
 
+	public TokenList() {
+		super();
+	}
+
 	public TokenList(List<Object> baseList) {
 		super(baseList);
 	}

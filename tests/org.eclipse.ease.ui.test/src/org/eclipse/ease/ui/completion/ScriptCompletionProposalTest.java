@@ -14,6 +14,7 @@
 package org.eclipse.ease.ui.completion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.ease.ICompletionContext;
 import org.junit.jupiter.api.DisplayName;
@@ -67,6 +68,24 @@ public class ScriptCompletionProposalTest {
 		final ScriptCompletionProposal proposal = new ScriptCompletionProposal(new BasicContext(null, null, "AAA.BBB", 4), "foo", "foo()", null, 0, null);
 
 		assertEquals(9, proposal.getCursorPosition());
+	}
+
+	@Test
+	@DisplayName("compareTo() lists higher priority first")
+	public void compareTo_lists_higher_priority_first() {
+		final ScriptCompletionProposal highPrio = new ScriptCompletionProposal(createContext(""), "foo", "foo()", null, 100, null);
+		final ScriptCompletionProposal lowPrio = new ScriptCompletionProposal(createContext(""), "bar", "bar()", null, 0, null);
+
+		assertTrue(highPrio.compareTo(lowPrio) < 0);
+	}
+
+	@Test
+	@DisplayName("compareTo() lists same prio in alphabetic order")
+	public void compareTo_lists_same_prio_in_alphabetic_order() {
+		final ScriptCompletionProposal alphabeticSecond = new ScriptCompletionProposal(createContext(""), "foo", "foo()", null, 0, null);
+		final ScriptCompletionProposal alphabeticFirst = new ScriptCompletionProposal(createContext(""), "bar", "bar()", null, 0, null);
+
+		assertTrue(alphabeticFirst.compareTo(alphabeticSecond) < 0);
 	}
 
 	private ICompletionContext createContext(String input) {

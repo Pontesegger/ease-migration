@@ -15,8 +15,6 @@ package org.eclipse.ease.lang.python;
 
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.ui.completion.BasicContext;
-import org.eclipse.ease.ui.completion.tokenizer.IVariablesResolver;
-import org.eclipse.ease.ui.completion.tokenizer.InputTokenizer;
 
 public class PythonCompletionContext extends BasicContext {
 
@@ -26,46 +24,5 @@ public class PythonCompletionContext extends BasicContext {
 
 	public PythonCompletionContext(Object resource, String contents, int position) {
 		super(PythonHelper.getScriptType(), resource, contents, position);
-	}
-
-	// @Override
-	// protected String simplifyCode() {
-	// final String code = super.simplifyCode();
-	//
-	// // XXX: API needs a review here, these simplifications are Py4J specific, not
-	// // all Python code.
-	// if (code.startsWith("jvm.gateway."))
-	// return code.substring("jvm.gateway.".length());
-	// if (code.startsWith("gateway."))
-	// return code.substring("gateway.".length());
-	//
-	// return code;
-	// }
-
-	@Override
-	protected InputTokenizer getInputTokenizer() {
-		if (getScriptEngine() != null)
-			return new PythonInputTokenizer(v -> {
-				final Object variable = getScriptEngine().getVariable(v);
-				return variable == null ? null : variable.getClass();
-			});
-
-		return new PythonInputTokenizer();
-	}
-
-	private final class PythonInputTokenizer extends InputTokenizer {
-
-		private PythonInputTokenizer() {
-			super();
-		}
-
-		private PythonInputTokenizer(IVariablesResolver variablesResolver) {
-			super(variablesResolver);
-		}
-
-		@Override
-		protected boolean isLiteral(final char candidate) {
-			return ('"' == candidate) || ('\'' == candidate);
-		}
 	}
 }
