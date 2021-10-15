@@ -62,6 +62,9 @@
 		<!-- Allow class names shorter than 5 characters -->
 		<exclude name="ShortClassName" />
 
+		<!-- Allow (x != y) expressions -->
+		<exclude name="ConfusingTernary" />
+
 		<!-- Allow static imports for JUnit and mocking -->
 		<exclude name="TooManyStaticImports" />
 	</rule>
@@ -118,8 +121,14 @@
 	<rule ref="category/java/errorprone.xml">
 		<exclude name="BeanMembersShouldSerialize" />
 
+		<!-- Rule applies to J2EE only -->
+		<exclude name="UseProperClassLoader" />
+
 		<!-- fails in maven build, see https://github.com/pmd/pmd/issues/873 -->
 		<exclude name="DataflowAnomalyAnalysis" />
+
+		<!-- ignore locales when converting strings -->
+		<exclude name="UseLocaleWithCaseConversions" />
 	</rule>
 
 	<rule ref="category/java/errorprone.xml/EmptyCatchBlock">
@@ -145,6 +154,9 @@
 
 		<!-- instantiating objects in loops is actually fine, see https://stackoverflow.com/questions/17340421/pmd-avoid-instantiating-new-objects-inside-loops -->
 		<exclude name="AvoidInstantiatingObjectsInLoops" />
+
+		<!-- rule is deprecated and charAt(0) would require an additional length check -->
+		<exclude name="SimplifyStartsWith" />
 	</rule>
 
 	<rule ref="category/java/security.xml" />

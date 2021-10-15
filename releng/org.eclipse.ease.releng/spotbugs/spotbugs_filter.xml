@@ -12,4 +12,14 @@
     <Match>
         <Bug pattern="TESTING"/>
     </Match>
+
+    <!-- Ignore default encoding when converting byte[] / String -->
+    <Match>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+
+    <!-- Allow toUpperCase()/toLowerCase() without locale setting -->
+    <Match>
+        <Bug pattern="DM_CONVERT_CASE"/>
+    </Match>
 </FindBugsFilter>

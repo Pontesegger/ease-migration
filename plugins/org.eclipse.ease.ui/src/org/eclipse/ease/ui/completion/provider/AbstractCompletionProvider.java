@@ -128,10 +128,21 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 	}
 
 	private boolean isMethodCall(ICompletionContext context) {
-		final TokenList candidates = new TokenList(context.getTokens()).getFromLast(Method.class);
+		TokenList candidates = new TokenList(context.getTokens()).getFromLast(Method.class);
 
 		if (!candidates.isEmpty()) {
 			for (final Object token : candidates.subList(1, candidates.size())) {
+				if (!(token instanceof String))
+					return false;
+			}
+
+			return true;
+		}
+
+		// look for raw method call
+		candidates = new TokenList(context.getTokens()).getFromLast("(");
+		if (!candidates.isEmpty()) {
+			for (final Object token : candidates) {
 				if (!(token instanceof String))
 					return false;
 			}

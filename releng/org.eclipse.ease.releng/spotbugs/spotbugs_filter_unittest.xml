@@ -24,4 +24,9 @@
     <Match>
         <Bug pattern="DM_DEFAULT_ENCODING"/>
     </Match>
+
+    <!-- Allow toUpperCase()/toLowerCase() without locale setting -->
+    <Match>
+        <Bug pattern="DM_CONVERT_CASE"/>
+    </Match>
 </FindBugsFilter>
