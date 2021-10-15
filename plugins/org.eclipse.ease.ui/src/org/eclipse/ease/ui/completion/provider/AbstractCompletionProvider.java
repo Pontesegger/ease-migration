@@ -119,10 +119,16 @@ public abstract class AbstractCompletionProvider implements ICompletionProvider 
 
 	private boolean matchesMethodName(ICompletionContext context, String name) {
 		final List<Object> tokens = context.getTokens();
-		final TokenList candidates = new TokenList(tokens).getFromLast(Method.class);
+		TokenList candidates = new TokenList(tokens).getFromLast(Method.class);
 
 		if (!candidates.isEmpty())
 			return name.equals(((Method) candidates.get(0)).getName());
+
+		candidates = new TokenList(context.getTokens()).getFromLast("(");
+		if ((!candidates.isEmpty()) && (candidates.size() < tokens.size())) {
+			final Object methodName = tokens.get(tokens.size() - 1 - candidates.size());
+			return name.equals(methodName);
+		}
 
 		return false;
 	}
