@@ -177,4 +177,14 @@ public final class ShellDropTarget extends DropTargetAdapter {
 
 		return element;
 	}
+
+	@Override
+	public void dragEnter(DropTargetEvent event) {
+		event.detail = DND.DROP_COPY;
+	}
+
+	@Override
+	public void dragOperationChanged(DropTargetEvent event) {
+		event.detail = DND.DROP_COPY;
+	}
 }
