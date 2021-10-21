@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2021-06" sequenceNumber="1634797096">
+<target name="2021-06" sequenceNumber="1632997860">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.21.0.v20210906-0842"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.21.0.v20210906-0842"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.900.v20210906-0500"/>
-      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.1000.v20210813-0655"/>
-      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.3.600.v202108041610"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.27.0.v20210816-1137"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.900.v20210906-0500"/>
-      <unit id="org.eclipse.jdt" version="3.18.900.v20210906-0500"/>
-      <repository id="eclipse-2021-09" location="https://download.eclipse.org/releases/2021-09/"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.20.0.v20210611-1600"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.20.0.v20210611-1600"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.800.v20210611-1600"/>
+      <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.900.v20210418-1743"/>
+      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.3.500.v202106021855"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.26.0.v20210506-1425"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.800.v20210611-1636"/>
+      <unit id="org.eclipse.jdt" version="3.18.800.v20210611-1600"/>
+      <repository id="eclipse-2021-06" location="https://download.eclipse.org/releases/2021-06/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="2.23.0.v20200310-1642"/>
       <unit id="org.mozilla.javascript" version="1.7.10.v20190430-1943"/>
-      <repository id="eclipse-orbit-2021-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20210825222808/repository"/>
+      <repository id="eclipse-orbit-2021-06" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20210602031627/repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.engine.jython.feature.feature.group" version="0.0.0"/>
