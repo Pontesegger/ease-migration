@@ -1098,10 +1098,12 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 	private int runUntilTerminated(IDebugEngine engine, Runnable runOnSuspended) {
 		int suspendedEvents = 0;
 
-		engine.schedule();
+		String topmostStackFrame = "";
 
+		engine.schedule();
 		while (!engine.isFinished()) {
-			if (getDebugTarget().isSuspended()) {
+			if ((getDebugTarget().isSuspended()) && (!topmostStackFrame.equals(getTopmostStackFrame()))) {
+				topmostStackFrame = getTopmostStackFrame().toString();
 				suspendedEvents++;
 				runOnSuspended.run();
 			}

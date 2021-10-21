@@ -108,6 +108,12 @@
 
 		<!-- needs detailed configuration to work, otherwise fails in maven -->
 		<exclude name="LoosePackageCoupling" />
+
+		<!-- amount of imports not relevant for unit tests -->
+		<exclude name="ExcessiveImports" />
+
+		<!-- amount of public methods not relevant for unit tests -->
+		<exclude name="ExcessivePublicCount" />
 	</rule>
 
 	<rule ref="category/java/documentation.xml">
