@@ -35,6 +35,8 @@
 							<append>${p2.append}</append>
 							<latestVersionOnly>${p2.keepLatestOnly}</latestVersionOnly>
 							<destination>${p2.destination}</destination>
+							<xzCompress>true</xzCompress>
+							<keepNonXzIndexFiles>true</keepNonXzIndexFiles>
 						</configuration>
 					</execution>
 				</executions>
