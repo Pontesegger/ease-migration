@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
@@ -130,11 +131,6 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 				getDebugTarget().resume();
 			});
 		}
-	}
-
-	@Test
-	public void hasDebugTarget() throws CoreException {
-		assertNotNull(getDebugTarget());
 	}
 
 	@Test
@@ -1102,7 +1098,7 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 
 		engine.schedule();
 		while (!engine.isFinished()) {
-			if ((getDebugTarget().isSuspended()) && (!topmostStackFrame.equals(getTopmostStackFrame()))) {
+			if ((getDebugTarget().isSuspended()) && (hasStackFrameChanged(topmostStackFrame))) {
 				topmostStackFrame = getTopmostStackFrame().toString();
 				suspendedEvents++;
 				runOnSuspended.run();
@@ -1112,6 +1108,10 @@ public abstract class AbstractDebugTest extends WorkspaceTestHelper {
 		}
 
 		return suspendedEvents;
+	}
+
+	private boolean hasStackFrameChanged(String topmostStackFrame) {
+		return (topmostStackFrame.isEmpty()) || (!Objects.equals(topmostStackFrame, getTopmostStackFrame().toString()));
 	}
 
 	protected abstract String getEngineId();
