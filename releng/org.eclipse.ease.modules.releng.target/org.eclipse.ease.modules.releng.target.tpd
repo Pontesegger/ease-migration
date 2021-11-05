@@ -34,14 +34,17 @@ location "https://download.eclipse.org/releases/2021-09/" eclipse-2021-09 {
 location "https://download.eclipse.org/tools/orbit/downloads/drops/R20210825222808/repository" eclipse-orbit-2021-09 {
 // for java unit test of modules
 	org.mockito [2.13.0,3.0.0)
+	com.google.guava [27.1.0,28.0.0)
 }
 
-location "https://download.eclipse.org/releases/2020-12/" eclipse-2020-12 {
-	org.eclipse.papyrus.infra.feature.feature.group
-	org.eclipse.papyrus.infra.gmfdiag.feature.feature.group
-	org.eclipse.papyrus.uml.diagram.feature.feature.group
+location "https://download.eclipse.org/modeling/mdt/papyrus/updates/releases/2021-09" papyrus-2021-09 {
+	org.eclipse.papyrus.sdk.feature.feature.group lazy
 }
 
+location "https://download.eclipse.org/xwt/milestones-1.7.0/1.7.0-S/" xwt {
+	//xwt is needed by Papyrus
+	org.eclipse.xwt.feature.feature.group lazy
+}
 location "http://download.eclipse.org/technology/subversive/4.0/update-site/" {
 // svn module
 	org.eclipse.team.svn.feature.group
