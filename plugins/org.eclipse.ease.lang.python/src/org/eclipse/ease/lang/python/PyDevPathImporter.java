@@ -41,9 +41,15 @@ public class PyDevPathImporter implements IScriptEngineLaunchExtension, IExecuti
 	@Override
 	public void notify(IScriptEngine engine, Script script, int status) {
 		if (status == SCRIPT_START) {
-			final Object file = script.getFile();
+			Object file = script.getFile();
 			if (file instanceof IResource)
 				registerProject(((IResource) file).getProject(), engine);
+
+			else {
+				file = engine.getExecutedFile();
+				if (file instanceof IResource)
+					registerProject(((IResource) file).getProject(), engine);
+			}
 		}
 	}
 

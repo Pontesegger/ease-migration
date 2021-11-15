@@ -115,6 +115,35 @@ public class PyDevPathImporterTest {
 		assertDoesNotThrow(() -> importer.notify(engine, script, IExecutionListener.SCRIPT_START));
 	}
 
+	@Test
+	@DisplayName("notify() registers project paths for enigne executed file")
+	public void notify_registers_project_paths_for_engine_executed_file() throws ExecutionException, CoreException {
+
+		final IResource resource = mock(IResource.class);
+		final IProject project = mock(IProject.class);
+		final PythonNature pythonNature = mock(PythonNature.class);
+		final IPythonPathNature pythonPathNature = mock(IPythonPathNature.class);
+
+		when(resource.getProject()).thenReturn(project);
+		when(project.isOpen()).thenReturn(true);
+		when(project.getNature(any())).thenReturn(pythonNature);
+		when(pythonNature.getPythonPathNature()).thenReturn(pythonPathNature);
+		when(pythonPathNature.getOnlyProjectPythonPathStr(true)).thenReturn("one|two");
+
+		final IScriptEngine engine = mock(IScriptEngine.class);
+		when(engine.getExecutedFile()).thenReturn(resource);
+
+		final Script script = mock(Script.class);
+
+		final PyDevPathImporter importer = new PyDevPathImporter();
+		importer.notify(engine, script, IExecutionListener.SCRIPT_START);
+
+		final ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
+		verify(engine).inject(codeCaptor.capture(), eq(false));
+		assertTrue(codeCaptor.getValue().contains("sys.path.append('one')"));
+		assertTrue(codeCaptor.getValue().contains("sys.path.append('two')"));
+	}
+
 	private Script setupScript(String path) throws CoreException {
 		final Script script = mock(Script.class);
 
