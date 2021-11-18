@@ -13,9 +13,9 @@
 package org.eclipse.ease;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -98,7 +98,7 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	}
 
 	protected Collection<EaseDebugVariable> getDefinedVariables(Object scope) {
-		return null;
+		return Collections.emptySet();
 	}
 
 	protected EaseDebugVariable createVariable(String name, Object value) {
@@ -192,31 +192,11 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 	}
 
 	protected final String buildArrayString(List<Object> elements) {
-		final StringBuilder output = new StringBuilder("[");
-
-		for (final Object element : elements)
-			output.append(", ").append(toString(element));
-
-		output.append(']');
-
-		if (output.length() > 4)
-			output.delete(1, 3);
-
-		return output.toString();
+		return String.format("[%s]", elements.stream().map(e -> toString(e)).collect(Collectors.joining(", ")));
 	}
 
 	protected final String buildObjectString(Map<String, Object> elements) {
-		final StringBuilder output = new StringBuilder("{");
-
-		for (final Entry<String, Object> entry : elements.entrySet())
-			output.append(", ").append(entry.getKey()).append(": ").append(toString(entry.getValue()));
-
-		output.append('}');
-
-		if (output.length() > 4)
-			output.delete(1, 3);
-
-		return output.toString();
+		return String.format("{%s}", elements.entrySet().stream().map(e -> e.getKey() + ": " + toString(e.getValue())).collect(Collectors.joining(", ")));
 	}
 
 	@Override

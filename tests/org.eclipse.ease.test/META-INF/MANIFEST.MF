@@ -8,6 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.junit.jupiter.api;bundle-version="5.5.0",
  org.mockito,
  org.eclipse.ease.ui.scripts,
- org.eclipse.ease.lang.javascript.rhino
+ org.eclipse.ease.lang.javascript.rhino,
+ org.junit.jupiter.params;bundle-version="5.5.0"
 Bundle-Vendor: Eclipse.org
 Automatic-Module-Name: org.eclipse.ease.test

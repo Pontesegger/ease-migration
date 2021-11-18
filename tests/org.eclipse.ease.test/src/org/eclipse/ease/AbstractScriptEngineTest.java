@@ -54,7 +54,7 @@ public class AbstractScriptEngineTest {
 	protected static final CharSequence ERROR_MARKER = "ERROR";
 	protected static final CharSequence INJECT_MARKER = "INJECT";
 
-	protected AbstractScriptEngine fTestEngine;
+	private AbstractScriptEngine fTestEngine;
 
 	@BeforeEach
 	public void setup() {
