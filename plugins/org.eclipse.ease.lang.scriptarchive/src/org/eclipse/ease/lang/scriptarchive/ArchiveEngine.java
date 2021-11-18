@@ -269,7 +269,7 @@ public class ArchiveEngine extends AbstractScriptEngine implements IScriptEngine
 	}
 
 	@Override
-	protected Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable {
+	protected Object execute(Script script, String fileName, boolean uiThread) throws Throwable {
 
 		final Object input = script.getCommand();
 		final Object mainScript = fManifest.get("Main-Script");

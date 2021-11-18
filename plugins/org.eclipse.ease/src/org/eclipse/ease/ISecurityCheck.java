@@ -16,6 +16,7 @@ package org.eclipse.ease;
 /**
  * Interface used for security callbacks. Callbacks can be registered to append additional checks for certain script engine actions.
  */
+@FunctionalInterface
 public interface ISecurityCheck {
 
 	enum ActionType {

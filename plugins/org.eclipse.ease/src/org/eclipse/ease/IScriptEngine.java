@@ -220,14 +220,6 @@ public interface IScriptEngine {
 	void addSecurityCheck(ISecurityCheck.ActionType type, ISecurityCheck check);
 
 	/**
-	 * Remove registered security check for all actions. If the check was not registered at all nothing will happen.
-	 *
-	 * @param check
-	 *            check to be removed
-	 */
-	void removeSecurityCheck(ISecurityCheck check);
-
-	/**
 	 * Get the launch that was used to create this engine.
 	 *
 	 * @return launch or <code>null</code> in case this engine was created without launch configuration

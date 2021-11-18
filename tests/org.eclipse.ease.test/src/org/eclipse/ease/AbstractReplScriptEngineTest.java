@@ -1,5 +1,6 @@
 package org.eclipse.ease;
 
+import static org.eclipse.ease.AbstractScriptEngineTest.INJECT_MARKER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,7 +21,7 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 	private class MockedScriptEngine extends AbstractReplScriptEngine {
 
 		public MockedScriptEngine() {
-			super("Mocked Engine");
+			super("Mocked");
 		}
 
 		@Override
@@ -55,12 +56,15 @@ public class AbstractReplScriptEngineTest extends AbstractScriptEngineTest {
 		}
 
 		@Override
-		protected Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable {
+		protected Object execute(Script script, String fileName, boolean uiThread) throws Throwable {
 			final String input = script.getCommand().toString();
 			if (input.contains(ERROR_MARKER))
 				throw new RuntimeException(input);
-			else
-				getOutputStream().write(input.getBytes());
+
+			if (input.contains(INJECT_MARKER))
+				inject("(injected code)", false);
+
+			getOutputStream().write(input.getBytes());
 
 			return input;
 		}

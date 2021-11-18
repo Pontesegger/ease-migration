@@ -164,7 +164,7 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 	}
 
 	@Override
-	protected Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable {
+	protected Object execute(Script script, String fileName, boolean uiThread) throws Throwable {
 
 		Object command = script.getCommand();
 
@@ -175,9 +175,9 @@ public class TestSuiteScriptEngine extends AbstractScriptEngine implements IDebu
 				if (runtimeSuite != null)
 					command = runtimeSuite;
 				else
-					throw new Exception("Could not load suite from resource: " + reference);
+					throw new Exception("Could not load suite from resource: " + script.getFile());
 			} catch (final Exception e) {
-				throw new Exception("Invalid testsuite content detected in: " + reference, e);
+				throw new Exception("Invalid testsuite content detected in: " + script.getFile(), e);
 			}
 		}
 

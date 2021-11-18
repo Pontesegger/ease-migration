@@ -60,7 +60,7 @@ public class GroovyScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
+	protected Object execute(final Script script, final String fileName, final boolean uiThread) throws Exception {
 		InputStreamReader reader = null;
 		Object result = null;
 		try {

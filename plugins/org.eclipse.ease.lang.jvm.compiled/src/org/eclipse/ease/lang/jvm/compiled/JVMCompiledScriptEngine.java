@@ -101,9 +101,9 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 	}
 
 	@Override
-	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
+	protected Object execute(final Script script, final String fileName, final boolean uiThread) throws Exception {
 
-		final Class<?> clazz = loadClass(reference);
+		final Class<?> clazz = loadClass(script.getFile());
 		if (clazz != null) {
 
 			final Method mainMethod = clazz.getMethod("main", String[].class);
@@ -121,8 +121,7 @@ public class JVMCompiledScriptEngine extends AbstractScriptEngine implements ISc
 						// initialize method not available, to be ignored
 					}
 
-					final Object result = mainMethod.invoke(null, internalGetVariable("argv"));
-					return result;
+					return mainMethod.invoke(null, internalGetVariable("argv"));
 
 				} finally {
 					Thread.currentThread().setContextClassLoader(localClassLoader);

@@ -73,10 +73,10 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 		if (fDebugger != null) {
 			try {
 				// load python part of debugger
-				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/edb.py");
-
-				internalSetVariable(PythonDebugger.PYTHON_DEBUGGER_VARIABLE, Py.java2py(fDebugger));
-				super.internalExecute(new Script("Load Python debugger", stream), "edb.py", "Load Python Debugger");
+				try (final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python", "pysrc/edb.py")) {
+					internalSetVariable(PythonDebugger.PYTHON_DEBUGGER_VARIABLE, Py.java2py(fDebugger));
+					super.internalExecute(new Script("Load Python debugger", stream), "Load Python Debugger");
+				}
 
 			} catch (final Throwable e) {
 				throw new ScriptEngineException("Failed to load Python Debugger", e);
@@ -85,11 +85,11 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 	}
 
 	@Override
-	protected Object internalExecute(final Script script, final Object reference, final String fileName) throws Exception {
+	protected Object internalExecute(final Script script, final String fileName) throws Exception {
 		if (fDebugger != null) {
 			return fDebugger.execute(script);
 		}
-		return super.internalExecute(script, reference, fileName);
+		return super.internalExecute(script, fileName);
 	}
 
 	@Override
@@ -238,11 +238,6 @@ public class JythonDebuggerEngine extends JythonScriptEngine implements IPythonD
 
 	@Override
 	protected boolean acceptVariable(Object value) {
-		// if ((value != null) && ((value.getClass().getName().startsWith("org.mozilla.javascript.gen"))
-		// || (value.getClass().getName().startsWith("org.mozilla.javascript.Arguments"))))
-		// return false;
-
 		return true;
 	}
-
 }

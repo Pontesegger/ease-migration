@@ -139,7 +139,7 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Throwable {
+	protected Object execute(final Script script, final String fileName, final boolean uiThread) throws Throwable {
 		if (uiThread) {
 			// run in UI thread
 			final RunnableWithResult<Object> runnable = new RunnableWithResult<Object>() {
@@ -148,7 +148,7 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 				public Object runWithTry() throws Throwable {
 
 					// call execute again, now from correct thread
-					return internalExecute(script, reference, fileName);
+					return internalExecute(script, fileName);
 				}
 			};
 
@@ -158,10 +158,10 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 		} else
 			// run in engine thread
-			return internalExecute(script, reference, fileName);
+			return internalExecute(script, fileName);
 	}
 
-	protected Object internalExecute(final Script script, final Object reference, final String fileName) throws Exception {
+	protected Object internalExecute(final Script script, final String fileName) throws Exception {
 		mResult = Py.None;
 
 		final PyObject code = Py.compile_command_flags(script.getCode(), "(none)", CompileMode.exec, new CompilerFlags(), true);

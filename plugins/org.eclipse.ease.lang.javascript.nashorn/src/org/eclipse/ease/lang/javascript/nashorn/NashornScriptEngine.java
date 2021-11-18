@@ -90,7 +90,7 @@ public class NashornScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	@Override
-	protected Object execute(final Script script, final Object reference, final String fileName, final boolean uiThread) throws Exception {
+	protected Object execute(final Script script, final String fileName, final boolean uiThread) throws Exception {
 		return fEngine.eval(script.getCode());
 	}
 

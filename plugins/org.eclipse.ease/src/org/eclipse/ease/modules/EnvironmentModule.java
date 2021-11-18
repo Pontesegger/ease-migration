@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.AbstractScriptEngine;
@@ -42,6 +43,7 @@ import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
+import org.eclipse.ease.ScriptEngineCancellationException;
 import org.eclipse.ease.modules.ModuleDefinition.ModuleDependency;
 import org.eclipse.ease.modules.ModuleTracker.ModuleState;
 import org.eclipse.ease.service.ScriptService;
@@ -602,7 +604,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	//
 	/**
-	 * Check if java callbacks are registered for a module method. This method get called on each module function invokation.
+	 * Check if java callbacks are registered for a module method. This method get called on each module function invocation.
 	 * <p>
 	 * ATTENTION: needed by dynamic script code, do not alter synopsis!
 	 * </p>
@@ -612,8 +614,9 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 * @return <code>true</code> when callbacks are registered
 	 */
 	public boolean hasMethodCallback(String methodToken) {
-		if (getScriptEngine() instanceof AbstractScriptEngine)
-			((AbstractScriptEngine) getScriptEngine()).checkForCancellation();
+		final IProgressMonitor monitor = getScriptEngine().getMonitor();
+		if ((monitor != null) && (monitor.isCanceled()))
+			throw new ScriptEngineCancellationException();
 
 		final Method method = fRegisteredMethods.get(methodToken);
 

@@ -121,9 +121,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 *            name of script engine job
 	 */
 	public AbstractScriptEngine(final String name) {
-		super("[EASE " + name + " Engine]");
+		super(String.format("[EASE %s Engine]", name));
 
-		// by default an engine shall be visible to the user. If the engine
 		setSystem(false);
 	}
 
@@ -188,7 +187,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			else
 				notifyExecutionListeners(script, IExecutionListener.SCRIPT_INJECTION_START);
 
-			script.setResult(execute(script, script.getFile(), fStackTrace.get(0).getName(), uiThread));
+			script.setResult(execute(script, fStackTrace.get(0).getName(), uiThread));
 
 		} catch (final BreakException e) {
 			script.setResult(e.getCondition());
@@ -371,7 +370,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	@Override
 	public void terminate() {
-
 		final IProgressMonitor monitor = getMonitor();
 		if ((monitor != null) && (!monitor.isCanceled()))
 			monitor.setCanceled(true);
@@ -379,18 +377,7 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		terminateCurrent();
 
 		synchronized (this) {
-			notify();
-		}
-	}
-
-	/**
-	 * Check engine for cancellation request and terminate if indicated by the monitor.
-	 */
-	public void checkForCancellation() {
-		final IProgressMonitor monitor = getMonitor();
-		if ((monitor != null) && (monitor.isCanceled())) {
-			if (Thread.currentThread().equals(getThread()))
-				throw new ScriptEngineCancellationException();
+			notifyAll();
 		}
 	}
 
@@ -576,27 +563,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		return Collections.unmodifiableMap(fBufferedVariables);
 	}
 
-	/**
-	 * Split a string with comma separated arguments.
-	 *
-	 * @param arguments
-	 *            comma separated arguments
-	 * @return trimmed list of arguments
-	 */
-	public static final String[] extractArguments(final String arguments) {
-		final ArrayList<String> args = new ArrayList<>();
-		if (arguments != null) {
-
-			final String[] tokens = arguments.split(",");
-			for (final String token : tokens) {
-				if (!token.trim().isEmpty())
-					args.add(token.trim());
-			}
-		}
-
-		return args.toArray(new String[args.size()]);
-	}
-
 	@Override
 	public void addSecurityCheck(ActionType type, ISecurityCheck check) {
 		if (!fSecurityChecks.containsKey(type))
@@ -604,13 +570,6 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 		if (!fSecurityChecks.get(type).contains(check))
 			fSecurityChecks.get(type).add(check);
-	}
-
-	@Override
-	public void removeSecurityCheck(ISecurityCheck check) {
-		for (final List<ISecurityCheck> entry : fSecurityChecks.values()) {
-			entry.remove(check);
-		}
 	}
 
 	protected List<Script> getScheduledScripts() {
@@ -661,18 +620,17 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	/**
 	 * Execute script code.
 	 *
+	 * @param script
+	 *            script to be executed
 	 * @param fileName
 	 *            name of file executed
-	 * @param uiThread
-	 * @param reader
-	 *            reader for script data to be executed
 	 * @param uiThread
 	 *            when set to <code>true</code> run code in UI thread
 	 * @return execution result
 	 * @throws Throwable
 	 *             any exception thrown during script execution
 	 */
-	protected abstract Object execute(Script script, Object reference, String fileName, boolean uiThread) throws Throwable;
+	protected abstract Object execute(Script script, String fileName, boolean uiThread) throws Throwable;
 
 	/**
 	 * Simple monitor to forward cancellation requests to the script engine.
