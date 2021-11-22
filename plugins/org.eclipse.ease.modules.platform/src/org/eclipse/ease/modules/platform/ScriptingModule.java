@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IScriptEngine;
@@ -52,6 +51,26 @@ public class ScriptingModule extends AbstractScriptModule {
 
 	/** Module identifier. */
 	public static final String MODULE_ID = "/System/Scripting";
+
+	/**
+	 * Split a string with comma separated arguments.
+	 *
+	 * @param arguments
+	 *            comma separated arguments
+	 * @return trimmed list of arguments
+	 */
+	public static final String[] extractArguments(final String arguments) {
+		final ArrayList<String> args = new ArrayList<>();
+
+		if (arguments != null) {
+			for (final String token : arguments.split(",")) {
+				if (!token.isBlank())
+					args.add(token.trim());
+			}
+		}
+
+		return args.toArray(new String[0]);
+	}
 
 	/**
 	 * Create a new script engine instance.
@@ -195,7 +214,7 @@ public class ScriptingModule extends AbstractScriptModule {
 			}
 
 			// set input parameters
-			engine.setVariable("argv", AbstractScriptEngine.extractArguments(arguments));
+			engine.setVariable("argv", extractArguments(arguments));
 
 			Object scriptObject = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
 			if (scriptObject == null) {

@@ -13,6 +13,7 @@
 
 package org.eclipse.ease.modules.platform;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -153,5 +154,20 @@ public class ScriptingModuleTest {
 
 		// reset the object
 		modifierModule.setSharedObject("foreignShared", testObject, false, false);
+	}
+
+	@Test
+	public void extractEmptyArguments() {
+		assertEquals(0, ScriptingModule.extractArguments(null).length);
+		assertEquals(0, ScriptingModule.extractArguments("").length);
+		assertEquals(0, ScriptingModule.extractArguments("    ").length);
+		assertEquals(0, ScriptingModule.extractArguments("\t\t").length);
+	}
+
+	@Test
+	public void extractArguments() {
+		assertArrayEquals(new String[] { "one" }, ScriptingModule.extractArguments("one"));
+		assertArrayEquals(new String[] { "one with spaces" }, ScriptingModule.extractArguments("one with spaces"));
+		assertArrayEquals(new String[] { "one", "and", "another" }, ScriptingModule.extractArguments("one,and, another"));
 	}
 }

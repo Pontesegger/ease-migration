@@ -29,7 +29,7 @@ Bundle-Version: 0.9.0.qualifier
 Bundle-Name: EASE Platform Modules (Incubation)
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.ease.modules.platform;singleton:=true
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.eclipse.ease.modules.platform
 Bundle-Vendor: Eclipse.org
 
