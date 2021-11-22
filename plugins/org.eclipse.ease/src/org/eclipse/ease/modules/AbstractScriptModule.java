@@ -10,6 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.modules;
 
 import org.eclipse.ease.IScriptEngine;
@@ -33,16 +34,16 @@ public abstract class AbstractScriptModule implements IScriptModule {
 
 	/**
 	 * Get the current script engine.
-	 * 
+	 *
 	 * @return script engine
 	 */
-	public IScriptEngine getScriptEngine() {
+	protected IScriptEngine getScriptEngine() {
 		return fEngine;
 	}
 
 	/**
 	 * Get the current environment module.
-	 * 
+	 *
 	 * @return environment module
 	 */
 	protected IEnvironment getEnvironment() {

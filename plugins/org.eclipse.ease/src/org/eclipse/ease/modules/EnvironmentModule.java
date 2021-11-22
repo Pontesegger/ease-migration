@@ -12,11 +12,10 @@
  *******************************************************************************/
 package org.eclipse.ease.modules;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.AbstractScriptEngine;
 import org.eclipse.ease.Activator;
 import org.eclipse.ease.ExitException;
@@ -77,6 +75,10 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		instance.initialize(AbstractScriptEngine.getCurrentScriptEngine(), instance);
 
 		instance.wrap(instance, false);
+	}
+
+	public static final String getWrappedVariableName(final Object toBeWrapped) {
+		return (MODULE_PREFIX + toBeWrapped.getClass().getName()).replace('.', '_');
 	}
 
 	private final ModuleTracker fModuleTracker = new ModuleTracker();
@@ -142,7 +144,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		// resolve identifier
 		final ModuleDefinition definition = ModuleHelper.resolveModuleName(moduleIdentifier);
 		if (definition == null)
-			throw new RuntimeException("Could not find module \"" + moduleIdentifier + "\"");
+			throw new IllegalArgumentException("Could not find module \"" + moduleIdentifier + "\"");
 
 		final ModuleState moduleState = fModuleTracker.getOrCreateModuleState(definition);
 
@@ -204,14 +206,8 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Object, U extends Class<T>> T getModule(final U clazz) {
-		for (final ModuleState state : fModuleTracker.getAvailableModules()) {
-			if (state.getInstance() != null) {
-				if (clazz.isAssignableFrom(state.getInstance().getClass()))
-					return (T) state.getInstance();
-			}
-		}
-
-		return null;
+		return fModuleTracker.getAvailableModules().stream().filter(s -> s.getInstance() != null)
+				.filter(s -> clazz.isAssignableFrom(s.getInstance().getClass())).map(s -> (T) s.getInstance()).findFirst().orElse(null);
 	}
 
 	@Override
@@ -274,34 +270,33 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 
 	/**
 	 * Read a single line of data from the default input stream of the script engine. Depending on the <i>blocking</i> parameter this method will wait for user
-	 * input or return immediately with available data.
+	 * input or return immediately with any available data.
 	 *
 	 * @param blocking
 	 *            <code>true</code> results in a blocking call until data is available, <code>false</code> returns in any case
-	 * @return string data from input stream or <code>null</code>
+	 * @return string data from input stream
 	 * @throws IOException
 	 *             when reading on the input stream fails
 	 */
 	@WrapToScript
 	public String readInput(@ScriptParameter(defaultValue = "true") final boolean blocking) throws IOException {
+
+		final ByteArrayOutputStream data = new ByteArrayOutputStream();
+
 		final InputStream inputStream = getScriptEngine().getInputStream();
-		boolean doRead = blocking;
-		if (!doRead) {
-			try {
-				doRead = (inputStream.available() > 0);
-			} catch (final IOException e) {
-				// no data to read available
-			}
+		while ((inputStream.available() > 0) || (blocking)) {
+			final int in = inputStream.read();
+			if (in == -1)
+				break;
+
+			if ('\n' == (char) in)
+				break;
+
+			if ('\r' != (char) in)
+				data.write(in);
 		}
 
-		if (doRead) {
-			// read a single line
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-				return reader.readLine();
-			}
-		}
-
-		return null;
+		return data.toString();
 	}
 
 	protected void fireModuleEvent(final Object module, final int type) {
@@ -324,29 +319,13 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		// create function wrappers
 		final Object result = createWrappers(toBeWrapped, identifier, useCustomNamespace);
 
-		boolean isTrackedModule = false;
-		for (final ModuleState state : fModuleTracker.getAvailableModules()) {
-			if (toBeWrapped.equals(state.getInstance())) {
-				state.setWrapped(true);
-				isTrackedModule = true;
-				break;
-			}
-		}
-
-		if (!isTrackedModule) {
-			final ModuleState state = fModuleTracker.addInstance(toBeWrapped);
-			state.setWrapped(true);
-		}
+		fModuleTracker.getAvailableModules().stream().filter(m -> Objects.equals(toBeWrapped, m.getInstance())).forEach(m -> m.setWrapped());
 
 		// notify listeners
 		if (reloaded)
 			fireModuleEvent(toBeWrapped, IModuleListener.RELOADED);
 
 		return result;
-	}
-
-	public static final String getWrappedVariableName(final Object toBeWrapped) {
-		return (MODULE_PREFIX + toBeWrapped.getClass().getName()).replace('.', '_');
 	}
 
 	/**
@@ -365,22 +344,15 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 *             when execution gets interrupted
 	 */
 	private Object createWrappers(final Object instance, final String identifier, boolean useCustomNamespace) throws ExecutionException {
-		final ICodeFactory codeFactory = getCodeFactory();
-		if (null == codeFactory)
-			return null;
-
 		String wrapperCode;
 		if (instance instanceof IEnvironment)
-			wrapperCode = codeFactory.createWrapper((IEnvironment) instance, instance, identifier, useCustomNamespace, getScriptEngine());
+			wrapperCode = getCodeFactory().createWrapper((IEnvironment) instance, instance, identifier, useCustomNamespace, getScriptEngine());
 		else
-			wrapperCode = codeFactory.createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
+			wrapperCode = getCodeFactory().createWrapper(this, instance, identifier, useCustomNamespace, getScriptEngine());
 
-		if (useCustomNamespace)
-			return getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode), false);
-		else
-			getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode), false);
+		final Object injectionResult = getScriptEngine().inject(new Script("Wrapper(" + instance.getClass().getSimpleName() + ")", wrapperCode), false);
 
-		return instance;
+		return (useCustomNamespace) ? injectionResult : instance;
 	}
 
 	/**
@@ -416,19 +388,19 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	 * file system. All other types of URIs are supported too (like http:// ...). You may also use absolute and relative paths as defined by your local file
 	 * system.
 	 *
-	 * @param filename
-	 *            name of file to be included
+	 * @param resource
+	 *            name or instance of resource to be included
 	 * @return result of include operation
 	 * @throws ExecutionException
 	 *             when included code fails
 	 */
 	@WrapToScript
-	public final Object include(final String filename) throws ExecutionException {
-		final Object file = ResourceTools.resolve(filename, getScriptEngine().getExecutedFile());
+	public final Object include(final Object resource) throws ExecutionException {
+		final Object file = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
 		if (file != null)
 			return getScriptEngine().inject(file, false);
 
-		throw new IllegalArgumentException("Cannot locate '" + filename + "'");
+		throw new IllegalArgumentException("Cannot locate '" + resource + "'");
 	}
 
 	/**
@@ -439,15 +411,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 	@WrapToScript
 	@Override
 	public IScriptEngine getScriptEngine() {
-
-		final IScriptEngine engine = super.getScriptEngine();
-		if (engine == null) {
-			final Job currentJob = Job.getJobManager().currentJob();
-			if (currentJob instanceof IScriptEngine)
-				return (IScriptEngine) currentJob;
-		}
-
-		return engine;
+		return super.getScriptEngine();
 	}
 
 	/**
@@ -602,7 +566,6 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		fModuleCallbacks.add(callbackProvider);
 	}
 
-	//
 	/**
 	 * Check if java callbacks are registered for a module method. This method get called on each module function invocation.
 	 * <p>
@@ -619,13 +582,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 			throw new ScriptEngineCancellationException();
 
 		final Method method = fRegisteredMethods.get(methodToken);
-
-		for (final IModuleCallbackProvider callbackProvider : fModuleCallbacks) {
-			if ((callbackProvider.hasPreExecutionCallback(method)) || (callbackProvider.hasPostExecutionCallback(method)))
-				return true;
-		}
-
-		return false;
+		return fModuleCallbacks.stream().anyMatch(p -> (p.hasPreExecutionCallback(method)) || (p.hasPostExecutionCallback(method)));
 	}
 
 	// needed by dynamic script code, do not change synopsis

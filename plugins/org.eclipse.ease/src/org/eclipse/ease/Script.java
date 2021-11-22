@@ -10,6 +10,7 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease;
 
 import java.io.ByteArrayInputStream;

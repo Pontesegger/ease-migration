@@ -13,5 +13,14 @@
             class="java.lang.StringBuilder">
       </entry>
    </extension>
+   <extension
+         point="org.eclipse.ease.modules">
+      <module
+            class="org.eclipse.ease.modules.TestModule"
+            id="org.eclipse.ease.test.environmentTestModule"
+            name="TestModule"
+            visible="true">
+      </module>
+   </extension>
 
 </fragment>

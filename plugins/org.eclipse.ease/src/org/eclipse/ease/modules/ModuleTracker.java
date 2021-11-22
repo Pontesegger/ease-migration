@@ -27,7 +27,6 @@ public class ModuleTracker {
 
 		public void setInstance(Object instance) {
 			fInstance = instance;
-			pushUp();
 		}
 
 		public Object getInstance() {
@@ -50,8 +49,8 @@ public class ModuleTracker {
 			return fWrapped;
 		}
 
-		public void setWrapped(boolean wrapped) {
-			fWrapped = wrapped;
+		public void setWrapped() {
+			fWrapped = true;
 			pushUp();
 		}
 
@@ -72,24 +71,9 @@ public class ModuleTracker {
 		return state;
 	}
 
-	public ModuleState addInstance(Object instance) {
-		final ModuleState state = new ModuleState();
-
-		fAvailableModules.add(0, state);
-		state.setInstance(instance);
-
-		return state;
-	}
-
 	public ModuleState getModuleState(ModuleDefinition definition) {
-		for (final ModuleState state : getAvailableModules()) {
-			if (state.getModuleDefinition() != null) {
-				if (definition.getId().equals(state.getModuleDefinition().getId()))
-					return state;
-			}
-		}
-
-		return null;
+		return getAvailableModules().stream().filter(s -> s.getModuleDefinition() != null).filter(s -> s.getModuleDefinition().equals(definition)).findFirst()
+				.orElse(null);
 	}
 
 	public ModuleState getOrCreateModuleState(ModuleDefinition definition) {

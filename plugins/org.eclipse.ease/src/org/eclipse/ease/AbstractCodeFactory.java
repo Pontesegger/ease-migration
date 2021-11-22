@@ -37,15 +37,7 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	public static final String LINE_DELIMITER = System.getProperty(Platform.PREF_LINE_SEPARATOR);
 
 	protected String buildParameterList(List<Parameter> parameters) {
-		// build parameter string
-		final StringBuilder parameterList = new StringBuilder();
-		for (final Parameter parameter : parameters)
-			parameterList.append(", ").append(toSafeName(parameter.getName()));
-
-		if (parameterList.length() > 2)
-			parameterList.delete(0, 2);
-
-		return parameterList.toString();
+		return parameters.stream().map(p -> toSafeName(p.getName())).collect(Collectors.joining(", "));
 	}
 
 	@Override
@@ -99,13 +91,13 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	@Override
 	public String getDefaultValue(final Parameter parameter) {
 		final String defaultStringValue = parameter.getDefaultValue().replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
-		final Class<?> clazz = parameter.getClazz();
 
 		// null as default value
 		if (ScriptParameter.NULL.equals(defaultStringValue))
 			return getNullString();
 
 		// base datatypes
+		final Class<?> clazz = parameter.getClazz();
 		if ((Integer.class.equals(clazz)) || (int.class.equals(clazz))) {
 			try {
 				return Integer.toString(Integer.parseInt(defaultStringValue));
@@ -380,7 +372,7 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	}
 
 	/**
-	 * Get the language identifier for this code factory
+	 * Get the language identifier for this code factory.
 	 *
 	 * @return language identifier as defined in extension point scriptType.name
 	 */

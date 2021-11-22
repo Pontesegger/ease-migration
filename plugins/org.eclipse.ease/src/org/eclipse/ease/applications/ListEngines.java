@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ease.applications;
 
+import java.io.PrintStream;
+
 import org.eclipse.ease.service.EngineDescription;
 import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
@@ -22,16 +24,20 @@ public class ListEngines implements IApplication {
 
 	@Override
 	public Object start(final IApplicationContext context) throws Exception {
-		System.out.println("Name: engineID");
-		System.out.println("==============");
+		getOutputStream().println("Name: engineID");
+		getOutputStream().println("==============");
 		final IScriptService service = ScriptService.getService();
 		for (final EngineDescription description : service.getEngines())
-			System.out.println("\t" + description.getName() + ": " + description.getID());
+			getOutputStream().println(String.format("\t%s: %s", description.getName(), description.getID()));
 
 		return 0;
 	}
 
 	@Override
 	public void stop() {
+	}
+
+	private PrintStream getOutputStream() {
+		return System.out;
 	}
 }

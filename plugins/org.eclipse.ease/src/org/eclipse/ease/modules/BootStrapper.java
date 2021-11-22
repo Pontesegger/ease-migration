@@ -28,11 +28,8 @@ public class BootStrapper implements IScriptEngineLaunchExtension {
 	public void createEngine(final IScriptEngine engine) {
 		final ICodeFactory codeFactory = ScriptService.getCodeFactory(engine);
 		if (codeFactory != null) {
-			final StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append(codeFactory.classInstantiation(EnvironmentModule.class, new String[0]));
-			stringBuilder.append(".bootstrap();\n");
-
-			engine.execute(new Script("Bootloader", stringBuilder.toString()));
+			final String code = String.format("%s.bootstrap();%n", codeFactory.classInstantiation(EnvironmentModule.class, new String[0]));
+			engine.execute(new Script("Bootloader", code));
 		}
 	}
 }
