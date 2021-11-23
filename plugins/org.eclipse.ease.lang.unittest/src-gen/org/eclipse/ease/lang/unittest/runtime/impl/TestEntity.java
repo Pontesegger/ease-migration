@@ -4,6 +4,7 @@ package org.eclipse.ease.lang.unittest.runtime.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -57,7 +58,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public abstract class TestEntity extends MinimalEObjectImpl.Container implements ITestEntity {
 	/**
 	 * The default value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -66,7 +67,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getDescription() <em>Description</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getDescription()
 	 * @generated
 	 * @ordered
@@ -75,7 +76,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -84,7 +85,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -93,7 +94,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getEntityStatus() <em>Entity Status</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEntityStatus()
 	 * @generated
 	 * @ordered
@@ -102,7 +103,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getEntityStatus() <em>Entity Status</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEntityStatus()
 	 * @generated
 	 * @ordered
@@ -111,7 +112,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getEndTimestamp() <em>End Timestamp</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEndTimestamp()
 	 * @generated
 	 * @ordered
@@ -120,7 +121,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getEndTimestamp() <em>End Timestamp</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEndTimestamp()
 	 * @generated
 	 * @ordered
@@ -129,7 +130,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getStartTimestamp() <em>Start Timestamp</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getStartTimestamp()
 	 * @generated
 	 * @ordered
@@ -138,7 +139,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getStartTimestamp() <em>Start Timestamp</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getStartTimestamp()
 	 * @generated
 	 * @ordered
@@ -147,7 +148,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getMetadata() <em>Metadata</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getMetadata()
 	 * @generated
 	 * @ordered
@@ -156,7 +157,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getDuration() <em>Duration</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getDuration()
 	 * @generated
 	 * @ordered
@@ -165,7 +166,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getResults() <em>Results</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getResults()
 	 * @generated
 	 * @ordered
@@ -174,7 +175,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #getEstimatedDuration() <em>Estimated Duration</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEstimatedDuration()
 	 * @generated
 	 * @ordered
@@ -183,7 +184,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #getEstimatedDuration() <em>Estimated Duration</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #getEstimatedDuration()
 	 * @generated
 	 * @ordered
@@ -192,7 +193,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The default value of the '{@link #isTerminated() <em>Terminated</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isTerminated()
 	 * @generated
 	 * @ordered
@@ -201,7 +202,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * The cached value of the '{@link #isTerminated() <em>Terminated</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @see #isTerminated()
 	 * @generated
 	 * @ordered
@@ -248,7 +249,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -258,7 +259,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -268,7 +269,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -281,7 +282,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -291,7 +292,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -304,7 +305,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -314,7 +315,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public void setEntityStatusGen(TestStatus newEntityStatus) {
@@ -331,12 +332,11 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 	 */
 	@Override
 	public TestStatus getStatus() {
+		if (isDisabled())
+			return TestStatus.DISABLED;
+
 		int status = getEntityStatus().getValue();
-
 		for (final ITestResult result : getResults()) {
-			if (TestStatus.DISABLED.equals(result.getStatus()))
-				return TestStatus.DISABLED;
-
 			status = Math.max(status, result.getStatus().getValue());
 		}
 
@@ -366,12 +366,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 	 */
 	@Override
 	public boolean hasError() {
-		for (final ITestResult result : getResults()) {
-			if (TestStatus.ERROR.equals(result.getStatus()))
-				return true;
-		}
-
-		return false;
+		return !getResults(TestStatus.ERROR).isEmpty();
 	}
 
 	/**
@@ -381,13 +376,12 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 	 */
 	@Override
 	public ITestSuite getTestSuite() {
+		if (this instanceof TestSuite)
+			return (ITestSuite) this;
+		
 		final ITestContainer parent = getParent();
-		if (parent != null) {
-			if (parent instanceof ITestSuite)
-				return (ITestSuite) parent;
-			else
-				return parent.getTestSuite();
-		}
+		if (parent != null) 
+			return parent.getTestSuite();
 
 		return null;
 	}
@@ -415,18 +409,18 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 		getMetadata().clear();
 		getResults().clear();
 
-		setStartTimestamp(0);
-		setEndTimestamp(0);
-
 		// set status after clearing results. This way we do not generate obsolete markers
 		setEntityStatus(TestStatus.NOT_RUN);
+
+		setStartTimestamp(0);
+		setEndTimestamp(0);
 
 		setTerminated(false);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -443,13 +437,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 	 */
 	@Override
 	public ITestResult getWorstResult() {
-		ITestResult candidate = null;
-		for (final ITestResult result : getResults()) {
-			if ((candidate == null) || (candidate.getStatus().getValue() < result.getStatus().getValue()))
-				candidate = result;
-		}
-
-		return candidate;
+		return getResults().stream().sorted((s1, s2) -> s2.getStatus().compareTo(s1.getStatus())).findFirst().orElse(null);
 	}
 
 	/**
@@ -478,14 +466,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 	 */
 	@Override
 	public EList<ITestResult> getResults(TestStatus status) {
-		final EList<ITestResult> results = new BasicEList<>();
-
-		for (final ITestResult result : getResults().toArray(new ITestResult[0])) {
-			if (result.getStatus().equals(status))
-				results.add(result);
-		}
-
-		return results;
+		return new BasicEList<>(getResults().stream().filter(r -> r.getStatus().equals(status)).collect(Collectors.toList()));
 	}
 
 	/**
@@ -533,7 +514,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -549,7 +530,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -559,7 +540,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -572,7 +553,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -584,7 +565,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public NotificationChain basicSetParent(ITestContainer newParent, NotificationChain msgs) {
@@ -594,7 +575,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -616,7 +597,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -645,7 +626,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -658,7 +639,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -668,7 +649,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -681,7 +662,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -691,7 +672,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -704,7 +685,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -722,7 +703,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -736,7 +717,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -770,7 +751,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -815,7 +796,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -857,7 +838,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -891,7 +872,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -933,7 +914,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -977,7 +958,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -987,7 +968,7 @@ public abstract class TestEntity extends MinimalEObjectImpl.Container implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override

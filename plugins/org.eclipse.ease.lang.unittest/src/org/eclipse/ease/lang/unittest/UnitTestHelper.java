@@ -59,7 +59,12 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-public class UnitTestHelper {
+public final class UnitTestHelper {
+
+	@Deprecated
+	private UnitTestHelper() {
+		throw new IllegalStateException("Constructor not meant to be called");
+	}
 
 	/**
 	 * Create error markers in the workspace.
@@ -125,7 +130,7 @@ public class UnitTestHelper {
 		final Map<Object, String> testFiles = new LinkedHashMap<>();
 
 		for (final String token : filters) {
-			if (!token.trim().isEmpty())
+			if (!token.isBlank())
 				testFiles.putAll(createTests(token, suite));
 		}
 
@@ -328,7 +333,7 @@ public class UnitTestHelper {
 
 		final List<ITestEntity> testStructure = UnitTestHelper.createTestStructure(includedFiles);
 
-		final org.eclipse.ease.lang.unittest.runtime.ITestSuite testSuite = IRuntimeFactory.eINSTANCE.createTestSuite();
+		final ITestSuite testSuite = IRuntimeFactory.eINSTANCE.createTestSuite();
 		testSuite.getChildren().addAll(testStructure);
 		testSuite.setName(definition.getName());
 

@@ -6,7 +6,7 @@ Bundle-Version: 0.9.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: Eclipse.org
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Export-Package: org.eclipse.ease.lang.unittest,
  org.eclipse.ease.lang.unittest.definition,
  org.eclipse.ease.lang.unittest.definition.impl,

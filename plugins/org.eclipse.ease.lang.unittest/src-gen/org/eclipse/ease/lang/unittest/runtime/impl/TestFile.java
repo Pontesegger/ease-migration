@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ease.AbstractScriptEngine;
-import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.Script;
@@ -21,15 +20,12 @@ import org.eclipse.ease.lang.unittest.definition.Flag;
 import org.eclipse.ease.lang.unittest.definition.ICode;
 import org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition;
 import org.eclipse.ease.lang.unittest.execution.ITestExecutionStrategy;
-import org.eclipse.ease.lang.unittest.runtime.IRuntimeFactory;
 import org.eclipse.ease.lang.unittest.runtime.IRuntimePackage;
+import org.eclipse.ease.lang.unittest.runtime.ITest;
 import org.eclipse.ease.lang.unittest.runtime.ITestEntity;
 import org.eclipse.ease.lang.unittest.runtime.ITestFile;
-import org.eclipse.ease.lang.unittest.runtime.ITestResult;
 import org.eclipse.ease.lang.unittest.runtime.ITestSuite;
 import org.eclipse.ease.lang.unittest.runtime.TestStatus;
-import org.eclipse.ease.service.IScriptService;
-import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -216,22 +212,9 @@ public class TestFile extends TestContainer implements ITestFile {
 
 				// classic test execution
 				if (!hasError()) {
+					final ScriptType scriptType = fScriptEngine.getDescription().getSupportedScriptTypes().get(0);
 
-					// load service directly to allow to work in headless mode
-					final IScriptService scriptService = ScriptService.getInstance();
-					final ScriptType scriptType = scriptService.getScriptType(getResource().toString());
-
-					if (scriptType.getName().equals("Python")) {
-						// load the unittest runner prefix
-						try {
-							final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner_definitions.py");
-							fScriptEngine.execute(url).get();
-						} catch (final MalformedURLException e) {
-							getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
-						} catch (final ExecutionException e) {
-							getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
-						}
-					}
+					loadPythonTestRunner(scriptType);
 
 					try {
 						fScriptEngine.execute(getResource()).get();
@@ -243,15 +226,7 @@ public class TestFile extends TestContainer implements ITestFile {
 						if (!children.isEmpty()) {
 							final ITestEntity test = children.get(children.size() - 1);
 							if (test.getStatus() == TestStatus.RUNNING) {
-								final ITestResult result = IRuntimeFactory.eINSTANCE.createTestResult();
-								result.setStatus(TestStatus.ERROR);
-								result.setMessage(e.getMessage());
-
-								if (fScriptEngine instanceof IDebugEngine)
-									result.setStackTrace(((IDebugEngine) fScriptEngine).getExceptionStackTrace());
-
-								test.getResults().add(result);
-
+								test.addError(e.getMessage(), fScriptEngine);
 								test.setEntityStatus(TestStatus.FINISHED);
 
 							} else {
@@ -275,9 +250,8 @@ public class TestFile extends TestContainer implements ITestFile {
 								try {
 									final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.js");
 									fScriptEngine.execute(url).get();
-								} catch (final MalformedURLException e) {
-									getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
-								} catch (final ExecutionException e) {
+
+								} catch (final MalformedURLException | ExecutionException e) {
 									getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 								}
 							}
@@ -288,9 +262,8 @@ public class TestFile extends TestContainer implements ITestFile {
 							try {
 								final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner.py");
 								fScriptEngine.execute(url).get();
-							} catch (final MalformedURLException e) {
-								getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
-							} catch (final ExecutionException e) {
+
+							} catch (final MalformedURLException | ExecutionException e) {
 								getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
 							}
 						}
@@ -317,7 +290,26 @@ public class TestFile extends TestContainer implements ITestFile {
 			}
 
 		} else {
-			getTest("[Setup]").addError("No engine found for <" + getResource().toString() + ">", null);
+			final ITest setup = getTest("[Setup]");
+			setup.addError(String.format("No engine found for <%s>", getResource()), null);
+			setup.setEntityStatus(TestStatus.FINISHED);
+
+		}
+	}
+
+	/**
+	 * @generated NOT
+	 */
+	private void loadPythonTestRunner(final ScriptType scriptType) {
+		if (scriptType.getName().equals("Python")) {
+			// load the unittest runner prefix
+			try {
+				final URL url = new URL("platform:/plugin/org.eclipse.ease.lang.unittest/resources/testrunner/testrunner_definitions.py");
+				fScriptEngine.execute(url).get();
+
+			} catch (final MalformedURLException | ExecutionException e) {
+				getTest("[EASE Testrunner]").addError(e.getMessage(), fScriptEngine);
+			}
 		}
 	}
 
@@ -328,7 +320,7 @@ public class TestFile extends TestContainer implements ITestFile {
 		final ITestSuiteDefinition definition = getTestSuite().getDefinition();
 		if (definition != null) {
 			final ICode customCode = definition.getCustomCode(codeLocation);
-			if ((customCode != null) && (!customCode.getContent().trim().isEmpty())) {
+			if ((customCode != null) && (!customCode.getContent().isBlank())) {
 				if (fScriptEngine != null) {
 					try {
 						fScriptEngine.execute(new Script(customCode.getLocation(), customCode.getContent())).get();
