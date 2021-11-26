@@ -135,7 +135,7 @@ public class SVNModule extends AbstractScriptModule {
 					false);
 			checkoutList.add(projectResource);
 		}
-		return checkoutList.toArray(new IRepositoryResource[checkoutList.size()]);
+		return checkoutList.toArray(new IRepositoryResource[0]);
 	}
 
 	/*
@@ -143,7 +143,7 @@ public class SVNModule extends AbstractScriptModule {
 	 */
 	private IRepositoryResource[] getCheckoutResourcesFromRoot(IRepositoryLocation repoLocation) {
 		final IRepositoryResource res = SVNRemoteStorage.instance().asRepositoryResource(repoLocation, repoLocation.getUrl(), false);
-		final IRepositoryResource[] doCeckout = new IRepositoryResource[] { res };
+		final IRepositoryResource[] doCeckout = { res };
 		final LocateProjectsOperation locateProjectsOp = new LocateProjectsOperation(doCeckout,
 				ExtensionsManager.getInstance().getCurrentCheckoutFactory().getLocateFilter(), 5);
 
@@ -186,6 +186,24 @@ public class SVNModule extends AbstractScriptModule {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * Get the remote location for a given local resource.
+	 *
+	 * @param resource
+	 *            resource to get remote location for
+	 * @return remote URL for the given resource
+	 */
+	@WrapToScript
+	public String getRemoteLocation(final Object resource) {
+		final Object file = ResourceTools.resolve(resource, getScriptEngine().getExecutedFile());
+		if (file instanceof IResource) {
+			final IRepositoryResource repositoryResource = SVNRemoteStorage.instance().asRepositoryResource((IResource) file);
+			return repositoryResource.getUrl();
+		}
+
+		return "";
 	}
 
 	/**
