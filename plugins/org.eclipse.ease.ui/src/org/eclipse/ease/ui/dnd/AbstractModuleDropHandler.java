@@ -41,32 +41,33 @@ public abstract class AbstractModuleDropHandler implements IShellDropHandler {
 	 */
 	protected Object loadModule(final IScriptEngine scriptEngine, final String moduleID, final boolean force) {
 
-		final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
-		if (environment != null) {
-			if ((force) || (environment.getModule(moduleID) == null)) {
-				if (ModuleHelper.resolveModuleName(moduleID) != null) {
-
+		if ((force) || (getLoadedModule(scriptEngine, moduleID) == null)) {
+			if (ModuleHelper.resolveModuleName(moduleID) != null) {
+				try {
 					final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
+					final String functionCall = codeFactory.createFunctionCall(EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class),
+							moduleID, false);
+					return scriptEngine.execute(functionCall).get();
 
-					try {
-						final String functionCall = codeFactory.createFunctionCall(EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class),
-								moduleID, false);
-						return scriptEngine.execute(functionCall).get();
-
-					} catch (final NoSuchMethodException e) {
-						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not found", e);
-					} catch (final SecurityException e) {
-						Logger.error(Activator.PLUGIN_ID, "Method loadModule() not accessible", e);
-					} catch (final ExecutionException e) {
-						Logger.error(Activator.PLUGIN_ID, "Method loadModule() failed to execute script code", e);
-					}
-
-				} else
-					Logger.error(Activator.PLUGIN_ID, "Module \"" + moduleID + "\" cannot be found");
+				} catch (final NoSuchMethodException e) {
+					Logger.error(Activator.PLUGIN_ID, "Method loadModule() not found", e);
+				} catch (final SecurityException e) {
+					Logger.error(Activator.PLUGIN_ID, "Method loadModule() not accessible", e);
+				} catch (final ExecutionException e) {
+					Logger.error(Activator.PLUGIN_ID, "Method loadModule() failed to execute script code", e);
+				}
 
 			} else
-				return environment.getModule(moduleID);
+				Logger.error(Activator.PLUGIN_ID, "Module \"" + moduleID + "\" cannot be found");
 		}
+
+		return getLoadedModule(scriptEngine, moduleID);
+	}
+
+	private Object getLoadedModule(IScriptEngine scriptEngine, String moduleID) {
+		final IEnvironment environment = IEnvironment.getEnvironment(scriptEngine);
+		if (environment != null)
+			return environment.getModule(moduleID);
 
 		return null;
 	}

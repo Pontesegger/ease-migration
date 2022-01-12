@@ -47,7 +47,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 	private static final String EXTENSION_DROP_HANDLER_ID = "org.eclipse.ease.ui.shell";
 	private static final String DROP_HANDLER = "dropHandler";
 	private static final String PARAMETER_CLASS = "class";
-	protected static final String ATTRIBUTE_PRIORITY = "priority";
+	private static final String ATTRIBUTE_PRIORITY = "priority";
 
 	private static Collection<IShellDropHandler> getDropTargetListeners() {
 
@@ -55,7 +55,7 @@ public final class ShellDropTarget extends DropTargetAdapter {
 
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_DROP_HANDLER_ID);
 		for (final IConfigurationElement e : config) {
-			if (e.getName().equals(DROP_HANDLER)) {
+			if (DROP_HANDLER.equals(e.getName())) {
 				// drop handler
 				// candidates.add(e);
 				try {
@@ -102,18 +102,12 @@ public final class ShellDropTarget extends DropTargetAdapter {
 	 *            container providing a script engine
 	 */
 	public static void addDropSupport(final Control parent, final IScriptEngineProvider engineProvider) {
-		final DropTarget target = new DropTarget(parent, DND.DROP_COPY | DND.DROP_MOVE);
+		final DropTarget target = new DropTarget(parent, DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK);
 		target.setTransfer(new Transfer[] { FileTransfer.getInstance(), ResourceTransfer.getInstance(), LocalSelectionTransfer.getTransfer(),
 				TextTransfer.getInstance() });
 		target.addDropListener(new ShellDropTarget(engineProvider));
 	}
 
-	/**
-	 * Constructor.
-	 *
-	 * @param scriptShell
-	 *            shell for DND action execution
-	 */
 	private ShellDropTarget(final IScriptEngineProvider provider) {
 		fScriptEngineProvider = provider;
 	}
@@ -180,11 +174,6 @@ public final class ShellDropTarget extends DropTargetAdapter {
 
 	@Override
 	public void dragEnter(DropTargetEvent event) {
-		event.detail = DND.DROP_COPY;
-	}
-
-	@Override
-	public void dragOperationChanged(DropTargetEvent event) {
 		event.detail = DND.DROP_COPY;
 	}
 }

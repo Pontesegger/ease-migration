@@ -18,6 +18,8 @@ import org.eclipse.ease.modules.WrapToScript;
 
 public class RootModule {
 
+	public static final String MODULE_ID = "/Test Root";
+
 	@WrapToScript
 	public static final String TEST_CONSTANT = "";
 

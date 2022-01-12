@@ -20,11 +20,8 @@ import java.util.List;
 
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.Logger;
-import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.ScriptService;
-import org.eclipse.ease.ui.Activator;
 import org.eclipse.ease.ui.dialogs.ParametersDialog;
 import org.eclipse.ease.ui.modules.ui.ModulesTools.ModuleEntry;
 import org.eclipse.jface.window.Window;
@@ -42,39 +39,27 @@ public class ModulesDropHandler extends AbstractModuleDropHandler implements ISh
 
 	@Override
 	public void performDrop(IScriptEngine scriptEngine, Object element) {
-		performDrop(scriptEngine, element, DND.DROP_MOVE);
+		performDrop(scriptEngine, element, DND.DROP_COPY);
 	}
 
 	@Override
 	public void performDrop(IScriptEngine scriptEngine, Object element, int detail) {
-		try {
-			if (element instanceof ModuleDefinition) {
-				final Method loadModuleMethod = EnvironmentModule.class.getMethod("loadModule", String.class, boolean.class);
+		if (element instanceof ModuleDefinition) {
+			loadModule(scriptEngine, ((ModuleDefinition) element).getPath().toString(), true);
 
-				final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
-				final String call = codeFactory.createFunctionCall(loadModuleMethod, ((ModuleDefinition) element).getPath().toString(), false);
-				scriptEngine.execute(call);
+		} else if (element instanceof ModuleEntry) {
+			final ModuleDefinition declaringModule = ((ModuleEntry<?>) element).getModuleDefinition();
+			loadModule(scriptEngine, declaringModule.getPath().toString(), false);
 
-			} else if (element instanceof ModuleEntry) {
-				final ModuleDefinition declaringModule = ((ModuleEntry<?>) element).getModuleDefinition();
-				loadModule(scriptEngine, declaringModule.getPath().toString(), false);
+			if (((ModuleEntry<?>) element).getEntry() instanceof Method) {
+				final Method method = (Method) ((ModuleEntry<?>) element).getEntry();
+				if ((detail != DND.DROP_COPY) && (hasParameters(method)))
+					executeCallWithParameters(scriptEngine, method);
+				else
+					executeDefaultCall(scriptEngine, method);
 
-				if (((ModuleEntry<?>) element).getEntry() instanceof Method) {
-					final Method method = (Method) ((ModuleEntry<?>) element).getEntry();
-					if ((detail != DND.DROP_MOVE) && (hasParameters(method)))
-						executeCallWithParameters(scriptEngine, method);
-					else
-						executeDefaultCall(scriptEngine, method);
-
-				} else if (((ModuleEntry<?>) element).getEntry() instanceof Field)
-					scriptEngine.execute(((Field) ((ModuleEntry<?>) element).getEntry()).getName());
-
-			} else
-				// fallback solution
-				scriptEngine.execute(element);
-
-		} catch (final NoSuchMethodException | SecurityException e) {
-			Logger.error(Activator.PLUGIN_ID, "loadModule() method not found in Environment module", e);
+			} else if (((ModuleEntry<?>) element).getEntry() instanceof Field)
+				scriptEngine.execute(((Field) ((ModuleEntry<?>) element).getEntry()).getName());
 		}
 	}
 
