@@ -22,7 +22,11 @@
 		<jacoco.version>0.8.6</jacoco.version>
 		<eclipse.jarsigner.version>1.3.2</eclipse.jarsigner.version>
 		<maven.buildhelper.version>1.9.1</maven.buildhelper.version>
-		<maven.pmd.version>3.15.0</maven.pmd.version>
+
+	<!-- Maven PMD Plugin 3.15.0 cannot resolve classes correctly, see https://issues.apache.org/jira/browse/MPMD-325
+	 	once 3.16.0 is out, please upgrade
+	-->
+		<maven.pmd.version>3.14.0</maven.pmd.version>
 		<maven.checkstyle.version>3.1.1</maven.checkstyle.version>
 		<maven.spotbugs.version>4.1.4</maven.spotbugs.version>
 
@@ -200,7 +204,7 @@
 
 		<module>../../tests/org.eclipse.ease.ui.completions.java.test</module>
 		<!-- test insertion point -->
-		
+
 	</modules>
 
 	<profiles>

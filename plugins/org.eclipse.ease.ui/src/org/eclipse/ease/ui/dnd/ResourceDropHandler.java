@@ -48,7 +48,7 @@ public class ResourceDropHandler implements IShellDropHandler {
 	public void performDrop(final IScriptEngine scriptEngine, final Object element) {
 		try {
 			final ICodeFactory codeFactory = ScriptService.getCodeFactory(scriptEngine);
-			final Method includeMethod = EnvironmentModule.class.getMethod("include", String.class);
+			final Method includeMethod = EnvironmentModule.class.getMethod("include", Object.class);
 
 			if ((element instanceof IFile) || (element instanceof File)) {
 				final String call = codeFactory.createFunctionCall(includeMethod, ResourceTools.toAbsoluteLocation(element, null));
