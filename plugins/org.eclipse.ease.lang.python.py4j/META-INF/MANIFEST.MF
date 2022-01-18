@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.7.0,4.0.0)",
  org.eclipse.ease.lang.python,
  org.eclipse.core.resources;bundle-version="[3.7.101,4.0.0)",
  org.eclipse.debug.core;bundle-version="[3.7.1,4.0.0)",
- org.eclipse.help
+ org.eclipse.help,
+ org.eclipse.ease.classloader
 Export-Package: org.eclipse.ease.lang.python.py4j.internal;x-internal:=true,
  org.eclipse.ease.lang.python.py4j.internal.ui;x-internal:=true
 Bundle-Activator: org.eclipse.ease.lang.python.py4j.internal.Activator

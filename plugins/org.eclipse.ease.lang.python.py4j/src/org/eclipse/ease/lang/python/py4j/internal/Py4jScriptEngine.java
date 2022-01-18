@@ -38,6 +38,7 @@ import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
+import org.eclipse.ease.classloader.EaseClassLoader;
 import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.tools.RunnableWithResult;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -74,12 +75,12 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 	/**
 	 * Standard StreamGobbler.
 	 */
-	private static class StreamGobbler implements Runnable {
+	private static final class StreamGobbler implements Runnable {
 		private final InputStream fReader;
 		private final OutputStream fWriter;
 		private final String fStreamName;
 
-		public StreamGobbler(final InputStream stream, final OutputStream output, final String streamName) {
+		private StreamGobbler(final InputStream stream, final OutputStream output, final String streamName) {
 			fReader = stream;
 			fWriter = output;
 			fStreamName = streamName;
@@ -327,7 +328,14 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	public void registerJar(final URL url) {
-		throw new UnsupportedOperationException();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		if (!(classLoader instanceof EaseClassLoader)) {
+			classLoader = new EaseClassLoader(classLoader);
+			Thread.currentThread().setContextClassLoader(classLoader);
+		}
+
+		if (classLoader instanceof EaseClassLoader)
+			((EaseClassLoader) classLoader).registerURL(this, url);
 	}
 
 	@Override
