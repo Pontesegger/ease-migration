@@ -36,10 +36,10 @@ public class MenuHandler extends ToolbarHandler {
 		// process each location
 		for (Location location : toLocations(value)) {
 			Logger.trace(Activator.PLUGIN_ID, TRACE_UI_INTEGRATION, Activator.PLUGIN_ID,
-					"Adding script \"" + script.getName() + "\" to " + location.fScheme + ":" + location.fViewID);
+					"Adding script \"" + script.getName() + "\" to " + location.fScheme + ":" + location.fTargetID);
 
-			if (location.fViewID != null) {
-				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fViewID);
+			if (location.fTargetID != null) {
+				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fTargetID);
 
 				// update contribution factory
 				getContributionFactory(location.getID()).addScript(script);
@@ -71,13 +71,13 @@ public class MenuHandler extends ToolbarHandler {
 		// process each location
 		for (Location location : toLocations(value)) {
 			Logger.trace(Activator.PLUGIN_ID, TRACE_UI_INTEGRATION, Activator.PLUGIN_ID,
-					"Removing script \"" + script.getName() + "\" from " + location.fScheme + ":" + location.fViewID);
+					"Removing script \"" + script.getName() + "\" from " + location.fScheme + ":" + location.fTargetID);
 
 			// update contribution
 			getContributionFactory(location.getID()).removeScript(script);
 
-			if (location.fViewID != null) {
-				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fViewID);
+			if (location.fTargetID != null) {
+				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fTargetID);
 				if ((view instanceof ViewPart) && (view.getViewSite() != null)) {
 					// the view is already rendered, contributions will not be
 					// considered anymore so remove item directly

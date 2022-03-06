@@ -26,63 +26,90 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.model.application.ui.SideValue;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.ui.scripts.Activator;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.scripts.repository.IScript;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 public class ToolbarHandler implements EventHandler {
+
 	/** Trace enablement for the script UI integration. */
 	public static final boolean TRACE_UI_INTEGRATION = Activator.getDefault().isDebugging()
 			&& "true".equalsIgnoreCase(Platform.getDebugOption(Activator.PLUGIN_ID + "/debug/UIIntegration"));
+
+	private static final String MAIN = "Main";
+	private static final Map<String, SideValue> positions = Map.of("TopLeft", SideValue.TOP, //
+			"TopRight", SideValue.TOP, //
+			"BottomLeft", SideValue.BOTTOM, //
+			"BottomRight", SideValue.BOTTOM, //
+			"Left", SideValue.LEFT, //
+			"Right", SideValue.RIGHT //
+	);
 
 	private static final String VIEW_ATTRIBUTE_NAME = "name";
 
 	public static class Location {
 
 		public String fScheme;
-		public String fViewID;
-		public String fName = null;
+		public String fTargetID;
+		public String fName;
 
 		public Location(final String scheme, final String location) {
 			fScheme = scheme;
 
-			String[] tokens = location.split("\\|");
+			final String[] tokens = location.split("\\|");
+			if (MAIN.equals(tokens[0])) {
+				// special case for main toolbar
+				fTargetID = MAIN;
+				if (tokens.length == 1)
+					fName = "TopLeft";
+				else if ((tokens.length >= 2) && (!tokens[1].isEmpty()) && positions.containsKey(tokens[1]))
+					fName = tokens[1];
+			} else {
+				// try to find a view with matching ID or matching title
+				final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.views");
+				for (final IConfigurationElement e : config) {
+					if ("view".equals(e.getName())) {
+						final String id = e.getAttribute("id");
+						if (id.equals(tokens[0])) {
+							fTargetID = id;
+							break;
+						}
 
-			// try to find a view with matching ID or matching title
-			final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.ui.views");
-			for (final IConfigurationElement e : config) {
-				if ("view".equals(e.getName())) {
-					String id = e.getAttribute("id");
-					if (id.equals(tokens[0])) {
-						fViewID = id;
-						break;
+						final String name = e.getAttribute(VIEW_ATTRIBUTE_NAME);
+						if (name.equals(tokens[0])) {
+							fTargetID = id;
+							break;
+						}
 					}
+				}
 
-					String name = e.getAttribute(VIEW_ATTRIBUTE_NAME);
-					if (name.equals(tokens[0])) {
-						fViewID = id;
-						break;
-					}
+				if (fTargetID != null) {
+					if ((tokens.length >= 2) && (!tokens[1].isEmpty()))
+						fName = tokens[1];
 				}
 			}
 
-			if (fViewID != null) {
-				if ((tokens.length >= 2) && (!tokens[1].isEmpty()))
-					fName = tokens[1];
-			}
 		}
 
 		public String getID() {
-			return fScheme + ":" + fViewID;
+			return fScheme + ":" + (MAIN.equals(fTargetID) ? fName : fTargetID);
 		}
 	}
 
@@ -125,21 +152,21 @@ public class ToolbarHandler implements EventHandler {
 			List<Event> refreshEvents;
 			synchronized (ToolbarHandler.this) {
 				keywordEvents = fKeywordEvents;
-				fKeywordEvents = new ArrayList<Event>();
+				fKeywordEvents = new ArrayList<>();
 
 				refreshEvents = fRefreshEvents;
-				fRefreshEvents = new ArrayList<Event>();
+				fRefreshEvents = new ArrayList<>();
 			}
 
 			// do not process the same script multiple times in the same event loop
-			Collection<IScript> processedScripts = new HashSet<IScript>();
+			final Collection<IScript> processedScripts = new HashSet<>();
 
-			for (Event event : keywordEvents) {
-				IScript script = (IScript) event.getProperty("script");
+			for (final Event event : keywordEvents) {
+				final IScript script = (IScript) event.getProperty("script");
 				processedScripts.add(script);
 
-				String value = (String) event.getProperty("value");
-				String oldValue = (String) event.getProperty("oldValue");
+				final String value = (String) event.getProperty("value");
+				final String oldValue = (String) event.getProperty("oldValue");
 
 				if ((oldValue != null) && (!oldValue.isEmpty()))
 					removeContribution(script, oldValue);
@@ -149,8 +176,8 @@ public class ToolbarHandler implements EventHandler {
 			}
 
 			// refresh scripts where appearance was updated
-			for (Event event : refreshEvents) {
-				IScript script = (IScript) event.getProperty("script");
+			for (final Event event : refreshEvents) {
+				final IScript script = (IScript) event.getProperty("script");
 				if (!processedScripts.contains(script)) {
 					removeContribution(script, script.getKeywords().get(getHandlerType()));
 					addContribution(script, script.getKeywords().get(getHandlerType()));
@@ -166,9 +193,9 @@ public class ToolbarHandler implements EventHandler {
 	 * @param value
 	 */
 	public Collection<Location> toLocations(final String value) {
-		Collection<Location> locations = new HashSet<Location>();
+		final Collection<Location> locations = new HashSet<>();
 
-		for (String part : value.split(";"))
+		for (final String part : value.split(";"))
 			locations.add(new Location(getHandlerType(), part));
 
 		return locations;
@@ -178,24 +205,24 @@ public class ToolbarHandler implements EventHandler {
 	private final Job fUpdateUIJob = new UIIntegrationJob();
 
 	/** Event queue to be processed. Main events for location additions/removals. */
-	private List<Event> fKeywordEvents = new ArrayList<Event>();
+	private List<Event> fKeywordEvents = new ArrayList<>();
 
 	/** Event queue to be processed. Refresh events due to name/image changes. */
-	private List<Event> fRefreshEvents = new ArrayList<Event>();
+	private List<Event> fRefreshEvents = new ArrayList<>();
 
 	/** UI contribution factories. */
-	protected final Map<String, ScriptContributionFactory> fContributionFactories = new HashMap<String, ScriptContributionFactory>();
+	protected final Map<String, ScriptContributionFactory> fContributionFactories = new HashMap<>();
 
 	public ToolbarHandler() {
-		IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+		final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
 		eventBroker.subscribe(IRepositoryService.BROKER_CHANNEL_SCRIPT_KEYWORDS + "name", this);
 		eventBroker.subscribe(IRepositoryService.BROKER_CHANNEL_SCRIPT_KEYWORDS + "image", this);
 	}
 
 	@Override
 	public void handleEvent(final Event event) {
-		IScript script = (IScript) event.getProperty("script");
-		String keyword = (String) event.getProperty("keyword");
+		final IScript script = (IScript) event.getProperty("script");
+		final String keyword = (String) event.getProperty("keyword");
 
 		synchronized (this) {
 			if (("image".equals(keyword)) || ("name".equals(keyword))) {
@@ -222,12 +249,26 @@ public class ToolbarHandler implements EventHandler {
 	protected void addContribution(final IScript script, final String value) {
 
 		// process each location
-		for (Location location : toLocations(value)) {
+		for (final Location location : toLocations(value)) {
 			Logger.trace(Activator.PLUGIN_ID, TRACE_UI_INTEGRATION, Activator.PLUGIN_ID,
-					"Adding script \"" + script.getName() + "\" to " + location.fScheme + ":" + location.fViewID);
+					"Adding script \"" + script.getName() + "\" to " + location.fScheme + ":" + location.fTargetID);
 
-			if (location.fViewID != null) {
-				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fViewID);
+			if (MAIN.equals(location.fTargetID) && (location.fName != null)) {
+				final ScriptContributionFactory contributionFactory = getContributionFactory(location.getID());
+				contributionFactory.addScript(script);
+
+				final MToolBar toolbar = getToolBarModel(location);
+				if (toolbar.getRenderer() == null)
+					return;
+				final ToolBarManager toolBarManager = ((ToolBarManagerRenderer) toolbar.getRenderer()).getManager(toolbar);
+
+				contributionFactory.setAffectedContribution(toolBarManager);
+				toolBarManager.add(new ScriptContributionItem(script));
+				toolBarManager.update(true);
+				toolbar.setVisible(true);
+				((WorkbenchPage) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()).updateActionBars();
+			} else if (location.fTargetID != null) {
+				final IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fTargetID);
 
 				// update contribution factory
 				getContributionFactory(location.getID()).addScript(script);
@@ -246,6 +287,14 @@ public class ToolbarHandler implements EventHandler {
 		}
 	}
 
+	private MToolBar getToolBarModel(final Location location) {
+		final EModelService service = PlatformUI.getWorkbench().getService(EModelService.class);
+		final IWorkbench workbench = PlatformUI.getWorkbench().getService(IWorkbench.class);
+		final MWindow window = service.getTopLevelWindowFor(workbench.getApplication().getSelectedElement());
+		final MToolBar toolbar = (MToolBar) service.find("org.eclipse.ease.ui.scripts.toolbar." + location.fName.toLowerCase(), window);
+		return toolbar;
+	}
+
 	/**
 	 * Remove a toolbar script contribution.
 	 *
@@ -256,15 +305,25 @@ public class ToolbarHandler implements EventHandler {
 	 */
 	protected void removeContribution(final IScript script, final String value) {
 		// process each location
-		for (Location location : toLocations(value)) {
+		for (final Location location : toLocations(value)) {
 			Logger.trace(Activator.PLUGIN_ID, TRACE_UI_INTEGRATION, Activator.PLUGIN_ID,
-					"Removing script \"" + script.getName() + "\" from " + location.fScheme + ":" + location.fViewID);
+					"Removing script \"" + script.getName() + "\" from " + location.fScheme + ":" + location.fTargetID);
 
 			// update contribution
 			getContributionFactory(location.getID()).removeScript(script);
 
-			if (location.fViewID != null) {
-				IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fViewID);
+			if (MAIN.equals(location.fTargetID) && (location.fName != null)) {
+				final MToolBar toolbar = getToolBarModel(location);
+				if (toolbar.getRenderer() == null)
+					return;
+				final ToolBarManager toolBarManager = ((ToolBarManagerRenderer) toolbar.getRenderer()).getManager(toolbar);
+
+				toolBarManager.remove(script.getLocation());
+				toolBarManager.update(false);
+				toolbar.setVisible(toolBarManager.getControl().getItemCount() != 0);
+				((WorkbenchPage) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()).updateActionBars();
+			} else if (location.fTargetID != null) {
+				final IViewPart view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(location.fTargetID);
 				if ((view instanceof ViewPart) && (view.getViewSite() != null)) {
 					// the view is already rendered, contributions will not be
 					// considered anymore so remove item directly

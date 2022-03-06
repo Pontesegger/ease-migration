@@ -146,6 +146,48 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?before=PerspectiveSwitcher">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.topright">
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?before=additions">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.topleft">
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.bottomright">
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.trim.status?before=org.eclipse.ui.StatusLine">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.bottomleft">
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.trim.vertical1">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.left">
+         </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.trim.vertical2">
+         <toolbar
+               id="org.eclipse.ease.ui.scripts.toolbar.right">
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ease.ui.shell">
