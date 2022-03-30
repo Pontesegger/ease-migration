@@ -14,19 +14,19 @@ package org.eclipse.ease.ui.scripts.repository.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -55,12 +55,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.service.event.EventHandler;
 
-public class RepositoryService implements IRepositoryService, IResourceChangeListener {
-
-	// TODO find a nice delay value here
-	static final long UPDATE_URI_INTERVAL = 1000; // update daily
-	// TODO find a nice delay value here
-	static final long UPDATE_SCRIPT_INTERVAL = 1000; // update hourly
+public final class RepositoryService implements IRepositoryService, IResourceChangeListener {
 
 	private static RepositoryService fInstance;
 
@@ -86,11 +81,15 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 		return fInstance;
 	}
 
+	/** Access fRepository only synchronized with fRepositoryMutex. **/
 	private IStorage fRepository = null;
+
+	/** Synchronizer for fRepository. **/
+	private final Object fRepositoryMutex = new Object();
 
 	private final UpdateRepositoryJob fUpdateJob;
 
-	IEventBroker fEventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+	private final IEventBroker fEventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
 
 	private final Job fSaveJob = new Job("Save Script Repositories") {
 
@@ -276,7 +275,7 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 
 	@Override
 	public IScript getScript(final String name) {
-		for (final IScript script : fRepository.getScripts()) {
+		for (final IScript script : getScripts()) {
 			if (name.equals(script.getPath().toString()))
 				return script;
 		}
@@ -294,12 +293,17 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 
 	@Override
 	public Collection<IScript> getScripts() {
-		return Collections.unmodifiableCollection(fRepository.getScripts());
+		synchronized (fRepositoryMutex) {
+			return new ArrayList<>(fRepository.getScripts());
+		}
 	}
 
 	@Override
 	public Collection<IScriptLocation> getLocations() {
-		return Collections.unmodifiableCollection(fRepository.getEntries());
+		synchronized (fRepositoryMutex) {
+			// create a unmodifiable copy, such that callers are save to iterate the result without ConcurrentModificationException
+			return List.copyOf(fRepository.getEntries());
+		}
 	}
 
 	@Override
@@ -386,23 +390,19 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 	public void resourceChanged(final IResourceChangeEvent event) {
 		try {
 			if (event.getDelta() != null) {
-				event.getDelta().accept(new IResourceDeltaVisitor() {
-
-					@Override
-					public boolean visit(final IResourceDelta delta) throws CoreException {
-						// TODO currently we update the whole location on a simple change, just focus on the changed files in future
-						final IResource resource = delta.getResource();
-						final String location = "workspace:/" + resource.getFullPath();
-						for (final IScriptLocation entry : getLocations()) {
-							if (entry.getLocation().equals(location)) {
-								// TODO currently updates a whole repository for eg a small file content change
-								fUpdateJob.update(entry);
-								return false;
-							}
+				event.getDelta().accept(delta -> {
+					// TODO currently we update the whole location on a simple change, just focus on the changed files in future
+					final IResource resource = delta.getResource();
+					final String location = "workspace:/" + resource.getFullPath();
+					for (final IScriptLocation entry : getLocations()) {
+						if (entry.getLocation().equals(location)) {
+							// TODO currently updates a whole repository for eg a small file content change
+							fUpdateJob.update(entry);
+							return false;
 						}
-
-						return true;
 					}
+
+					return true;
 				});
 			}
 		} catch (final CoreException e) {
@@ -432,7 +432,9 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 		PreferencesHelper.addLocation(entry);
 		Logger.trace(Activator.PLUGIN_ID, TRACE_REPOSITORY_SERVICE, Activator.PLUGIN_ID, "Script location added: " + locationURI);
 
-		fRepository.getEntries().add(entry);
+		synchronized (fRepositoryMutex) {
+			fRepository.getEntries().add(entry);
+		}
 
 		if (entry.getLocation().startsWith("workspace://"))
 			ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
@@ -442,18 +444,20 @@ public class RepositoryService implements IRepositoryService, IResourceChangeLis
 
 	@Override
 	public void removeLocation(final String locationURI) {
-		for (final IScriptLocation entry : new HashSet<>(fRepository.getEntries())) {
-			if (entry.getLocation().equals(locationURI)) {
-				fRepository.getEntries().remove(entry);
+		synchronized (fRepositoryMutex) {
+			for (final IScriptLocation entry : new HashSet<>(fRepository.getEntries())) {
+				if (entry.getLocation().equals(locationURI)) {
+					fRepository.getEntries().remove(entry);
 
-				for (final IScript script : new HashSet<>(entry.getScripts()))
-					removeScript(script);
+					for (final IScript script : new HashSet<>(entry.getScripts()))
+						removeScript(script);
 
-				save();
-				Logger.trace(Activator.PLUGIN_ID, TRACE_REPOSITORY_SERVICE, Activator.PLUGIN_ID, "Script location removed: " + locationURI);
+					save();
+					Logger.trace(Activator.PLUGIN_ID, TRACE_REPOSITORY_SERVICE, Activator.PLUGIN_ID, "Script location removed: " + locationURI);
 
-				// no need to traverse further as locationURIs need to be unique
-				break;
+					// no need to traverse further as locationURIs need to be unique
+					break;
+				}
 			}
 		}
 
