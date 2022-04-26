@@ -18,7 +18,7 @@ import java.util.List;
 import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.service.ScriptType;
 
-public interface ICompletionContext {
+public interface ICompletionContext extends IScriptEngineProvider {
 
 	List<Object> getTokens();
 
@@ -27,13 +27,6 @@ public interface ICompletionContext {
 	int getReplaceOffset();
 
 	int getReplaceLength();
-
-	/**
-	 * Get active script engine.
-	 *
-	 * @return script engine or <code>null</code>
-	 */
-	IScriptEngine getScriptEngine();
 
 	/**
 	 * Get all loaded modules.

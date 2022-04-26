@@ -53,49 +53,49 @@ public class ScriptTest {
 	}
 
 	@Test
-	public void codeFromString() throws Exception {
+	public void codeFromString() throws IOException {
 		final Script script = new Script(SAMPLE_CODE);
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromInputStream() throws Exception {
+	public void codeFromInputStream() throws IOException {
 		final Script script = new Script(new ByteArrayInputStream(SAMPLE_CODE.getBytes()));
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromReader() throws Exception {
+	public void codeFromReader() throws IOException {
 		final Script script = new Script(new StringReader(SAMPLE_CODE));
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromScriptable() throws Exception {
+	public void codeFromScriptable() throws IOException {
 		final Script script = new Script((IScriptable) () -> new ByteArrayInputStream(SAMPLE_CODE.getBytes()));
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromWorkspaceFile() throws Exception {
+	public void codeFromWorkspaceFile() throws IOException {
 		final Script script = new Script(fFile);
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromFilesystemFile() throws Exception {
+	public void codeFromFilesystemFile() throws IOException {
 		final Script script = new Script(fFile.getLocation().toFile());
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void codeFromStringBuilder() throws Exception {
+	public void codeFromStringBuilder() throws IOException {
 		final Script script = new Script(new StringBuilder(SAMPLE_CODE));
 		assertEquals(SAMPLE_CODE, script.getCode());
 	}
 
 	@Test
-	public void getCodeStream() throws IOException, Exception {
+	public void getCodeStream() throws IOException {
 		final Script script = new Script(new ByteArrayInputStream(SAMPLE_CODE.getBytes()));
 		assertEquals(SAMPLE_CODE, ResourceTools.toString(script.getCodeStream()));
 

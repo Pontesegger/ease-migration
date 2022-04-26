@@ -89,10 +89,10 @@ public class Script {
 	 * return different streams with the same text content.
 	 *
 	 * @return scriptable data
-	 * @throws Exception
+	 * @throws IOException
 	 *             when stream cannot be established
 	 */
-	public InputStream getCodeStream() throws Exception {
+	public InputStream getCodeStream() throws IOException {
 		return new ByteArrayInputStream(getCode().getBytes());
 	}
 
@@ -100,10 +100,10 @@ public class Script {
 	 * Get the scriptable data as {@link String}.
 	 *
 	 * @return scriptable data
-	 * @throws Exception
+	 * @throws IOException
 	 *             when code cannot be read from source
 	 */
-	public String getCode() throws Exception {
+	public String getCode() throws IOException {
 		if (fCodeBuffer != null)
 			return fCodeBuffer;
 

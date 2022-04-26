@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.ease;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -23,8 +24,8 @@ public interface IScriptable {
 	 * Get input stream containing source code.
 	 *
 	 * @return source code as {@link InputStream}
-	 * @throws Exception
+	 * @throws IOException
 	 *             when inputStream cannot be created
 	 */
-	InputStream getSourceCode() throws Exception;
+	InputStream getSourceCode() throws IOException;
 }

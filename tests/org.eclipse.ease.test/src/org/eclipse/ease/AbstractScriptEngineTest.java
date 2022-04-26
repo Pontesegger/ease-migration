@@ -412,7 +412,7 @@ public class AbstractScriptEngineTest {
 
 		final Script script = new Script(file) {
 			@Override
-			public String getCode() throws Exception {
+			public String getCode() {
 				return "code";
 			}
 		};

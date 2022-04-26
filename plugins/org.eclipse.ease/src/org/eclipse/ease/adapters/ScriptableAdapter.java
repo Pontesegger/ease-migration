@@ -14,10 +14,12 @@ package org.eclipse.ease.adapters;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ease.IScriptable;
 
@@ -31,7 +33,13 @@ public class ScriptableAdapter implements IAdapterFactory {
 	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adapterType.equals(IScriptable.class)) {
 			if (adaptableObject instanceof IFile)
-				return (T) (IScriptable) () -> ((IFile) adaptableObject).getContents();
+				return (T) (IScriptable) () -> {
+					try {
+						return ((IFile) adaptableObject).getContents();
+					} catch (final CoreException e) {
+						throw new IOException(e);
+					}
+				};
 
 			if (adaptableObject instanceof File)
 				return (T) (IScriptable) () -> new FileInputStream((File) adaptableObject);
