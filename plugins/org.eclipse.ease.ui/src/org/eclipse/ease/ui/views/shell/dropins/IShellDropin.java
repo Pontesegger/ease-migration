@@ -13,6 +13,7 @@
 package org.eclipse.ease.ui.views.shell.dropins;
 
 import org.eclipse.ease.IReplEngine;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
@@ -32,7 +33,7 @@ public interface IShellDropin {
 	void setScriptEngine(IReplEngine engine);
 
 	/**
-	 * Create the drop-in visual components.
+	 * Get the drop-in visual root component. Querying this method multiple times always returns the same object.
 	 *
 	 * @param site
 	 *            workbench part site this drop-in is registered to
@@ -40,7 +41,7 @@ public interface IShellDropin {
 	 *            parent container to render in
 	 * @return composite created within parent container (may not be <code>null</code>)
 	 */
-	Composite createPartControl(IWorkbenchPartSite site, Composite parent);
+	Composite getPartControl(IWorkbenchPartSite site, Composite parent);
 
 	/**
 	 * Get this drop-in title. The title is used to populate a tabitem.
@@ -50,4 +51,11 @@ public interface IShellDropin {
 	String getTitle();
 
 	void setHidden(boolean hidden);
+
+	/**
+	 * Get the selection provider of this dropin or null.
+	 *
+	 * @return selection provider or <code>null</code>
+	 */
+	ISelectionProvider getSelectionProvider();
 }

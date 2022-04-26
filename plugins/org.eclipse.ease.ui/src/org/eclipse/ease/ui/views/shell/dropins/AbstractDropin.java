@@ -18,14 +18,38 @@ import java.time.Duration;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
+import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.Script;
 import org.eclipse.jface.util.Throttler;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-public abstract class AbstractDropin implements IShellDropin, IExecutionListener {
+public abstract class AbstractDropin implements IShellDropin, IExecutionListener, IScriptEngineProvider {
+
+	public static final ISelectionProvider EMPTY_SELECTION_PROVIDER = new ISelectionProvider() {
+		@Override
+		public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		}
+
+		@Override
+		public ISelection getSelection() {
+			return StructuredSelection.EMPTY;
+		}
+
+		@Override
+		public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		}
+
+		@Override
+		public void setSelection(ISelection selection) {
+		}
+	};
 
 	private IReplEngine fEngine;
 
@@ -34,6 +58,8 @@ public abstract class AbstractDropin implements IShellDropin, IExecutionListener
 	private boolean fIsActive = false;
 
 	private boolean fGloballyHidden = false;
+
+	private Composite fComposite = null;
 
 	@Override
 	public void setScriptEngine(IReplEngine engine) {
@@ -47,18 +73,26 @@ public abstract class AbstractDropin implements IShellDropin, IExecutionListener
 	}
 
 	@Override
-	public Composite createPartControl(final IWorkbenchPartSite site, final Composite parent) {
-		final Composite composite = createComposite(site, parent);
+	public IScriptEngine getScriptEngine() {
+		return fEngine;
+	}
 
-		fIsActive = true;
+	@Override
+	public Composite getPartControl(final IWorkbenchPartSite site, final Composite parent) {
+		if (fComposite == null) {
 
-		composite.addListener(SWT.Hide, event -> fIsActive = false);
-		composite.addListener(SWT.Show, event -> {
+			fComposite = createComposite(site, parent);
+
 			fIsActive = true;
-			update();
-		});
 
-		return composite;
+			fComposite.addListener(SWT.Hide, event -> fIsActive = false);
+			fComposite.addListener(SWT.Show, event -> {
+				fIsActive = true;
+				update();
+			});
+		}
+
+		return fComposite;
 	}
 
 	@Override
@@ -86,6 +120,11 @@ public abstract class AbstractDropin implements IShellDropin, IExecutionListener
 	@Override
 	public void setHidden(boolean hidden) {
 		fGloballyHidden = hidden;
+	}
+
+	@Override
+	public ISelectionProvider getSelectionProvider() {
+		return EMPTY_SELECTION_PROVIDER;
 	}
 
 	protected abstract void updateUI();

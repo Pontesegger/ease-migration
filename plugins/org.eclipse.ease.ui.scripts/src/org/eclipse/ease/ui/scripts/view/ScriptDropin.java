@@ -10,39 +10,28 @@
  * Contributors:
  *     Christian Pontesegger - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.ease.ui.scripts.view;
 
 import org.eclipse.ease.IReplEngine;
-import org.eclipse.ease.IScriptEngine;
-import org.eclipse.ease.IScriptEngineProvider;
 import org.eclipse.ease.ui.scripts.Messages;
 import org.eclipse.ease.ui.scripts.ui.ScriptComposite;
-import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
+import org.eclipse.ease.ui.views.shell.dropins.AbstractDropin;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPartSite;
 
-public class ScriptDropin implements IShellDropin, IScriptEngineProvider {
+public class ScriptDropin extends AbstractDropin {
 
-	private IReplEngine fEngine;
 	private ScriptComposite fComposite;
 
 	@Override
 	public void setScriptEngine(IReplEngine engine) {
-		fEngine = engine;
+		super.setScriptEngine(engine);
 
 		if (fComposite != null)
-			fComposite.setEngine(fEngine.getDescription().getID());
-	}
-
-	@Override
-	public Composite createPartControl(final IWorkbenchPartSite site, final Composite parent) {
-		fComposite = new ScriptComposite(this, site, parent, SWT.NONE);
-
-		if (fEngine != null)
-			fComposite.setEngine(fEngine.getDescription().getID());
-
-		return fComposite;
+			fComposite.setEngine(engine.getDescription().getID());
 	}
 
 	@Override
@@ -51,12 +40,22 @@ public class ScriptDropin implements IShellDropin, IScriptEngineProvider {
 	}
 
 	@Override
-	public IScriptEngine getScriptEngine() {
-		return fEngine;
+	protected void updateUI() {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void setHidden(boolean hidden) {
-		// nothing to do
+	protected Composite createComposite(IWorkbenchPartSite site, Composite parent) {
+		fComposite = new ScriptComposite(this, site, parent, SWT.NONE);
+
+		if (getScriptEngine() != null)
+			fComposite.setEngine(getScriptEngine().getDescription().getID());
+
+		return fComposite;
+	}
+
+	@Override
+	public ISelectionProvider getSelectionProvider() {
+		return fComposite.getSelectionProvider();
 	}
 }

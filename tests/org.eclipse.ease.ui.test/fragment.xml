@@ -34,5 +34,14 @@
             primary="false">
       </toc>
    </extension>
+   <extension
+         point="org.eclipse.ease.ui.shell">
+      <dropin
+            class="org.eclipse.ease.ui.views.shell.dropins.DummyDropin">
+      </dropin>
+      <dropin
+            class="org.eclipse.ease.ui.views.shell.dropins.InvalidDropin">
+      </dropin>
+   </extension>
 
 </fragment>

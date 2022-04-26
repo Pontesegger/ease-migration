@@ -13,18 +13,12 @@
  *******************************************************************************/
 package org.eclipse.ease.ui.view;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ease.ICodeFactory;
 import org.eclipse.ease.ICompletionContext;
@@ -32,7 +26,6 @@ import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.IReplEngine;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.IScriptEngineProvider;
-import org.eclipse.ease.Logger;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptExecutionException;
 import org.eclipse.ease.ScriptResult;
@@ -52,6 +45,7 @@ import org.eclipse.ease.ui.dnd.ShellDropTarget;
 import org.eclipse.ease.ui.handler.ToggleDropinsSection;
 import org.eclipse.ease.ui.help.hovers.ContentProposalModifier;
 import org.eclipse.ease.ui.preferences.IPreferenceConstants;
+import org.eclipse.ease.ui.views.shell.dropins.DropinTools;
 import org.eclipse.ease.ui.views.shell.dropins.IShellDropin;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ComboContentAdapter;
@@ -142,7 +136,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 
 	private CodeCompletionAggregator fCompletionDispatcher = null;
 
-	private Collection<IShellDropin> fDropins = Collections.emptySet();
+	private Collection<IShellDropin> fDropins = null;
 
 	private String[] fHistory;
 
@@ -205,9 +199,8 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 		for (final IShellDropin dropin : fDropins) {
 			final TabItem tab = new TabItem(tabFolder, SWT.NONE);
 			tab.setText(dropin.getTitle());
-			tab.setControl(dropin.createPartControl(getSite(), tabFolder));
+			tab.setControl(dropin.getPartControl(getSite(), tabFolder));
 		}
-
 		showDropinsPane(shallDisplayDropins());
 
 		fInputCombo = new Combo(parent, SWT.NONE);
@@ -291,6 +284,15 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			invalidEngine.setException(new ScriptExecutionException("No script engines available"));
 			fOutputText.printResult(invalidEngine);
 		}
+
+		getSite().setSelectionProvider(new DropinsSelectionProvider(tabFolder, getAvailableDropins()));
+	}
+
+	private Collection<IShellDropin> getAvailableDropins() {
+		if (fDropins == null)
+			fDropins = DropinTools.getAvailableDropins();
+
+		return fDropins;
 	}
 
 	private boolean shallDisplayDropins() {
@@ -439,7 +441,7 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 	}
 
 	public void stopScriptEngine() {
-		fScriptEngine.terminateCurrent();
+		getScriptEngine().terminateCurrent();
 	}
 
 	@Override
@@ -530,33 +532,5 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			fCompletionDispatcher = new CodeCompletionAggregator(fScriptEngine);
 			addAutoCompletion();
 		}
-	}
-
-	private static final String EXTENSION_SHELL_ID = "org.eclipse.ease.ui.shell";
-	private static final String EXTENSION_DROPIN_ID = "dropin";
-
-	private static final String PROPERTY_DROPIN_CLASS = "class";
-
-	private static Collection<IShellDropin> getAvailableDropins() {
-		final List<IShellDropin> dropins = new ArrayList<>();
-
-		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_SHELL_ID);
-		for (final IConfigurationElement e : config) {
-			if (e.getName().equals(EXTENSION_DROPIN_ID)) {
-				// drop-in detected
-				Object dropin;
-				try {
-					dropin = e.createExecutableExtension(PROPERTY_DROPIN_CLASS);
-					if (dropin instanceof IShellDropin) {
-						// TODO sort by priorities
-						dropins.add((IShellDropin) dropin);
-					}
-				} catch (final CoreException e1) {
-					Logger.error(Activator.PLUGIN_ID, "Invalid shell dropin detected: " + e.getAttribute(PROPERTY_DROPIN_CLASS), e1);
-				}
-			}
-		}
-
-		return dropins;
 	}
 }

@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.Map;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
-import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.ui.views.shell.dropins.variables.VariablesContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -39,21 +37,16 @@ public class ModulesStackContentProviderTest {
 	@DisplayName("getElements() returns found modules")
 	public void getElements_returns_modules() {
 
-		final List<Object> mockedModules = Arrays.asList(new EnvironmentModule());
-
 		final IEnvironment environment = mock(IEnvironment.class);
-		when(environment.getModules()).thenReturn(mockedModules);
-
-		final Map<String, Object> variables = new HashMap<>();
-		variables.put("env", environment);
+		when(environment.getModules()).thenReturn(List.of(new EnvironmentModule()));
 
 		final IScriptEngine engine = mock(IScriptEngine.class);
-		when(engine.getVariables()).thenReturn(variables);
+		when(engine.getVariables()).thenReturn(Map.of("env", environment));
 
 		final IStructuredContentProvider contentProvider = new ModulesStackContentProvider();
 
-		assertTrue(contentProvider.getElements(engine)[0] instanceof ModuleDefinition);
-		assertEquals("Environment", ((ModuleDefinition) contentProvider.getElements(engine)[0]).getName());
+		assertEquals(1, contentProvider.getElements(engine).length);
+		assertTrue(contentProvider.getElements(engine)[0] instanceof EnvironmentModule);
 	}
 
 	@Test

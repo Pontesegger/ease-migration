@@ -21,6 +21,7 @@ import org.eclipse.ease.ui.views.shell.dropins.AbstractDropin;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -89,5 +90,10 @@ public class ModulesStackDropin extends AbstractDropin {
 	@Override
 	protected void updateUI() {
 		fModulesTable.refresh();
+	}
+
+	@Override
+	public ISelectionProvider getSelectionProvider() {
+		return fModulesTable;
 	}
 }
