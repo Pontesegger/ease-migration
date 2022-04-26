@@ -23,10 +23,10 @@ import org.eclipse.ease.Script;
  * Default implementation of {@link IScriptRegistry} simply using maps to perform 1:1 mapping.
  */
 public class ScriptRegistry implements IScriptRegistry {
-	/** Lookup from {@link IResource} in eclipse world to {@link Script} in EASE world */
+	/** Lookup from {@link IResource} in eclipse world to {@link Script} in EASE world. */
 	private final Map<IResource, Script> fResourceMap = new HashMap<>();
 
-	/** Reverse lookup from {@link Script} in EASE world to {@link IResource} in eclipse world */
+	/** Reverse lookup from {@link Script} in EASE world to {@link IResource} in eclipse world. */
 	private final Map<Script, IResource> fScriptMap = new HashMap<>();
 
 	@Override

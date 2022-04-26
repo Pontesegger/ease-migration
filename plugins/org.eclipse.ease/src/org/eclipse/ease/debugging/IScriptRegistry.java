@@ -28,7 +28,7 @@ public interface IScriptRegistry {
 	 * @param script
 	 *            Script to be stored in registry.
 	 */
-	public void put(Script script);
+	void put(Script script);
 
 	/**
 	 * Return the {@link Script} identified by this {@link IResource}.
@@ -37,7 +37,7 @@ public interface IScriptRegistry {
 	 *            {@link IResource} to get {@link Script} for.
 	 * @return {@link Script} identified by {@link IResource} or {@code null} if no mapping found.
 	 */
-	public Script getScript(IResource resource);
+	Script getScript(IResource resource);
 
 	/**
 	 * Get the {@link IResource} identified by this {@link Script}.
@@ -46,5 +46,5 @@ public interface IScriptRegistry {
 	 *            {@link Script} to get {@link IResource} for.
 	 * @return {@link IResource} identified by {@link Script} or {@code null} if no mapping found.
 	 */
-	public IResource getResource(Script script);
+	IResource getResource(Script script);
 }

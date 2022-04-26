@@ -18,10 +18,10 @@ import org.eclipse.ease.Activator;
 import org.eclipse.ease.ISecurityCheck;
 import org.osgi.service.prefs.Preferences;
 
-public class ScriptUIAccess implements ISecurityCheck {
+public final class ScriptUIAccess implements ISecurityCheck {
 
 	/** Singleton instance. */
-	private static ISecurityCheck INSTANCE = new ScriptUIAccess();
+	private static final ISecurityCheck INSTANCE = new ScriptUIAccess();
 
 	public static ISecurityCheck getInstance() {
 		return INSTANCE;
@@ -32,7 +32,7 @@ public class ScriptUIAccess implements ISecurityCheck {
 	}
 
 	@Override
-	public boolean doIt(ActionType action, Object... data) throws SecurityException {
+	public boolean doIt(ActionType action, Object... data) {
 		if ((ActionType.INJECT_CODE == action) && (data.length >= 2) && (data[1] instanceof Boolean) && ((Boolean) data[1])) {
 			final Preferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).node(Activator.PREFERENCES_NODE_SCRIPTS);
 			final boolean allowUIAccess = prefs.getBoolean(Activator.SCRIPTS_ALLOW_UI_ACCESS, Activator.DEFAULT_SCRIPTS_ALLOW_UI_ACCESS);

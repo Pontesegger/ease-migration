@@ -21,7 +21,7 @@ public interface IScriptable {
 
 	/**
 	 * Get input stream containing source code.
-	 * 
+	 *
 	 * @return source code as {@link InputStream}
 	 * @throws Exception
 	 *             when inputStream cannot be created

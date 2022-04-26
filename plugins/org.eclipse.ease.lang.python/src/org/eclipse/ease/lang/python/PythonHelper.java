@@ -20,10 +20,15 @@ import org.eclipse.ease.service.IScriptService;
 import org.eclipse.ease.service.ScriptService;
 import org.eclipse.ease.service.ScriptType;
 
-public class PythonHelper {
+public final class PythonHelper {
 
 	/** Script type identifier for Python. Must match with the script type 'name' from plugin.xml. */
 	public static final String SCRIPT_TYPE_PYTHON = "Python";
+
+	@Deprecated
+	private PythonHelper() {
+		throw new UnsupportedOperationException("Utility class shall not be instantiated");
+	}
 
 	public static String getSaveName(final String identifier) {
 		// check if name is already valid
@@ -40,9 +45,10 @@ public class PythonHelper {
 				buffer.insert(0, '_');
 		} else {
 			// buffer is empty, create a random string of lowercase letters
+			final Random random = new Random();
 			buffer.append('_');
-			for (int index = 0; index < new Random().nextInt(20); index++)
-				buffer.append('a' + new Random().nextInt(26));
+			for (int index = 0; index < random.nextInt(20); index++)
+				buffer.append('a' + random.nextInt(26));
 		}
 
 		return buffer.toString();

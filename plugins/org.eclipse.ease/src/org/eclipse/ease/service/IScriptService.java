@@ -98,7 +98,7 @@ public interface IScriptService {
 	 *            engine description for further filtering
 	 * @return launch extensions or empty collection
 	 */
-	Collection<IScriptEngineLaunchExtension> getLaunchExtensions(final EngineDescription engineDescription);
+	Collection<IScriptEngineLaunchExtension> getLaunchExtensions(EngineDescription engineDescription);
 
 	/**
 	 * Get the script type for a given resource location.

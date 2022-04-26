@@ -37,11 +37,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 public class SelectScriptStorageDialog extends Dialog {
-	private Text txtWorkspace;
-	private Text txtFileSystem;
-	private Button btnStoreInSettings;
-	private Button btnStoreInWorkspace;
-	private Button btnStoreOnFileSystem;
+	private Text fTxtWorkspace;
+	private Text fTxtFileSystem;
+	private Button fBtnStoreInSettings;
+	private Button fBtnStoreInWorkspace;
+	private Button fBtnStoreOnFileSystem;
 	private String fLocation = null;
 
 	/**
@@ -74,27 +74,27 @@ public class SelectScriptStorageDialog extends Dialog {
 		lblWhereDoYou.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		lblWhereDoYou.setText(Messages.SelectScriptStorageDialog_storageDescription);
 
-		btnStoreInSettings = new Button(container, SWT.RADIO);
-		btnStoreInSettings.setSelection(true);
-		btnStoreInSettings.addSelectionListener(new SelectionAdapter() {
+		fBtnStoreInSettings = new Button(container, SWT.RADIO);
+		fBtnStoreInSettings.setSelection(true);
+		fBtnStoreInSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 			}
 		});
 		final GridData gd_btnStoreInSettings = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_btnStoreInSettings.verticalIndent = 20;
-		btnStoreInSettings.setLayoutData(gd_btnStoreInSettings);
-		btnStoreInSettings.setText(Messages.SelectScriptStorageDialog_storeInSettings);
+		fBtnStoreInSettings.setLayoutData(gd_btnStoreInSettings);
+		fBtnStoreInSettings.setText(Messages.SelectScriptStorageDialog_storeInSettings);
 		new Label(container, SWT.NONE);
 
-		btnStoreInWorkspace = new Button(container, SWT.RADIO);
-		btnStoreInWorkspace.setText(Messages.SelectScriptStorageDialog_storeInWorkspace);
+		fBtnStoreInWorkspace = new Button(container, SWT.RADIO);
+		fBtnStoreInWorkspace.setText(Messages.SelectScriptStorageDialog_storeInWorkspace);
 		new Label(container, SWT.NONE);
 
-		txtWorkspace = new Text(container, SWT.BORDER);
+		fTxtWorkspace = new Text(container, SWT.BORDER);
 		final GridData gd_txtWorkspace = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_txtWorkspace.horizontalIndent = 17;
-		txtWorkspace.setLayoutData(gd_txtWorkspace);
+		fTxtWorkspace.setLayoutData(gd_txtWorkspace);
 
 		final Button btnNewButton = new Button(container, SWT.NONE);
 		btnNewButton.setText(Messages.SelectScriptStorageDialog_browse);
@@ -106,19 +106,19 @@ public class SelectScriptStorageDialog extends Dialog {
 				if (dialog.open() == Window.OK) {
 					final Object[] result = dialog.getResult();
 					if ((result.length > 0) && (result[0] instanceof IPath))
-						txtWorkspace.setText(result[0].toString());
+						fTxtWorkspace.setText(result[0].toString());
 				}
 			}
 		});
 
-		btnStoreOnFileSystem = new Button(container, SWT.RADIO);
-		btnStoreOnFileSystem.setText(Messages.SelectScriptStorageDialog_fileSystem);
+		fBtnStoreOnFileSystem = new Button(container, SWT.RADIO);
+		fBtnStoreOnFileSystem.setText(Messages.SelectScriptStorageDialog_fileSystem);
 		new Label(container, SWT.NONE);
 
-		txtFileSystem = new Text(container, SWT.BORDER);
+		fTxtFileSystem = new Text(container, SWT.BORDER);
 		final GridData gd_txtFileSystem = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_txtFileSystem.horizontalIndent = 17;
-		txtFileSystem.setLayoutData(gd_txtFileSystem);
+		fTxtFileSystem.setLayoutData(gd_txtFileSystem);
 
 		final Button btnNewButton_1 = new Button(container, SWT.NONE);
 		btnNewButton_1.setText(Messages.SelectScriptStorageDialog_browse);
@@ -128,7 +128,7 @@ public class SelectScriptStorageDialog extends Dialog {
 				final DirectoryDialog dialog = new DirectoryDialog(getShell());
 				final String path = dialog.open();
 				if (path != null)
-					txtFileSystem.setText(new File(path).toURI().toString());
+					fTxtFileSystem.setText(new File(path).toURI().toString());
 			}
 		});
 		return container;
@@ -155,19 +155,19 @@ public class SelectScriptStorageDialog extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		if (btnStoreInSettings.getSelection())
+		if (fBtnStoreInSettings.getSelection())
 			fLocation = PreferencesHelper.getDefaultScriptStorageLocation();
 
-		else if (btnStoreInWorkspace.getSelection()) {
-			if (txtWorkspace.getText().startsWith("/"))
-				fLocation = "workspace:/" + txtWorkspace.getText();
+		else if (fBtnStoreInWorkspace.getSelection()) {
+			if (fTxtWorkspace.getText().startsWith("/"))
+				fLocation = "workspace:/" + fTxtWorkspace.getText();
 			else
-				fLocation = "workspace://" + txtWorkspace.getText();
+				fLocation = "workspace://" + fTxtWorkspace.getText();
 		}
 
-		else if (btnStoreOnFileSystem.getSelection())
+		else if (fBtnStoreOnFileSystem.getSelection())
 			// FIXME change user input to URI syntax
-			fLocation = txtFileSystem.getText();
+			fLocation = fTxtFileSystem.getText();
 
 		super.okPressed();
 	}

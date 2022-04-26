@@ -25,7 +25,7 @@ import org.eclipse.ease.ui.scripts.expressions.definitions.AbstractExpressionDef
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-public class ExpressionTools {
+public final class ExpressionTools {
 
 	private static class ParameterDescription {
 
@@ -106,6 +106,11 @@ public class ExpressionTools {
 
 	private static final String EXTENSION_EXPRESSION_ID = "org.eclipse.ease.ui.scripts.expressions";
 	private static final String EXTENSION_DEFINITION_ID = "definition";
+
+	@Deprecated
+	private ExpressionTools() {
+		throw new UnsupportedOperationException("Utility class shall not be isntantiated.");
+	}
 
 	public static Map<String, ExpressionDescription> loadDescriptions() {
 		final Map<String, ExpressionDescription> descriptions = new HashMap<>();

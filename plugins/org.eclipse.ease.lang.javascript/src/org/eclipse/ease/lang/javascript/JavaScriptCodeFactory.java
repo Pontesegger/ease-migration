@@ -76,8 +76,9 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 		} else {
 			// buffer is empty, create a random string of lowercase letters
 			buffer.append('_');
-			for (int index = 0; index < new Random().nextInt(20); index++)
-				buffer.append('a' + new Random().nextInt(26));
+			final Random random = new Random();
+			for (int index = 0; index < random.nextInt(20); index++)
+				buffer.append('a' + random.nextInt(26));
 		}
 
 		if (RESERVED_KEYWORDS.contains(buffer.toString()))
@@ -137,15 +138,13 @@ public class JavaScriptCodeFactory extends AbstractCodeFactory {
 	private String createObjectWrapper(IEnvironment environment, Object instance, String identifier) {
 		final StringBuilder scriptCode = new StringBuilder();
 
-		scriptCode.append(IEnvironment.EASE_CODE_PREFIX + "temporary_wrapper_object = {").append(StringTools.LINE_DELIMITER);
-		scriptCode.append("\tjavaInstance: ").append(identifier).append(',').append(StringTools.LINE_DELIMITER);
+		scriptCode.append(String.format("%stemporary_wrapper_object = {%n", IEnvironment.EASE_CODE_PREFIX));
+		scriptCode.append(String.format("\tjavaInstance: %s,%n", identifier));
 
-		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// field definitions").append(StringTools.LINE_DELIMITER);
+		scriptCode.append(String.format("%n\t// field definitions%n"));
 		for (final Field field : ModuleHelper.getFields(instance.getClass())) {
-			if (isSupportedByLanguage(field)) {
-				scriptCode.append('\t').append(field.getName()).append(": ").append(identifier).append('.').append(field.getName()).append(',')
-						.append(StringTools.LINE_DELIMITER);
-			}
+			if (isSupportedByLanguage(field))
+				scriptCode.append(String.format("\t%s: %s.%s,%n", field.getName(), identifier, field.getName()));
 		}
 
 		scriptCode.append(StringTools.LINE_DELIMITER).append("\t// method definitions").append(StringTools.LINE_DELIMITER);

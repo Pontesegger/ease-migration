@@ -103,10 +103,13 @@ public class EaseClassLoader extends ClassLoader {
 	}
 
 	public void unregisterEngine(final Job engine) {
-		try (URLClassLoader classLoader = fRegisteredJars.remove(engine)) {
-			// nothing to do
-		} catch (final IOException e) {
-			// closing classloader failed, giving up
+		final URLClassLoader classLoader = fRegisteredJars.remove(engine);
+		if (classLoader != null) {
+			try {
+				classLoader.close();
+			} catch (final IOException e) {
+				// gracefully ignore
+			}
 		}
 	}
 }

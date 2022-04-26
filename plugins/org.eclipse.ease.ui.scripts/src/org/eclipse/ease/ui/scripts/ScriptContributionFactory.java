@@ -14,7 +14,6 @@ package org.eclipse.ease.ui.scripts;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +33,7 @@ import org.eclipse.ui.services.IServiceLocator;
 /**
  * Factory adding scripts to dynamically populated menu.
  */
-public final class ScriptContributionFactory extends CompoundContributionItem implements IWorkbenchContribution
-// , IScriptListener
-{
+public final class ScriptContributionFactory extends CompoundContributionItem implements IWorkbenchContribution {
 
 	private IServiceLocator fServiceLocator;
 	private boolean fDirty = true;
@@ -52,32 +49,29 @@ public final class ScriptContributionFactory extends CompoundContributionItem im
 
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		List<IContributionItem> contributions = new ArrayList<IContributionItem>();
+		final List<IContributionItem> contributions = new ArrayList<>();
 
-		final IRepositoryService repositoryService = (IRepositoryService) PlatformUI.getWorkbench().getService(IRepositoryService.class);
+		final IRepositoryService repositoryService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
 
 		if (repositoryService != null) {
-			final List<IScript> scripts = new ArrayList<IScript>(repositoryService.getScripts());
+			final List<IScript> scripts = new ArrayList<>(repositoryService.getScripts());
 
-			Collections.sort(scripts, new Comparator<IScript>() {
-				@Override
-				public int compare(final IScript o1, final IScript o2) {
-					IPath path1 = o1.getPath();
-					IPath path2 = o2.getPath();
-					if (path1.isEmpty() && !path2.isEmpty())
-						return 1;
+			Collections.sort(scripts, (o1, o2) -> {
+				final IPath path1 = o1.getPath();
+				final IPath path2 = o2.getPath();
+				if (path1.isEmpty() && !path2.isEmpty())
+					return 1;
 
-					else if (!path1.isEmpty() && path2.isEmpty())
-						return -1;
+				else if (!path1.isEmpty() && path2.isEmpty())
+					return -1;
 
-					else
-						return o1.getName().compareToIgnoreCase(o2.getName());
-				}
+				else
+					return o1.getName().compareToIgnoreCase(o2.getName());
 			});
 
-			final Map<IPath, ScriptPopupMenu> dynamicMenus = new HashMap<IPath, ScriptPopupMenu>();
+			final Map<IPath, ScriptPopupMenu> dynamicMenus = new HashMap<>();
 
-			List<IContributionItem> rootItems = new ArrayList<IContributionItem>();
+			final List<IContributionItem> rootItems = new ArrayList<>();
 			for (final IScript script : scripts) {
 				final ScriptPopup popup = new ScriptPopup(script);
 
@@ -88,19 +82,19 @@ public final class ScriptContributionFactory extends CompoundContributionItem im
 
 				} else {
 					// script in sub menu
-					ScriptPopupMenu menu = registerPath(dynamicMenus, path);
+					final ScriptPopupMenu menu = registerPath(dynamicMenus, path);
 					menu.addItem(popup);
 				}
 			}
 
 			// add root menus to additions
-			for (Entry<IPath, ScriptPopupMenu> element : dynamicMenus.entrySet()) {
+			for (final Entry<IPath, ScriptPopupMenu> element : dynamicMenus.entrySet()) {
 				if (element.getKey().segmentCount() == 1)
 					contributions.add(element.getValue().getContribution(fServiceLocator));
 			}
 
 			// add root elements to additions
-			for (IContributionItem item : rootItems)
+			for (final IContributionItem item : rootItems)
 				contributions.add(item);
 
 			fDirty = false;
@@ -140,8 +134,8 @@ public final class ScriptContributionFactory extends CompoundContributionItem im
 			dynamicMenus.put(path, new ScriptPopupMenu(path.lastSegment()));
 
 			if (path.segmentCount() > 1) {
-				IPath parent = path.removeLastSegments(1);
-				ScriptPopupMenu parentMenu = registerPath(dynamicMenus, parent);
+				final IPath parent = path.removeLastSegments(1);
+				final ScriptPopupMenu parentMenu = registerPath(dynamicMenus, parent);
 				parentMenu.addItem(dynamicMenus.get(path));
 			}
 		}

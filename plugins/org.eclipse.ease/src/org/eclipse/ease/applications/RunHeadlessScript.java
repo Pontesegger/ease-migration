@@ -15,6 +15,7 @@ package org.eclipse.ease.applications;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -114,18 +115,23 @@ public class RunHeadlessScript implements IApplication {
 	}
 
 	private static void printUsage() {
-		System.out.println("SYNTAX: [-workspace <workspace location> [-refreshWorkspace]] [-engine <engineID>]-script <script name> <script parameters>");
-		System.out.println("");
-		System.out.println("\t\t<script name> is a path like 'file://C/myfolder/myscript.js'");
-		System.out.println("\t\t<engineID> provides a dedicated script engine ID. Use org.eclipse.ease.listEngines application.");
-		System.out.println("\t\t<workspace location> is a file system path like 'C:\\somefolder\\myworkspace'");
-		System.out.println("\t\t\tif you provide a workspace you can use workspace:// identifiers in your scripts");
-		System.out.println("\t\t\tif you provide a workspace you may ask to refresh it first prior to script execution");
-		System.out.println("\t\t<script parameters> will be passed to the script as String[] in the variable 'argv'");
+		getOutputStream()
+				.println("SYNTAX: [-workspace <workspace location> [-refreshWorkspace]] [-engine <engineID>]-script <script name> <script parameters>");
+		getOutputStream().println("");
+		getOutputStream().println("\t\t<script name> is a path like 'file://C/myfolder/myscript.js'");
+		getOutputStream().println("\t\t<engineID> provides a dedicated script engine ID. Use org.eclipse.ease.listEngines application.");
+		getOutputStream().println("\t\t<workspace location> is a file system path like 'C:\\somefolder\\myworkspace'");
+		getOutputStream().println("\t\t\tif you provide a workspace you can use workspace:// identifiers in your scripts");
+		getOutputStream().println("\t\t\tif you provide a workspace you may ask to refresh it first prior to script execution");
+		getOutputStream().println("\t\t<script parameters> will be passed to the script as String[] in the variable 'argv'");
 	}
 
 	private static void printError(String message) {
-		System.out.println("ERROR: " + message);
+		getOutputStream().println("ERROR: " + message);
+	}
+
+	private static PrintStream getOutputStream() {
+		return System.out;
 	}
 
 	@Override
@@ -252,5 +258,6 @@ public class RunHeadlessScript implements IApplication {
 
 	@Override
 	public void stop() {
+		// nothing to do
 	}
 }

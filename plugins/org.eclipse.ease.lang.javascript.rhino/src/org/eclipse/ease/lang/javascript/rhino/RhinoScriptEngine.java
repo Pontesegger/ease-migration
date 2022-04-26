@@ -100,10 +100,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 		if (scope instanceof Double)
 			return true;
 
-		if (scope == null)
-			return true;
-
-		return false;
+		return (scope == null);
 	}
 
 	/** Rhino Scope. Created when interpreter is initialized */
@@ -222,9 +219,9 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 				result = ((org.mozilla.javascript.Script) script.getCommand()).exec(getContext(), fScope);
 
 			else {
-				final InputStreamReader codeReader = new InputStreamReader(script.getCodeStream());
-				result = getContext().evaluateReader(fScope, codeReader, fileName, 1, null);
-				codeReader.close();
+				try (InputStreamReader codeReader = new InputStreamReader(script.getCodeStream())) {
+					result = getContext().evaluateReader(fScope, codeReader, fileName, 1, null);
+				}
 			}
 
 			// evaluate result
@@ -237,7 +234,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			else if (result instanceof NativeJavaObject)
 				return ((NativeJavaObject) result).unwrap();
 
-			else if (result.getClass().getName().equals("org.mozilla.javascript.InterpretedFunction"))
+			else if ("org.mozilla.javascript.InterpretedFunction".equals(result.getClass().getName()))
 				return null;
 
 			return result;
@@ -400,7 +397,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 			@Override
 			public Boolean runWithTry() throws Throwable {
 				if (!JavaScriptCodeFactory.isSaveName(name))
-					throw new RuntimeException("\"" + name + "\" is not a valid JavaScript variable name");
+					throw new IllegalArgumentException(String.format("'%s' is not a valid JavaScript variable name", name));
 
 				final Scriptable scope = fScope;
 
@@ -413,16 +410,14 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	protected Object internaljavaToJS(final Object value, final Scriptable scope) {
-		Object result = null;
-		if (isPrimitiveType(value) || (value instanceof Scriptable)) {
-			result = value;
-		} else if (value instanceof Character) {
-			result = String.valueOf(((Character) value).charValue());
-		} else {
-			result = getContext().getWrapFactory().wrap(getContext(), scope, value, null);
-		}
-		return result;
+		if (isPrimitiveType(value) || (value instanceof Scriptable))
+			return value;
 
+		else if (value instanceof Character)
+			return String.valueOf(((Character) value).charValue());
+
+		else
+			return getContext().getWrapFactory().wrap(getContext(), scope, value, null);
 	}
 
 	private boolean isPrimitiveType(final Object value) {

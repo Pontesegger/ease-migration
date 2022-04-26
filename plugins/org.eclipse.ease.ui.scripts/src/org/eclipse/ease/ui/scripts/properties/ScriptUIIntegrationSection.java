@@ -44,8 +44,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -71,12 +69,12 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class ScriptUIIntegrationSection extends AbstractPropertySection {
 
-	private class KeywordObservableValue extends AbstractObservableValue<String> {
+	private static final class KeywordObservableValue extends AbstractObservableValue<String> {
 
 		private final IScript fScript;
 		private final String fKeyword;
 
-		public KeywordObservableValue(IScript script, String keyword) {
+		private KeywordObservableValue(IScript script, String keyword) {
 			fScript = script;
 			fKeyword = keyword;
 		}
@@ -156,13 +154,7 @@ public class ScriptUIIntegrationSection extends AbstractPropertySection {
 		fTxtImage = getWidgetFactory().createText(composite, "", SWT.NONE);
 		fTxtImage.setToolTipText(Messages.ScriptUIIntegrationSection_imageUri);
 		fTxtImage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		fTxtImage.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateImagePreview();
-			}
-		});
+		fTxtImage.addModifyListener(e -> updateImagePreview());
 
 		final Button btnBrowseWorkspace = getWidgetFactory().createButton(composite, "", SWT.NONE);
 		btnBrowseWorkspace.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT));

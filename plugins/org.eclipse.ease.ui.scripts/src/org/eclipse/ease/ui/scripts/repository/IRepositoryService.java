@@ -47,13 +47,16 @@ public interface IRepositoryService {
 
 	/**
 	 * Trigger an immediate refresh of all script sources and contained scripts.
+	 *
+	 * @param force
+	 *            force the update when set to <code>true</code>
 	 */
 	void update(boolean force);
 
 	void updateLocation(IScriptLocation location, String scriptURI, long lastChanged);
 
 	/**
-	 * Get all scripts registered with this service
+	 * Get all scripts registered with this service.
 	 *
 	 * @return collection of scripts
 	 */
@@ -86,7 +89,7 @@ public interface IRepositoryService {
 	 * @param recursive
 	 *            <code>true</code> to parse subfolders of location
 	 */
-	void addLocation(final String locationURI, final boolean defaultLocation, final boolean recursive);
+	void addLocation(String locationURI, boolean defaultLocation, boolean recursive);
 
 	/**
 	 * Remove a give location from the repository. Removes the location and all scripts registered under that location.
@@ -94,5 +97,5 @@ public interface IRepositoryService {
 	 * @param locationURI
 	 *            location URI to unregister
 	 */
-	void removeLocation(final String locationURI);
+	void removeLocation(String locationURI);
 }

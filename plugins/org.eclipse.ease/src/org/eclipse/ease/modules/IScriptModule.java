@@ -19,9 +19,10 @@ import org.eclipse.ease.IScriptEngine;
  * Implementing this interface is optional for a module.
  */
 public interface IScriptModule {
+
 	/**
 	 * Provides script engine and environment instances.
-	 * 
+	 *
 	 * @param engine
 	 *            script engine this module is loaded in
 	 * @param environment

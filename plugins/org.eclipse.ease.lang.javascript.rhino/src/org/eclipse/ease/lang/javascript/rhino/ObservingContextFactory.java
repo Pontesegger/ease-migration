@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.ease.lang.javascript.rhino;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,17 +22,17 @@ import org.mozilla.javascript.ContextFactory;
 
 public class ObservingContextFactory extends ContextFactory {
 
-	private final Set<Context> fTerminationRequests = new HashSet<>();
+	private final Set<Context> fTerminationRequests = Collections.synchronizedSet(new HashSet<>());
 
 	@Override
-	protected synchronized void observeInstructionCount(final Context cx, final int instructionCount) {
+	protected void observeInstructionCount(final Context cx, final int instructionCount) {
 		if (fTerminationRequests.remove(cx))
 			throw new ScriptEngineCancellationException();
 
 		super.observeInstructionCount(cx, instructionCount);
 	}
 
-	public synchronized void terminate(final Context context) {
+	public void terminate(final Context context) {
 		fTerminationRequests.add(context);
 	}
 

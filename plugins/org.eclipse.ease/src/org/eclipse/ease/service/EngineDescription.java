@@ -74,11 +74,9 @@ public class EngineDescription {
 	public int getPriority() {
 		try {
 			return Integer.parseInt(fConfigurationElement.getAttribute(PRIORITY));
-		} catch (final Throwable e) {
-			// ignore
+		} catch (final NumberFormatException e) {
+			return 0;
 		}
-
-		return 0;
 	}
 
 	/**

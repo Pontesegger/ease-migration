@@ -31,7 +31,7 @@ public class DynamicContentEditorInput implements IStorageEditorInput {
 
 	/**
 	 * Constructor. Takes text from a script.
-	 * 
+	 *
 	 * @param script
 	 *            script to extract text from
 	 */

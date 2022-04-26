@@ -28,7 +28,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
 /**
- * Abstract action that can be used to update an {@link IDebugView}
+ * Abstract action that can be used to update an {@link IDebugView}.
  *
  * @since 1.0
  */
@@ -44,7 +44,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 		 */
 		@Override
@@ -61,7 +61,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
 	@Override
@@ -74,7 +74,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
 	@Override
@@ -84,7 +84,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
 	@Override
@@ -94,7 +94,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
 	 */
 	@Override
@@ -104,7 +104,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	@Override
@@ -130,7 +130,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
@@ -146,8 +146,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/**
 	 * Returns the value of this filters preference (on/off) for the given view.
-	 * 
-	 * @param part
+	 *
 	 * @return boolean
 	 */
 	protected boolean getPreferenceValue() {
@@ -156,15 +155,15 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 	}
 
 	/**
-	 * Returns the key for this action's preference
-	 * 
+	 * Returns the key for this action's preference.
+	 *
 	 * @return String
 	 */
 	protected abstract String getPreferenceKey();
 
 	/**
 	 * Returns the key used by this action to store its preference value/setting. Based on a base key (suffix) and part id (prefix).
-	 * 
+	 *
 	 * @return preference store key
 	 */
 	protected String getCompositeKey() {
@@ -196,7 +195,7 @@ public abstract class ViewFilterAction extends ViewerFilter implements IViewActi
 
 	/**
 	 * Returns whether this action is selected/checked.
-	 * 
+	 *
 	 * @return whether this action is selected/checked
 	 */
 	protected boolean getValue() {

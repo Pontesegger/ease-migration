@@ -20,9 +20,6 @@ import org.eclipse.ui.services.IServiceLocator;
  */
 public class ScriptServiceFactory extends AbstractServiceFactory {
 
-	public ScriptServiceFactory() {
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object create(final Class serviceInterface, final IServiceLocator parentLocator, final IServiceLocator locator) {

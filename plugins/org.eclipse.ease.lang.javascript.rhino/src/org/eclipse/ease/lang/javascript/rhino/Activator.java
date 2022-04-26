@@ -19,28 +19,19 @@ public class Activator implements BundleActivator {
 
 	public static final String PLUGIN_ID = "org.eclipse.ease.engine.javascript.rhino.debugger";
 
-	private static BundleContext context;
+	private static BundleContext fContext;
 
-	static BundleContext getContext() {
-		return context;
+	public static BundleContext getContext() {
+		return fContext;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+		fContext = bundleContext;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.context = null;
+		fContext = null;
 	}
-
 }

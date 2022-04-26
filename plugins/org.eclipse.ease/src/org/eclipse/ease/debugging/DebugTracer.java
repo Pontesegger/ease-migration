@@ -15,19 +15,24 @@ package org.eclipse.ease.debugging;
 
 import org.eclipse.core.runtime.Platform;
 
-public class DebugTracer {
+public final class DebugTracer {
 
-	private static final boolean DEBUG = org.eclipse.ease.Activator.getDefault().isDebugging()
+	private static final boolean USE_DEBUG = org.eclipse.ease.Activator.getDefault().isDebugging()
 			&& "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.ease/debug/debuggerEvents"));
 
 	private static int fMinOriginLength = 10;
 
 	public static void debug(String origin, String message) {
-		if (DEBUG) {
+		if (USE_DEBUG) {
 			while (origin.length() < fMinOriginLength)
 				origin = origin + " ";
 
 			System.out.println("::: " + origin + ": " + message);
 		}
+	}
+
+	@Deprecated
+	private DebugTracer() {
+		throw new UnsupportedOperationException("Constructor of utility class shall not be called.");
 	}
 }

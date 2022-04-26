@@ -35,6 +35,7 @@ public class ListEngines implements IApplication {
 
 	@Override
 	public void stop() {
+		// nothing to do
 	}
 
 	private PrintStream getOutputStream() {

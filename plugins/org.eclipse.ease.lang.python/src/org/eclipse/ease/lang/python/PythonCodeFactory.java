@@ -15,7 +15,6 @@ package org.eclipse.ease.lang.python;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -31,118 +30,22 @@ import org.eclipse.ease.tools.StringTools;
 
 public class PythonCodeFactory extends AbstractCodeFactory {
 
-	public static final List<String> RESERVED_KEYWORDS = new ArrayList<>();
+	private static final List<String> RESERVED_KEYWORDS = Arrays.asList("and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else",
+			"except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or", "pass", "print", "raise", "return", "try",
+			"while", "with", "yield",
 
+			// built in functions
+			"__import__", "abs", "all", "any", "ascii", "bin", "bool", "bytearray", "bytes", "callable", "chr", "classmethod", "compile", "complex", "delattr",
+			"dict", "dir", "divmod", "enumerate", "eval", "exec", "filter", "float", "format", "frozenset", "getattr", "globals", "hasattr", "hash", "help",
+			"hex", "id", "input", "int", "isinstance", "issubclass", "iter", "len", "list", "locals", "map", "max", "memoryview", "min", "next", "object",
+			"oct", "open", "ord", "pow", "print", "property", "range", "repr", "reversed", "round", "set", "setattr", "slice", "sorted", "staticmethod", "str",
+			"sum", "super", "tuple", "type", "vars", "zip");
 	/**
 	 * List of Java primitive types as they need to be handled differently from normal classes when getting their py4j representation.
 	 *
 	 * bytes are handled differently as Python has native bytearray type.
 	 */
 	private static final List<Class<?>> PRIMITIVES = Arrays.asList(short.class, int.class, long.class, float.class, double.class, boolean.class, char.class);
-
-	static {
-		RESERVED_KEYWORDS.add("and");
-		RESERVED_KEYWORDS.add("as");
-		RESERVED_KEYWORDS.add("assert");
-		RESERVED_KEYWORDS.add("break");
-		RESERVED_KEYWORDS.add("class");
-		RESERVED_KEYWORDS.add("continue");
-		RESERVED_KEYWORDS.add("def");
-		RESERVED_KEYWORDS.add("del");
-		RESERVED_KEYWORDS.add("elif");
-		RESERVED_KEYWORDS.add("else");
-		RESERVED_KEYWORDS.add("except");
-		RESERVED_KEYWORDS.add("exec");
-		RESERVED_KEYWORDS.add("finally");
-		RESERVED_KEYWORDS.add("for");
-		RESERVED_KEYWORDS.add("from");
-		RESERVED_KEYWORDS.add("global");
-		RESERVED_KEYWORDS.add("if");
-		RESERVED_KEYWORDS.add("import");
-		RESERVED_KEYWORDS.add("in");
-		RESERVED_KEYWORDS.add("is");
-		RESERVED_KEYWORDS.add("lambda");
-		RESERVED_KEYWORDS.add("not");
-		RESERVED_KEYWORDS.add("or");
-		RESERVED_KEYWORDS.add("pass");
-		RESERVED_KEYWORDS.add("print");
-		RESERVED_KEYWORDS.add("raise");
-		RESERVED_KEYWORDS.add("return");
-		RESERVED_KEYWORDS.add("try");
-		RESERVED_KEYWORDS.add("while");
-		RESERVED_KEYWORDS.add("with");
-		RESERVED_KEYWORDS.add("yield");
-
-		// built in functions
-		RESERVED_KEYWORDS.add("__import__");
-		RESERVED_KEYWORDS.add("abs");
-		RESERVED_KEYWORDS.add("all");
-		RESERVED_KEYWORDS.add("any");
-		RESERVED_KEYWORDS.add("ascii");
-		RESERVED_KEYWORDS.add("bin");
-		RESERVED_KEYWORDS.add("bool");
-		RESERVED_KEYWORDS.add("bytearray");
-		RESERVED_KEYWORDS.add("bytes");
-		RESERVED_KEYWORDS.add("callable");
-		RESERVED_KEYWORDS.add("chr");
-		RESERVED_KEYWORDS.add("classmethod");
-		RESERVED_KEYWORDS.add("compile");
-		RESERVED_KEYWORDS.add("complex");
-		RESERVED_KEYWORDS.add("delattr");
-		RESERVED_KEYWORDS.add("dict");
-		RESERVED_KEYWORDS.add("dir");
-		RESERVED_KEYWORDS.add("divmod");
-		RESERVED_KEYWORDS.add("enumerate");
-		RESERVED_KEYWORDS.add("eval");
-		RESERVED_KEYWORDS.add("exec");
-		RESERVED_KEYWORDS.add("filter");
-		RESERVED_KEYWORDS.add("float");
-		RESERVED_KEYWORDS.add("format");
-		RESERVED_KEYWORDS.add("frozenset");
-		RESERVED_KEYWORDS.add("getattr");
-		RESERVED_KEYWORDS.add("globals");
-		RESERVED_KEYWORDS.add("hasattr");
-		RESERVED_KEYWORDS.add("hash");
-		RESERVED_KEYWORDS.add("help");
-		RESERVED_KEYWORDS.add("hex");
-		RESERVED_KEYWORDS.add("id");
-		RESERVED_KEYWORDS.add("input");
-		RESERVED_KEYWORDS.add("int");
-		RESERVED_KEYWORDS.add("isinstance");
-		RESERVED_KEYWORDS.add("issubclass");
-		RESERVED_KEYWORDS.add("iter");
-		RESERVED_KEYWORDS.add("len");
-		RESERVED_KEYWORDS.add("list");
-		RESERVED_KEYWORDS.add("locals");
-		RESERVED_KEYWORDS.add("map");
-		RESERVED_KEYWORDS.add("max");
-		RESERVED_KEYWORDS.add("memoryview");
-		RESERVED_KEYWORDS.add("min");
-		RESERVED_KEYWORDS.add("next");
-		RESERVED_KEYWORDS.add("object");
-		RESERVED_KEYWORDS.add("oct");
-		RESERVED_KEYWORDS.add("open");
-		RESERVED_KEYWORDS.add("ord");
-		RESERVED_KEYWORDS.add("pow");
-		RESERVED_KEYWORDS.add("print");
-		RESERVED_KEYWORDS.add("property");
-		RESERVED_KEYWORDS.add("range");
-		RESERVED_KEYWORDS.add("repr");
-		RESERVED_KEYWORDS.add("reversed");
-		RESERVED_KEYWORDS.add("round");
-		RESERVED_KEYWORDS.add("set");
-		RESERVED_KEYWORDS.add("setattr");
-		RESERVED_KEYWORDS.add("slice");
-		RESERVED_KEYWORDS.add("sorted");
-		RESERVED_KEYWORDS.add("staticmethod");
-		RESERVED_KEYWORDS.add("str");
-		RESERVED_KEYWORDS.add("sum");
-		RESERVED_KEYWORDS.add("super");
-		RESERVED_KEYWORDS.add("tuple");
-		RESERVED_KEYWORDS.add("type");
-		RESERVED_KEYWORDS.add("vars");
-		RESERVED_KEYWORDS.add("zip");
-	}
 
 	/**
 	 * Returns the Python (py4j) identifier for the given class.
@@ -248,26 +151,12 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 	protected String createFieldWrapper(IEnvironment environment, String identifier, Field field) {
 		final StringBuilder pythonCode = new StringBuilder();
 
-		pythonCode.append("import sys").append(StringTools.LINE_DELIMITER);
+		pythonCode.append(String.format("import sys%n"));
 
-		pythonCode.append("if \"py4j\" in sys.modules:").append(StringTools.LINE_DELIMITER);
-		pythonCode.append("    ");
-		pythonCode.append(field.getName());
-		pythonCode.append(" = py4j.java_gateway.get_field(");
-		pythonCode.append(identifier);
-		pythonCode.append(", \"");
-		pythonCode.append(field.getName());
-		pythonCode.append("\")");
-		pythonCode.append(StringTools.LINE_DELIMITER);
-
-		pythonCode.append("else:").append(StringTools.LINE_DELIMITER);
-		pythonCode.append("    ");
-		pythonCode.append(field.getName());
-		pythonCode.append(" = ");
-		pythonCode.append(identifier);
-		pythonCode.append(".");
-		pythonCode.append(field.getName());
-		pythonCode.append(StringTools.LINE_DELIMITER);
+		pythonCode.append(String.format("if \"py4j\" in sys.modules:%n"));
+		pythonCode.append(String.format("    %s = py4j.java_gateway.get_field(%s, \"%s\")%n", field.getName(), identifier, field.getName()));
+		pythonCode.append(String.format("else:%n"));
+		pythonCode.append(String.format("    %s = %s.%s%n", field.getName(), identifier, field.getName()));
 
 		return pythonCode.toString();
 	}
@@ -323,8 +212,8 @@ public class PythonCodeFactory extends AbstractCodeFactory {
 
 		// insert deprecation warnings
 		if (ModuleHelper.isDeprecated(method))
-			body.append(EnvironmentModule.getWrappedVariableName(environment))
-					.append(".printError(\"" + method.getName() + "() is deprecated. Consider updating your code.\", True)").append(StringTools.LINE_DELIMITER);
+			body.append(String.format("%s.printError(\"%s() is deprecated. Consider updating your code.\", True)%n",
+					EnvironmentModule.getWrappedVariableName(environment), method.getName()));
 
 		// Convert Lists to Java arrays
 		body.append(buildArrayConversions(parameters)).append(StringTools.LINE_DELIMITER);

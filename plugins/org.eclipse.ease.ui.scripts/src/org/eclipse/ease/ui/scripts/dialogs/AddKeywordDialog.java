@@ -133,11 +133,6 @@ public class AddKeywordDialog extends TitleAreaDialog {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
 	@Override
 	protected void okPressed() {
 		// store variables

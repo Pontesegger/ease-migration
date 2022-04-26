@@ -32,8 +32,8 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 
 	@Override
 	protected boolean createFile(final Path path, final String content) {
-		Path locationPath = new Path(getLocation().substring(12));
-		IPath fullPath = locationPath.append(path.removeLastSegments(1));
+		final Path locationPath = new Path(getLocation().substring(12));
+		final IPath fullPath = locationPath.append(path.removeLastSegments(1));
 
 		IContainer container;
 		if (fullPath.segmentCount() > 1)
@@ -41,12 +41,12 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 		else
 			container = ResourcesPlugin.getWorkspace().getRoot().getProject(fullPath.toString());
 
-		IFile file = container.getFile(new Path(path.lastSegment()));
+		final IFile file = container.getFile(new Path(path.lastSegment()));
 		if (!file.exists()) {
 			try {
 				file.create(new ByteArrayInputStream(content.getBytes()), false, null);
 				return true;
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				Logger.error(Activator.PLUGIN_ID, "Could not create file " + file, e);
 			}
 		}
@@ -56,10 +56,10 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 
 	@Override
 	protected boolean createPath(final IPath path) {
-		Path locationPath = new Path(getLocation().substring(12));
-		IPath fullPath = locationPath.append(path);
+		final Path locationPath = new Path(getLocation().substring(12));
+		final IPath fullPath = locationPath.append(path);
 
-		IProject project = createProject(fullPath.segment(0));
+		final IProject project = createProject(fullPath.segment(0));
 
 		if (project != null) {
 			// project exists
@@ -74,7 +74,7 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 	}
 
 	private boolean createFolders(final IContainer container, final IPath folderPath) {
-		IFolder folder = container.getFolder(folderPath);
+		final IFolder folder = container.getFolder(folderPath);
 
 		// create parent if needed
 		if (!folder.getParent().exists()) {
@@ -87,7 +87,7 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 			try {
 				folder.create(false, true, null);
 				return true;
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				Logger.error(Activator.PLUGIN_ID, "Could not create folder " + folder, e);
 			}
 		} else
@@ -97,13 +97,13 @@ public class WorkspaceScriptStorage extends ScriptStorage {
 	}
 
 	private IProject createProject(final String name) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
 			try {
 				project.create(null);
 				project.open(null);
 				return project;
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				Logger.error(Activator.PLUGIN_ID, "Could not create project " + project, e);
 			}
 		} else
