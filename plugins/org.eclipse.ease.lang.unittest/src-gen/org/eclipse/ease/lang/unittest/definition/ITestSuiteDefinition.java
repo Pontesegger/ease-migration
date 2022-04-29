@@ -55,7 +55,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Name()
@@ -67,7 +67,7 @@ public interface ITestSuiteDefinition extends EObject {
 	/**
 	 * Sets the value of the '{@link org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition#getName <em>Name</em>}' attribute. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @param value
 	 *            the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
@@ -81,7 +81,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Description</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Description()
@@ -107,7 +107,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Include Filter</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Include Filter</em>' attribute.
 	 * @see #setIncludeFilter(String)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_IncludeFilter()
@@ -133,7 +133,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Exclude Filter</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Exclude Filter</em>' attribute.
 	 * @see #setExcludeFilter(String)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_ExcludeFilter()
@@ -160,7 +160,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Disabled Resources</em>' attribute list isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Disabled Resources</em>' attribute list.
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_DisabledResources()
 	 * @model dataType="org.eclipse.ease.lang.unittest.definition.Path" extendedMetaData="kind='element' name='disabledResource'"
@@ -175,7 +175,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Variables</em>' containment reference list isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Variables</em>' containment reference list.
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Variables()
 	 * @model containment="true" extendedMetaData="kind='element' name='variable' namespace='##targetNamespace'"
@@ -190,7 +190,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Custom Code</em>' containment reference list isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Custom Code</em>' containment reference list.
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_CustomCode()
 	 * @model containment="true"
@@ -205,7 +205,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Flags</em>' map isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Flags</em>' map.
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Flags()
 	 * @model mapType="org.eclipse.ease.lang.unittest.definition.FlagToStringMap&lt;org.eclipse.ease.lang.unittest.definition.Flag,
@@ -220,7 +220,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Version</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Version</em>' attribute.
 	 * @see #setVersion(String)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Version()
@@ -232,7 +232,7 @@ public interface ITestSuiteDefinition extends EObject {
 	/**
 	 * Sets the value of the '{@link org.eclipse.ease.lang.unittest.definition.ITestSuiteDefinition#getVersion <em>Version</em>}' attribute. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @param value
 	 *            the new value of the '<em>Version</em>' attribute.
 	 * @see #getVersion()
@@ -246,7 +246,7 @@ public interface ITestSuiteDefinition extends EObject {
 	 * If the meaning of the '<em>Resource</em>' attribute isn't clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
+	 *
 	 * @return the value of the '<em>Resource</em>' attribute.
 	 * @see #setResource(Object)
 	 * @see org.eclipse.ease.lang.unittest.definition.IDefinitionPackage#getTestSuiteDefinition_Resource()
@@ -268,7 +268,7 @@ public interface ITestSuiteDefinition extends EObject {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @model
 	 * @generated
 	 */
@@ -276,7 +276,7 @@ public interface ITestSuiteDefinition extends EObject {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @model
 	 * @generated
 	 */
@@ -287,4 +287,13 @@ public interface ITestSuiteDefinition extends EObject {
 	 */
 	<T> T getFlag(Flag identifier, T defaultValue);
 
+	/**
+	 * @generated NOT
+	 */
+	void setVariable(String identifier, String content);
+
+	/**
+	 * @generated NOT
+	 */
+	void setFlag(String identifier, String value);
 } // ITestSuiteDefinition
