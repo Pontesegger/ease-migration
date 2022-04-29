@@ -63,16 +63,6 @@
       </command>
       <command
             categoryId="org.eclipse.ease.commands.category.script"
-            defaultHandler="org.eclipse.ease.ui.scripts.handler.ToggleScriptRecording"
-            id="org.eclipse.ease.commands.script.toggleScriptRecording"
-            name="%toggleScriptRec">
-         <state
-               class="org.eclipse.jface.commands.ToggleState"
-               id="STYLE">
-         </state>
-      </command>
-      <command
-            categoryId="org.eclipse.ease.commands.category.script"
             defaultHandler="org.eclipse.ease.ui.scripts.handler.EditScript"
             id="org.eclipse.ease.commands.script.edit"
             name="%editScript">
@@ -126,15 +116,6 @@
                name="additions"
                visible="false">
          </separator>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ease.ui.views.scriptShell?after=additions">
-         <command
-               commandId="org.eclipse.ease.commands.script.toggleScriptRecording"
-               icon="icons/elcl16/start_script_recording.png"
-               label="%toggleScriptRec"
-               style="toggle">
-         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"

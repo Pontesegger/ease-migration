@@ -25,7 +25,7 @@
 		<!-- More than 1 assert allowed in tests -->
 		<exclude name="JUnitTestContainsTooManyAsserts" />
 
-		<!-- JUnit 5 tests should be package private -->
+		<!-- Allow public test classes/methods for JUnit 5 -->
 		<exclude name="JUnit5TestShouldBePackagePrivate" />
 	</rule>
 
@@ -135,6 +135,9 @@
 
 		<!-- ignore locales when converting strings -->
 		<exclude name="UseLocaleWithCaseConversions" />
+
+		<!-- ignore repeated string literals, eg for script code -->
+		<exclude name="AvoidDuplicateLiterals" />
 	</rule>
 
 	<rule ref="category/java/errorprone.xml/EmptyCatchBlock">

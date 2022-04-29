@@ -14,13 +14,11 @@ package org.eclipse.ease;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,54 +39,6 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 	}
 
 	@Override
-	public String createKeywordHeader(Map<String, String> keywords, String existingHeader) {
-		final StringBuilder header = new StringBuilder();
-
-		// copy existing text before keywords
-		if (existingHeader == null)
-			existingHeader = "";
-
-		final String[] existingLines = existingHeader.split("\\r?\\n");
-		int index = 0;
-		for (; index < existingLines.length; index++) {
-			final Matcher matcher = AbstractCodeParser.PARAMETER_PATTERN.matcher(existingLines[index]);
-			if (!matcher.matches())
-				header.append(existingLines[index]).append(LINE_DELIMITER);
-			else
-				break;
-		}
-
-		// add line delimiter before keywords
-		if ((header.length() > 0) && (!keywords.isEmpty()))
-			header.append(LINE_DELIMITER);
-
-		// add keywords
-		for (final Entry<String, String> entry : keywords.entrySet()) {
-			header.append(entry.getKey());
-			header.append(new String(new char[Math.max(16 - entry.getKey().length(), 1)]).replace('\0', ' '));
-
-			header.append(": ");
-			header.append(entry.getValue()).append(LINE_DELIMITER);
-		}
-
-		// copy existing text after keywords
-		boolean isFirstLineAfterKeywords = true;
-		for (; index < existingLines.length; index++) {
-			final Matcher matcher = AbstractCodeParser.PARAMETER_PATTERN.matcher(existingLines[index]);
-			if (!matcher.matches()) {
-				if (isFirstLineAfterKeywords) {
-					header.append(LINE_DELIMITER);
-					isFirstLineAfterKeywords = false;
-				}
-
-				header.append(existingLines[index]).append(LINE_DELIMITER);
-			}
-		}
-
-		return header.toString();
-	}
-
-	@Override
 	public String getDefaultValue(final Parameter parameter) {
 		final String defaultStringValue = parameter.getDefaultValue().replaceAll("\\r", "\\\\r").replaceAll("\\n", "\\\\n");
 
@@ -102,36 +52,50 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 			try {
 				return Integer.toString(Integer.parseInt(defaultStringValue));
 			} catch (final NumberFormatException e1) {
+				throw new IllegalArgumentException(String.format("Cannot convert default value '%s' of parameter '%s' to %s", parameter.getDefaultValue(),
+						parameter.getName(), parameter.getClazz().getSimpleName()), e1);
 			}
 		}
 		if ((Long.class.equals(clazz)) || (long.class.equals(clazz))) {
 			try {
 				return Long.toString(Long.parseLong(defaultStringValue));
 			} catch (final NumberFormatException e1) {
+				throw new IllegalArgumentException(String.format("Cannot convert default value '%s' of parameter '%s' to %s", parameter.getDefaultValue(),
+						parameter.getName(), parameter.getClazz().getSimpleName()), e1);
 			}
 		}
 		if ((Byte.class.equals(clazz)) || (byte.class.equals(clazz))) {
 			try {
 				return Integer.toString(Integer.parseInt(defaultStringValue));
 			} catch (final NumberFormatException e1) {
+				throw new IllegalArgumentException(String.format("Cannot convert default value '%s' of parameter '%s' to %s", parameter.getDefaultValue(),
+						parameter.getName(), parameter.getClazz().getSimpleName()), e1);
 			}
 		}
 		if ((Float.class.equals(clazz)) || (float.class.equals(clazz))) {
 			try {
 				return Float.toString(Float.parseFloat(defaultStringValue));
 			} catch (final NumberFormatException e1) {
+				throw new IllegalArgumentException(String.format("Cannot convert default value '%s' of parameter '%s' to %s", parameter.getDefaultValue(),
+						parameter.getName(), parameter.getClazz().getSimpleName()), e1);
 			}
 		}
 		if ((Double.class.equals(clazz)) || (double.class.equals(clazz))) {
 			try {
 				return Double.toString(Double.parseDouble(defaultStringValue));
 			} catch (final NumberFormatException e1) {
+				throw new IllegalArgumentException(String.format("Cannot convert default value '%s' of parameter '%s' to %s", parameter.getDefaultValue(),
+						parameter.getName(), parameter.getClazz().getSimpleName()), e1);
 			}
 		}
 		if ((Boolean.class.equals(clazz)) || (boolean.class.equals(clazz))) {
 			return Boolean.parseBoolean(defaultStringValue) ? getTrueString() : getFalseString();
 		}
 		if ((Character.class.equals(clazz)) || (char.class.equals(clazz))) {
+			if (defaultStringValue.isEmpty())
+				throw new IllegalArgumentException(
+						String.format("Cannot convert empty default value of parameter '%s' to %s", parameter.getName(), parameter.getClazz().getSimpleName()));
+
 			return "'" + defaultStringValue.charAt(0) + "'";
 		}
 		if (String.class.equals(clazz))
@@ -179,7 +143,7 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 		final WrapToScript wrapAnnotation = method.getAnnotation(WrapToScript.class);
 		if (wrapAnnotation != null) {
 			for (final String name : wrapAnnotation.alias().split(WrapToScript.DELIMITER))
-				if (!name.trim().isEmpty())
+				if (!name.isBlank())
 					methodAliases.add(name.trim());
 		}
 
@@ -213,29 +177,21 @@ public abstract class AbstractCodeFactory implements ICodeFactory {
 
 	@Override
 	public String createFunctionCall(final Method method, final Object... parameters) {
-		final StringBuilder code = new StringBuilder();
+		final String parameterString = Arrays.asList(parameters).stream().map(p -> parameterToString(p)).collect(Collectors.joining(", "));
+		return String.format("%s(%s);", method.getName(), parameterString);
+	}
 
-		code.append(method.getName()).append('(');
-		for (final Object parameter : parameters) {
-			if (parameter instanceof String)
-				code.append('"').append(((String) parameter).replace("\"", "\\\"").replace("\\", "\\\\")).append('"');
-			else if (parameter == null)
-				code.append(getNullString());
-			else if (parameter instanceof Boolean)
-				code.append(((Boolean) parameter) ? getTrueString() : getFalseString());
-			else
-				code.append(parameter.toString());
+	private String parameterToString(Object parameter) {
+		if (parameter instanceof String)
+			return String.format("\"%s\"", ((String) parameter).replace("\"", "\\\"").replace("\\", "\\\\"));
 
-			code.append(", ");
-		}
+		if (parameter == null)
+			return getNullString();
 
-		// remove last comma separator
-		if (parameters.length > 0)
-			code.delete(code.length() - 2, code.length());
+		if (parameter instanceof Boolean)
+			return ((Boolean) parameter) ? getTrueString() : getFalseString();
 
-		code.append(");");
-
-		return code.toString();
+		return parameter.toString();
 	}
 
 	/**

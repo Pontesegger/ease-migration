@@ -2,6 +2,7 @@ package org.eclipse.ease;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,13 +25,13 @@ public class ScriptResultTest {
 	private static final ScriptExecutionException EXCEPTION = new ScriptExecutionException("some error");
 
 	@Test
-	@DisplayName("isDone() == false on new ScriptResult()")
+	@DisplayName("isDone() = false on new ScriptResult()")
 	public void isDone_false_on_new_ScriptResult() {
 		assertFalse(new ScriptResult().isDone());
 	}
 
 	@Test
-	@DisplayName("isDone() == true when result is ready")
+	@DisplayName("isDone() = true when result is ready")
 	public void isDone_true_when_result_is_ready() {
 		final ScriptResult result = new ScriptResult();
 		result.setResult(RESULT);
@@ -39,7 +40,7 @@ public class ScriptResultTest {
 	}
 
 	@Test
-	@DisplayName("isDone() == true when result is null")
+	@DisplayName("isDone() = true when result is null")
 	public void isDone_true_when_result_is_null() {
 		final ScriptResult result = new ScriptResult();
 		result.setResult(null);
@@ -48,7 +49,7 @@ public class ScriptResultTest {
 	}
 
 	@Test
-	@DisplayName("isDone() == true when exception was thrown")
+	@DisplayName("isDone() = true when exception was thrown")
 	public void isDone_true_when_exception_was_thrown() {
 		final ScriptResult result = new ScriptResult();
 		result.setException(EXCEPTION);
@@ -209,5 +210,50 @@ public class ScriptResultTest {
 
 		result.setException(EXCEPTION);
 		assertThrows(IllegalArgumentException.class, () -> result.setException(EXCEPTION));
+	}
+
+	@Test
+	@DisplayName("cancel() = false")
+	public void cancel_returns_false() {
+		assertFalse(new ScriptResult().cancel(false));
+	}
+
+	@Test
+	@DisplayName("isCancelled() = false")
+	public void isCancelled_returns_false() {
+		assertFalse(new ScriptResult().isCancelled());
+	}
+
+	@Test
+	@DisplayName("toString() returns String for execution result")
+	public void toString_returns_String_for_execution_result() throws InterruptedException, ExecutionException {
+		final ScriptResult result = new ScriptResult();
+		result.setResult(RESULT);
+
+		assertNotNull(result.toString());
+	}
+
+	@Test
+	@DisplayName("toString() returns String for 'null' result")
+	public void toString_returns_String_for_null_result() throws InterruptedException, ExecutionException {
+		final ScriptResult result = new ScriptResult();
+		result.setResult(null);
+
+		assertNotNull(result.toString());
+	}
+
+	@Test
+	@DisplayName("toString() returns String for execution exception")
+	public void toString_returns_String_for_execution_exception() throws InterruptedException, ExecutionException {
+		final ScriptResult result = new ScriptResult();
+		result.setException(EXCEPTION);
+
+		assertNotNull(result.toString());
+	}
+
+	@Test
+	@DisplayName("VOID.toString() returns String")
+	public void void_toString_returns_String() throws InterruptedException, ExecutionException {
+		assertNotNull(ScriptResult.VOID.toString());
 	}
 }

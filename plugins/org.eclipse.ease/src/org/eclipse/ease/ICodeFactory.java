@@ -13,7 +13,6 @@
 package org.eclipse.ease;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ease.modules.IEnvironment;
@@ -128,17 +127,6 @@ public interface ICodeFactory {
 	String createCommentedString(String comment, boolean blockComment);
 
 	/**
-	 * Create a comment header for given keywords. Arbitrary content will be delimited by an empty line
-	 *
-	 * @param keywords
-	 *            key:value pairs to be stored
-	 * @param existingHeader
-	 *            current header to copy plain text from
-	 * @return String representation of header
-	 */
-	String createKeywordHeader(Map<String, String> keywords, String existingHeader);
-
-	/**
 	 * Create script wrapper code for a given java instance.
 	 *
 	 * @param environment
@@ -151,6 +139,7 @@ public interface ICodeFactory {
 	 *            whether to store methods to the global namespace or to create a custom object
 	 * @param engine
 	 *            script engine
+	 * @return create wrapped script code
 	 */
 	String createWrapper(IEnvironment environment, Object instance, String identifier, boolean customNamespace, IScriptEngine engine);
 }
