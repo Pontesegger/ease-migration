@@ -10,6 +10,7 @@
         </Or>
     </Match>
 
+
     <!-- Ignore spotbugs reports from incomplete detectors -->
     <Match>
         <Bug pattern="TESTING"/>
@@ -28,5 +29,10 @@
     <!-- Allow toUpperCase()/toLowerCase() without locale setting -->
     <Match>
         <Bug pattern="DM_CONVERT_CASE"/>
+    </Match>
+
+    <!-- Instanceof checks in tests are fine -->
+    <Match>
+        <Bug pattern="BC_VACUOUS_INSTANCEOF"/>
     </Match>
 </FindBugsFilter>

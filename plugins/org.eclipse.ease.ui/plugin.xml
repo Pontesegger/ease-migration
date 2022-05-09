@@ -579,4 +579,13 @@
             sequence="M1+E">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.eclipse.ease.ui.views.scriptShell">
+         <propertyCategory
+               category="modules">
+         </propertyCategory>
+      </propertyContributor>
+   </extension>
 </plugin>

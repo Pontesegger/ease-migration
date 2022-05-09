@@ -77,12 +77,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.osgi.service.prefs.Preferences;
 
 /**
  * The JavaScript shell allows to interactively execute JavaScript code.
  */
-public class ScriptShell extends ViewPart implements IPropertyChangeListener, IScriptEngineProvider, IExecutionListener {
+public class ScriptShell extends ViewPart implements IPropertyChangeListener, IScriptEngineProvider, IExecutionListener, ITabbedPropertySheetPageContributor {
 
 	public static final String VIEW_ID = "org.eclipse.ease.ui.views.scriptShell";
 
@@ -532,5 +535,18 @@ public class ScriptShell extends ViewPart implements IPropertyChangeListener, IS
 			fCompletionDispatcher = new CodeCompletionAggregator(fScriptEngine);
 			addAutoCompletion();
 		}
+	}
+
+	@Override
+	public String getContributorId() {
+		return VIEW_ID;
+	}
+
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
+		if (adapter == IPropertySheetPage.class)
+			return adapter.cast(new TabbedPropertySheetPage(this));
+
+		return super.getAdapter(adapter);
 	}
 }
