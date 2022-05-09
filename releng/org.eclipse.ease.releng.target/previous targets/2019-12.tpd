@@ -45,6 +45,6 @@ location "http://eclipse.py4j.org/" py4j-eclipse {
 	org.py4j.feature.feature.group lazy
 }
 
-location "http://www.pydev.org/updates" pydev {
+location "https://pydev-9-3-0.surge.sh" pydev {
 	org.python.pydev.feature.feature.group lazy
 }
