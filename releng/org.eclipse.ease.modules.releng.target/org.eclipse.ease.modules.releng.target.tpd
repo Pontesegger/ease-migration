@@ -1,8 +1,8 @@
-target "2021-06" with source requirements
+target "2021-12" with source requirements
 
 environment JavaSE-11
 
-location "https://download.eclipse.org/releases/2021-09/" eclipse-2021-09 {
+location "https://download.eclipse.org/releases/2021-12/" eclipse-2021-12 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -31,7 +31,7 @@ location "https://download.eclipse.org/releases/2021-09/" eclipse-2021-09 {
 	org.eclipse.osgi
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20210825222808/repository" eclipse-orbit-2021-09 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20211122181901/repository" eclipse-orbit-2021-12 {
 // for java unit test of modules
 	org.mockito [2.13.0,3.0.0)
 	com.google.guava [27.1.0,28.0.0)

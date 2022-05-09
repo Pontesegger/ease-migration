@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2021-06" sequenceNumber="1637707059">
+<target name="2021-12" sequenceNumber="1652105416">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.21.0.v20210906-0842"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.21.0.v20210906-0842"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.900.v20210906-0500"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.22.0.v20211124-1800"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.22.0.v20211124-1800"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.1000.v20211124-1800"/>
       <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.1000.v20210813-0655"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.27.0.v20210816-1137"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.28.0.v20211110-0654"/>
       <unit id="org.eclipse.uml2.uml" version="5.5.0.v20210228-1829"/>
       <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.9.0.202106221344"/>
-      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.16.0.v20210907-2013"/>
-      <unit id="org.eclipse.ocl.examples.feature.group" version="6.16.0.v20210907-2013"/>
-      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.23.0.v202107272335"/>
-      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.23.0.v202107101937"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.900.v20210906-0500"/>
-      <unit id="org.eclipse.jdt" version="3.18.900.v20210906-0500"/>
-      <unit id="org.eclipse.egit.feature.group" version="5.13.0.202109080827-r"/>
-      <unit id="org.eclipse.jgit.feature.group" version="5.13.0.202109080827-r"/>
-      <unit id="org.eclipse.osgi" version="3.17.0.v20210823-1805"/>
-      <repository id="eclipse-2021-09" location="https://download.eclipse.org/releases/2021-09/"/>
+      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.17.0.v20211130-1448"/>
+      <unit id="org.eclipse.ocl.examples.feature.group" version="6.17.0.v20211130-1448"/>
+      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.24.0.v202110010323"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.24.0.v202111190506"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.1000.v20211124-1800"/>
+      <unit id="org.eclipse.jdt" version="3.18.1000.v20211124-1800"/>
+      <unit id="org.eclipse.egit.feature.group" version="6.0.0.202111291000-r"/>
+      <unit id="org.eclipse.jgit.feature.group" version="6.0.0.202111291000-r"/>
+      <unit id="org.eclipse.osgi" version="3.17.100.v20211104-1730"/>
+      <repository id="eclipse-2021-12" location="https://download.eclipse.org/releases/2021-12/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="2.23.0.v20200310-1642"/>
       <unit id="com.google.guava" version="27.1.0.v20190517-1946"/>
-      <repository id="eclipse-orbit-2021-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20210825222808/repository"/>
+      <repository id="eclipse-orbit-2021-12" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20211122181901/repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.papyrus.sdk.feature.feature.group" version="0.0.0"/>
