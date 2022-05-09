@@ -1,8 +1,8 @@
-target "2022-03" with source requirements
+target "2021-12" with source requirements
 
 environment JavaSE-11
 
-location "https://download.eclipse.org/releases/2022-03/" eclipse-2022-03 {
+location "https://download.eclipse.org/releases/2021-12/" eclipse-2021-12 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -19,7 +19,7 @@ location "https://download.eclipse.org/releases/2022-03/" eclipse-2022-03 {
 	org.eclipse.jdt
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository" eclipse-orbit-2022-03 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20211122181901/repository" eclipse-orbit-2021-12 {
 	// needed for unit tests
 	org.mockito [2.13.0,3.0.0)
 	org.mozilla.javascript [1.7.10,1.8.0)
