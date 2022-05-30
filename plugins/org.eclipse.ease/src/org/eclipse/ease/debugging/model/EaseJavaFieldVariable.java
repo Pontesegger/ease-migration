@@ -91,8 +91,7 @@ public class EaseJavaFieldVariable extends EaseDebugVariable {
 	private final Object fBackingJavaObject;
 	private final Field fField;
 
-	public EaseJavaFieldVariable(final Field field, Object backingJavaObject, final IDebugElement parent)
-			throws IllegalArgumentException, IllegalAccessException {
+	public EaseJavaFieldVariable(final Field field, Object backingJavaObject, final IDebugElement parent) throws IllegalAccessException {
 		super(field.getName(), field.get(backingJavaObject), parent, null);
 
 		fField = field;

@@ -125,7 +125,7 @@ public class EaseDebugValue implements IValue {
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (String.class.equals(adapter))
-			return (T) ((fValue != null) ? fValue.toString() : "");
+			adapter.cast((fValue != null) ? fValue.toString() : "");
 
 		return null;
 	}
@@ -185,14 +185,13 @@ public class EaseDebugValue implements IValue {
 				fields = fields.stream().filter(field -> !Modifier.isStatic(field.getModifiers())).collect(Collectors.toSet());
 
 				for (final Field field : fields) {
-					try {
-						field.setAccessible(true);
-						final EaseDebugVariable variable = new EaseJavaFieldVariable(field, getValue(), fParent);
-						fVariables.add(variable);
-					} catch (final IllegalArgumentException e) {
-						// ignore
-					} catch (final IllegalAccessException e) {
-						// ignore
+					if (field.trySetAccessible()) {
+						try {
+							final EaseDebugVariable variable = new EaseJavaFieldVariable(field, getValue(), fParent);
+							fVariables.add(variable);
+						} catch (final IllegalAccessException e) {
+							// not expected to be thrown as field is accessible
+						}
 					}
 				}
 			}
@@ -200,7 +199,7 @@ public class EaseDebugValue implements IValue {
 			sortVariables();
 		}
 
-		return fVariables.toArray(new EaseDebugVariable[fVariables.size()]);
+		return fVariables.toArray(new EaseDebugVariable[0]);
 	}
 
 	@Override
