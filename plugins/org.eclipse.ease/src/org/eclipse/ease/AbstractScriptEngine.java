@@ -499,8 +499,13 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	}
 
 	protected void notifyExecutionListeners(final Script script, final int status) {
-		for (final Object listener : fExecutionListeners.getListeners())
-			((IExecutionListener) listener).notify(this, script, status);
+		for (final Object listener : fExecutionListeners.getListeners()) {
+			try {
+				((IExecutionListener) listener).notify(this, script, status);
+			} catch (final Throwable e) {
+				Logger.warning(Activator.PLUGIN_ID, "Execution listener did throw an exception", e);
+			}
+		}
 	}
 
 	public ScriptStackTrace getStackTrace() {
@@ -587,21 +592,36 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 	/**
 	 * Internal version of {@link #getVariable(String)}. Only called after script engine was initialized successfully.
+	 *
+	 * @param name
+	 *            variable to retrieve
+	 * @return variable content
 	 */
 	protected abstract Object internalGetVariable(String name);
 
 	/**
 	 * Internal version of {@link #getVariables()}. Only called after script engine was initialized successfully.
+	 *
+	 * @return map of engine variables: name -> value
 	 */
 	protected abstract Map<String, Object> internalGetVariables();
 
 	/**
 	 * Internal version of {@link #hasVariable(String)}. Only called after script engine was initialized successfully.
+	 *
+	 * @param name
+	 *            variable to verify
+	 * @return <code>true</code> when variable exists
 	 */
 	protected abstract boolean internalHasVariable(String name);
 
 	/**
 	 * Internal version of {@link #setVariable(String, Object)}. Only called after script engine was initialized successfully.
+	 *
+	 * @param name
+	 *            variable to set
+	 * @param content
+	 *            value to set variable to
 	 */
 	protected abstract void internalSetVariable(String name, Object content);
 

@@ -37,6 +37,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
@@ -677,6 +679,20 @@ public class AbstractScriptEngineTest {
 		final ScriptResult result = scriptResult;
 		assertTrue(result.isDone(), "result " + scriptResult.hashCode() + " is not ready");
 		assertThrows(ScriptExecutionException.class, () -> result.get());
+	}
+
+	@Test
+	@DisplayName("engine notification handles exceptions gracefully")
+	public void engine_notification_handles_exceptions_gracefully() throws ExecutionException, InterruptedException, TimeoutException {
+		fTestEngine.addExecutionListener((engine, script, status) -> {
+			throw new IllegalArgumentException("not expected");
+		});
+
+		final ScriptResult result = fTestEngine.execute("foo");
+
+		fTestEngine.schedule();
+
+		assertEquals("foo", result.get(10, TimeUnit.SECONDS));
 	}
 
 	public static class MockedScriptEngine extends AbstractScriptEngine {
