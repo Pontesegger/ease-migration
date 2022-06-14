@@ -45,18 +45,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.ease.modules</groupId>
-			<artifactId>org.eclipse.ease.modules.modeling</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.ease.modules</groupId>
-			<artifactId>org.eclipse.ease.modules.modeling.ui</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.ease.modules</groupId>
 			<artifactId>org.eclipse.ease.modules.help</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<scope>compile</scope>
