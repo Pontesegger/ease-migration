@@ -35,7 +35,7 @@ public class ModuleHelpTest {
 	@BeforeEach
 	public void setUp() throws Exception {
 		fSampleModule = new org.eclipse.ease.ui.help.hovers.SampleModule();
-		fSampleModuleDefinition = ModuleDefinition.getDefinition(fSampleModule);
+		fSampleModuleDefinition = ModuleDefinition.forInstance(fSampleModule);
 
 		fSampleMethod = fSampleModule.getClass().getMethod("sum", double.class, double.class);
 		fSampleField = fSampleModule.getClass().getField("PI");

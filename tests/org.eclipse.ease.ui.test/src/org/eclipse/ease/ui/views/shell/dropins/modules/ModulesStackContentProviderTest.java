@@ -25,6 +25,7 @@ import java.util.Map;
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.modules.EnvironmentModule;
 import org.eclipse.ease.modules.IEnvironment;
+import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.ease.ui.views.shell.dropins.variables.VariablesContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -46,7 +47,7 @@ public class ModulesStackContentProviderTest {
 		final IStructuredContentProvider contentProvider = new ModulesStackContentProvider();
 
 		assertEquals(1, contentProvider.getElements(engine).length);
-		assertTrue(contentProvider.getElements(engine)[0] instanceof EnvironmentModule);
+		assertTrue(contentProvider.getElements(engine)[0] instanceof ModuleDefinition);
 	}
 
 	@Test

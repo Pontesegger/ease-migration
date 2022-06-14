@@ -16,6 +16,7 @@ package org.eclipse.ease.ui.views.shell.dropins.modules;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.ease.modules.EnvironmentModule;
+import org.eclipse.ease.modules.ModuleDefinition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ public class ModulesStackLabelProviderTest {
 	@Test
 	@DisplayName("getText(module) returns definition name")
 	public void getText_returns_definition_name() {
-		assertEquals("Environment", new ModulesStackLabelProvider().getText(new EnvironmentModule()));
+		assertEquals("Environment", new ModulesStackLabelProvider().getText(ModuleDefinition.forInstance(new EnvironmentModule())));
 	}
 
 	@Test

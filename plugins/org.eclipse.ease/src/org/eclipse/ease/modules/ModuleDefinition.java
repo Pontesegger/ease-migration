@@ -38,33 +38,6 @@ import org.osgi.service.prefs.Preferences;
 
 public class ModuleDefinition {
 
-	public static ModuleDefinition forInstance(Object element) {
-		final List<ModuleDefinition> modules = new ArrayList<>(ScriptService.getInstance().getAvailableModules());
-
-		return modules.stream().filter(d -> Objects.equals(d.getModuleClass(), element.getClass())).findAny().orElse(null);
-	}
-
-	public static class ModuleDependency {
-
-		/** Module dependency parameter name. */
-		private static final String CONFIG_DEPENDENCY_ID = "module";
-
-		private final IConfigurationElement fElement;
-
-		public ModuleDependency(IConfigurationElement element) {
-			fElement = element;
-		}
-
-		public String getId() {
-			return fElement.getAttribute(CONFIG_DEPENDENCY_ID);
-		}
-
-		public ModuleDefinition getDefinition() {
-			final IScriptService scriptService = ScriptService.getInstance();
-			return scriptService.getModuleDefinition(getId());
-		}
-	}
-
 	/** Module name parameter. */
 	private static final String NAME = "name";
 
@@ -86,21 +59,10 @@ public class ModuleDefinition {
 	/** Module icon parameter name. */
 	private static final String ICON = "icon";
 
-	/**
-	 * Retrieve the module definition for a given module instance.
-	 *
-	 * @param module
-	 *            module instance to look up
-	 * @return module definition or <code>null</code>
-	 */
-	public static ModuleDefinition getDefinition(final Object module) {
-		final IScriptService scriptService = ScriptService.getService();
-		for (final ModuleDefinition definition : scriptService.getAvailableModules()) {
-			if (definition.getModuleClass().equals(module.getClass()))
-				return definition;
-		}
+	public static ModuleDefinition forInstance(Object element) {
+		final List<ModuleDefinition> modules = new ArrayList<>(ScriptService.getInstance().getAvailableModules());
 
-		return null;
+		return modules.stream().filter(d -> Objects.equals(d.getModuleClass(), element.getClass())).findAny().orElse(null);
 	}
 
 	/** Main configuration element for module. */
@@ -298,5 +260,26 @@ public class ModuleDefinition {
 		} else if (!getId().equals(other.getId()))
 			return false;
 		return true;
+	}
+
+	public static class ModuleDependency {
+
+		/** Module dependency parameter name. */
+		private static final String CONFIG_DEPENDENCY_ID = "module";
+
+		private final IConfigurationElement fElement;
+
+		public ModuleDependency(IConfigurationElement element) {
+			fElement = element;
+		}
+
+		public String getId() {
+			return fElement.getAttribute(CONFIG_DEPENDENCY_ID);
+		}
+
+		public ModuleDefinition getDefinition() {
+			final IScriptService scriptService = ScriptService.getInstance();
+			return scriptService.getModuleDefinition(getId());
+		}
 	}
 }

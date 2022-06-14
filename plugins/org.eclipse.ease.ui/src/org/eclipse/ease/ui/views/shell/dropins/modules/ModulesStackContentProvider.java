@@ -13,8 +13,11 @@
 
 package org.eclipse.ease.ui.views.shell.dropins.modules;
 
+import java.util.stream.Collectors;
+
 import org.eclipse.ease.IScriptEngine;
 import org.eclipse.ease.modules.IEnvironment;
+import org.eclipse.ease.modules.ModuleDefinition;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 
 public class ModulesStackContentProvider implements IStructuredContentProvider {
@@ -24,7 +27,8 @@ public class ModulesStackContentProvider implements IStructuredContentProvider {
 		if (inputElement instanceof IScriptEngine) {
 			final IEnvironment environment = IEnvironment.getEnvironment((IScriptEngine) inputElement);
 			if (environment != null)
-				return environment.getModules().toArray();
+				return environment.getModules().stream().map(m -> ModuleDefinition.forInstance(m)).filter(m -> m != null).collect(Collectors.toList())
+						.toArray();
 		}
 
 		return new Object[0];

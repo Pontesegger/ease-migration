@@ -23,18 +23,16 @@ public class ModulesStackLabelProvider extends ColumnLabelProvider {
 
 	@Override
 	public String getText(final Object element) {
-		final ModuleDefinition moduleDefinition = ModuleDefinition.forInstance(element);
-		if (moduleDefinition != null)
-			return moduleDefinition.getName();
+		if (element instanceof ModuleDefinition)
+			return ((ModuleDefinition) element).getName();
 
 		return element.getClass().getCanonicalName();
 	}
 
 	@Override
 	public Image getImage(final Object element) {
-		final ModuleDefinition moduleDefinition = ModuleDefinition.forInstance(element);
-		if (moduleDefinition != null) {
-			final ImageDescriptor icon = moduleDefinition.getImageDescriptor();
+		if (element instanceof ModuleDefinition) {
+			final ImageDescriptor icon = ((ModuleDefinition) element).getImageDescriptor();
 			if (icon != null)
 				return icon.createImage();
 

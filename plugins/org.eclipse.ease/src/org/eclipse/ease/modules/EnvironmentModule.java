@@ -477,7 +477,7 @@ public class EnvironmentModule extends AbstractScriptModule implements IEnvironm
 		if (PlatformUI.isWorkbenchRunning()) {
 			if (topic != null) {
 				for (final Object module : getModules()) {
-					final ModuleDefinition definition = ModuleDefinition.getDefinition(module);
+					final ModuleDefinition definition = ModuleDefinition.forInstance(module);
 					if (definition != null) {
 						// look for matching method
 						for (final Method method : definition.getMethods()) {
