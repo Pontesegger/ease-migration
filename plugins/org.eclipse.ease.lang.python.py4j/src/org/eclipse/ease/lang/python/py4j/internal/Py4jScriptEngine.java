@@ -369,10 +369,7 @@ public class Py4jScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	public String toString(Object object) {
-		if (object == null)
-			return "None";
-
-		if (ScriptResult.VOID.equals(object))
+		if ((object == null) || (ScriptResult.VOID.equals(object)))
 			return null;
 
 		return super.toString(object);

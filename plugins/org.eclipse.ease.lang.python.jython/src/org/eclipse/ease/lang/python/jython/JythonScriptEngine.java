@@ -17,10 +17,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -31,6 +30,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ease.AbstractReplScriptEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineException;
+import org.eclipse.ease.ScriptResult;
 import org.eclipse.ease.lang.python.PythonHelper;
 import org.eclipse.ease.lang.python.preferences.IPreferenceConstants;
 import org.eclipse.ease.tools.RunnableWithResult;
@@ -59,9 +59,9 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 	public static final String ENGINE_ID = "org.eclipse.ease.python.jython";
 
-	protected InteractiveInterpreter mEngine;
+	protected InteractiveInterpreter fEngine;
 
-	private PyObject mResult;
+	private PyObject fResult;
 
 	private class DisplayHook extends PyObject {
 
@@ -69,7 +69,7 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 		@Override
 		public PyObject __call__(final PyObject arg0) {
-			mResult = arg0;
+			fResult = arg0;
 			return Py.None;
 		}
 	}
@@ -105,7 +105,7 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	protected void setupEngine() throws ScriptEngineException {
-		mEngine = new InteractiveInterpreter();
+		fEngine = new InteractiveInterpreter();
 
 		// register display callback method to extract execution result
 		final DisplayHook displayHook = new DisplayHook();
@@ -162,11 +162,12 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	protected Object internalExecute(final Script script, final String fileName) throws Exception {
-		mResult = Py.None;
+		fResult = Py.None;
 
 		final PyObject code = Py.compile_command_flags(script.getCode(), "(none)", CompileMode.exec, new CompilerFlags(), true);
 		if (code == Py.None)
-			throw new RuntimeException("Could not compile code");
+			throw new IllegalArgumentException("Could not compile code");
+
 		final Object file = script.getFile();
 		File f = null;
 		if (file instanceof IFile) {
@@ -187,7 +188,7 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 		if (newString != null) {
 			Py.getSystemState().path.remove(newString);
 		}
-		return toJava(mResult);
+		return toJava(fResult);
 	}
 
 	private static Object toJava(final PyObject result) {
@@ -243,24 +244,19 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 	}
 
 	protected Collection<String> getPythonLibraries() {
-		final List<String> result = new ArrayList<>();
 		final IPreferenceStore preferences = Activator.getDefault().getPreferenceStore();
 		final String libraries = preferences.getString(IPreferenceConstants.PYTHON_LIBRARIES);
-		final String[] libs = libraries.split(";");
-		for (final String lib : libs) {
-			result.add(lib);
-		}
-		return result;
+		return Arrays.asList(libraries.split(";"));
 	}
 
 	@Override
 	public void registerJar(final URL url) {
 		// FIXME implement jar classloader
-		throw new RuntimeException("Registering JARs is not supported for python");
+		throw new UnsupportedOperationException("Registering JARs is not supported for python");
 	}
 
 	protected InteractiveInterpreter getEngine() {
-		return mEngine;
+		return fEngine;
 	}
 
 	@Override
@@ -300,5 +296,13 @@ public class JythonScriptEngine extends AbstractReplScriptEngine {
 
 		getEngine().set(name, content);
 		getEngine().getSystemState().builtins.__setitem__(name, Py.java2py(content));
+	}
+
+	@Override
+	public String toString(Object object) {
+		if ((object == null) || (ScriptResult.VOID.equals(object)))
+			return null;
+
+		return super.toString(object);
 	}
 }

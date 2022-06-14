@@ -13,6 +13,8 @@
 
 package org.eclipse.ease.lang.python.py4j;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -56,10 +58,21 @@ public class Py4jScriptEngineTest {
 	}
 
 	@Test
-	@DisplayName("xxPYTHONPATH contains project root folder")
-	public void PYTHONPfATH_contains_project_root_folder() throws ExecutionException, CoreException, URISyntaxException, IOException {
-		final IProject project = WorkspaceTestHelper.importProject("org.eclipse.ease.lang.python.py4j.test", "resources/genericproject");
-		pathTest(Pattern.compile(".*resources.testproject"), project.getFile("hello.py"));
+	@DisplayName("toString(VOID) is null")
+	public void toString_of_VOID_is_null() throws ExecutionException, CoreException, URISyntaxException, IOException {
+		assertNull(new Py4jScriptEngine().toString(ScriptResult.VOID));
+	}
+
+	@Test
+	@DisplayName("toString(null) is null")
+	public void toString_of_null_is_null() throws ExecutionException, CoreException, URISyntaxException, IOException {
+		assertNull(new Py4jScriptEngine().toString(null));
+	}
+
+	@Test
+	@DisplayName("toString(Object) is not empty")
+	public void toString_of_Object_is_not_empty() throws ExecutionException, CoreException, URISyntaxException, IOException {
+		assertEquals("foo", new Py4jScriptEngine().toString("foo"));
 	}
 
 	private void pathTest(Pattern pathPattern) throws ExecutionException {
