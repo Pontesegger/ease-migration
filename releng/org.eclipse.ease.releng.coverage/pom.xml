@@ -180,6 +180,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.ease</groupId>
+			<artifactId>org.eclipse.ease.classloader.test</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.ease</groupId>
 			<artifactId>org.eclipse.ease.lang.javascript.rhino.test</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 			<scope>test</scope>

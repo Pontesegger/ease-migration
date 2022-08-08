@@ -15,6 +15,7 @@ package org.eclipse.ease.classloader;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class EaseClassLoader extends ClassLoader {
 			fRegisteredJars.put(engine, URLClassLoader.newInstance(new URL[] { url }, this));
 
 		else {
-			final List<URL> urlList = Arrays.asList(fRegisteredJars.get(engine).getURLs());
+			final List<URL> urlList = new ArrayList<>(Arrays.asList(fRegisteredJars.get(engine).getURLs()));
 			if (!urlList.contains(url)) {
 				urlList.add(url);
 				fRegisteredJars.put(engine, URLClassLoader.newInstance(urlList.toArray(new URL[0]), this));
