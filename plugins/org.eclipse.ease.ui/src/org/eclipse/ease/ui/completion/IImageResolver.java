@@ -15,6 +15,7 @@ package org.eclipse.ease.ui.completion;
 
 import org.eclipse.swt.graphics.Image;
 
+@FunctionalInterface
 public interface IImageResolver {
 
 	/**
