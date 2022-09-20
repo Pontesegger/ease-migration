@@ -1,8 +1,8 @@
-target "2022-03" with source requirements
+target "2022-09" with source requirements
 
 environment JavaSE-11
 
-location "https://download.eclipse.org/releases/2022-03/" eclipse-2022-03 {
+location "https://download.eclipse.org/releases/2022-09/" eclipse-2022-09 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -10,12 +10,6 @@ location "https://download.eclipse.org/releases/2022-03/" eclipse-2022-03 {
 
 	// for modeling stuff
 	org.eclipse.emf.feature.group
-
-	// modeling modules
-	org.eclipse.uml2.uml
-	org.eclipse.gmf.runtime.diagram.ui
-	org.eclipse.ocl.examples.classic.feature.group
-	org.eclipse.ocl.examples.feature.group
 
 	// unit test modules
 	org.eclipse.wst.xml_core.feature.feature.group
@@ -31,20 +25,15 @@ location "https://download.eclipse.org/releases/2022-03/" eclipse-2022-03 {
 	org.eclipse.osgi
 }
 
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository" eclipse-orbit-2022-03 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository" eclipse-orbit-2022-09 {
 // for java unit test of modules
 	org.mockito [2.13.0,3.0.0)
 	com.google.guava [27.1.0,28.0.0)
+
+	org.junit.jupiter.api [5.5.0,6.0.0)
+	org.junit.jupiter.params [5.5.0,6.0.0)
 }
 
-location "https://download.eclipse.org/modeling/mdt/papyrus/updates/releases/2022-03" papyrus-2022-03 {
-	org.eclipse.papyrus.sdk.feature.feature.group lazy
-}
-
-location "https://download.eclipse.org/xwt/milestones-1.7.0/1.7.0-S/" xwt {
-	//xwt is needed by Papyrus
-	org.eclipse.xwt.feature.feature.group lazy
-}
 location "http://download.eclipse.org/technology/subversive/4.0/update-site/" {
 // svn module
 	org.eclipse.team.svn.feature.group

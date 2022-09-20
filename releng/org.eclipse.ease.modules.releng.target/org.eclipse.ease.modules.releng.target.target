@@ -1,39 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2022-03" sequenceNumber="1652119577">
+<target name="2022-09" sequenceNumber="1664889375">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.23.0.v20220308-0722"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.23.0.v20220308-0722"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.1100.v20220308-0310"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.25.0.v20220831-1800"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.25.0.v20220831-1800"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.1300.v20220831-1800"/>
       <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.1100.v20220210-1157"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.29.0.v20220226-1304"/>
-      <unit id="org.eclipse.uml2.uml" version="5.5.0.v20210228-1829"/>
-      <unit id="org.eclipse.gmf.runtime.diagram.ui" version="1.9.0.202202190902"/>
-      <unit id="org.eclipse.ocl.examples.classic.feature.group" version="5.17.1.v20220309-0840"/>
-      <unit id="org.eclipse.ocl.examples.feature.group" version="6.17.1.v20220309-0840"/>
-      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.25.0.v202201311924"/>
-      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.25.0.v202201160258"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.1100.v20220308-0310"/>
-      <unit id="org.eclipse.jdt" version="3.18.1100.v20220308-0310"/>
-      <unit id="org.eclipse.egit.feature.group" version="6.1.0.202203080745-r"/>
-      <unit id="org.eclipse.jgit.feature.group" version="6.1.0.202203080745-r"/>
-      <unit id="org.eclipse.osgi" version="3.17.200.v20220215-2237"/>
-      <repository id="eclipse-2022-03" location="https://download.eclipse.org/releases/2022-03/"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.31.0.v20220817-1401"/>
+      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.27.0.v202207150226"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.27.0.v202208280234"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.1300.v20220831-1800"/>
+      <unit id="org.eclipse.jdt" version="3.18.1300.v20220831-1800"/>
+      <unit id="org.eclipse.egit.feature.group" version="6.3.0.202209071007-r"/>
+      <unit id="org.eclipse.jgit.feature.group" version="6.3.0.202209071007-r"/>
+      <unit id="org.eclipse.osgi" version="3.18.100.v20220817-1601"/>
+      <repository id="eclipse-2022-09" location="https://download.eclipse.org/releases/2022-09/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="2.23.0.v20200310-1642"/>
       <unit id="com.google.guava" version="27.1.0.v20190517-1946"/>
-      <repository id="eclipse-orbit-2022-03" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
-    </location>
-    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.papyrus.sdk.feature.feature.group" version="0.0.0"/>
-      <repository id="papyrus-2022-03" location="https://download.eclipse.org/modeling/mdt/papyrus/updates/releases/2022-03"/>
-    </location>
-    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.xwt.feature.feature.group" version="0.0.0"/>
-      <repository id="xwt" location="https://download.eclipse.org/xwt/milestones-1.7.0/1.7.0-S/"/>
+      <unit id="org.junit.jupiter.api" version="5.8.2.v20220624-2009"/>
+      <unit id="org.junit.jupiter.params" version="5.8.2.v20220624-2009"/>
+      <repository id="eclipse-orbit-2022-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.team.svn.feature.group" version="4.0.5.I20170425-1700"/>
