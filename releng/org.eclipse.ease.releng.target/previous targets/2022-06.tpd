@@ -1,8 +1,8 @@
-target "2022-09" with source requirements
+target "2022-06" with source requirements
 
 environment JavaSE-11
 
-location "https://download.eclipse.org/releases/2022-09/" eclipse-2022-09 {
+location "https://download.eclipse.org/releases/2022-06/" eclipse-2022-06 {
 	org.eclipse.platform.feature.group
 	org.eclipse.rcp.feature.group
 	org.eclipse.jdt.feature.group
@@ -17,17 +17,12 @@ location "https://download.eclipse.org/releases/2022-09/" eclipse-2022-09 {
 	// java module
 	org.eclipse.pde.feature.group
 	org.eclipse.jdt
-	
 }
 
-
-location "https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository" eclipse-orbit-2022-09 {
+location "https://download.eclipse.org/tools/orbit/downloads/drops/R20220531185310/repository" eclipse-orbit-2022-06 {
 	// needed for unit tests
 	org.mockito [2.13.0,3.0.0)
 	org.mozilla.javascript [1.7.10,1.8.0)
-	
-	org.junit.jupiter.api [5.5.0,6.0.0)
-	org.junit.jupiter.params [5.5.0,6.0.0)
 }
 
 location "https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest" ease-engines {

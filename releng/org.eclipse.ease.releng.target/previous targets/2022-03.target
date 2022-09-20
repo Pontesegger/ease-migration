@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2022-09" sequenceNumber="1664880847">
+<target name="2022-03" sequenceNumber="1652108283">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.platform.feature.group" version="4.25.0.v20220831-1800"/>
-      <unit id="org.eclipse.rcp.feature.group" version="4.25.0.v20220831-1800"/>
-      <unit id="org.eclipse.jdt.feature.group" version="3.18.1300.v20220831-1800"/>
+      <unit id="org.eclipse.platform.feature.group" version="4.23.0.v20220308-0722"/>
+      <unit id="org.eclipse.rcp.feature.group" version="4.23.0.v20220308-0722"/>
+      <unit id="org.eclipse.jdt.feature.group" version="3.18.1100.v20220308-0310"/>
       <unit id="org.eclipse.equinox.p2.discovery.feature.feature.group" version="1.2.1100.v20220210-1157"/>
-      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.4.200.v202204112136"/>
-      <unit id="org.eclipse.emf.feature.group" version="2.31.0.v20220817-1401"/>
-      <unit id="org.eclipse.pde.feature.group" version="3.14.1300.v20220831-1800"/>
-      <unit id="org.eclipse.jdt" version="3.18.1300.v20220831-1800"/>
-      <repository id="eclipse-2022-09" location="https://download.eclipse.org/releases/2022-09/"/>
+      <unit id="org.eclipse.wst.jsdt.feature.feature.group" version="2.4.0.v202201270041"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.29.0.v20220226-1304"/>
+      <unit id="org.eclipse.pde.feature.group" version="3.14.1100.v20220308-0310"/>
+      <unit id="org.eclipse.jdt" version="3.18.1100.v20220308-0310"/>
+      <repository id="eclipse-2022-03" location="https://download.eclipse.org/releases/2022-03/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito" version="2.23.0.v20200310-1642"/>
       <unit id="org.mozilla.javascript" version="1.7.10.v20190430-1943"/>
-      <unit id="org.junit.jupiter.api" version="5.8.2.v20220624-2009"/>
-      <unit id="org.junit.jupiter.params" version="5.8.2.v20220624-2009"/>
-      <repository id="eclipse-orbit-2022-09" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository"/>
+      <repository id="eclipse-orbit-2022-03" location="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.ease.engine.jython.feature.feature.group" version="0.0.0"/>
