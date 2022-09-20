@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature id="org.eclipse.ease.modules.feature" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.feature" version="0.10.0.qualifier">
       <category name="Modules"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.team.svn.feature" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.team.svn.feature" version="0.10.0.qualifier">
       <category name="Modules"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.team.git.feature" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.team.git.feature" version="0.10.0.qualifier">
       <category name="Modules"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.charting.feature" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.charting.feature" version="0.10.0.qualifier">
       <category name="Modules"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.feature.source" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.team.svn.feature.source" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.team.svn.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.team.git.feature.source" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.team.git.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
-   <feature id="org.eclipse.ease.modules.charting.feature.source" version="0.9.0.qualifier">
+   <feature id="org.eclipse.ease.modules.charting.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
    <category-def name="Modules" label="EASE Modules">
