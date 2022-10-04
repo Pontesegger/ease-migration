@@ -321,6 +321,58 @@
           <repository
               url="http://www.pydev.org/updates"/>
         </repositoryList>
+        <repositoryList
+            name="2021-12">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20211122181901/repository"/>
+          <repository
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
+          <repository
+              url="https://download.eclipse.org/releases/2021-12"/>
+          <repository
+              url="http://eclipse.py4j.org/"/>
+          <repository
+              url="http://www.pydev.org/updates"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-03">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+          <repository
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
+          <repository
+              url="https://download.eclipse.org/releases/2022-03"/>
+          <repository
+              url="http://eclipse.py4j.org/"/>
+          <repository
+              url="http://www.pydev.org/updates"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-06">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220531185310/repository"/>
+          <repository
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
+          <repository
+              url="https://download.eclipse.org/releases/2022-06"/>
+          <repository
+              url="http://eclipse.py4j.org/"/>
+          <repository
+              url="http://www.pydev.org/updates"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-09">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository"/>
+          <repository
+              url="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest"/>
+          <repository
+              url="https://download.eclipse.org/releases/2022-09"/>
+          <repository
+              url="http://eclipse.py4j.org/"/>
+          <repository
+              url="http://www.pydev.org/updates"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -499,7 +551,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2021-09"
+        defaultValue="2022-09"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
@@ -704,6 +756,66 @@
           <repository
               url="http://download.eclipse.org/releases/2020-12"/>
         </repositoryList>
+        <repositoryList
+            name="2021-12">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20211122181901/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2021-12"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-12"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-03">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2022-03"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-12"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-06">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220531185310/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2022-06"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-12"/>
+        </repositoryList>
+        <repositoryList
+            name="2022-09">
+          <repository
+              url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository"/>
+          <repository
+              url="http://download.eclipse.org/releases/2022-09"/>
+          <repository
+              url="http://download.eclipse.org/nebula/releases/1.0.0"/>
+          <repository
+              url="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+          <repository
+              url="http://download.eclipse.org/ease/integration/nightly"/>
+          <repository
+              url="http://download.eclipse.org/releases/2020-12"/>
+        </repositoryList>
       </targlet>
     </setupTask>
     <setupTask
@@ -788,7 +900,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        defaultValue="2021-09"
+        defaultValue="2022-09"
         storageURI="scope://Workspace">
       <description>Default target platform for EASE development.</description>
     </setupTask>
