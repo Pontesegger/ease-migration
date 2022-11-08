@@ -101,5 +101,8 @@
    <startupBlacklist
          className="com.python.pydev.debug.DebugEarlyStartup">
    </startupBlacklist>
+   <startupBlacklist
+         className="org.eclipse.ui.internal.monitoring.MonitoringStartup">
+   </startupBlacklist>
 </extension>
 </plugin>

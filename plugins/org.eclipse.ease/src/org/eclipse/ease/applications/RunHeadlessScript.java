@@ -43,6 +43,8 @@ import org.eclipse.ui.IStartup;
 
 public class RunHeadlessScript implements IApplication {
 
+	private static final String ATTRIBUTE_CLASS = "class";
+
 	private static final String HELP = "-help";
 
 	private static final String ENGINE = "-engine";
@@ -57,13 +59,13 @@ public class RunHeadlessScript implements IApplication {
 
 	private static void loadStartupExtension(PlatformExtension extension) {
 		try {
-			Logger.info(Activator.PLUGIN_ID, String.format("Loading early startup extension: %s", extension.getAttribute("class")));
-			extension.createInstance("class", IStartup.class).earlyStartup();
+			Logger.info(Activator.PLUGIN_ID, String.format("Loading early startup extension: %s", extension.getAttribute(ATTRIBUTE_CLASS)));
+			extension.createInstance(ATTRIBUTE_CLASS, IStartup.class).earlyStartup();
 
-		} catch (final ClassCastException e) {
-			printError(String.format("Failed to execute earlyStartup(): %s", e.getMessage()));
 		} catch (final CoreException e) {
-			printError(String.format("Could not create instance for startup code: %s", extension.getAttribute("class")));
+			printError(String.format("Could not create instance for startup code: %s", extension.getAttribute(ATTRIBUTE_CLASS)));
+		} catch (final Throwable e) {
+			printError(String.format("Failed to execute earlyStartup(): %s", e.getMessage()));
 		}
 	}
 
@@ -74,12 +76,12 @@ public class RunHeadlessScript implements IApplication {
 		for (int index = 0; index < arguments.length; index++) {
 			if (parameters.containsKey(SCRIPT)) {
 				// script arguments
-				((List) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index]);
+				((List<String>) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index]);
 
 			} else if (SCRIPT.equals(arguments[index])) {
 				if ((index + 1) < arguments.length) {
 					parameters.put(SCRIPT, arguments[index + 1]);
-					((List) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index + 1]);
+					((List<String>) parameters.get(SCRIPT_ARGUMENTS)).add(arguments[index + 1]);
 					index++;
 
 				} else
@@ -253,7 +255,7 @@ public class RunHeadlessScript implements IApplication {
 
 		final Collection<PlatformExtension> earlyStartups = PlatformExtension.createFor("org.eclipse.ui.startup");
 		earlyStartups.stream().filter(e -> "startup".equals(e.getConfigurationElement().getName()))
-				.filter(e -> !blacklistedStartups.contains(e.getAttribute("class"))).forEach(RunHeadlessScript::loadStartupExtension);
+				.filter(e -> !blacklistedStartups.contains(e.getAttribute(ATTRIBUTE_CLASS))).forEach(RunHeadlessScript::loadStartupExtension);
 	}
 
 	@Override
