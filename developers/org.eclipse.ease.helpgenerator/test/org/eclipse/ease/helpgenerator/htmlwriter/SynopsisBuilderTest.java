@@ -57,6 +57,16 @@ public class SynopsisBuilderTest {
 	}
 
 	@Test
+	@DisplayName("build() method with array return value")
+	public void buildArrayReturnValue() {
+
+		final Method method = new Method("simple", "comment", "deprecationMessage", NO_ALIASES, new ReturnValue("String[]", ""), Collections.emptyList(),
+				NO_EXCEPTIONS, NO_EXAMPLES);
+
+		assertEquals("{@link String}[] simple()", SynopsisBuilder.getInstance().build(method));
+	}
+
+	@Test
 	@DisplayName("build() method with class return value")
 	public void buildClassReturnValue() {
 

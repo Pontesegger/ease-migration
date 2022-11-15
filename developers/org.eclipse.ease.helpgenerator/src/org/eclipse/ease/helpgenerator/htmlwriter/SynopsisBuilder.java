@@ -64,7 +64,11 @@ public class SynopsisBuilder {
 			case "?":
 				return "?";
 			default:
-				return String.format("{@link %s}", token.trim());
+				final String type = token.trim();
+				if (type.endsWith("[]"))
+					return String.format("{@link %s}[]", type.substring(0, type.length() - 2));
+				else
+					return String.format("{@link %s}", type);
 			}
 
 		}).collect(Collectors.joining());
