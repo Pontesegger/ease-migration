@@ -22,8 +22,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -58,17 +56,17 @@ public class PasteTextToScriptShell extends AbstractHandler {
 	private String getCurrentLineFromActiveEditor() {
 		final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-		final Control editorControl = editor.getAdapter(Control.class);
-		if (editorControl instanceof StyledText) {
-			if (editor instanceof ITextEditor) {
-				final IDocument document = ((ITextEditor) editor).getDocumentProvider().getDocument(editor.getEditorInput());
-				if (document != null) {
-					try {
-						final IRegion lineInformation = document.getLineInformationOfOffset(((StyledText) editorControl).getCaretOffset());
-						return document.get(lineInformation.getOffset(), lineInformation.getLength()).trim();
-					} catch (final BadLocationException e) {
-						// ignore gracefully;
-					}
+		if (editor instanceof ITextEditor) {
+			final IDocument document = ((ITextEditor) editor).getDocumentProvider().getDocument(editor.getEditorInput());
+			if (document != null) {
+				try {
+					final ITextSelection textSelection = (ITextSelection) ((ITextEditor) editor).getSite().getSelectionProvider().getSelection();
+					final IRegion lineInformation = document.getLineInformationOfOffset(textSelection.getOffset());
+
+					return document.get(lineInformation.getOffset(), lineInformation.getLength()).trim();
+
+				} catch (final BadLocationException e) {
+					// ignore gracefully;
 				}
 			}
 		}
