@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -75,7 +76,7 @@ public abstract class AbstractCodeParser implements ICodeParser {
 	public String getHeaderComment(final InputStream stream) {
 		final StringBuilder comment = new StringBuilder();
 
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
 		boolean isComment = true;
 		boolean isBlock = false;
@@ -143,7 +144,7 @@ public abstract class AbstractCodeParser implements ICodeParser {
 
 	@Override
 	public SignatureInfo getSignatureInfo(final InputStream stream) throws ScriptSignatureException {
-		final BufferedReader bReader = new BufferedReader(new InputStreamReader(stream));
+		final BufferedReader bReader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 		try {
 			String prev, cur;
 

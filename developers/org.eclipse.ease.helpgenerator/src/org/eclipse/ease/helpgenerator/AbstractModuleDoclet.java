@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -169,7 +170,7 @@ public abstract class AbstractModuleDoclet {
 	}
 
 	public IMemento getPluginDefinition() throws Exception {
-		final InputStreamReader reader = new InputStreamReader(new FileInputStream(getPluginOrFragmentFile()));
+		final InputStreamReader reader = new InputStreamReader(new FileInputStream(getPluginOrFragmentFile()), StandardCharsets.UTF_8);
 		final IMemento root = XMLMemento.createReadRoot(reader);
 		reader.close();
 
@@ -444,12 +445,12 @@ public abstract class AbstractModuleDoclet {
 
 	private List<String> readContent(String location) throws IOException {
 		try (InputStream packageData = new URL(location).openStream()) {
-			return new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
+			return new BufferedReader(new InputStreamReader(packageData, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
 
 		} catch (final MalformedURLException e) {
 			// try to open a local file
 			try (InputStream packageData = new FileInputStream(location)) {
-				return new BufferedReader(new InputStreamReader(packageData)).lines().collect(Collectors.toList());
+				return new BufferedReader(new InputStreamReader(packageData, StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
 			}
 		}
 	}

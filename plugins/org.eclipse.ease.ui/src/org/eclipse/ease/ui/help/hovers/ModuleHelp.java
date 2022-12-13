@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.modules.ModuleDefinition;
@@ -49,7 +50,7 @@ public class ModuleHelp implements IHoverHelp {
 	 */
 	private static IMemento getHtmlContent(final URL url) throws Exception {
 		try {
-			final IMemento rootNode = XMLMemento.createReadRoot(new InputStreamReader(url.openStream(), "UTF-8"));
+			final IMemento rootNode = XMLMemento.createReadRoot(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 			return rootNode.getChild("body");
 		} catch (final Exception e) {
 			Logger.error(Activator.PLUGIN_ID, "Cannot find the module help content ", e);

@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,11 +38,11 @@ public class InputStreamParser {
 	}
 
 	protected static ScriptType getScriptType(final InputStream contents) {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(contents));
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(contents, StandardCharsets.UTF_8));
 
 		// read MAX_LINES looking for a pattern content-type: <some content>
 		try {
-			String line = reader.readLine();
+			final String line = reader.readLine();
 			int lineCount = MAX_LINES;
 			while ((line != null) && (lineCount-- > 0)) {
 				final Matcher matcher = CONTENT_TYPE_PATTERN.matcher(line);
@@ -55,7 +56,7 @@ public class InputStreamParser {
 				}
 
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// cannot read data, giving up
 		}
 

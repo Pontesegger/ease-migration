@@ -15,6 +15,7 @@ package org.eclipse.ease.lang.javascript.rhino;
 
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -219,7 +220,7 @@ public class RhinoScriptEngine extends AbstractReplScriptEngine {
 				result = ((org.mozilla.javascript.Script) script.getCommand()).exec(getContext(), fScope);
 
 			else {
-				try (InputStreamReader codeReader = new InputStreamReader(script.getCodeStream())) {
+				try (InputStreamReader codeReader = new InputStreamReader(script.getCodeStream(), StandardCharsets.UTF_8)) {
 					result = getContext().evaluateReader(fScope, codeReader, fileName, 1, null);
 				}
 			}

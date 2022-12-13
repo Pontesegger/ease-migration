@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -154,7 +155,7 @@ public final class JavaResources {
 
 	private BufferedReader getJavaClassDefinitions() throws IOException {
 		final URL url = new URL("platform:/plugin/" + PLUGIN_ID + "/resources/java" + getJavaMajorVersion() + " classes.txt");
-		return new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
+		return new BufferedReader(new InputStreamReader(url.openConnection().getInputStream(), StandardCharsets.UTF_8));
 	}
 
 	/**

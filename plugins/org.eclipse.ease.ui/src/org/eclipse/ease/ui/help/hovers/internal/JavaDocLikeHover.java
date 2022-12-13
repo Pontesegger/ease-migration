@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.ease.Logger;
 import org.eclipse.ease.tools.StringTools;
@@ -376,7 +377,7 @@ public class JavaDocLikeHover {
 			try {
 				final URL url = new URL("platform:/plugin/org.eclipse.ease.ui/resources/EASEHoverStylesheet.css");
 				final InputStream inputStream = url.openConnection().getInputStream();
-				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+				final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 				fgStyleSheet = StringTools.toString(reader);
 				reader.close();
 

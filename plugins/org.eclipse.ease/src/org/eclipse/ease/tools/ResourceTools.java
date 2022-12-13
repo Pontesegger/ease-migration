@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -485,9 +486,8 @@ public final class ResourceTools {
 
 			} else
 				return "file://" + ((File) file).toString();
-		}
 
-		else if (file != null)
+		} else if (file != null)
 			return file.toString();
 
 		// nothing to resolve, return null
@@ -621,7 +621,7 @@ public final class ResourceTools {
 		if (stream == null)
 			return null;
 
-		return toString(new InputStreamReader(stream));
+		return toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
 	}
 
 	/**

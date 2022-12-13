@@ -1,9 +1,9 @@
 package org.eclipse.ease.lang.groovy.interpreter;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.eclipse.ease.AbstractReplScriptEngine;
@@ -61,28 +61,13 @@ public class GroovyScriptEngine extends AbstractReplScriptEngine {
 
 	@Override
 	protected Object execute(final Script script, final String fileName, final boolean uiThread) throws Exception {
-		InputStreamReader reader = null;
-		Object result = null;
-		try {
-			reader = new InputStreamReader(script.getCodeStream());
+		try (InputStreamReader reader = new InputStreamReader(script.getCodeStream(), StandardCharsets.UTF_8)) {
 			if ((fileName == null) || (fileName.isEmpty()))
-				result = fEngine.evaluate(reader);
+				return fEngine.evaluate(reader);
 
 			else
-				result = fEngine.evaluate(reader, fileName);
-
-		} catch (final Exception e) {
-			throw e;
-		} finally {
-			// gracefully close reader
-			try {
-				if (reader != null)
-					reader.close();
-			} catch (final IOException e) {
-			}
+				return fEngine.evaluate(reader, fileName);
 		}
-
-		return result;
 	}
 
 	@Override

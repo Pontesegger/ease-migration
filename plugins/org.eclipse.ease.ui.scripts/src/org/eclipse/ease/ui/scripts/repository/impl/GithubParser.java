@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class GithubParser {
 		final Map<String, String> scripts = new HashMap<>();
 		final String contentTreeUrl = getContentTreeUrl(location);
 		final JsonParser jsonParser = new JsonParser();
-		try (Reader reader = new InputStreamReader(new URL(contentTreeUrl).openStream())) {
+		try (Reader reader = new InputStreamReader(new URL(contentTreeUrl).openStream(), StandardCharsets.UTF_8)) {
 			final JsonObject rootObject = jsonParser.parse(reader).getAsJsonObject();
 			if (rootObject == null)
 				return scripts; // return empty map
