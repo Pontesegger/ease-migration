@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.eclipse.core.resources.IContainer;
@@ -36,12 +37,12 @@ public class ResourceHandle extends FilesystemHandle {
 
 	@Override
 	protected BufferedReader createReader() throws Exception {
-		return new BufferedReader(new InputStreamReader(fFile.getContents()));
+		return new BufferedReader(new InputStreamReader(fFile.getContents(), StandardCharsets.UTF_8));
 	}
 
 	@Override
 	public void write(final String data) throws IOException {
-		write(data.getBytes());
+		write(data.getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Override

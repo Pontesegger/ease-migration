@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class FilesystemHandle implements IFileHandle {
@@ -39,7 +40,7 @@ public class FilesystemHandle implements IFileHandle {
 	}
 
 	protected BufferedReader createReader() throws Exception {
-		return new BufferedReader(new InputStreamReader(new FileInputStream(fFile)));
+		return new BufferedReader(new InputStreamReader(new FileInputStream(fFile), StandardCharsets.UTF_8));
 	}
 
 	private BufferedReader getReader() {
