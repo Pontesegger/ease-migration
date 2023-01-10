@@ -192,6 +192,11 @@ public class RhinoDebugger extends AbstractEaseDebugger implements Debugger {
 					context.setDebugger(debugger, debuggerContextData);
 			}
 		}
+
+		@Override
+		public String toString() {
+			return getName();
+		}
 	}
 
 	private final Map<Integer, Script> fFrameToSource = new HashMap<>();

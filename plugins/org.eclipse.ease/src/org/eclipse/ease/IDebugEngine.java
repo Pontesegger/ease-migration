@@ -69,4 +69,6 @@ public interface IDebugEngine extends IScriptEngine {
 	 * @return variables assigned to scope
 	 */
 	Collection<EaseDebugVariable> getVariables(Object scope);
+
+	Thread getThread();
 }
