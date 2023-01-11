@@ -462,7 +462,7 @@ public abstract class AbstractEaseDebugger implements IEventProcessor, IExecutio
 	}
 
 	protected Object getThread() {
-		return Thread.currentThread();
+		return fEngine.getThread();
 	}
 
 	/**
