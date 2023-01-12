@@ -16,6 +16,7 @@ package org.eclipse.ease.lang.python.py4j.internal;
 import org.eclipse.ease.IExecutionListener;
 import org.eclipse.ease.debugging.dispatcher.IEventProcessor;
 import org.eclipse.ease.lang.python.debugger.ICodeTracer;
+import org.eclipse.ease.lang.python.debugger.IPyFrame;
 import org.eclipse.ease.lang.python.debugger.PythonBreakpoint;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
 
@@ -49,7 +50,7 @@ public interface ICodeTraceFilter extends ICodeTracer, IEventProcessor, IExecuti
 
 	/**
 	 * Resume execution after filter has notified us that execution might need to be stopped.
-	 * 
+	 *
 	 * @param resumeType
 	 *            Resume type for execution continuation.
 	 */
@@ -59,4 +60,18 @@ public interface ICodeTraceFilter extends ICodeTracer, IEventProcessor, IExecuti
 	 * Suspend execution after filter has notified us that execution might need to be stopped.
 	 */
 	void suspend();
+
+	/**
+	 * Get the current python frame.
+	 *
+	 * @return current python frame
+	 */
+	IPyFrame getCurrentFrame();
+
+	/**
+	 * Get the python frame of the last thrown exception.
+	 *
+	 * @return last exception python frame
+	 */
+	IPyFrame getExceptionFrame();
 }

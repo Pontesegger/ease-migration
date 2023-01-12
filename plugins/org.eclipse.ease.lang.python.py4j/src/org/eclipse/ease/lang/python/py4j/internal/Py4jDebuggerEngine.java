@@ -27,6 +27,7 @@ import org.eclipse.ease.debugging.model.EaseDebugVariable;
 import org.eclipse.ease.lang.python.debugger.IPythonDebugEngine;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
 import org.eclipse.ease.lang.python.debugger.PythonEventDispatchJob;
+import org.eclipse.ease.lang.python.debugger.PythonScriptRegistry;
 import org.eclipse.ease.lang.python.debugger.ResourceHelper;
 import org.eclipse.ease.lang.python.debugger.model.PythonDebugTarget;
 
@@ -41,7 +42,6 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	public static final String ENGINE_ID = "org.eclipse.ease.lang.python.py4j.debugger.engine";
 
 	private Py4jDebugger fDebugger = null;
-	private ICodeTraceFilter fPyDebugger = null;
 
 	@Override
 	public void setDebugger(final PythonDebugger debugger) {
@@ -56,16 +56,22 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	protected void setupEngine() throws ScriptEngineException {
 		super.setupEngine();
 
+		if (fDebugger == null) {
+			final Py4jDebugger debugger = new Py4jDebugger(this, false);
+			debugger.setScriptRegistry(new PythonScriptRegistry());
+			setDebugger(debugger);
+		}
+
 		// in case we were called using "Run as"
 		if (fDebugger != null) {
 			try {
 				// load python part of debugger
 				final InputStream stream = ResourceHelper.getResourceStream("org.eclipse.ease.lang.python.py4j", "pysrc/py4jdb.py");
-				fPyDebugger = (ICodeTraceFilter) super.internalExecute(new Script("Load Python debugger", stream), null);
+				final ICodeTraceFilter pythonDebugger = (ICodeTraceFilter) super.internalExecute(new Script("Load Python debugger", stream), null);
 
 				// Connect both sides
-				fPyDebugger.setDebugger(fDebugger);
-				fDebugger.setTraceFilter(fPyDebugger);
+				pythonDebugger.setDebugger(fDebugger);
+				fDebugger.setPythonDebuggerStub(pythonDebugger);
 
 			} catch (final Throwable e) {
 				throw new ScriptEngineException("Failed to load Python Debugger", e);
@@ -77,16 +83,17 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 	protected void teardownEngine() {
 		super.teardownEngine();
 
-		fPyDebugger = null;
 		fDebugger = null;
 	}
 
 	@Override
 	protected Object internalExecute(final Script script, final String fileName) throws Throwable {
-		if (fDebugger != null)
-			return fDebugger.execute(script);
+		return fDebugger.execute(script);
+	}
 
-		return super.internalExecute(script, fileName);
+	@Override
+	public ScriptStackTrace getStackTrace() {
+		return fDebugger.getStacktrace();
 	}
 
 	@Override
@@ -108,8 +115,7 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 
 	@Override
 	public ScriptStackTrace getExceptionStackTrace(Object thread) {
-		// FIXME to be implemented
-		return null;
+		return fDebugger.getExceptionStacktrace();
 	}
 
 	@Override
@@ -133,12 +139,5 @@ public class Py4jDebuggerEngine extends Py4jScriptEngine implements IPythonDebug
 			variables.add(createVariable(entry.getKey(), entry.getValue()));
 
 		return variables;
-	}
-
-	@Override
-	protected EaseDebugVariable createVariable(String name, Object value) {
-		final EaseDebugVariable variable = super.createVariable(name, value);
-
-		return variable;
 	}
 }

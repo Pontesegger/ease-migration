@@ -23,10 +23,14 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.ease.IDebugEngine;
 import org.eclipse.ease.Script;
 import org.eclipse.ease.ScriptEngineCancellationException;
+import org.eclipse.ease.debugging.ScriptStackTrace;
 import org.eclipse.ease.debugging.events.debugger.IDebuggerEvent;
+import org.eclipse.ease.lang.python.debugger.IPyFrame;
 import org.eclipse.ease.lang.python.debugger.IPythonScriptRegistry;
 import org.eclipse.ease.lang.python.debugger.PythonBreakpoint;
 import org.eclipse.ease.lang.python.debugger.PythonDebugger;
+
+import py4j.Py4JException;
 
 /**
  * Extension of {@link PythonDebugger} with additional {@link ICodeTraceFilter} to lower amount of trace dispatches.
@@ -35,11 +39,8 @@ public class Py4jDebugger extends PythonDebugger {
 	/**
 	 * Extended code tracer doing pre-filtering.
 	 */
-	private ICodeTraceFilter fTraceFilter;
+	private ICodeTraceFilter fPythonDebuggerStub;
 
-	/**
-	 * @see PythonDebugger#PythonDebugger(IDebugEngine, boolean)
-	 */
 	public Py4jDebugger(IDebugEngine engine, boolean showDynamicCode) {
 		super(engine, showDynamicCode);
 	}
@@ -50,8 +51,8 @@ public class Py4jDebugger extends PythonDebugger {
 	 * @param traceFilter
 	 *            Extended code tracer.
 	 */
-	public void setTraceFilter(ICodeTraceFilter traceFilter) {
-		fTraceFilter = traceFilter;
+	public void setPythonDebuggerStub(ICodeTraceFilter traceFilter) {
+		fPythonDebuggerStub = traceFilter;
 	}
 
 	/**
@@ -70,30 +71,32 @@ public class Py4jDebugger extends PythonDebugger {
 				final List<IBreakpoint> breakpoints = fBreakpoints.get(script);
 				if (breakpoints != null) {
 					final List<PythonBreakpoint> pythonBreakpoints = new ArrayList<>();
+
 					for (final IBreakpoint breakpoint : breakpoints) {
-						final int lineno = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
-						pythonBreakpoints.add(new PythonBreakpoint(filename, lineno));
+						final int lineNumber = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+						pythonBreakpoints.add(new PythonBreakpoint(filename, lineNumber));
 					}
+
 					return pythonBreakpoints;
 				}
 			}
 		}
 
-		return Collections.<PythonBreakpoint> emptyList();
-
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected void suspend(IDebuggerEvent event) {
-		fTraceFilter.suspend();
-		super.suspend(event);
+		fPythonDebuggerStub.suspend();
 
+		super.suspend(event);
 	}
 
 	@Override
 	protected void resume(int resumeType, Object thread) {
 		super.resume(resumeType, thread);
-		fTraceFilter.resume(resumeType);
+
+		fPythonDebuggerStub.resume(resumeType);
 	}
 
 	@Override
@@ -105,7 +108,8 @@ public class Py4jDebugger extends PythonDebugger {
 				registry.put(script);
 				reference = registry.getReference(script);
 			}
-			return fTraceFilter.run(script, reference);
+
+			return fPythonDebuggerStub.run(script, reference);
 
 		} catch (final Exception e) {
 			/*
@@ -118,8 +122,16 @@ public class Py4jDebugger extends PythonDebugger {
 			if (getThreadState(getThread()).fResumeType == DebugEvent.STEP_END) {
 				throw new ScriptEngineCancellationException();
 			}
+
+			if (e instanceof Py4JException)
+				throw new Py4JException(beautifyExceptionMessage(e.getMessage()));
+
 			throw e;
 		}
+	}
+
+	private String beautifyExceptionMessage(String message) {
+		return message;
 	}
 
 	@Override
@@ -131,11 +143,10 @@ public class Py4jDebugger extends PythonDebugger {
 
 		final String reference = registry.getReference(script);
 		if (reference != null) {
-			final int linenumber = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+			final int lineNumber = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
 
-			if (linenumber != -1) {
-				fTraceFilter.setBreakpoint(new PythonBreakpoint(reference, linenumber));
-			}
+			if (lineNumber != -1)
+				fPythonDebuggerStub.setBreakpoint(new PythonBreakpoint(reference, lineNumber));
 		}
 	}
 
@@ -148,11 +159,32 @@ public class Py4jDebugger extends PythonDebugger {
 
 		final String reference = registry.getReference(script);
 		if (reference != null) {
-			final int linenumber = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
+			final int lineNumber = breakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER, -1);
 
-			if (linenumber != -1) {
-				fTraceFilter.removeBreakpoint(new PythonBreakpoint(reference, linenumber));
-			}
+			if (lineNumber != -1)
+				fPythonDebuggerStub.removeBreakpoint(new PythonBreakpoint(reference, lineNumber));
 		}
+	}
+
+	@Override
+	public ScriptStackTrace getStacktrace() {
+		return toStackTrace(fPythonDebuggerStub.getCurrentFrame());
+	}
+
+	@Override
+	public ScriptStackTrace getExceptionStacktrace() {
+		return toStackTrace(fPythonDebuggerStub.getExceptionFrame());
+	}
+
+	private ScriptStackTrace toStackTrace(IPyFrame frame) {
+		final ScriptStackTrace trace = new ScriptStackTrace();
+
+		while (frame != null) {
+			trace.add(new PythonDebugFrame(frame));
+
+			frame = frame.getParent();
+		}
+
+		return trace;
 	}
 }

@@ -53,27 +53,28 @@ public class PythonDebugger extends AbstractEaseDebugger implements IEventProces
 		public PythonDebugFrame(final IPyFrame frame) {
 			super(getScriptRegistry() != null ? getScriptRegistry().getScript(frame.getFilename()) : null, frame.getLineNumber(), TYPE_FILE);
 			fFrame = frame;
-
 		}
 
 		@Override
 		public String getName() {
 			final Script script = getScript();
-			if (script.isDynamic()) {
-				// dynamic script
-				final String title = getScript().getTitle();
-				return (title != null) ? "Dynamic: " + title : "(Dynamic)";
+			if (script != null) {
+				if (script.isDynamic()) {
+					// dynamic script
+					final String title = getScript().getTitle();
+					return (title != null) ? "Dynamic: " + title : "(Dynamic)";
 
-			} else {
-				final Object command = getScript().getCommand();
-				if (command != null) {
-					if (command instanceof IFile)
-						return ((IFile) command).getName();
+				} else {
+					final Object command = getScript().getCommand();
+					if (command != null) {
+						if (command instanceof IFile)
+							return ((IFile) command).getName();
 
-					else if (command instanceof File)
-						return ((File) command).getName();
+						else if (command instanceof File)
+							return ((File) command).getName();
 
-					return command.toString();
+						return command.toString();
+					}
 				}
 			}
 

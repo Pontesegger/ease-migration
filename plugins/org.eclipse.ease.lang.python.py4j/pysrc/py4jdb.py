@@ -197,6 +197,7 @@ class _pyease_CodeTracer(_pyease_bdb.Bdb):
 
         # Caches for currently executed code parts
         self._current_frame = None
+        self._last_exception_frame = None
         self._current_file = None
 
         # Async continuation handling
@@ -205,6 +206,18 @@ class _pyease_CodeTracer(_pyease_bdb.Bdb):
 
         # TODO: Think about a better way to handle step return
         self._return_hack = False
+
+    def getCurrentFrame(self):
+        if self._current_frame is not None:
+        	  return _pyease_PyFrame(self._current_frame)
+        	  
+        return None
+    
+    def getExceptionFrame(self):
+        if self._last_exception_frame is not None:
+        	  return _pyease_PyFrame(self._last_exception_frame)
+
+        return None
 
     def setDebugger(self, debugger):
         '''
@@ -228,7 +241,9 @@ class _pyease_CodeTracer(_pyease_bdb.Bdb):
         '''
         # Pre-filter to avoid issues with library internals
         if not _pyease_ignore_frame(frame):
+            self._current_frame = frame
             _pyease_bdb.Bdb.trace_dispatch(self, frame, event, arg)
+        
         return self.trace_dispatch
 
     def user_line(self, frame):
@@ -259,6 +274,12 @@ class _pyease_CodeTracer(_pyease_bdb.Bdb):
         self._continue_func = self.set_step
         self.dispatch(frame, 'return')
 
+    def dispatch_exception(self, frame, arg):
+        if not frame.f_code.co_filename.endswith("bdb.py"):
+            self._last_exception_frame = frame
+        
+        _pyease_bdb.Bdb.dispatch_exception(self, frame, arg)
+        
     def user_exception(self, frame, exc_info):
         '''
         Called when debugger thinks thrown exception is of interest.
@@ -266,9 +287,6 @@ class _pyease_CodeTracer(_pyease_bdb.Bdb):
         :param frame:    Current stack frame with exception information.
         :param exc_info:    ignored
         '''
-        # Cache exception
-        if self._debugger:
-            self._debugger.setExceptionStackTrace(_pyease_PyFrame(frame))
 
         self._continue_func = self.set_continue
         self.dispatch(frame, 'exception')
