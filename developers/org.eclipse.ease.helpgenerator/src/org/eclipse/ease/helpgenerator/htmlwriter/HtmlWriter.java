@@ -238,9 +238,14 @@ public class HtmlWriter {
 				if (defaultValue != null) {
 					addText(buffer, "<span class=\"optional\"><b>Optional:</b> defaults to &lt;<i>");
 
-					if ((!String.class.getName().equals(parameter.getTypeName())) && (defaultValue.length() > 2))
+					if (!String.class.getName().equals(parameter.getTypeName())) {
 						// remove quotes from default value
-						defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
+						if (defaultValue.startsWith("\""))
+							defaultValue = defaultValue.substring(1);
+
+						if (defaultValue.endsWith("\""))
+							defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+					}
 
 					if (defaultValue.contains("org.eclipse.ease.modules.ScriptParameter.null"))
 						addText(buffer, "null");
