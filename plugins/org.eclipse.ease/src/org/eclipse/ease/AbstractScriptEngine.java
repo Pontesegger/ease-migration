@@ -82,8 +82,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		}
 	}
 
-	/** List of code junks to be executed. */
-	private final List<Script> fScheduledScripts = Collections.synchronizedList(new ArrayList<Script>());
+	/** List of code parts to be executed. */
+	private final List<Script> fScheduledScripts = new ArrayList<>();
 
 	private final ListenerList<IExecutionListener> fExecutionListeners = new ListenerList<>();
 
@@ -135,10 +135,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	public final ScriptResult execute(final Object content) {
 		final Script script = (content instanceof Script) ? (Script) content : new Script(content);
 
-		fScheduledScripts.add(script);
-
-		synchronized (this) {
-			notifyAll();
+		synchronized (fScheduledScripts) {
+			fScheduledScripts.add(script);
+			fScheduledScripts.notifyAll();
 		}
 
 		return script.getResult();
@@ -237,19 +236,17 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			// main loop
 			while (!shallTerminate()) {
 
-				// execute code
-				if (!fScheduledScripts.isEmpty()) {
-					final Script piece = fScheduledScripts.remove(0);
-					inject(piece, true, false);
+				try {
+					synchronized (fScheduledScripts) {
+						waitForNextScript();
 
-				} else {
-					synchronized (this) {
-						try {
-							Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine idle: " + getName());
-							wait();
-						} catch (final InterruptedException e) {
+						if (!fScheduledScripts.isEmpty()) {
+							final Script piece = fScheduledScripts.remove(0);
+							inject(piece, true, false);
 						}
 					}
+				} catch (final InterruptedException e) {
+					// waiting got interrupted, quite likely a shutdown
 				}
 			}
 		}
@@ -258,6 +255,15 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 			returnStatus = Status.CANCEL_STATUS;
 
 		return cleanupRun(returnStatus);
+	}
+
+	private void waitForNextScript() throws InterruptedException {
+		synchronized (fScheduledScripts) {
+			while ((fScheduledScripts.isEmpty()) && (!shallTerminate())) {
+				Logger.trace(Activator.PLUGIN_ID, TRACE_SCRIPT_ENGINE, "Engine idle: " + getName());
+				fScheduledScripts.wait();
+			}
+		}
 	}
 
 	private IStatus setupRun() {
@@ -294,9 +300,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		synchronized (fScheduledScripts) {
 			for (final Script script : fScheduledScripts)
 				script.setException(new ScriptExecutionException("Engine got terminated"));
-		}
 
-		fScheduledScripts.clear();
+			fScheduledScripts.clear();
+		}
 
 		notifyExecutionListeners(null, IExecutionListener.ENGINE_END);
 
@@ -309,8 +315,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 				returnStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Could not teardown script engine", e);
 			}
 		} finally {
-			synchronized (this) {
-				notifyAll();
+			synchronized (fScheduledScripts) {
+				fScheduledScripts.notifyAll();
 			}
 
 			closeStreams();
@@ -365,7 +371,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 	 * @return <code>true</code> when termination is requested or there is no more work to be done
 	 */
 	protected boolean shallTerminate() {
-		return getMonitor().isCanceled() || fScheduledScripts.isEmpty();
+		synchronized (fScheduledScripts) {
+			return getMonitor().isCanceled() || fScheduledScripts.isEmpty();
+		}
 	}
 
 	@Override
@@ -376,8 +384,8 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 
 		terminateCurrent();
 
-		synchronized (this) {
-			notifyAll();
+		synchronized (fScheduledScripts) {
+			fScheduledScripts.notifyAll();
 		}
 	}
 
@@ -392,9 +400,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		if (!Thread.currentThread().equals(getThread())) {
 			// we cannot join our own thread
 
-			synchronized (this) {
+			synchronized (fScheduledScripts) {
 				while (!isFinished())
-					wait(1000);
+					fScheduledScripts.wait(1000);
 			}
 		}
 	}
@@ -404,9 +412,9 @@ public abstract class AbstractScriptEngine extends Job implements IScriptEngine 
 		if (!Thread.currentThread().equals(getThread())) {
 			// we cannot join our own thread
 
-			synchronized (this) {
+			synchronized (fScheduledScripts) {
 				if (!isFinished())
-					wait(timeout);
+					fScheduledScripts.wait(timeout);
 			}
 		}
 	}

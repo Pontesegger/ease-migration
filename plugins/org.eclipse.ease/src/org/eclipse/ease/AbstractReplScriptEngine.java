@@ -55,8 +55,8 @@ public abstract class AbstractReplScriptEngine extends AbstractScriptEngine impl
 			// we can only set this before the engine got started
 			setSystem(!terminate);
 
-		synchronized (this) {
-			notifyAll();
+		synchronized (getScheduledScripts()) {
+			getScheduledScripts().notifyAll();
 		}
 	}
 
