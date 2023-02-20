@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ease.modules.charting.feature"
+      label="EASE Charting Support (Incubation)"
+      version="0.10.0.qualifier"
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.ease">
+
+   <description url="https://www.eclipse.org/ease/">
+      EASE module to draw nebula charts.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <discovery label="Nebula Snapshots" url="http://download.eclipse.org/technology/nebula/snapshot"/>
+   </url>
+
+   <plugin
+         id="org.eclipse.ease.modules.charting"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

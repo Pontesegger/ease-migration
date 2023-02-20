@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            category="org.eclipse.ease.ui.views.category.scripting"
+            class="org.eclipse.ease.modules.charting.views.ChartView"
+            icon="icons/Chart.png"
+            id="org.eclipse.ease.modules.charting.views.ChartView"
+            name="Chart"
+            restorable="false">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ease.modules">
+      <module
+            class="org.eclipse.ease.modules.charting.ChartingModule"
+            id="org.eclipse.ease.modules.charting.ChartingModule"
+            name="Charting"
+            visible="true">
+         <dependency
+               module="org.eclipse.ease.modules.platform.resources">
+         </dependency>
+      </module>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ease.modules.charting.views.ChartView">
+         <command
+               commandId="org.eclipse.ease.charting.commands.exportGraph"
+               icon="icons/Photo.png"
+               label="Save Snapshot"
+               style="push"
+               tooltip="Save Snapshot to PNG file">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ease.commands.category.charting"
+            defaultHandler="org.eclipse.ease.modules.charting.commands.ExportGraph"
+            description="Export Graph as PNG file"
+            id="org.eclipse.ease.charting.commands.exportGraph"
+            name="Export Graph">
+      </command>
+      <category
+            id="org.eclipse.ease.commands.category.charting"
+            name="Charting">
+      </category>
+   </extension>
+
+</plugin>

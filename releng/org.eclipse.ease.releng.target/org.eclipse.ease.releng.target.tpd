@@ -18,6 +18,14 @@ location "https://download.eclipse.org/releases/2022-09/" eclipse-2022-09 {
 	org.eclipse.pde.feature.group
 	org.eclipse.jdt
 	
+	// unit test modules
+	org.eclipse.wst.xml_core.feature.feature.group
+	org.eclipse.wst.xml_ui.feature.feature.group
+	
+	// git module
+	org.eclipse.egit.feature.group
+	org.eclipse.jgit.feature.group
+	org.eclipse.osgi
 }
 
 
@@ -47,4 +55,14 @@ location "http://eclipse.py4j.org/" py4j-eclipse {
 // location "http://www.pydev.org/updates" pydev {
 location "https://pydev-9-3-0.surge.sh" pydev {
 	org.python.pydev.feature.feature.group lazy
+}
+
+location "http://download.eclipse.org/technology/subversive/4.0/update-site/" {
+// svn module
+	org.eclipse.team.svn.feature.group
+}
+
+location "http://download.eclipse.org/nebula/releases/2.2.0" {
+// charting module
+	org.eclipse.nebula.visualization.feature.feature.group lazy
 }

@@ -178,6 +178,18 @@
 		<module>../../plugins/org.eclipse.ease.lang.unittest.ui</module>
 		<module>../../features/org.eclipse.ease.lang.unittest.feature</module>
 
+		<!-- Modules -->
+		<module>../../plugins/org.eclipse.ease.modules.charting</module>
+		<module>../../plugins/org.eclipse.ease.modules.platform</module>
+		<module>../../plugins/org.eclipse.ease.modules.team.git</module>
+		<!-- temporary disabled due to API breakage in egit dependencies <module>../../plugins/org.eclipse.ease.modules.team.git.ui</module> -->
+		<module>../../plugins/org.eclipse.ease.modules.team.svn</module>
+		<module>../../plugins/org.eclipse.ease.modules.jvm</module>
+		<module>../../features/org.eclipse.ease.modules.feature</module>
+		<module>../../features/org.eclipse.ease.modules.team.git.feature</module>
+		<module>../../features/org.eclipse.ease.modules.team.svn.feature</module>
+		<module>../../features/org.eclipse.ease.modules.charting.feature</module>
+
 		<!-- plugin insertion point -->
 
 		<!-- releng -->
@@ -199,6 +211,8 @@
 		<module>../../tests/org.eclipse.ease.lang.unittest.test</module>
 		<module>../../tests/org.eclipse.ease.ui.scripts.test</module>
 		<module>../../tests/org.eclipse.ease.ui.test</module>
+
+		<module>../../tests/org.eclipse.ease.modules.platform.test</module>
 
 		<module>../../tests/org.eclipse.ease.ui.completions.java.test</module>
 		<!-- test insertion point -->

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.ease.modules.team.svn.feature"
+      label="EASE SVN Scripting Support (Incubation)"
+      version="0.10.0.qualifier"
+      provider-name="Eclipse.org"
+      plugin="org.eclipse.ease">
+
+   <description url="https://www.eclipse.org/ease/">
+      EASE modules to access SVN repositories.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <plugin
+         id="org.eclipse.ease.modules.team.svn"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>

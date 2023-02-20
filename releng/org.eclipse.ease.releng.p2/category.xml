@@ -33,6 +33,19 @@
    <feature id="org.eclipse.ease.lang.unittest.feature" version="0.10.0.qualifier">
       <category name="Lang"/>
    </feature>
+   <feature id="org.eclipse.ease.modules.feature" version="0.10.0.qualifier">
+      <category name="Modules"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.team.svn.feature" version="0.10.0.qualifier">
+      <category name="Modules"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.team.git.feature" version="0.10.0.qualifier">
+      <category name="Modules"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.charting.feature" version="0.10.0.qualifier">
+      <category name="Modules"/>
+   </feature>
+
    <feature id="org.eclipse.ease.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
@@ -66,6 +79,19 @@
    <feature id="org.eclipse.ease.lang.unittest.feature.source" version="0.10.0.qualifier">
       <category name="Developers"/>
    </feature>
+   <feature id="org.eclipse.ease.modules.feature.source" version="0.10.0.qualifier">
+      <category name="Developers"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.team.svn.feature.source" version="0.10.0.qualifier">
+      <category name="Developers"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.team.git.feature.source" version="0.10.0.qualifier">
+      <category name="Developers"/>
+   </feature>
+   <feature id="org.eclipse.ease.modules.charting.feature.source" version="0.10.0.qualifier">
+      <category name="Developers"/>
+   </feature>
+
    <category-def name="Core" label="EASE Core">
       <description>
          Core scripting framework components.
@@ -76,6 +102,12 @@
          Support for various scripting languages.
       </description>
    </category-def>
+   <category-def name="Modules" label="EASE Modules">
+      <description>
+         Additional functionality to be loaded into script engines at runtime.
+      </description>
+   </category-def>
+
    <category-def name="Developers" label="EASE Developer Resources">
       <description>
          Source packages of EASE components.
@@ -83,4 +115,5 @@
    </category-def>
    <repository-reference location="https://eclipse-ease-addons.github.io/org.eclipse.ease.engines.p2/latest" enabled="true" />
    <repository-reference location="http://eclipse.py4j.org/" enabled="true" />
+   <repository-reference location="http://download.eclipse.org/technology/nebula/snapshot" enabled="true" />
 </site>

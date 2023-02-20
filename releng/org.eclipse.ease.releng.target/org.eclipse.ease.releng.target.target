@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="2022-09" sequenceNumber="1664880847">
+<target name="2022-09" sequenceNumber="1676907155">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.platform.feature.group" version="4.25.0.v20220831-1800"/>
@@ -12,6 +12,11 @@
       <unit id="org.eclipse.emf.feature.group" version="2.31.0.v20220817-1401"/>
       <unit id="org.eclipse.pde.feature.group" version="3.14.1300.v20220831-1800"/>
       <unit id="org.eclipse.jdt" version="3.18.1300.v20220831-1800"/>
+      <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="3.27.0.v202207150226"/>
+      <unit id="org.eclipse.wst.xml_ui.feature.feature.group" version="3.27.0.v202208280234"/>
+      <unit id="org.eclipse.egit.feature.group" version="6.3.0.202209071007-r"/>
+      <unit id="org.eclipse.jgit.feature.group" version="6.3.0.202209071007-r"/>
+      <unit id="org.eclipse.osgi" version="3.18.100.v20220817-1601"/>
       <repository id="eclipse-2022-09" location="https://download.eclipse.org/releases/2022-09/"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
@@ -34,6 +39,14 @@
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.python.pydev.feature.feature.group" version="0.0.0"/>
       <repository id="pydev" location="https://pydev-9-3-0.surge.sh"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.team.svn.feature.group" version="4.0.5.I20170425-1700"/>
+      <repository location="http://download.eclipse.org/technology/subversive/4.0/update-site/"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.nebula.visualization.feature.feature.group" version="0.0.0"/>
+      <repository location="http://download.eclipse.org/nebula/releases/2.2.0"/>
     </location>
   </locations>
   <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>

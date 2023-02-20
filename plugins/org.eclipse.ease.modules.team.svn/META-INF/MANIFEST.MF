@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EASE SVN Module (Incubation)
+Bundle-SymbolicName: org.eclipse.ease.modules.team.svn;singleton:=true
+Bundle-Version: 0.10.0.qualifier
+Require-Bundle: org.eclipse.ui;bundle-version="[3.106.1,4.0.0)",
+ org.eclipse.core.runtime;bundle-version="[3.10.0,4.0.0)",
+ org.eclipse.team.svn;bundle-version="[2.0.4,5.0.0)",
+ org.eclipse.team.svn.core;bundle-version="[2.0.4,5.0.0)",
+ org.eclipse.ease,
+ org.eclipse.team.svn.ui;bundle-version="[2.0.3,5.0.0)",
+ org.eclipse.core.resources;bundle-version="[3.9.1,4.0.0)",
+ org.eclipse.ease.modules.platform
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-Vendor: Eclipse.org
+Automatic-Module-Name: org.eclipse.ease.modules.team.svn
